@@ -49,7 +49,7 @@ public class CRISTCommunityIntentPrediction implements ICRISTCommunityIntentPred
 	private ICtxBroker ctxBroker;
 
 	public CRISTCommunityIntentPrediction() {
-		System.out.println("Hello! I'm the CRIST User Intent Prediction!");
+		//System.out.println("Hello! I'm the CRIST User Intent Prediction!");
 	}
 	
 	public IInternalPersonalisationManager getPersoMgr() {
@@ -71,11 +71,9 @@ public class CRISTCommunityIntentPrediction implements ICRISTCommunityIntentPred
 	public void initialiseCRISTPrediction() {
 
 		if (this.getPersoMgr() == null) {
-			System.out
-					.println(this.getClass().getName() + "PreManager is null");
+		//	System.out.println(this.getClass().getName() + "PreManager is null");
 		} else {
-			System.out.println(this.getClass().getName()
-					+ "PreManager is NOT null");
+			//System.out.println(this.getClass().getName()+ "PreManager is NOT null");
 		}
 
 		System.out.println("Yo!! I'm a brand new service and my interface is: "
@@ -83,7 +81,7 @@ public class CRISTCommunityIntentPrediction implements ICRISTCommunityIntentPred
 		try{
 			// TODO
 			// this.preManager.registerForContextUpdate(myId, myCtxId);
-			System.out.println("CRIST Predictor registered the Context Update Event");
+		//	System.out.println("CRIST Predictor registered the Context Update Event");
 		}catch(Exception e){
 			System.err.println("Exception when trying to register the Context Update Event");
 			System.err.println(e.toString());
@@ -91,12 +89,12 @@ public class CRISTCommunityIntentPrediction implements ICRISTCommunityIntentPred
 	}
 	
 	public IInternalPersonalisationManager getPreManager() {
-		System.out.println(this.getClass().getName()+" Return InternalPreManager");
+		//System.out.println(this.getClass().getName()+" Return InternalPreManager");
 		return (IInternalPersonalisationManager) getPersoMgr();
 	}
 
 	public void setPreManager(IInternalPersonalisationManager internalPreManager) {
-		System.out.println(this.getClass().getName()+" GOT InternalPreManager");
+		//System.out.println(this.getClass().getName()+" GOT InternalPreManager");
 		this.setPersoMgr(internalPreManager);
 	}
 

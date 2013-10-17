@@ -37,13 +37,12 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 	private LinkedHashMap<String, Integer> intentModel = new LinkedHashMap<String, Integer>();
 
 	public CRISTUserIntentDiscovery(){
-		LOG.info("Hello! I'm the CRIST User Intent Discovery!");
+		//LOG.info("Hello! I'm the CRIST User Intent Discovery!");
 	}
 
 	
 	public void initialiseCRISTDiscovery() {
-		LOG.info("Yo!! I'm a brand new service and my interface is: "
-				+ this.getClass().getName());
+		//LOG.info("Yo!! I'm a brand new service and my interface is: "	+ this.getClass().getName());
 		//registerForContextChanges();
 	}
 
@@ -128,7 +127,7 @@ public class CRISTUserIntentDiscovery implements ICRISTUserIntentDiscovery {
 					     }
 					String situationID = historyList.get(currentIndex).getSituation().getSituationID();
 					if (situationID == null) {
-						LOG.debug("situationID is null. delete it in historyList");
+						//LOG.debug("situationID is null. delete it in historyList");
 						historyList.remove(currentIndex);
 						continue;
 					}
