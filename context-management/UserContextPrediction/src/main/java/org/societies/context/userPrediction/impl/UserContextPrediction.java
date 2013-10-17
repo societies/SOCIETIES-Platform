@@ -176,12 +176,12 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			nnet.setInput(trainingElement.getInput());
 			nnet.calculate();
 			double[] networkOutput = nnet.getOutput();
-			System.out.print("Input num :" + arrayToString(trainingElement.getInput()) + " Trained Output num:" + desiredOutput.get(i));
-			System.out.print("\n Input types :" + arrayToTypes(trainingElement.getInput()) + " Trained Output type:" + numberToType("PHYSICAL_STATUS",desiredOutput.get(i)));
+		//	System.out.print("Input num :" + arrayToString(trainingElement.getInput()) + " Trained Output num:" + desiredOutput.get(i));
+		//	System.out.print("\n Input types :" + arrayToTypes(trainingElement.getInput()) + " Trained Output type:" + numberToType("PHYSICAL_STATUS",desiredOutput.get(i)));
 
 			String netOut = arrayToString(networkOutput);
-			System.out.println("\n prediction value:" + netOut); 
-			System.out.println(" prediction type :" + numberToType(CtxAttributeTypes.STATUS,netOut) );
+		// System.out.println("\n prediction value:" + netOut); 
+		//	System.out.println(" prediction type :" + numberToType(CtxAttributeTypes.STATUS,netOut) );
 		}
 
 	}
@@ -295,7 +295,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 
 		try {
 			results = ctxBroker.retrieveHistoryTuples(attributeType, listOfEscortingAttributeIds, null, null).get();
-			LOG.debug(" history: "+ attributeType  +" retrieveHistoryTupleData: " +results);
+			if (LOG.isDebugEnabled())	LOG.debug(" history: "+ attributeType  +" retrieveHistoryTupleData: " +results);
 
 		} catch (Exception e) {
 			LOG.error("Exception when trying to retrieve context history for attribute type:"+attributeType+". "+e.getLocalizedMessage() );
@@ -354,9 +354,9 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 		String outcome = "";
 
 		//HashMap<String, Vector<String>> dataSet = this.createDataSet(type);
-		LOG.debug("2. create dataset:: "+dataSet );
+		if (LOG.isDebugEnabled())	LOG.debug("2. create dataset:: "+dataSet );
 
-		LOG.debug("3. train neural network");
+		if (LOG.isDebugEnabled())	LOG.debug("3. train neural network");
 		runNNFromMapOfContext(dataSet, 5);
 
 		String todValue = situation.get(HoD);
@@ -378,7 +378,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 		outcome = numberToType(type , netOut);
 
 		//System.out.println("\n prediction string value:" + outcome);
-		LOG.debug("\n prediction string value:" + outcome);
+		if (LOG.isDebugEnabled())	LOG.debug("\n prediction string value:" + outcome);
 
 		return outcome;
 	}
@@ -519,7 +519,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 		}
 
 		//System.out.println("typeValues "+typeValues);
-		LOG.debug("typeValues "+typeValues);
+		if (LOG.isDebugEnabled())LOG.debug("typeValues "+typeValues);
 
 		return valueNum;
 	}
@@ -530,7 +530,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 	public org.societies.context.api.user.prediction.PredictionMethod getDefaultPredictionMethod(
 			org.societies.context.api.user.prediction.PredictionMethod predMethod) {
 
-		LOG.debug("default UserContextPrediction method: " + currentPredictionMehtod.getCurrentMethod() );
+		if (LOG.isDebugEnabled()) LOG.debug("default UserContextPrediction method: " + currentPredictionMehtod.getCurrentMethod() );
 
 		return this.currentPredictionMehtod;
 	}
@@ -539,7 +539,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 	public org.societies.context.api.user.prediction.PredictionMethod getPredictionMethod(
 			org.societies.context.api.user.prediction.PredictionMethod predMethod) {
 
-		LOG.debug("current UserContextPrediction method: " + currentPredictionMehtod.getCurrentMethod() );
+		if (LOG.isDebugEnabled())	LOG.debug("current UserContextPrediction method: " + currentPredictionMehtod.getCurrentMethod() );
 
 		return this.currentPredictionMehtod;
 	}
@@ -625,8 +625,8 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			e.printStackTrace();
 		} 		
 
-		LOG.debug("predictedCtxAttr :"+ predictedCtxAttr);
-		LOG.debug("prdValue :"+ predictedCtxAttr.getStringValue());
+		if (LOG.isDebugEnabled()) LOG.debug("predictedCtxAttr :"+ predictedCtxAttr);
+		if (LOG.isDebugEnabled()) LOG.debug("prdValue :"+ predictedCtxAttr.getStringValue());
 
 		return predictedCtxAttr;
 	}
@@ -646,7 +646,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 			Date date = new Date();
 			result = this.predictContext(ctxAttrID, date);	
 		} else {
-			LOG.info("context prediction is supported based on time");
+			LOG.info("context prediction is supported only based on time");
 		}
 
 		return result;
