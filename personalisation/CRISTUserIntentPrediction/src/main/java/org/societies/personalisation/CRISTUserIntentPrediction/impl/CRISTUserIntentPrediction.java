@@ -67,7 +67,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 	*/
 	
 	public CRISTUserIntentPrediction() {
-		LOG.info("Hello! I'm the CRIST User Intent Prediction!");
+		//LOG.info("Hello! I'm the CRIST User Intent Prediction!");
 	}
 
 
@@ -175,7 +175,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		
 		if (this.cristTaskManager == null)
 		{
-			LOG.info("The CRIST Taks Manager is NULL. ");
+			//LOG.info("The CRIST Taks Manager is NULL. ");
 /*			cristTaskManager = new CRISTUserIntentTaskManager();
 			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();*/
 			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());			
@@ -236,7 +236,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		
 		if (this.cristTaskManager == null)
 		{
-			LOG.info("The CRIST Taks Manager is NULL. ");
+		//	LOG.info("The CRIST Taks Manager is NULL. ");
 /*			cristTaskManager = new CRISTUserIntentTaskManager();
 			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();*/
 			return new AsyncResult<List<CRISTUserAction>>(new ArrayList<CRISTUserAction>());			
@@ -309,7 +309,7 @@ public class CRISTUserIntentPrediction implements ICRISTUserIntentPrediction {
 		
 		if (this.cristTaskManager == null)
 		{
-			LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
+		//	LOG.info("The CRIST Taks Manager is NULL. Initiating a new mananger...");
 /*			cristTaskManager = new CRISTUserIntentTaskManager();
 			((CRISTUserIntentTaskManager) cristTaskManager).initialiseCRISTUserIntentManager();*/
 			return new AsyncResult<CRISTUserAction>(null);			
