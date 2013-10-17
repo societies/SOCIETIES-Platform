@@ -208,6 +208,7 @@
       <xs:element name="model"    type="xs:string" minOccurs="0"/>
       <xs:element name="type"     type="xs:string" minOccurs="0"/>
       <xs:element name="value"    type="xs:string" minOccurs="0"/>
+      <xs:element name="qualityBean" type="tns:ctxQualityBean" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
   
