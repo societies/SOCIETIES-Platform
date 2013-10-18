@@ -40,6 +40,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.broker.ICtxBroker;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
@@ -70,6 +71,7 @@ public class HelloWorld implements IHelloWorld{
 	private ICtxBroker ctxBroker;
 
 	private CtxAttribute nameCtxAttribute;
+	private List<CtxModelObject> objects;
 
 	private List<CtxAttribute> retrievedAttributes;
 	
@@ -79,6 +81,7 @@ public class HelloWorld implements IHelloWorld{
 
 	
 	public void initialiseHelloWorld(){
+		objects = new ArrayList<CtxModelObject>();
 		myServiceID = new ServiceResourceIdentifier();
 		myServiceID.setServiceInstanceIdentifier("css://eliza@societies.org/HelloEarth");
 		try {
@@ -94,8 +97,8 @@ public class HelloWorld implements IHelloWorld{
 	public void displayUserLocation() {
 	
 		String str = "";
-		for (CtxAttribute ctxAttr : this.retrievedAttributes){
-			str = str.concat("Got access to: "+ctxAttr.getStringValue()+" : "+ctxAttr.getId().toUriString());
+		for (CtxModelObject ctxAttr : this.objects){
+			str = str.concat("Got access to: "+ctxAttr.toString()+" : "+ctxAttr.getId().toUriString()+"\n");
 		}
 		
 		JOptionPane.showMessageDialog(null, str);
@@ -137,7 +140,8 @@ public class HelloWorld implements IHelloWorld{
 			if (lookupResults.size()==0){
 				return null;
 			}else{
-				this.retrievedAttributes = (List<CtxAttribute>) this.ctxBroker.retrieve(me, lookupResults);
+				Future<List<CtxModelObject>> retrieveResults = this.ctxBroker.retrieve(me, lookupResults);
+				this.objects = 	retrieveResults.get();
 
 				
 			}

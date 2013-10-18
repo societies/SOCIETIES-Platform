@@ -8,6 +8,45 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AccessControlResponseItemWrapper extends AccessControlResponseItem {
+	
+	private boolean isSelected;
+	private int continuousSliderValue;
+	private int discreteSliderValue;
+	
+	public int getContinuousSliderValue()
+	{
+		return this.continuousSliderValue;
+	}
+	
+	public void setcontinuousSliderValue(int continuousSliderValue)
+	{
+		this.continuousSliderValue = continuousSliderValue;
+		this.obfuscationLevel=((double) this.continuousSliderValue/(double)100);
+	}
+	
+	public int getdiscreteSliderValue()
+	{
+		return this.discreteSliderValue;
+	}
+	
+	public void setDiscreteSliderValue(int discreteSliderValue)
+	{
+		this.discreteSliderValue = discreteSliderValue;
+		this.obfuscationLevel=((double)this.discreteSliderValue/((double)this.getRequestItemWrapper().getObfuscatorInfo().getNbOfObfuscationLevelStep()-1));
+	
+	}
+
+	
+	public boolean getIsSelected()
+	{
+		return this.isSelected;
+	}
+	
+	public void setIsSelected(boolean isSelected)
+	{
+		this.isSelected = isSelected;
+	}
+	
 
     public static void unwrapList(List<AccessControlResponseItem> listToUnwrap) {
         List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
@@ -66,6 +105,8 @@ public class AccessControlResponseItemWrapper extends AccessControlResponseItem 
         original.setRequestItem(this.requestItem);
         original.setDecision(this.decision);
         original.setObfuscationLevel(this.obfuscationLevel);
+        original.setRemember(this.remember);
+        original.setRequestorscope(this.requestorscope);
 
         return original;
     }

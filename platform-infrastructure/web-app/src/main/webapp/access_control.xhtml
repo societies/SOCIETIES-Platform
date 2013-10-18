@@ -37,14 +37,29 @@
 						<p:outputLabel
 							value="#{responseItem.requestItem.resource.dataType}"
 							for="checkbox" style="margin-top: 5px;" />
-						<p:commandButton value="Details >" style="float:right;"
+						<!-- <p:commandButton value="Details >" style="float:right;"
 							onclick="document.getElementById('#{p:component('optionsPanel')}').visible = true; return false;"
-							process="@none" update="@none" />
+							process="@none" update="@none" /> -->
 					</f:facet>
 
 					<p:panel visible="true" id="optionsPanel">
-						<!--Purpose-->
-						<p:outputLabel value="Purpose: {still to be added}" />
+
+						<!--Actions-->
+						<p:panelGrid columns="4">
+							<p:selectOneMenu id="actionScopeMenu"
+								value="#{responseItem.requestorscope}">
+								<f:selectItems value="#{accessControlController.requestScope}" />
+							</p:selectOneMenu>
+
+							<p:outputLabel value="will be able to" />
+
+							<p:outputLabel
+								value="#{responseItem.requestItemWrapper.selectedActionNames}" />
+
+
+							<p:outputLabel
+								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" />
+						</p:panelGrid>
 
 						<!--Obfuscation-->
 						<p:panel
@@ -57,42 +72,27 @@
 								<p:selectBooleanCheckbox
 									rendered="#{(responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep > 1
 								and responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete') or responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}"
-									value="#{accessControlController.obChecked}">
+									value="#{responseItem.isSelected}">
 									<p:ajax event="change" update="dataObPanel" />
 								</p:selectBooleanCheckbox>
 							</p:panelGrid>
 
 
-
-							<p:panel id="dataObPanel"
-								visible="#{accessControlController.obChecked}">
-
-								<p:blockUI id="blockDataOb" widgetVar="blockDataOb"
-									block="dataObPanel">
-			Loading<br />
-									<p:graphicImage value="/images/ajax-loader.gif" />
-								</p:blockUI>
+							<p:panel id="dataObPanel" visible="#{responseItem.isSelected}">
 
 								<p:panelGrid columns="1">
 									<h:panelGrid columns="4"
 										rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'continuous'}">
 										<h:outputText id="contObfuscationLabel"
-											value="%#{responseItem.obfuscationLevel}" />
+											value="%#{responseItem.continuousSliderValue}" />
 										<p:slider for="contObfuscationLevel"
 											display="contObfuscationLabel" displayTemplate="%{value}"
 											style="width: 200px;" minValue="0" maxValue="100">
 											<p:ajax event="slideEnd" process="contObfuscationLevel"
-												onstart="blockDataOb.show()"
-												onsuccess="setContinuousOb()" />
+												update="contObfuscationLabel, contObfuscationExample" />
 										</p:slider>
 										<h:inputHidden id="contObfuscationLevel"
-											value="#{accessControlController.sliderValue}" />
-										<p:remoteCommand name="setContinuousOb"
-											update="contObfuscationExample" onsuccess="blockDataOb.hide()">
-											<f:setPropertyActionListener
-												value="#{responseItem.requestItemWrapper.obfuscatorInfo.computeObfuscationLevel(accessControlController.sliderValue)}"
-												target="#{responseItem.obfuscationLevel}" />
-										</p:remoteCommand>
+											value="#{responseItem.continuousSliderValue}" />
 										<h:outputText id="contObfuscationExample"
 											value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}" />
 									</h:panelGrid>
@@ -100,25 +100,16 @@
 									<h:panelGrid columns="4"
 										rendered="#{responseItem.requestItemWrapper.obfuscatorInfo.obfuscationLevelType.value() eq 'discrete'}">
 										<h:outputText id="disContObfuscationLabel"
-											value="#{responseItem.obfuscationLevel}" />
+											value="#{responseItem.discreteSliderValue}" />
 										<p:slider for="disContObfuscationLevel"
 											display="disContObfuscationLabel" displayTemplate="{value}"
 											style="width: 200px;" minValue="0"
 											maxValue="#{responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep - 1}">
-											<p:ajax event="slideEnd" update="disContObfuscationExample"
-												process="disContObfuscationLevel"
-												onstart="blockDataOb.show()"
-												onsuccess="setDiscreteOb(); blockDataOb.hide()" />
+											<p:ajax event="slideEnd" update="disContObfuscationLabel, disContObfuscationExample"
+												process="disContObfuscationLevel" />
 										</p:slider>
 										<h:inputHidden id="disContObfuscationLevel"
-											value="#{accessControlController.sliderValue}" />
-										<p:remoteCommand id="setDiscreteOb" name="setDiscreteOb"
-											update="disContObfuscationExample">
-											<f:setPropertyActionListener
-												value="#{responseItem.requestItemWrapper.obfuscatorInfo.computeObfuscationLevel(accessControlController.sliderValue)}"
-												target="#{responseItem.obfuscationLevel}" />
-										</p:remoteCommand>
-
+											value="#{responseItem.discreteSliderValue}" />
 										<h:outputText id="disContObfuscationExample"
 											value="#{responseItem.requestItemWrapper.obfuscatorInfo.getObfuscationExample(responseItem.obfuscationLevel)}" />
 									</h:panelGrid>
@@ -126,90 +117,52 @@
 							</p:panel>
 						</p:panel>
 
-						<!--Actions-->
-						<p:panelGrid columns="4">
-							<p:selectOneMenu id="actionScopeMenu">
-								<f:selectItem itemLabel="Everyone" />
-								<f:selectItem itemLabel="Only this app" />
-							</p:selectOneMenu>
 
-							<p:outputLabel value="will be able to" />
-
-							<p:selectManyCheckbox id="actionsCheckboxes"
-								value="#{responseItem.requestItemWrapper.selectedActionNames}"
-								style="margin: 0;">
-								<f:selectItems value="#{responseItem.requestItem.actions}"
-									var="action" itemValue="#{action.actionConstant.name()}"
-									itemLabel="#{action.actionConstant.name()}"
-									itemDisabled="#{action.actionConstant.name() eq 'READ'}" />
-							</p:selectManyCheckbox>
-
-							<p:outputLabel
-								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" />
-						</p:panelGrid>
 
 						<!--Conditions-->
+
 						<p:dataGrid id="conditionsTable"
 							value="#{responseItem.requestItem.conditions}" var="condition"
-							columns="1">
+							columns="2">
 							<f:facet name="header">
                                 Conditions
                             </f:facet>
 
-							<p:outputLabel for="conditionValue"
-								value="#{condition.conditionConstant.name()}" />
+							<p:outputLabel value="#{condition.conditionConstant.name()}" />
 
-							<p:selectOneMenu
-								label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
-								id="conditionValue" value="#{condition.value}"
-								required="#{!condition.optional}"
-								validatorMessage="This value is required">
-								<f:selectItem itemLabel="(none)" itemValue=""
-									noSelectionOption="true" rendered="#{condition.optional}" />
-								<f:selectItems
-									value="#{accessControlController.getAvailableConditionValues(condition.conditionConstant)}" />
-							</p:selectOneMenu>
+							<p:outputLabel value="#{condition.value}" />
+
 
 						</p:dataGrid>
 
-						<p:commandButton outcome="productDetail"
-							icon="ui-icon-circle-plus" title="Add condition"
-							actionListener="#{accessControlController.addNewCondition(responseItem.requestItem)}"
-							process="addConditionName,@this" update="optionsPanel" />
-						<p:selectOneMenu id="addConditionName"
-							value="#{accessControlController.newConditionToAdd}">
-							<f:selectItems
-								value="#{accessControlController.getAvailableConditionConstants(responseItem.requestItem)}"
-								var="newCondition" itemLabel="#{newCondition.name()}" />
-						</p:selectOneMenu>
-					</p:panel>
-				</p:panel>
 
+						<!-- DECISION AND REMEBER -->
+						<p:panelGrid columns="2">
+							<h:outputText value="Allow Access:" />
+							<p:selectOneMenu value="#{responseItem.decision}">
+								<f:selectItems value="#{accessControlController.decisions}" />
+							</p:selectOneMenu>
+
+							<h:outputText value="Remember preferences?" />
+							<p:selectOneMenu value="#{responseItem.remember}">
+								<f:selectItem itemLabel="Yes" itemValue="#{true}" />
+								<f:selectItem itemLabel="No" itemValue="#{false}" />
+							</p:selectOneMenu>
+						</p:panelGrid>
+
+					</p:panel>
+
+				</p:panel>
 			</p:dataGrid>
 
 
 			<f:facet name="footer">
 				<p:messages id="validationMessages" />
 
-				<p:commandButton id="acceptRememberButton"
-					value="Accept and remember" onclick="blockUI.show()"
-					action="#{accessControlController.completeAccessRequestActionRemember}"
-					update="@form" />
-
-				<p:commandButton id="acceptButton" value="Accept just once"
-					onclick="blockUI.show()"
-					action="#{accessControlController.completeAccessRequestAction}"
-					update="@form" />
-
-				<p:commandButton id="refuseRememberButton"
-					value="Refuse and remember" onclick="blockUI.show()"
-					action="#{accessControlController.cancelAccessRequestActionRemember}"
-					process="@this" update="@form" />
-
-				<p:commandButton id="refuseButton" value="Refuse just once"
-					onclick="blockUI.show()"
-					action="#{accessControlController.cancelAccessRequestAction}"
-					process="@this" update="@form" />
+				<p:commandButton id="acceptButton" value="Save"
+					onstart="blockUI.show()" ajax="true"
+					actionListener="#{accessControlController.completeAccess}"
+					onsuccess="blockUI.hide()" />
 
 			</f:facet>
 		</p:panel>

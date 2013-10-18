@@ -107,20 +107,19 @@ public class Tester {
 		//this.createPPNPreference2();
 	}
 	
-	@After
+	/*@After
 	public void tearDown() throws Exception {
 		
 		for (final CtxIdentifier ctxId : this.testCtxIds) {
 			this.ctxBroker.remove(ctxId);
 		}
-	}
+	}*/
 	
 	@Test
 	public void testRetrieve(){	
 		List<String> types = new ArrayList<String>();
-		types.add(CtxAttributeTypes.NAME_FIRST);
-		types.add(CtxAttributeTypes.NAME_LAST);
-		types.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		types.add(CtxAttributeTypes.NAME);
+		types.add(CtxAttributeTypes.LOCATION_COORDINATES);
 			this.helloWorld.retrieveCtxAttribute(types);
 			this.helloWorld.displayUserLocation();
 	
@@ -144,21 +143,21 @@ public class Tester {
 	private void createOrRetrieveNonInferrableAttribute() throws Exception {
 	
 		final Set<CtxAttribute> nameAttrs = 
-				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME_FIRST); 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME); 
 		if (nameAttrs.iterator().hasNext()) {
 			this.nameAttribute = nameAttrs.iterator().next();
 		} else {
 			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
-					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME_FIRST);
+					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME);
 			this.nameAttribute = createAttribute.get();
-			this.nameAttribute.setStringValue(DEFAULT_FIRST_NAME_VALUE);
+			this.nameAttribute.setStringValue(DEFAULT_FIRST_NAME_VALUE.concat(" ").concat(DEFAULT_LAST_NAME_VALUE));
 			this.nameAttribute = (CtxAttribute) this.ctxBroker.update(
 					this.nameAttribute).get();
 			// Add to set of context data items to be removed in {@link #tearDown}
 			this.testCtxIds.add(this.nameAttribute.getId());
 		}
 		this.nameAttributeValue = nameAttribute.getStringValue();
-		final Set<CtxAttribute> nameLastAttrs = 
+		/*final Set<CtxAttribute> nameLastAttrs = 
 				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME_LAST); 
 		if (nameLastAttrs.iterator().hasNext()) {
 			this.nameAttribute = nameLastAttrs.iterator().next();
@@ -172,17 +171,17 @@ public class Tester {
 			// Add to set of context data items to be removed in {@link #tearDown}
 			this.testCtxIds.add(this.nameAttribute.getId());
 		}
-		this.nameAttributeValue.concat(" " + nameAttribute.getStringValue());
+		this.nameAttributeValue.concat(" " + nameAttribute.getStringValue());*/
 		
 		final Set<CtxAttribute> symLoc = 
-				this.cssPersonEntity.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC); 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.LOCATION_COORDINATES); 
 		if (symLoc.iterator().hasNext()) {
 			this.symLocAtt = symLoc.iterator().next();
 		} else {
 			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
-					this.cssPersonEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
+					this.cssPersonEntity.getId(), CtxAttributeTypes.LOCATION_COORDINATES);
 			this.symLocAtt = createAttribute.get();
-			this.symLocAtt.setStringValue("Puma Lab");
+			this.symLocAtt.setStringValue("(2.3509, 48.8566, 542)");
 			this.symLocAtt = (CtxAttribute) this.ctxBroker.update(
 					this.symLocAtt).get();
 			// Add to set of context data items to be removed in {@link #tearDown}
