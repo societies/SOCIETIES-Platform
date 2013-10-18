@@ -40,6 +40,8 @@ public interface IDisplayPortalServer {
 	
 	public void releaseResource(IIdentity serverIdentity, String identity, String location);
 	
+	boolean checkAccess(IIdentity serverIdentity, String location);
+	
 	public String[] getScreenLocations(IIdentity serverIdentity);
 	
 	public ServiceResourceIdentifier getServerServiceId(IIdentity serverIdentity);

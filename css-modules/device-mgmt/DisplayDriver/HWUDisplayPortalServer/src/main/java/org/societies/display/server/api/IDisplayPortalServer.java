@@ -35,7 +35,7 @@ import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier
 public interface IDisplayPortalServer {
 
     public void setScreens();
-
+    
 	public String requestAccess(String identity, String location);
 	
 	public void releaseResource(String identity, String location);

@@ -45,6 +45,7 @@ import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.D
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerIPAddressResultBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerMethodType;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenLocationResultBean;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenUseBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerServiceIDResultBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.display.server.api.remote.IDisplayPortalServer;
@@ -75,6 +76,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerIPAddressResultBean> ipAddressResults;
 	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerServiceIDResultBean> serviceIDResults;
 	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenLocationResultBean> screenLocationsResults;
+	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenUseBean> screenUseResult;
 	/**
 	 * @return the commManager
 	 */
@@ -95,6 +97,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 		this.ipAddressResults = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerIPAddressResultBean>();
 		this.serviceIDResults = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerServiceIDResultBean>();
 		this.screenLocationsResults = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenLocationResultBean>();
+		this.screenUseResult = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenUseBean>();
     }
 
 
@@ -164,8 +167,50 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 				synchronized (ipAddressResults) {
 					this.ipAddressResults.notifyAll();
 				}
-		}
+		}else if (result instanceof DisplayPortalServerScreenUseBean){
+			this.screenUseResult.put(DisplayPortalServerMethodType.CHECK_SCREEN_USE, (DisplayPortalServerScreenUseBean) result);
+			synchronized (screenUseResult) {
+				this.screenUseResult.notifyAll();
+			}
+	}
 
+	}
+	
+
+	@Override
+	public boolean checkAccess(IIdentity serverIdentity, String location)
+	{
+		DisplayPortalServerBean bean = new DisplayPortalServerBean();
+		bean.setMethod(DisplayPortalServerMethodType.CHECK_SCREEN_USE);
+		bean.setLocation(location);
+		Stanza stanza = new Stanza(serverIdentity);
+		
+		try {
+			this.commManager.sendIQGet(stanza, bean, this);
+		} catch (CommunicationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		while(!this.screenUseResult.containsKey(DisplayPortalServerMethodType.CHECK_SCREEN_USE))
+		{
+			try{
+			synchronized(this.screenUseResult)
+			{
+				this.screenUseResult.wait();
+			}
+			
+			DisplayPortalServerScreenUseBean resultBean = this.screenUseResult.get(DisplayPortalServerMethodType.CHECK_SCREEN_USE);
+			logging.debug("Returning frin checkScreen " + resultBean.isInUse());
+			this.screenUseResult.remove(DisplayPortalServerMethodType.CHECK_SCREEN_USE);
+			return resultBean.isInUse();
+			
+			}catch(Exception e)
+			{
+				
+			}
+		}
+		return true;
 	}
 
 	@Override
