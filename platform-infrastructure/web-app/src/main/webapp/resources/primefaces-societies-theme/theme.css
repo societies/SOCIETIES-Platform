@@ -2227,3 +2227,11 @@ ul.side a:hover{
 .ui-datatable .ui-column-filter {
 	width: 80% !important;
 	}
+	
+.ui-datepicker {
+	background: white;
+}
+	
+.calendarInput input {
+	width: 70px;
+}

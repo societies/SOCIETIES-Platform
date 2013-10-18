@@ -16,10 +16,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
@@ -33,8 +31,6 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
-import org.societies.api.context.model.CtxOriginType;
-import org.societies.api.context.model.CtxQuality;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.schema.context.model.CtxOriginTypeBean;
 import org.societies.api.schema.context.model.CtxQualityBean;
@@ -236,6 +232,8 @@ public class ContextManagementController extends BasePageController implements S
 				contextModel.setEntity_results(ctxList.get(CTX_ENTITY_RESULTS));
 				contextModel.setAsso_results(ctxList.get(CTX_ASSO_RESULTS));
 				contextModel.setAttr_results(ctxList.get(CTX_ATTR_RESULTS));
+				contextModel.setPath(path_parent);
+				path_parent = contextModel.getPath_parent();
 			} else {
 				switch(contextModel.getViewType()){
 				case LINKED_ENTITIES:
@@ -245,9 +243,9 @@ public class ContextManagementController extends BasePageController implements S
 				default:
 					contextModel.setEntity_results(getAllCtxEntityData(contextModel.getEntityTypes()));
 				}
+				contextModel.setPath(path_parent);
+				path_parent = contextModel.getPath_parent();
 			}
-			contextModel.setPath(path_parent);
-			path_parent = contextModel.getPath_parent();
 		}
 		catch(Exception e){
 			log.error("",e);
@@ -384,7 +382,8 @@ public class ContextManagementController extends BasePageController implements S
 		list = internalCtxBroker.lookup(string2Model(model), type).get();
 		for (CtxIdentifier id: list){
 			CtxModelObject ctxModelObject = internalCtxBroker.retrieve(id).get();
-			((CtxEntity)ctxModelObject).getAssociations("");
+			if(ctxModelObject instanceof CtxEntity)
+				((CtxEntity)ctxModelObject).getAssociations("");
 			CtxUIElement ctxBean = serliazeCtxModel(internalCtxBroker.retrieve(id).get());
 			results.add(ctxBean);				
 		}
@@ -449,19 +448,19 @@ public class ContextManagementController extends BasePageController implements S
 
 		CtxUIElement ctxBean = new CtxUIElement();
 		if(elm!= null){
-			log.info("element: "+elm);
+			log.debug("element: "+elm);
 			String ctxValue =  elm.getId().toString().replace("context://", "");
 			String info[] = ctxValue.split("/");
 
 			// Log info
-			log.info("====> Found new Element ");
-			log.info("FULL ID:"+elm.getId().toString());
-			log.info("Source:"+info[0]);
-			log.info("Model:"+info[1]);
-			log.info("Type:"+info[2]);
-			log.info("ID:"+info[info.length-1]);
-			log.info("ID_noSpecChar:"+elm.getId().toString().replaceAll("\\W", ""));
-			log.info("==== ");
+			log.debug("====> Found new Element ");
+			log.debug("FULL ID:"+elm.getId().toString());
+			log.debug("Source:"+info[0]);
+			log.debug("Model:"+info[1]);
+			log.debug("Type:"+info[2]);
+			log.debug("ID:"+info[info.length-1]);
+			log.debug("ID_noSpecChar:"+elm.getId().toString().replaceAll("\\W", ""));
+			log.debug("==== ");
 
 
 			ctxBean.setId(elm.getId().toString());
@@ -477,7 +476,7 @@ public class ContextManagementController extends BasePageController implements S
 			if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
 
 				CtxAttribute attr = (CtxAttribute) elm;
-				log.info("Ctx Attribute type "+attr.getValueType());
+				log.debug("Ctx Attribute type "+attr.getValueType());
 
 
 				if (attr.getValueType().equals(CtxAttributeValueType.STRING)){
@@ -532,6 +531,43 @@ public class ContextManagementController extends BasePageController implements S
 		return ctxBean;
 
 	}	
+	
+	public CtxUIElement serializeCtxAttribute(CtxAttribute attr)
+	{
+		log.info("Ctx Attribute type "+attr.getValueType());
+		
+		CtxUIElement ctxBean = new CtxUIElement();
+
+		if (attr.getValueType().equals(CtxAttributeValueType.STRING)){
+			ctxBean.setValue(""  + attr.getStringValue());
+		}
+		else if (attr.getValueType().equals(CtxAttributeValueType.DOUBLE)){
+			ctxBean.setValue(""+attr.getDoubleValue());
+		}
+		else if (attr.getValueType().equals( CtxAttributeValueType.INTEGER)){
+			ctxBean.setValue(""+attr.getIntegerValue());
+		}
+		else if (attr.getValueType().equals(CtxAttributeValueType.BINARY)){
+			ctxBean.setValue("Binary [" + attr.getBinaryValue().length+"bytes]");
+		}
+		else {
+			ctxBean.setValue(" -- ");
+		}
+
+		CtxQualityBean qualityBean = new CtxQualityBean();
+		qualityBean.setLastUpdated(attr.getQuality().getLastUpdated());
+		if(attr.getQuality().getOriginType() != null)
+			qualityBean.setOriginType(CtxOriginTypeBean.valueOf(attr.getQuality().getOriginType().toString()));
+		qualityBean.setPrecision(attr.getQuality().getPrecision());
+		qualityBean.setUpdateFrequency(attr.getQuality().getUpdateFrequency());
+		
+		ctxBean.setQualityBean(qualityBean);
+		
+		if (attr.getQuality().getPrecision()!=null)
+			ctxBean.setQuality("Precision:" +attr.getQuality().getPrecision());
+		
+		return ctxBean;
+	}
 
 	private String genLink(String id, String label){
 		return "<a href='#' onclick='retrieve(\""+ id +"\");'>"+label+"</a>";
@@ -588,7 +624,6 @@ public class ContextManagementController extends BasePageController implements S
 	}
 	
 	private void modifySource(String source){
-		log.info("SOURCE--------> "+source);
 		contextModel.setSource(source);
 	}
 
@@ -795,7 +830,7 @@ public class ContextManagementController extends BasePageController implements S
 	
 //			Future<CtxModelObject> update = internalCtxBroker.update(model);
 			CtxModelObject update = internalCtxBroker.update(model).get();
-			log.info("update: "+update);
+			log.debug("update: "+update);
 			submit();
 			
 	        FacesMessage msg = new FacesMessage(modelType+" Edited", ((CtxUIElement) event.getObject()).getValue());  
@@ -1319,11 +1354,11 @@ public class ContextManagementController extends BasePageController implements S
 			String type = selectedNewModel;
 			String value = attributeValue;
 			
-			log.info("Param to save: ");
-			log.info("parentId: "+ parentId);
-			log.info("model_req: "+ selectedModel);
-			log.info("type: "+ type);
-			log.info("value: "+ value);
+			log.debug("Param to save: ");
+			log.debug("parentId: "+ parentId);
+			log.debug("model_req: "+ selectedModel);
+			log.debug("type: "+ type);
+			log.debug("value: "+ value);
 	
 			CtxModelObject model = null;
 	
@@ -1333,14 +1368,14 @@ public class ContextManagementController extends BasePageController implements S
 			}
 	
 			CtxModelType modelType = string2Model(selectedModel);
-			log.info("model type: "+modelType);
+			log.debug("model type: "+modelType);
 	
 			switch (modelType) {
 			case ENTITY:
 				Future<CtxEntity> entity = internalCtxBroker.createEntity(type);
-				log.info("entity: "+entity);
+				log.debug("entity: "+entity);
 				model = entity.get();
-				log.info("model: "+model);
+				log.debug("model: "+model);
 	
 				//if parent is an association I must create map from parent to child
 				if(ctxIdentifier != null && ctxIdentifier.getModelType() == CtxModelType.ASSOCIATION){
@@ -1367,8 +1402,12 @@ public class ContextManagementController extends BasePageController implements S
 				break;
 			}
 			Future<CtxModelObject> update = internalCtxBroker.update(model);
-			log.info("update: "+update);
+			log.debug("update: "+update);
 			model = update.get();
+			
+			//reset view
+			selectedOperationType = "";
+			operationsListener();
 			submit();
 	
 		}
@@ -1408,18 +1447,14 @@ public class ContextManagementController extends BasePageController implements S
 	
 	public void viewPredictedValues(String ctxId)
 	{
-		RequestContext context = RequestContext.getCurrentInstance();
-		log.info("entered");
-		
 		try
 		{
-			
 			
 			Date paramDate = predictedDate;
 			CtxAttributeIdentifier ctx = new CtxAttributeIdentifier(ctxId);
 			
-			log.info("date picked: "+predictedDate);
-			log.info("ctxId: "+ctxId);
+			log.debug("date picked: "+predictedDate);
+			log.debug("ctxId: "+ctxId);
 			
 			List<CtxAttribute> ctxAttributeList = internalCtxBroker.retrieveFuture(ctx, paramDate).get();
 			List<CtxUIElement> ctxDisplayList = null;
@@ -1427,7 +1462,7 @@ public class ContextManagementController extends BasePageController implements S
 			{
 				ctxDisplayList = new ArrayList<CtxUIElement>();
 				for(CtxAttribute elem : ctxAttributeList)
-					ctxDisplayList.add(serliazeCtxModel(elem));
+					ctxDisplayList.add(serializeCtxAttribute(elem));
 			}
 			contextModel.setPredictedAttributeList(ctxDisplayList);
 			
@@ -1439,8 +1474,11 @@ public class ContextManagementController extends BasePageController implements S
 			error.setErrorMessage(e.getMessage());
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error", error.getErrorMessage()));	
 		}
-		
-		context.execute("dialog.show()");
+	}
+	
+	public void handleClose()
+	{
+		predictedDate = null;
 	}
 	
 }
