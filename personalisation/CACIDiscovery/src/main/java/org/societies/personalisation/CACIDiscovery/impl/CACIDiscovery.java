@@ -19,16 +19,19 @@
  */
 package org.societies.personalisation.CACIDiscovery.impl;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CommunityCtxEntity;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
@@ -152,10 +155,10 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 		//System.out.println("mergeModels 2 communityActionsMap "+communityActionsMap);
 
-		int i =0;
+		//int i =0;
 		for(UserIntentModelData userModel : userModelList){
 
-			i++;
+			//i++;
 			//System.out.println("model i= "+i );
 			HashMap<IUserIntentAction,  HashMap<IUserIntentAction,Double>> uiModelActions = userModel.getActionModel();
 
@@ -209,12 +212,12 @@ public class CACIDiscovery implements ICACIDiscovery{
 			//this.printCACIModel(communityActionsMap);
 		}
 
-		
+
 		UserIntentModelData communityModel = new UserIntentModelData();
 		communityModel.setActionModel(communityActionsMap);
-		
+
 		this.printCACIModel(communityActionsMap);
-		
+
 		return communityModel;
 	}
 
@@ -586,7 +589,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 				//System.out.println("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
 				LOG.info("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
 				HashMap<IUserIntentAction, Double> targetActions = map.get(sourceAct);
-				
+
 				for(IUserIntentAction actionTarget : targetActions.keySet()){
 					//System.out.println("--> targetID:"+actionTarget.getActionID() +"confidence level: "+actionTarget.getConfidenceLevel());	
 					LOG.info("--> targetID:"+actionTarget.getActionID() +"confidence level: "+actionTarget.getConfidenceLevel());
@@ -603,42 +606,65 @@ public class CACIDiscovery implements ICACIDiscovery{
 	}
 
 
-	private List<UserIntentModelData> retrieveUIModels (IIdentity cisId) {
+	private List<UserIntentModelData> retrieveUIModels (IIdentity cisId)  {
 
 		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
 		//LOG.debug(" retrieving cauis for cisID "+ cisId);
 		CtxEntityIdentifier commEntID;
-		try {
+		CommunityCtxEntity commEnt = null;
+		List<CtxIdentifier> modelAttrIDList = new ArrayList<CtxIdentifier>();
+		try{
 			commEntID = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
-			CommunityCtxEntity commEnt = (CommunityCtxEntity) this.ctxBroker.retrieve(commEntID).get();
+			commEnt = (CommunityCtxEntity) this.ctxBroker.retrieve(commEntID).get();
+		} catch (Exception e) {
+			LOG.error("Exception while retrieving community entity ID "+e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+
+		if(commEnt!=null ){
+
 			Set<CtxEntityIdentifier> membersIDSet = commEnt.getMembers();
 
 			for(CtxEntityIdentifier entityId  : membersIDSet){
 				if (LOG.isDebugEnabled())LOG.debug(" retrieving entityIds for cisID "+ entityId);
 
-				List<CtxIdentifier> modelAttrIDList = this.ctxBroker.lookup(entityId, CtxModelType.ATTRIBUTE,CtxAttributeTypes.CAUI_MODEL).get();
+				try{
+					modelAttrIDList = this.ctxBroker.lookup(entityId, CtxModelType.ATTRIBUTE,CtxAttributeTypes.CAUI_MODEL).get();
+					if (LOG.isDebugEnabled())LOG.debug(" retrieving modelAttrIDList for cisID "+ modelAttrIDList);
 
-				if (LOG.isDebugEnabled())LOG.debug(" retrieving modelAttrIDList for cisID "+ modelAttrIDList);
+					if(modelAttrIDList.size()>0){
+						for(CtxIdentifier attrID : modelAttrIDList){
 
-				if(modelAttrIDList.size()>0){
-					for(CtxIdentifier attrID : modelAttrIDList){
+							//LOG.info(" retrieving attrID  "+ attrID);
+							CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
+							if (LOG.isDebugEnabled())LOG.debug(" retrieving uiModelAttr  "+ uiModelAttr.getId());
 
-						//LOG.info(" retrieving attrID  "+ attrID);
-						CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
-						if (LOG.isDebugEnabled())LOG.debug(" retrieving uiModelAttr  "+ uiModelAttr.getId());
+							if(uiModelAttr.getBinaryValue() != null){
+								UserIntentModelData newUIModelData;
+								try {
+									newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+									userModelList.add(newUIModelData);
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (ClassNotFoundException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 
-						if(uiModelAttr.getBinaryValue() != null){
-							UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
-							userModelList.add(newUIModelData);
+							}
 						}
 					}
-				}
-			}
-		} catch (Exception e) {
-			LOG.error("Exception while retrieving individual CAUI models "+e.getLocalizedMessage());
-			e.printStackTrace();
-		} 
 
+
+				} catch (Exception e) {
+					LOG.error("Exception while retrieving community entity ID "+e.getLocalizedMessage());
+					e.printStackTrace();
+				}
+
+			}
+		}
+		if (LOG.isDebugEnabled())LOG.debug(" Retrieved CAUI Models:   "+ userModelList);
 		return userModelList;
 	}
 

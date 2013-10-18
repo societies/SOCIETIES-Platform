@@ -150,6 +150,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
 	public void enableUserPrediction(Boolean bool) {
+		if (LOG.isDebugEnabled())LOG.debug("user prediction enabled:"+ bool);
 		this.enableCauiPrediction = bool;
 	}
 
@@ -166,6 +167,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
 	public void enableCommPrediction(Boolean bool) {
+		if (LOG.isDebugEnabled())LOG.debug("community prediction enabled:"+ bool);
 		enableCACIPrediction = bool;
 	}
 
@@ -201,7 +203,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 			IAction action) {
 
 		long startTime = System.currentTimeMillis();
-
+	
+		if (LOG.isDebugEnabled())LOG.debug("getPrediction user prediction enabled:"+ enableCauiPrediction);
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		this.recordMonitoredAction(action);
 
@@ -1008,7 +1011,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 		try {
 			//TODO remove this option
 			if( cisID == null ){
-				List<CtxEntityIdentifier> commEntIDList = retrieveBelongingCIS();
+				List<CtxEntityIdentifier> commEntIDList = retrieveOwningCIS();
 				entID = commEntIDList.get(0);
 			} else {
 				//entID = this.ctxBroker.retrieveIndividualEntityId(null, cisID).get();
@@ -1064,31 +1067,32 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 
-	public List<CtxEntityIdentifier> retrieveBelongingCIS(){
+	public List<CtxEntityIdentifier> retrieveOwningCIS(){
 
 		List<CtxEntityIdentifier> commEntIDList = new ArrayList<CtxEntityIdentifier>();
 
-		List<CtxIdentifier> listISMemberOf = new ArrayList<CtxIdentifier>();
+		List<CtxIdentifier> listAdminOf = new ArrayList<CtxIdentifier>();
 
 		final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
 		final String cssOwnerStr = cssNodeId.getBareJid();
 		try {
 			this.cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
-			listISMemberOf = this.ctxBroker.lookup(this.cssOwnerId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
-			if (LOG.isDebugEnabled())LOG.debug(".............listISMemberOf................." +listISMemberOf);
+			//listISMemberOf = this.ctxBroker.lookup(this.cssOwnerId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+			listAdminOf = this.ctxBroker.lookup(this.cssOwnerId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_ADMIN_OF).get();
+			if (LOG.isDebugEnabled())LOG.debug("........assoc is admin of ...." +listAdminOf);
 
-			if(!listISMemberOf.isEmpty() ){
-				CtxAssociation assoc = (CtxAssociation) this.ctxBroker.retrieve(listISMemberOf.get(0)).get();
+			if(!listAdminOf.isEmpty() ){
+				CtxAssociation assoc = (CtxAssociation) this.ctxBroker.retrieve(listAdminOf.get(0)).get();
 				Set<CtxEntityIdentifier> entIDSet = assoc.getChildEntities();
 
 				for(CtxEntityIdentifier entId : entIDSet){
 					IIdentity cisId = this.commsMgr.getIdManager().fromJid(entId.getOwnerId());
-					if (LOG.isDebugEnabled())LOG.debug("cis id : "+cisId );
+				
 					CtxEntityIdentifier commId = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
 					commEntIDList.add(commId);
 				}
 			}
-
+			if (LOG.isDebugEnabled())LOG.debug("is admin of cis ids : "+commEntIDList );
 		} catch (Exception e) {
 			LOG.error("Unable to retrieve CISids that css belongs to " +e.getLocalizedMessage());
 		} 
@@ -1108,8 +1112,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 		try {
 			this.cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
-			commEntIDList = this.retrieveBelongingCIS();
+			commEntIDList = this.retrieveOwningCIS();
 			//TODO remove this line and add code to check if cis is local
+			// done
 			result.addAll(commEntIDList);
 
 			if (LOG.isDebugEnabled())LOG.debug(".............retrieveMyCIS..commEntIDList " +commEntIDList);
