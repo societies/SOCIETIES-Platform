@@ -21,15 +21,12 @@
 		<p:tabView id="tabView" dynamic="true" activeIndex="0">
 
 			<p:tab title="User Model">
-				
-				
-			
-		
-			<h:panelGrid raws="3">
+
+				<h:panelGrid raws="3">
 					<p:dataTable id="userTable" var="CAUIAction"
 						value="#{cauiController.userActionsList}">
-						
-						
+
+
 						<p:column headerText="Source User Action">
 							<h:outputText value="#{CAUIAction.sourceAction}" />
 						</p:column>
@@ -55,7 +52,7 @@
 					<p:column headerText="User Action">
 						<h:outputText value="#{CAUIAction.sourceAction}" />
 					</p:column>
-					<p:column headerText="Prevailing Context Values">
+					<p:column headerText="Prevailing Escorting Context Values">
 						<h:outputText value="#{CAUIAction.ctxAction}" />
 					</p:column>
 				</p:dataTable>
@@ -71,21 +68,24 @@
 							<h:outputText value="#{CAUIAction.sourceAction}" />
 						</p:column>
 						<p:column headerText="Target User Action : transition probability">
-							<h:outputText value="#{CAUIAction.targetAction}" />
+							<h:outputText value="#{CAUIAction.targetAction}" escape="false" />
 						</p:column>
 					</p:dataTable>
-					<h:outputText value="Select local CIS id" />
+					<h:outputText value="Select CIS id" />
 					<h:selectOneMenu value="#{cauiController.cisId}">
+
 						<f:selectItems value="#{cauiController.retrieveCisIdList()}" />
 					</h:selectOneMenu>
 
-					<p:commandButton value="Learn new community model"
+					<p:commandButton
+						value="Learn new community model (only for CIS id that user owns)"
 						action="#{cauiController.learnCommunityModel}">
 					</p:commandButton>
 
 
 
-					<p:commandButton value="Refresh community model"
+					<p:commandButton
+						value="Refresh community model (for CIS id that user owns or belongs)"
 						actionListener="#{cauiController.refreshCommunityModels()}"
 						update="communityTable" />
 				</h:panelGrid>

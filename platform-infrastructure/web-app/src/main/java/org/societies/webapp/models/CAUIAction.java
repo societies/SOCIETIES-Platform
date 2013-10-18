@@ -32,7 +32,7 @@ public class CAUIAction implements Serializable{
 		
 		for( String tAct :targetActionMap.keySet()){
 			Double transProb = targetActionMap.get(tAct);
-			this.targetAction = targetAction +tAct+":"+transProb+"/n";
+			this.targetAction = targetAction +" {"+tAct+":"+transProb+"} ";
 		}
 		
 		if(ctxActionMap.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null ){
