@@ -128,14 +128,20 @@ public class Correlation {
 	}
 	
 	public boolean isAnyMemberEqual(List<String> list1, List<String> list2) {
-		LOG.debug("isAnyMemberEqual({}, {})", list1, list2);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("isAnyMemberEqual({}, {})", list1, list2);
+		}
 		for (String needle : list1) {
 			if (list2.contains(needle)) {
-				LOG.debug("isAnyMemberEqual(): true");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("isAnyMemberEqual(): true");
+				}
 				return true;
 			}
 		}
-		LOG.debug("isAnyMemberEqual(): false");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("isAnyMemberEqual(): false");
+		}
 		return false;
 	}
 	

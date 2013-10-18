@@ -126,7 +126,7 @@ public class TransitionProbabilitiesCalc {
 		
 		LinkedHashMap<List<String>,ActionDictObject> step3Dict = new  LinkedHashMap<List<String>,ActionDictObject>();
 	    step3Dict = getStepDict(dictionary, 3);
-        printDictionary(step3Dict);
+      //  printDictionary(step3Dict);
 
 		for (List<String> act : step3Dict.keySet()){
 			HashMap<String,Double> transResultsForAct = new HashMap<String,Double>();
@@ -162,21 +162,7 @@ public class TransitionProbabilitiesCalc {
 		
 		return results;
 	}
-	/*
-	private Integer retrieveTransNum(int steps){
-		int total2Trans = 0; 
-		LinkedHashMap<List<String>,ActionDictObject> dict = dictionary;
 
-		for (List<String> act : dict.keySet()){
-			if(act.size() == steps){
-				ActionDictObject actDictObj = dict.get(act);	
-				total2Trans = total2Trans+actDictObj.getTotalOccurences();
-			}
-		}		
-		return total2Trans;
-	}
-
-	 */
 	public LinkedHashMap<List<String>,ActionDictObject> getStepDict(LinkedHashMap<List<String>,ActionDictObject> dictionaryFull,  int steps){
 		
 		LinkedHashMap<List<String>,ActionDictObject> stepDict = new  LinkedHashMap<List<String>,ActionDictObject>();
@@ -188,22 +174,8 @@ public class TransitionProbabilitiesCalc {
 		return stepDict;
 	}
 
-	
-/*	
-	public LinkedHashMap<List<String>,ActionDictObject> getSeqsq(int score){
-		LinkedHashMap<List<String>,ActionDictObject> results = new LinkedHashMap<List<String>,ActionDictObject>();
-		LinkedHashMap<List<String>,ActionDictObject> dict = dictionary;
-		for (List<String> act : dict.keySet()){
-			int totalOccur = dict.get(act).getTotalOccurences();
-			if( totalOccur > score) results.put(act, dict.get(act));	
-		}
-		//System.out.println("total entries in model "+dict.size()); 
-		//System.out.println("entries occured more than "+score); 
-		return results;
-	}
-*/
-	
-	
+		
+	/*
 	public void printDictionary(LinkedHashMap<List<String>,ActionDictObject> dictionary){
 
 		System.out.println ("**** printing step2 dictionary contents *****");
@@ -216,4 +188,5 @@ public class TransitionProbabilitiesCalc {
 			System.out.println("Action:"+actions+ "# "+occurences+" | context: "+dicObj.toString());
 		}
 	}
+*/
 }

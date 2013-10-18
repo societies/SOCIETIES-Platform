@@ -106,7 +106,7 @@ public class ConstructUIModel {
 			
 			
 			List<IUserIntentAction> sourceActionList = cauiTaskManager.retrieveActionsByTypeValue(sourceAction[1],sourceAction[2]);
-			System.out.println("sourceActionList "+sourceActionList);
+			//System.out.println("sourceActionList "+sourceActionList);
 			//	LOG.info("5 sourceActionList "+ sourceActionList);
 			IUserIntentAction sourceActionObj = sourceActionList.get(0);
 			
@@ -149,7 +149,7 @@ public class ConstructUIModel {
 		for(String actions : transProbDictionary.keySet()){
 			HashMap<String,Double> transTargets = transProbDictionary.get(actions);
 			//System.out.println("Action:"+actions+ "| target: "+transTargets);
-			LOG.debug("Action:"+actions+ "| target: "+transTargets);
+			if (LOG.isDebugEnabled())LOG.debug("Action:"+actions+ "| target: "+transTargets);
 		}
 	}	
 

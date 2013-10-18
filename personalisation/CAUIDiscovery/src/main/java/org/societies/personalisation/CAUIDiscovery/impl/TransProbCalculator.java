@@ -112,26 +112,12 @@ public class TransProbCalculator {
 			}
 
 		}
-		System.out.println("step3Dict results size"+results.size());	
-		System.out.println("step3Dict results "+results);
+		//System.out.println("step3Dict results size"+results.size());	
+		//System.out.println("step3Dict results "+results);
 
 		return results;
 	}
-	/*
-	private Integer retrieveTransNum(int steps){
-		int total2Trans = 0; 
-		LinkedHashMap<List<String>,ActionDictObject> dict = dictionary;
 
-		for (List<String> act : dict.keySet()){
-			if(act.size() == steps){
-				ActionDictObject actDictObj = dict.get(act);	
-				total2Trans = total2Trans+actDictObj.getTotalOccurences();
-			}
-		}		
-		return total2Trans;
-	}
-
-	 */
 	public LinkedHashMap<List<String>,ActionDictObject> getStepDict(LinkedHashMap<List<String>,ActionDictObject> dictionaryFull,  int steps){
 
 		LinkedHashMap<List<String>,ActionDictObject> stepDict = new  LinkedHashMap<List<String>,ActionDictObject>();
