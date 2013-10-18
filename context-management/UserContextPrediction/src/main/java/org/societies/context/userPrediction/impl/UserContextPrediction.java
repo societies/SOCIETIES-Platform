@@ -319,9 +319,9 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 
 
 		HashMap<String, Vector<String>> dataSet = this.createDataSet(type);
-		LOG.debug("2. create dataset:: "+dataSet );
+		if (LOG.isDebugEnabled())	LOG.debugLOG.debug("2. create dataset:: "+dataSet );
 
-		LOG.debug("3. train neural network");
+		if (LOG.isDebugEnabled())	LOG.debugLOG.debug("3. train neural network");
 		runNNFromMapOfContext(dataSet, 5);
 
 		String todValue = situation.get(HoD);
@@ -329,7 +329,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 		String devValue = situation.get(CtxAttributeTypes.TEMPERATURE);
 		String actValue = situation.get(CtxAttributeTypes.ACTION);
 
-		System.out.println("\n situation" + situation);
+		//System.out.println("\n situation" + situation);
 
 		double input[]= {typeToNumber(HoD,todValue), typeToNumber(CtxAttributeTypes.LOCATION_SYMBOLIC,locValue), typeToNumber(CtxAttributeTypes.TEMPERATURE,devValue),
 				typeToNumber(CtxAttributeTypes.ACTION,actValue)};
@@ -343,7 +343,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 		outcome = numberToType(type , netOut);
 
 		//System.out.println("\n prediction string value:" + outcome);
-		LOG.debug("\n prediction string value:" + outcome);
+		if (LOG.isDebugEnabled())	LOG.debugLOG.debug("\n prediction string value:" + outcome);
 
 		return outcome;
 	}

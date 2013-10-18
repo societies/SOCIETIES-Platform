@@ -143,7 +143,7 @@ public class CACIPrediction {
 				}
 			}			
 		}
-
+		if (LOG.isInfoEnabled())LOG.info("CACI: getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+results);
 		return results;
 	}
 

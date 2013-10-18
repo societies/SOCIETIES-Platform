@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
 
 import org.slf4j.Logger;
@@ -22,8 +23,12 @@ import org.societies.webapp.models.CAUIAction;
 import org.societies.webapp.models.CAUIActionLog;
 import org.societies.webapp.service.UserService;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 
 import javax.annotation.PostConstruct;
@@ -49,7 +54,7 @@ public class CAUIController extends BasePageController {
 
 	@ManagedProperty(value = "#{cauiPrediction}")
 	private ICAUIPrediction cauiPrediction;
-	
+
 	@ManagedProperty(value = "#{commMngrRef}")
 	private ICommManager commMngrRef;
 
@@ -97,32 +102,108 @@ public class CAUIController extends BasePageController {
 	public String[] getCisIdList() {
 		return cisIdList;
 	}
-
+	
 	public String[] retrieveCisIdList(){
 
 		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList :: fetching cis ids ");
 		//cisIdList = new String[] {"name1", "name2", "name2", "aaa","bbb"};
-		List<CtxEntityIdentifier> entidList = this.cauiPrediction.retrieveMyCIS();
-
-		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList :: entidList "+entidList);
+		List<String> entidListOwn = retrieveOwningCIS();
+		List<String> entidListMember = retrieveMemberCIS();
+		entidListMember.removeAll(entidListOwn);
+		
+		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList :: entidListOwn "+entidListOwn);
+		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList :: entidList "+entidListMember);
 
 		List<String> entidListString = new ArrayList<String>();
 
-		if(!entidList.isEmpty()){
+		if(!entidListOwn.isEmpty()){
+			entidListString.add("--CIS I own");
+			for(String cisID : entidListOwn){
+				//String identityString = entID.getOwnerId();
+				entidListString.add(cisID);
 
-			for(CtxEntityIdentifier entID : entidList){
-				String identityString = entID.getOwnerId();
-
-				entidListString.add(identityString);
-				if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList ::entID.toString()  "+entID.toString());
 			}			
-			this.cisIdList = entidListString.toArray(new String[entidListString.size()]);
+
+			if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList ::entidListString  "+entidListString);
 		}
+
+
+		if(!entidListMember.isEmpty()){
+			entidListString.add("--CIS I am member");
+			for(String cisID : entidListMember){
+				//String identityString = entID.getOwnerId();
+				entidListString.add(cisID);
+			}	
+		}
+
+		this.cisIdList = entidListString.toArray(new String[entidListString.size()]);
 
 		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList ::cisIdList "+cisIdList);	
 		return cisIdList;
 	}
 
+
+
+	public List<String> retrieveMemberCIS(){
+
+		List<String> cisIDList = new ArrayList<String>();
+
+		List<CtxIdentifier> listMemberOf = new ArrayList<CtxIdentifier>();
+		IIdentity cssOwnerId =  getOwnerId();
+		try {
+			listMemberOf = this.internalCtxBroker.lookup(cssOwnerId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+			if(!listMemberOf.isEmpty() ){
+				CtxAssociation assoc = (CtxAssociation) this.internalCtxBroker.retrieve(listMemberOf.get(0)).get();
+				// a set with css entity id
+				Set<CtxEntityIdentifier> entIDSet = assoc.getChildEntities();
+
+				for(CtxEntityIdentifier entId : entIDSet){
+					IIdentity cisId = this.commMngrRef.getIdManager().fromJid(entId.getOwnerId());
+
+					//CtxEntityIdentifier commId = this.internalCtxBroker.retrieveCommunityEntityId(cisId).get();
+					cisIDList.add(cisId.getBareJid());
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Unable to retrieve CISids that css belongs to " +e.getLocalizedMessage());
+		} 
+
+		return cisIDList;
+	}
+
+
+
+	public List<String> retrieveOwningCIS(){
+
+		List<String> cisIDList = new ArrayList<String>();
+
+		List<CtxIdentifier> listAdminOf = new ArrayList<CtxIdentifier>();
+		IIdentity cssOwnerId =  getOwnerId();
+
+		try {
+			//listISMemberOf = this.ctxBroker.lookup(this.cssOwnerId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_MEMBER_OF).get();
+			listAdminOf = this.internalCtxBroker.lookup(cssOwnerId, CtxModelType.ASSOCIATION, CtxAssociationTypes.IS_ADMIN_OF).get();
+			if (LOG.isDebugEnabled())LOG.debug("........assoc is admin of ...." +listAdminOf);
+
+			if(!listAdminOf.isEmpty() ){
+				CtxAssociation assoc = (CtxAssociation) this.internalCtxBroker.retrieve(listAdminOf.get(0)).get();
+				Set<CtxEntityIdentifier> entIDSet = assoc.getChildEntities();
+
+				for(CtxEntityIdentifier entId : entIDSet){
+					IIdentity cisId = this.commMngrRef.getIdManager().fromJid(entId.getOwnerId());
+
+					//	CtxEntityIdentifier commId = this.internalCtxBroker.retrieveCommunityEntityId(cisId).get();
+					cisIDList.add(cisId.getBareJid());
+				}
+
+			}
+			if (LOG.isDebugEnabled())LOG.debug("is admin of cis ids : "+cisIDList );
+		} catch (Exception e) {
+			LOG.error("Unable to retrieve CISids that css belongs to " +e.getLocalizedMessage());
+		} 
+
+		return cisIDList;
+	}
 
 
 
@@ -237,7 +318,7 @@ public class CAUIController extends BasePageController {
 
 
 		model = this.cauiPrediction.getCACIActiveModel();
-	
+
 		if (LOG.isDebugEnabled())LOG.debug("getCACIActiveModel  : "+ model);
 		if(!model.isEmpty()){
 			result = convertModel(model);
@@ -308,7 +389,7 @@ public class CAUIController extends BasePageController {
 				if(sourceAct.getActionContext()!= null){
 					contextAction = sourceAct.getActionContext();
 				}
-				
+
 				HashMap<String, Double> targetMap = new HashMap<String, Double>();
 				if( originalModel.get(sourceAct) != null) {
 
@@ -317,10 +398,10 @@ public class CAUIController extends BasePageController {
 					for(IUserIntentAction targetActOrig : targetMapOriginal.keySet()){
 						String trimedTargetStr = targetActOrig.getparameterName()+"="+targetActOrig.getvalue();
 						Double transProb = targetMapOriginal.get(targetActOrig);
-						
+
 						DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
 						symbols.setDecimalSeparator('.');
-												
+
 						DecimalFormat df = new DecimalFormat("#.##",symbols );
 						Double transProbTrimmed = Double.parseDouble(df.format(transProb));
 						targetMap.put(trimedTargetStr, transProbTrimmed);
@@ -361,30 +442,39 @@ public class CAUIController extends BasePageController {
 
 		//this.communityActionsList = this.getLocalCACIActiveModel();
 		if (LOG.isDebugEnabled())LOG.debug("refreshCommunityModels  1");
+		
+		
+		if(this.cisId.equalsIgnoreCase("--CIS I own") || this.cisId.equalsIgnoreCase("--CIS I own") ){
+			addGlobalMessage("Refreshing Community Intent Model", "Select a valid CIS id", FacesMessage.SEVERITY_INFO);
+			return;
+		}
+		
+		
+		
 		IIdentity identityCisId  = getIIdentity(this.cisId);
 		if (LOG.isDebugEnabled())LOG.debug("refreshCommunityModels  2 selected id: "+identityCisId);
-		
+
 		CtxAttribute caciAttr = this.cauiPrediction.retrieveCACIModel(identityCisId);
 		UserIntentModelData newCACIModelData = null;
-		
+
 		if (LOG.isDebugEnabled())LOG.debug("refreshCommunityModels  3 caciAttr id: "+caciAttr.getId());
-	
+
 		if(caciAttr.getBinaryValue() != null){
-			
+
 			try {
 				newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
-				
+
 				if(!newCACIModelData.getActionModel().isEmpty()){
 					this.communityActionsList = convertModel(newCACIModelData.getActionModel());
 					if (LOG.isDebugEnabled())LOG.debug("refreshCommunityModels  4 newCACIModelData: "+newCACIModelData.getActionModel());
 				}
-				
+
 			} catch (Exception e) {
 				LOG.error("Exception while refreshing CACI models " +e.getLocalizedMessage());
 				e.printStackTrace();
 			} 
 		}
-			
+
 		if (LOG.isDebugEnabled())LOG.debug("this.communityActionsList :"+this.communityActionsList);
 		addGlobalMessage("Refreshing community model", "Retrieving model from DB", FacesMessage.SEVERITY_INFO);
 	}
@@ -392,36 +482,27 @@ public class CAUIController extends BasePageController {
 	public void refreshPredictionLog(){
 
 		if (LOG.isDebugEnabled())LOG.debug("this.cauiPrediction.refreshPredictionLoc");
-
-
 		this.predictionLogList = this.getPredictionLog();
-		addGlobalMessage("Refreshing prediction log", "xxx", FacesMessage.SEVERITY_INFO);
-
+		addGlobalMessage("Refreshing prediction log", "list of last performed and predicted actions", FacesMessage.SEVERITY_INFO);
 	}
 
 	public void learnCommunityModel(){
 
-		if (LOG.isDebugEnabled())LOG.debug("discovery started..." );
-		//addGlobalMessage("learn community Model", "for id ", FacesMessage.SEVERITY_INFO);
+		if(this.cisId.equalsIgnoreCase("--CIS I own") || this.cisId.equalsIgnoreCase("--CIS I own") ){
+			addGlobalMessage("Learning new Community Intent Model", "Select a valid CIS id", FacesMessage.SEVERITY_INFO);
+			return;
+		}
 		if (LOG.isDebugEnabled())LOG.debug("discovery started...learnCommunityModel before:: "+this.cisId );
-		
-		//FacesContext fc = FacesContext.getCurrentInstance();
-		//LOG.debug("discovery started...learnCommunityModel fc:: "+fc );
-		//Map<String,String> params = fc.getExternalContext().getRequestParameterMap();
-		//LOG.debug("discovery started...learnCommunityModel params:: "+params );
-		//String action = params.get("action");
-			
 		IIdentity identityCisId  = getIIdentity(this.cisId);
 		this.cauiPrediction.generateNewCommunityModel(identityCisId);
 	}
 
-	
+
 	private IIdentity getOwnerId(){
 
 		IIdentity cssOwnerId = null;
 		try {
 			final INetworkNode cssNodeId = this.commMngrRef.getIdManager().getThisNetworkNode();
-
 			final String cssOwnerStr = cssNodeId.getBareJid();
 			cssOwnerId = this.commMngrRef.getIdManager().fromJid(cssOwnerStr);
 			if (LOG.isDebugEnabled())LOG.debug("*** css identity = " + cssOwnerId);
@@ -442,13 +523,13 @@ public class CAUIController extends BasePageController {
 			result = this.commMngrRef.getIdManager().fromJid(cisIDString);
 			if (LOG.isDebugEnabled())LOG.debug("***getIIdentity converted identity = " + result);
 		} catch (InvalidFormatException e) {
-			
+
 			e.printStackTrace();
 		}
 		return result;
 	}
-	
-	
+
+
 
 	public ICtxBroker getInternalCtxBroker() {
 		//LOG.debug("get internalCtxBroker manager " +internalCtxBroker);
@@ -456,7 +537,7 @@ public class CAUIController extends BasePageController {
 	}
 
 	public void setInternalCtxBroker(ICtxBroker internalCtxBroker) {
-	
+
 		this.internalCtxBroker = internalCtxBroker;
 	}
 
