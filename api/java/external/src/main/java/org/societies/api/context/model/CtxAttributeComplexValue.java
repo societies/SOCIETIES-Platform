@@ -204,4 +204,24 @@ public class CtxAttributeComplexValue implements Serializable {
 		
 		this.pairs = pairs;
 	}
+
+	/*
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		
+		final StringBuilder sb = new StringBuilder();
+		sb.append("CtxAttributeComplexValue [");
+		sb.append("average=").append(this.average);
+		sb.append(", median=").append(this.median);
+		sb.append(", rangeMin=").append(this.rangeMin);
+		sb.append(", rangeMax=").append(this.rangeMax);
+		sb.append(", locationgps=").append(this.locationgps);
+		sb.append(", mode=").append(this.mode);
+		sb.append(", pairs=").append(this.pairs);
+		sb.append("]");
+		
+		return sb.toString();
+	}
 }
