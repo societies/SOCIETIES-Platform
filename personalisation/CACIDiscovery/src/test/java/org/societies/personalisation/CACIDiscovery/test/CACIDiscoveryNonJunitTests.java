@@ -61,9 +61,12 @@ public class CACIDiscoveryNonJunitTests {
 
 		//discovery.generateNewCommunityModel(uiModelList);
 		UserIntentModelData merged = discovery.mergeModels(uiModelList);
-		System.out.println("1 merged:"+ merged);
-		System.out.println("2 merged:"+ merged.getActionModel().keySet());
-		System.out.println("3 merged:"+ merged.getActionModel());
+		//System.out.println("1 merged:"+ merged);
+		//System.out.println("2 merged:"+ merged.getActionModel().keySet());
+		//System.out.println("3 merged:"+ merged.getActionModel());
+		
+		System.out.println("printModel(merged)");
+		printModel(merged);
 	}
 
 
@@ -87,20 +90,20 @@ public class CACIDiscoveryNonJunitTests {
 		UserIntentModelData modelDataA = cauiTaskManager.createModel();
 
 
-		//IUserIntentAction userActionOn1 = new UserIntentAction(serviceSri ,SERVICE_TYPE,"radio","on",10L);
-		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"radio","on");
+		//IUserIntentAction userActionOn1 = new UserIntentAction(serviceSri ,SERVICE_TYPE,"A","on",10L);
+		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"A","A");
 		userActionOn1.setActionContext(context1);
 
 		//IUserIntentAction userActionSetVol = new UserIntentAction(serviceSri ,SERVICE_TYPE,"SetVolume","medium",11L);
-		IUserIntentAction userActionSetVol = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"SetVolume","medium");
+		IUserIntentAction userActionSetVol = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"B","B");
 		userActionSetVol.setActionContext(context1);
 
 		//IUserIntentAction userActionSetChannel = new UserIntentAction(serviceSri ,SERVICE_TYPE,"SetChannel","radio1",11L);
-		IUserIntentAction userActionSetChannel = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"SetChannel","radio1");
+		IUserIntentAction userActionSetChannel = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"C","C");
 		userActionSetChannel.setActionContext(context2);
 
-		//IUserIntentAction userActionOff1 = new UserIntentAction(serviceSri ,SERVICE_TYPE,"radio","off",12L);
-		IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"radio","off");
+		//IUserIntentAction userActionOff1 = new UserIntentAction(serviceSri ,SERVICE_TYPE,"A","off",12L);
+		IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"D","D");
 		userActionOff1.setActionContext(context2);
 
 
@@ -135,16 +138,24 @@ public class CACIDiscoveryNonJunitTests {
 
 		UserIntentModelData modelData = cauiTaskManager.createModel();
 
-		IUserIntentAction userActionOn1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"radio","on");
-		userActionOn1.setActionContext(context1);
+		IUserIntentAction actA = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"A","A");
+		actA.setActionContext(context1);
 
-		//IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"radio","off");
-		IUserIntentAction userActionSetMedium = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"SetVolume","medium");
-		userActionSetMedium.setActionContext(context1);
+		//IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri ,SERVICE_TYPE,"B","off");
+		IUserIntentAction actB = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"B","B");
+		actB.setActionContext(context1);
 
+		IUserIntentAction actE = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"E","E");
+		
+		IUserIntentAction actD = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"D","D");
+		actD.setActionContext(context1);
+		
 		//On --> setVol 0.5
-		cauiTaskManager.setActionLink(userActionOn1, userActionSetMedium, 1.0d);	
-
+		cauiTaskManager.setActionLink(actA, actB, 0.8d);	
+		cauiTaskManager.setActionLink(actA, actE, 0.2d);
+		cauiTaskManager.setActionLink(actE, actD, 1.0d);
+		cauiTaskManager.setActionLink(actB, actE, 1.0d);
+		
 		modelData  = cauiTaskManager.retrieveModel();
 		System.out.println("B CAUI modelData ::"+modelData.getActionModel());
 		//printModel(modelData);
@@ -158,7 +169,7 @@ public class CACIDiscoveryNonJunitTests {
 
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> allActions = new HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>();
 		allActions = model.getActionModel();
-		System.out.println("------------printModel start ---------------");
+		//System.out.println("------------printModel start ---------------");
 		for(IUserIntentAction action : allActions.keySet()){
 			System.out.println("source:"+action.getparameterName()+"/"+action.getvalue() /*+" ctx:"+ action.getActionContext()*/);
 
@@ -167,7 +178,7 @@ public class CACIDiscoveryNonJunitTests {
 			
 			HashMap<IUserIntentAction, Double> targetActions = allActions.get(action);
 			for(IUserIntentAction actionTarget : targetActions.keySet()){
-				System.out.println("--> target:"+actionTarget.getparameterName()+"/"+actionTarget.getvalue() /*+" ctx:"+ actionTarget.getActionContext()*/);	
+				System.out.println("--> target:"+actionTarget.getparameterName()+"/"+actionTarget.getvalue()+"/"+ targetActions.get(actionTarget)/*+" ctx:"+ actionTarget.getActionContext()*/);	
 			}
 			}
 		}

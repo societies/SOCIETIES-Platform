@@ -24,7 +24,7 @@
 
 				<h:panelGrid raws="3">
 					<p:dataTable id="userTable" var="CAUIAction"
-						value="#{cauiController.userActionsList}">
+						value="#{cauiController.userActionsList}" scrollable="true" scrollWidth="800" scrollHeight="150">
 
 
 						<p:column headerText="Source User Action">
@@ -48,7 +48,7 @@
 			<p:tab title="Action's context">
 
 				<p:dataTable id="contextTable2" var="CAUIAction"
-					value="#{cauiController.userActionsList}">
+					value="#{cauiController.userActionsList}" scrollable="true" scrollWidth="800" scrollHeight="150">
 					<p:column headerText="User Action">
 						<h:outputText value="#{CAUIAction.sourceAction}" />
 					</p:column>
@@ -63,7 +63,7 @@
 			<p:tab title="Community Model">
 				<h:panelGrid raws="5">
 					<p:dataTable id="communityTable" var="CAUIAction"
-						value="#{cauiController.communityActionsList}">
+						value="#{cauiController.communityActionsList}" scrollable="true" scrollWidth="800" scrollHeight="150">
 						<p:column headerText="Source User Action">
 							<h:outputText value="#{CAUIAction.sourceAction}" />
 						</p:column>
@@ -92,21 +92,29 @@
 			</p:tab>
 
 
-			<p:tab title="Prediction Log">
+			<p:tab title="User Action Log">
 
 				<p:dataTable id="predictionLogTable" var="CAUIActionLog"
-					value="#{cauiController.predictionLogList}">
+					value="#{cauiController.predictionLogList}" scrollable="true" scrollWidth="800" scrollHeight="150">
+
+					<p:column headerText="Time">
+						<h:outputText value="#{CAUIActionLog.time}" />
+					</p:column>
 
 					<p:column headerText="Performed User Action">
 						<h:outputText value="#{CAUIActionLog.performedAction}" />
 					</p:column>
-					<p:column headerText="Predicted User Action ">
-						<h:outputText value="#{CAUIActionLog.predictedAction}" />
+										
+					 <p:column headerText="Situation">
+						<h:outputText value="#{CAUIActionLog.ctxAction}" />
 					</p:column>
+					
+					
 				</p:dataTable>
-				<p:commandButton value="Refresh Prediction Log"
+				<p:commandButton value="Retrieve History of Actions"
 					actionListener="#{cauiController.refreshPredictionLog}"
 					update="predictionLogTable" />
+					
 			</p:tab>
 
 			<p:tab title="Options">
