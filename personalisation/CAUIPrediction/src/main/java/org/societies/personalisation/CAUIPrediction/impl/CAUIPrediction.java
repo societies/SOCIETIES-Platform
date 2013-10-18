@@ -605,12 +605,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 			this.cauiTaskManager.updateModel(newUIModelData);
 			cauiModelExist = true;		 
 			this.currentUIModelData = newUIModelData;
-			LOG.info("caui model set - actions map: "+newUIModelData.getActionModel());
+			if (LOG.isInfoEnabled())LOG.info("caui model set - actions map: "+newUIModelData.getActionModel());
 		}
 	}
-
-
-
 
 	public void setCACIActiveModel (UserIntentModelData newUIModelData){
 
@@ -618,7 +615,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			this.caciPredictor.setCACIActiveModel(newUIModelData);
 			caciModelExist = true;	
 
-			LOG.info("caci model set - actions map: "+newUIModelData.getActionModel());
+			if (LOG.isInfoEnabled())LOG.info("caci model set - actions map: "+newUIModelData.getActionModel());
 		}
 	}
 
@@ -739,8 +736,6 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//***********************************
 
 	private void retrieveCAUIModelDB(){
-
-
 
 		try {
 			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(this.getOwnerId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();

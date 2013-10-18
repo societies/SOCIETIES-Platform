@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,6 +18,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.personalisation.model.IAction;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
@@ -23,10 +27,14 @@ import org.societies.webapp.models.CAUIAction;
 import org.societies.webapp.models.CAUIActionLog;
 import org.societies.webapp.service.UserService;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAssociation;
 import org.societies.api.context.model.CtxAssociationTypes;
 import org.societies.api.context.model.CtxAttribute;
+import org.societies.api.context.model.CtxAttributeIdentifier;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
@@ -44,6 +52,7 @@ public class CAUIController extends BasePageController {
 
 	private static Logger LOG = LoggerFactory.getLogger(CAUIController.class);
 
+	private final static String newline = "\n";
 	private static final long serialVersionUID = 1L;
 
 	@ManagedProperty(value = "#{userService}")
@@ -88,7 +97,9 @@ public class CAUIController extends BasePageController {
 
 		this.userActionsList = this.getCAUIActiveModel();
 		this.communityActionsList = this.getLocalCACIActiveModel();
-		this.predictionLogList = this.getPredictionLog();
+		
+		//remove this from constructor
+		this.predictionLogList = this.getHistoryLog();
 
 		//LOG.debug("action records ::"+this.userActionsList);
 		//LOG.debug("community records ::"+this.communityActionsList);
@@ -102,7 +113,7 @@ public class CAUIController extends BasePageController {
 	public String[] getCisIdList() {
 		return cisIdList;
 	}
-	
+
 	public String[] retrieveCisIdList(){
 
 		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList :: fetching cis ids ");
@@ -110,7 +121,7 @@ public class CAUIController extends BasePageController {
 		List<String> entidListOwn = retrieveOwningCIS();
 		List<String> entidListMember = retrieveMemberCIS();
 		entidListMember.removeAll(entidListOwn);
-		
+
 		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList :: entidListOwn "+entidListOwn);
 		if (LOG.isDebugEnabled())LOG.debug("retrieveCisIdList :: entidList "+entidListMember);
 
@@ -205,37 +216,6 @@ public class CAUIController extends BasePageController {
 		return cisIDList;
 	}
 
-
-
-	public void setCisIdList(String[] cisIdList) {
-		this.cisIdList = cisIdList;
-	}
-
-
-
-
-
-	public String getCisId() {
-		return cisId;
-	}
-
-	public void setCisId(String cisId) {
-		this.cisId = cisId;
-	}
-
-
-
-
-	/*
-	public List<String> getCisIdList() {
-		return cisIdList;
-	}
-
-
-	public void setCisIdList(List<String> cisIdList) {
-		this.cisIdList = cisIdList;
-	}
-	 */
 
 
 
@@ -354,7 +334,7 @@ public class CAUIController extends BasePageController {
 	}
 	 */
 
-
+	/*
 	public List<CAUIActionLog>  getPredictionLog(){
 
 		List<CAUIActionLog> result = new ArrayList<CAUIActionLog>(); 
@@ -372,7 +352,102 @@ public class CAUIController extends BasePageController {
 		if (LOG.isDebugEnabled())LOG.debug("getPredictionLog result : "+ result);
 		return result;
 	}
+	 */
+	
+	
+	public List<CAUIActionLog>  getHistoryLog(){
 
+		List<CAUIActionLog> result = new ArrayList<CAUIActionLog>(); 
+	//	List<Entry<String, String>> tempResultList = this.cauiPrediction.getPredictionPairLog();
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = retrieveHistoryTupleData();
+		result = convertHocTuplesToCauiActLog(results);
+		
+		/*
+		if( !tempResultList.isEmpty()){
+			for(Entry<String,String> entry : tempResultList){
+				String performed = entry.getKey();
+				String predicted = entry.getValue();
+				CAUIActionLog cauiLog = new CAUIActionLog(performed,predicted);
+				if (LOG.isDebugEnabled())LOG.debug("getPredictionLog  cauiLog : "+ cauiLog);
+				result.add(cauiLog);
+			}
+		}
+		*/
+		if (LOG.isDebugEnabled())LOG.debug("getPredictionLog result : "+ result);
+		return result;
+	}
+
+	
+	
+	public Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> retrieveHistoryTupleData(){
+
+		Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> results = new LinkedHashMap<CtxHistoryAttribute, List<CtxHistoryAttribute>>();
+		List<CtxAttributeIdentifier> listOfEscortingAttributeIds = new ArrayList<CtxAttributeIdentifier>();
+		try {
+			results = this.internalCtxBroker.retrieveHistoryTuples(CtxAttributeTypes.LAST_ACTION, listOfEscortingAttributeIds, null, null).get();
+			//System.out.println(" retrieveHistoryTupleData: " +results);
+
+		}catch (Exception e) {
+			LOG.error("Exception thrown while retrieving history of performed user actions "+e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+		return results;
+	}
+
+	public List<CAUIActionLog> convertHocTuplesToCauiActLog(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
+
+		//String data =""; 
+		List<CAUIActionLog> cauiActLog =new ArrayList<CAUIActionLog>();
+	
+		//int i = 0;
+		for(CtxHistoryAttribute ctxHocAttr :mapHocData.keySet()){
+
+			try {
+				Date time = ctxHocAttr.getLastUpdated();
+				IAction action = (IAction)SerialisationHelper.deserialise(ctxHocAttr.getBinaryValue(), this.getClass().getClassLoader());
+				List<CtxHistoryAttribute> escortingAttrList = mapHocData.get(ctxHocAttr);
+
+				CtxHistoryAttribute attr1 = escortingAttrList.get(0);
+				CtxHistoryAttribute attr3 = escortingAttrList.get(2);
+				CtxHistoryAttribute attr4 = escortingAttrList.get(3);
+
+				String actionParValLog = action.getparameterName()+"="+ action.getvalue();
+				HashMap<String,Serializable> hocMap = new HashMap<String,Serializable>();
+						
+				hocMap.put(attr1.getType(), getValueFromAttr(attr1));
+				hocMap.put(attr3.getType(), getValueFromAttr(attr3));
+				hocMap.put(attr4.getType(), getValueFromAttr(attr4));
+										
+				CAUIActionLog actLog = new CAUIActionLog(actionParValLog, "n/a", hocMap, time.toString() );
+				
+				cauiActLog.add(actLog);
+			} catch (Exception e) {
+				LOG.error("Exception while trying to conver history attributes to readable string "+e.getLocalizedMessage());
+				e.printStackTrace();
+			}	
+		}
+		
+		return cauiActLog;
+	}
+
+	private String getValueFromAttr(CtxHistoryAttribute attr){
+
+		String result = "";
+		
+		if(attr.getValueType().equals(CtxAttributeValueType.STRING) && attr.getStringValue()!= null){
+			result = attr.getStringValue();
+			
+			return result;
+		} else if (attr.getValueType().equals(CtxAttributeValueType.INTEGER) && attr.getIntegerValue()!= null ){
+			Integer intResult = attr.getIntegerValue();
+			result = String.valueOf(intResult);
+		
+			return result;
+		}	
+
+		return result;
+
+	}
 
 	private List<CAUIAction> convertModel(HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> originalModel ){
 
@@ -421,8 +496,7 @@ public class CAUIController extends BasePageController {
 
 		//IIdentity cssID = getOwnerId(); 
 		//if( getOwnerId() != null) {	cssID = getOwnerId();		}
-		if (LOG.isDebugEnabled())LOG.debug("service ref for cauiDisc "+ this.cauiPrediction);
-		if (LOG.isDebugEnabled())LOG.debug("service ref for broker  "+ this.internalCtxBroker);
+
 		this.cauiPrediction.generateNewUserModel();
 		if (LOG.isDebugEnabled())LOG.debug("discovery started..." );
 		addGlobalMessage("MODEL LEARNING TRIGGERED for user", "click on refresh model button", FacesMessage.SEVERITY_INFO);
@@ -442,15 +516,15 @@ public class CAUIController extends BasePageController {
 
 		//this.communityActionsList = this.getLocalCACIActiveModel();
 		if (LOG.isDebugEnabled())LOG.debug("refreshCommunityModels  1");
-		
-		
+
+
 		if(this.cisId.equalsIgnoreCase("--CIS I own") || this.cisId.equalsIgnoreCase("--CIS I own") ){
 			addGlobalMessage("Refreshing Community Intent Model", "Select a valid CIS id", FacesMessage.SEVERITY_INFO);
 			return;
 		}
-		
-		
-		
+
+
+
 		IIdentity identityCisId  = getIIdentity(this.cisId);
 		if (LOG.isDebugEnabled())LOG.debug("refreshCommunityModels  2 selected id: "+identityCisId);
 
@@ -481,22 +555,61 @@ public class CAUIController extends BasePageController {
 
 	public void refreshPredictionLog(){
 
-		if (LOG.isDebugEnabled())LOG.debug("this.cauiPrediction.refreshPredictionLoc");
-		this.predictionLogList = this.getPredictionLog();
-		addGlobalMessage("Refreshing prediction log", "list of last performed and predicted actions", FacesMessage.SEVERITY_INFO);
+		if (LOG.isDebugEnabled())LOG.debug("this.cauiPrediction.refreshPredictionLog");
+		this.predictionLogList = this.getHistoryLog();
+		addGlobalMessage("Retrieving history of performed actions", "last actions", FacesMessage.SEVERITY_INFO);
 	}
 
+	public void removeHistoryLog(){
+
+		if (LOG.isDebugEnabled())LOG.debug("removeHistoryLog");
+		//this.predictionLogList = this.getHistoryLog();
+		//Integer i = 0;
+		try {
+		
+			List<CtxIdentifier> hocTuplesIdList = this.internalCtxBroker.lookup(getOwnerId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.LAST_ACTION).get();
+			if(!hocTuplesIdList.isEmpty()){
+				
+				for (CtxIdentifier id : hocTuplesIdList ){
+					List<CtxAttributeIdentifier> escortingList = new ArrayList<CtxAttributeIdentifier>();
+					CtxAttributeIdentifier primaryAttrID = (CtxAttributeIdentifier) id ;
+					
+					if (LOG.isDebugEnabled())LOG.debug("removeHistoryLog for "+primaryAttrID );
+					
+					this.internalCtxBroker.removeHistoryTuples(primaryAttrID, escortingList).get();	
+				}
+			}
+	
+		} catch (Exception e) {
+			LOG.error("Exception while removing history records " +e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+		
+		addGlobalMessage("Remove history of performed actions", "records removed", FacesMessage.SEVERITY_INFO);
+	}
+	
+	
+	
 	public void learnCommunityModel(){
 
 		if(this.cisId.equalsIgnoreCase("--CIS I own") || this.cisId.equalsIgnoreCase("--CIS I own") ){
 			addGlobalMessage("Learning new Community Intent Model", "Select a valid CIS id", FacesMessage.SEVERITY_INFO);
 			return;
 		}
-		if (LOG.isDebugEnabled())LOG.debug("discovery started...learnCommunityModel before:: "+this.cisId );
-		IIdentity identityCisId  = getIIdentity(this.cisId);
-		this.cauiPrediction.generateNewCommunityModel(identityCisId);
-	}
+		List<String> ownedCIS = retrieveOwningCIS();
 
+		if(!ownedCIS.contains(this.cisId)){
+			addGlobalMessage("Learning new Community Intent Model", "You are not the administrator of this community ", FacesMessage.SEVERITY_INFO);
+			return;
+		}	
+
+		if (LOG.isDebugEnabled())LOG.debug("discovery started...learnCommunityModel before:: "+this.cisId );
+
+		if(ownedCIS.contains(this.cisId)){
+			IIdentity identityCisId  = getIIdentity(this.cisId);
+			this.cauiPrediction.generateNewCommunityModel(identityCisId);
+		}
+	}
 
 	private IIdentity getOwnerId(){
 
@@ -542,7 +655,6 @@ public class CAUIController extends BasePageController {
 	}
 
 
-
 	public ICommManager getCommMngrRef() {
 		//LOG.debug("get getCommMngrRef "+this.commMngrRef);
 		return this.commMngrRef;
@@ -573,8 +685,6 @@ public class CAUIController extends BasePageController {
 		this.userService = userService;
 	}
 
-
-
 	public String getStringProperty() {
 		return stringProperty;
 	}
@@ -591,6 +701,19 @@ public class CAUIController extends BasePageController {
 		this.boolProperty = boolProperty;
 	}
 
+
+	public void setCisIdList(String[] cisIdList) {
+		this.cisIdList = cisIdList;
+	}
+
+	public String getCisId() {
+		return cisId;
+	}
+
+	public void setCisId(String cisId) {
+		this.cisId = cisId;
+	}
+	
 	public void showMeAMessage() {
 		addGlobalMessage("THIS IS CAUI MESSAGE", "Now here's your message!", FacesMessage.SEVERITY_INFO);
 	}
