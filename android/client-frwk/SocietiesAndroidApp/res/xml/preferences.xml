@@ -16,7 +16,7 @@
 		    <EditTextPreference 
    		    	android:title="XMPP Server Name" 
    		    	android:key="daServerURI" 
-   		    	android:defaultValue="ict-societies.eu" 
+   		    	android:defaultValue="societies.local.macs.hw.ac.uk" 
    		    	android:summary="Name of XMPP Server"/>
 		    <EditTextPreference 
    		    	android:title="XMPP Server IP address" 
@@ -26,7 +26,7 @@
 		   	<EditTextPreference 
    		    	android:title="Domain Authority Node" 
    		    	android:key="daNode" 
-   		    	android:defaultValue="da.ict-societies.eu" 
+   		    	android:defaultValue="hwudomain.societies.local.macs.hw.ac.uk" 
    		    	android:summary="Domain Authority Node XMPP JID"/>
     		<EditTextPreference 
    		    	android:title="CSS Identity" 
@@ -59,7 +59,7 @@
 	           android:title="Identity Domain Servers"
 	           android:summary="Select an Identity server"
 	           android:key="listIdentityDomain"
-	           android:defaultValue="ict-societies.eu"
+	           android:defaultValue="societies.local.macs.hw.ac.uk"
                android:entries="@array/xmppNames"
            	   android:entryValues="@array/xmppValues" />       
 	</PreferenceScreen>
