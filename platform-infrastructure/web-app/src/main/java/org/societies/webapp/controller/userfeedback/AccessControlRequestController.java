@@ -33,7 +33,24 @@ public class AccessControlRequestController extends BasePageController {
 	
 	private boolean obChecked = false;
 	private int sliderValue;
+	
+	private List<Decision> decisions;
+	
+	private List<RequestorScopeValues> requestScope;
+	
+	private List<ActionConstants> actions;
+	
+	private List<AccessControlResponseItemWrapper> responseItems;
+	
+	public List<AccessControlResponseItemWrapper> getResponseItems()
+	{
+		return this.responseItems;
+	}
 
+	public List<RequestorScopeValues> getRequestScope()
+	{
+		return this.requestScope;
+	}
 	public int getSliderValue() {
 		return sliderValue;
 	}
@@ -87,6 +104,12 @@ public class AccessControlRequestController extends BasePageController {
         if (log.isDebugEnabled())
             log.debug("AccessControlRequestController ctor()");
         idToObfuscation = new HashMap<String, Double>();
+        this.decisions = new ArrayList<Decision>();
+        this.decisions.add(Decision.DENY);
+        this.decisions.add(Decision.PERMIT);
+        this.requestScope = new ArrayList<RequestorScopeValues>();
+        this.requestScope.add(RequestorScopeValues.EVERYONE);
+        this.requestScope.add(RequestorScopeValues.ONLY_THIS_APP);
 
     }
 
@@ -118,10 +141,12 @@ public class AccessControlRequestController extends BasePageController {
             if (log.isDebugEnabled())
                 log.debug("Preparing event for GUI with ID " + eventID);
 
-            prepareEventForGUI(event);
+            prepareEventForGUI();
         } else {
             log.warn("Event not found for ID " + eventID);
         }
+        setResponseItems();
+
     }
 
     @SuppressWarnings("MethodMayBeStatic")
@@ -166,15 +191,16 @@ public class AccessControlRequestController extends BasePageController {
         return availableConstants;
     }
 
-    public List<AccessControlResponseItemWrapper> getResponseItems() {
-        if (event == null)
-            return null;
-
-        ArrayList<AccessControlResponseItemWrapper> wrappers = new ArrayList<AccessControlResponseItemWrapper>();
-        for (ResponseItem item : event.getResponseItems())
-            wrappers.add((AccessControlResponseItemWrapper) item);
-        return wrappers;
-       
+    public void setResponseItems() {
+    	this.responseItems = new ArrayList<AccessControlResponseItemWrapper>();
+        if (event != null)
+        {
+        	for (ResponseItem item : event.getResponseItems())
+        	{
+        		this.responseItems.add((AccessControlResponseItemWrapper) item);
+        	}
+                
+        }    
     }
     
 
@@ -205,7 +231,7 @@ public class AccessControlRequestController extends BasePageController {
         newConditionToAdd = null;
     }
 
-    public void completeAccessRequestAction() {
+   /* public void completeAccessRequestAction() {
     	//TODO: remember flag to set
         log.debug("completeAccessRequestAction() id=" + eventID);
 
@@ -220,10 +246,6 @@ public class AccessControlRequestController extends BasePageController {
 
         try {
             List<AccessControlResponseItem> responseItems = event.getResponseItems();
-            for (AccessControlResponseItem respItem : responseItems){
-            	//set remember: true
-            	respItem.setRemember(false);
-            }
 			userFeedback.submitAccessControlResponse(eventID, responseItems, event.getRequestor());
         } catch (Exception e) {
             addGlobalMessage("Error publishing notification of completed access control event",
@@ -257,10 +279,6 @@ public class AccessControlRequestController extends BasePageController {
 
         try {
             List<AccessControlResponseItem> responseItems = event.getResponseItems();
-            for (AccessControlResponseItem respItem : responseItems){
-            	//set remember: true
-            	respItem.setRemember(true);
-            }
 			userFeedback.submitAccessControlResponse(eventID, responseItems, event.getRequestor());
         } catch (Exception e) {
             addGlobalMessage("Error publishing notification of completed access control event",
@@ -282,7 +300,7 @@ public class AccessControlRequestController extends BasePageController {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
         //return "validationMessages?faces-redirect=true";
 
        // return "home?faces-redirect=true"; // previously, could redirect to next negotiation - but this makes no sense now
@@ -299,9 +317,7 @@ public class AccessControlRequestController extends BasePageController {
 
         try {
             List<AccessControlResponseItem> responseItems = event.getResponseItems();
-            for (AccessControlResponseItem respItem : responseItems){
-            	respItem.setRemember(false);
-            }
+            //event.
 			userFeedback.submitAccessControlResponse(eventID, responseItems, event.getRequestor());
         } catch (Exception e) {
             addGlobalMessage("Error publishing notification of cancelled access control event",
@@ -351,10 +367,57 @@ public class AccessControlRequestController extends BasePageController {
                     FacesMessage.SEVERITY_ERROR);
 			return;
 		} // previously, could redirect to next negotiation - but this makes no sense now
-    }
+    } */
     
-    private static void prepareEventForGUI(UserFeedbackAccessControlEvent event) {
-        AccessControlResponseItemWrapper.wrapList(event.getResponseItems());
+    public void completeAccess() {
+        log.debug("completeAccessRequestAction()");
+
+        if (event == null) {
+            log.warn("'event' is null - cannot proceed with cancelAccessRequestAction() method");
+            return;
+        }
+
+    	List<AccessControlResponseItem> newResponseItems = new ArrayList<AccessControlResponseItem>();
+        for (AccessControlResponseItem item : this.responseItems){
+        	newResponseItems.add(item);
+
+        	this.log.debug("Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+        }
+        event.getResponseItems().clear();
+        event.setResponseItems(newResponseItems);
+        log.debug(event.getResponseItems().toString());
+        for (AccessControlResponseItem item : event.getResponseItems()){
+        	this.log.debug("Returning: ! "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+        }
+        prepareEventForTransmission();
+
+
+        try {
+            for (AccessControlResponseItem item : event.getResponseItems()){
+
+            	this.log.debug("HEH !! Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+            }
+
+			userFeedback.submitAccessControlResponse(eventID, event.getResponseItems(), event.getRequestor());
+        } catch (Exception e) {
+            addGlobalMessage("Error publishing notification of cancelled access control event",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+            log.error("Error publishing notification of cancelled access control event", e);
+        }
+
+        try {
+			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
+		} catch (IOException e) {
+			addGlobalMessage("Cannot redirect you to your previous page!",
+                    e.getMessage(),
+                    FacesMessage.SEVERITY_ERROR);
+			return;
+		}
+    }// previously, could redirect to next negotiation - but this makes no sense now
+    
+    private void prepareEventForGUI() {
+        AccessControlResponseItemWrapper.wrapList(this.event.getResponseItems());
 
         for (ResponseItem response : event.getResponseItems()) {
 
@@ -379,22 +442,29 @@ public class AccessControlRequestController extends BasePageController {
 
         }
 
-    }
+    } 
 
-    private static void prepareEventForTransmission(UserFeedbackAccessControlEvent event) {
+    private void prepareEventForTransmission() {
         // Convert ResponseItemWrappers back to ResponseItems if necessary
-        AccessControlResponseItemWrapper.unwrapList(event.getResponseItems());
+        for (AccessControlResponseItem response : this.event.getResponseItems()) {
+        	log.debug("PREPARING:" +  response.isRemember());
+        }
+        AccessControlResponseItemWrapper.unwrapList(this.event.getResponseItems());
+        for (AccessControlResponseItem response : this.event.getResponseItems()) {
+        	log.debug("PREPARING2:" +  response.isRemember());
+        }
 
-        for (ResponseItem response : event.getResponseItems()) {
+        for (ResponseItem response : this.event.getResponseItems()) {
+        	
+        	log.debug(response.toString());
 
             RequestItemWrapper requestItemWrapper = (RequestItemWrapper) response.getRequestItem();
+
+        	log.debug(requestItemWrapper.toString());
 
             // Action strings need to be converted back to Actions
             // Actually we're just filtering out the unselected ones
 
-            // we always need read, add it if we haven't got it
-            if (!requestItemWrapper.getSelectedActionNames().contains("READ"))
-                requestItemWrapper.getSelectedActionNames().add("READ");
 
             // upon return, the "Actions" field should only contain selected actions
             requestItemWrapper.setActions(requestItemWrapper.getSelectedActions());
@@ -402,21 +472,23 @@ public class AccessControlRequestController extends BasePageController {
             // unwrap the sub items
             RequestItem requestItem;
             if (response.getRequestItem() instanceof RequestItemWrapper) {
-                requestItem = ((RequestItemWrapper) response.getRequestItem()).getRequestItem();
+            	requestItem = ((RequestItemWrapper) response.getRequestItem()).getRequestItem();
+            	
                 response.setRequestItem(requestItem);
+
             } else {
                 requestItem = response.getRequestItem();
             }
 
             // remove any optional, unset ConditionConstants
-            for (int i = 0; i < requestItem.getConditions().size(); i++) {
+           /* for (int i = 0; i < requestItem.getConditions().size(); i++) {
                 Condition condition = requestItem.getConditions().get(i);
 
                 if (condition.isOptional() && condition.getValue() == null || "".equals(condition.getValue())) {
                     requestItem.getConditions().remove(i);
                     i--;
                 }
-            }
+            }*/
         }
     }
 
@@ -429,5 +501,13 @@ public class AccessControlRequestController extends BasePageController {
     public ConditionConstants getNewConditionToAdd() {
         return newConditionToAdd;
     }
+
+	public List<Decision> getDecisions() {
+		return decisions;
+	}
+
+	public void setDecisions(List<Decision> decisions) {
+		this.decisions = decisions;
+	}
 
 }

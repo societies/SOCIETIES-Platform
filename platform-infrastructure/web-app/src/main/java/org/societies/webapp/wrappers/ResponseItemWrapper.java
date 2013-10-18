@@ -46,9 +46,9 @@ public class ResponseItemWrapper extends ResponseItem {
 
     }
 
-    public RequestItemWrapper getRequestItemWrapper() {
-        return (RequestItemWrapper) super.getRequestItem();
-    }
+ //   public RequestItemWrapper getRequestItemWrapper() {
+   //     return (RequestItemWrapper) super.getRequestItem();
+    //}
 
     public boolean isPermitted() {
         return this.decision == Decision.PERMIT;
