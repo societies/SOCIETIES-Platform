@@ -28,6 +28,7 @@
 		<property name="userPCM" ref="userPCM" />
 		<property name="commsMgr" ref="commsMgr"/>
 		<property name="commPrefMgr" ref="commPrefMgr"></property>
+		<property name="cisManager" ref="cisManager"></property>
   	</bean>
   	
   	

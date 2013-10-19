@@ -26,14 +26,17 @@
 	</osgi:reference>
 	
 	<osgi:reference id="commPrefMgr"
-		interface="org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager"
+		interface="org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager">
 	</osgi:reference>
 	
 	<osgi:reference id="commsMgr" 
-		interface="org.societies.api.comm.xmpp.interfaces.ICommManager"> 
+	    interface="org.societies.api.comm.xmpp.interfaces.ICommManager"> 
 	</osgi:reference>
 	
 
+	<osgi:reference id="cisManager" 
+	    interface="org.societies.api.cis.management.ICisManager" >
+	</osgi:reference>
 	
 
 </beans>
