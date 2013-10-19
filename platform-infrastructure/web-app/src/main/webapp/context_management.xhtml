@@ -189,7 +189,7 @@
 		        </f:facet>  
 		         
 		        <p:column id="deleteEntryColumn" style="width: 5%">
-   					<p:commandButton  id="deleteEntry" icon="ui-icon-trash" actionListener="#{contextManagementController.deleteRow(element.id)}" update=":mainForm:entityTable"/>  
+   					<p:commandButton  id="deleteEntry" icon="ui-icon-trash" actionListener="#{contextManagementController.deleteRow(element.id)}" update=":mainForm:entityTable" disabled="#{element.diplayId eq '1'}" />  
    				</p:column>
 		         
 		        <p:column id="aheadEntryColumn" style="width: 5%">
