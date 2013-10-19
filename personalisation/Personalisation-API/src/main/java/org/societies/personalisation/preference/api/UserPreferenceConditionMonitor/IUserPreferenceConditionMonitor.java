@@ -24,6 +24,7 @@
  */
 package org.societies.personalisation.preference.api.UserPreferenceConditionMonitor;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -75,4 +76,13 @@ public interface IUserPreferenceConditionMonitor {
 	 * @return PreferenceManager service
 	 */
 	public IUserPreferenceManagement getPreferenceManager();
+	
+	
+	/*
+	 * this method is for testing only
+	 */
+	public void pushPreferencesToCommunities(Calendar calendar);
+	
+	
+	public void downloadPreferencesFromCommunities(Calendar calendar);
 }

@@ -24,12 +24,20 @@
  */
 
 package org.societies.integration.test.bit.community.preferences;
+import java.util.Calendar;
+import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.cis.management.ICis;
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
 import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 
@@ -49,12 +57,12 @@ public class Tester {
 	
 	private IIdentity userId;
 	
-
+	private ICisManager cisManager;
 	
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private ICommunityPreferenceManager commPrefMgr;
-
 	
+	private List<ICis> myCISs;
 
 	public Tester(){
 
@@ -64,9 +72,12 @@ public class Tester {
 	public void setUp(){
 		try{
 		this.userPrefMgr = TestCommPrefs.getPreferenceManager();
-		commPrefMgr = TestCommPrefs.getCommPrefMgr();
+		this.commPrefMgr = TestCommPrefs.getCommPrefMgr();
 		this.idm = TestCommPrefs.getCommsMgr().getIdManager();
 		this.ctxBroker = TestCommPrefs.getCtxBroker();
+		this.cisManager = TestCommPrefs.getCisManager();
+		myCISs = this.cisManager.getCisList();
+		IServiceControl serviceControl;
 		
 		logging.debug("Finished initialising Test Community Preferences");
 		}catch(Exception e){
@@ -77,4 +88,48 @@ public class Tester {
 	
 	
 
+	@Test
+	public void testUpload(){
+		if (myCISs==null){
+			Assert.fail("For this test to work, this CSS should have CISs.");
+			return;
+		}
+		if (myCISs.size()==0){
+				Assert.fail("For this test to work, this CSS should have CISs.");
+				return;
+		}
+		
+		
+		Calendar cal = Calendar.getInstance();
+		
+		int minute = cal.get(Calendar.MINUTE);
+		minute++;
+		cal.set(Calendar.MINUTE, minute);
+		TestCommPrefs.getUserPCM().pushPreferencesToCommunities(cal);
+
+		
+		
+		
+	}
+	
+	@Test
+	public void testDownload(){
+		if (myCISs==null){
+			Assert.fail("For this test to work, this CSS should have CISs.");
+			return;
+		}
+		if (myCISs.size()==0){
+				Assert.fail("For this test to work, this CSS should have CISs.");
+				return;
+		}
+		
+		
+		Calendar cal = Calendar.getInstance();
+		
+		int minute = cal.get(Calendar.MINUTE);
+		minute++;
+		cal.set(Calendar.MINUTE, minute);
+		TestCommPrefs.getUserPCM().downloadPreferencesFromCommunities(cal);
+		
+	}
 }

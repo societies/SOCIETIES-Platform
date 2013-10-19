@@ -105,6 +105,7 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 			CommunityPersonalisationCommsClientBean bean = new CommunityPersonalisationCommsClientBean();
 			bean.setCisId(cisId.getBareJid());
 			bean.setMethodType(CommunityPersonalisationMethodType.GET_COMMUNITY_PREFERENCE_DETAILS);
+			
 			String requestID = UUID.randomUUID().toString();
 			bean.setRequestID(requestID);
 			this.commManager.sendIQGet(stanza, bean, this);

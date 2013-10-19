@@ -151,6 +151,19 @@ public class CommunitiesHandler {
 	}
 
 
+	public void scheduleDownloaderTask(Calendar downloaderCalendar){
+		Timer downloadTimer = new Timer();
+		DownloaderTask downloadTimerTask = new DownloaderTask();
+		downloadTimerTask.setDone(false);
+		downloadTimer.schedule(downloadTimerTask, downloaderCalendar.getTime());
+	}
+	
+	public void scheduleUploaderTask (Calendar uploadCalendar){
+		Timer uploadTimer = new Timer();
+		UploaderTask uploadTimerTask = new UploaderTask();
+		uploadTimerTask.setDone(false);
+		uploadTimer.schedule(uploadTimerTask, uploadCalendar.getTime());
+	}
 	public class UploaderTask extends TimerTask{
 		private Logger logging = LoggerFactory.getLogger(this.getClass());
 
@@ -174,7 +187,7 @@ public class CommunitiesHandler {
 					IIdentity cisId = getIdManager().fromJid(cis.getCisId());
 
 					List<Service> services = serviceDiscovery.getServices(cisId).get();
-
+					
 					List<PreferenceDetails> matchingDetails = findRelevantPreferences(services, userPrefMgr.getPreferenceDetailsForAllPreferences());
 					if(this.logging.isDebugEnabled()){
 						this.logging.debug("Found relevant matching details: "+matchingDetails.size());
