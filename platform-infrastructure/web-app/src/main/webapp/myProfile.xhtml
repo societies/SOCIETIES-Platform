@@ -28,16 +28,16 @@
                     <h:panelGrid columns="2" cellpadding="5">
                     
                         <h:outputText value="Identity: " />
-                        <h:inputText value="#{profile.record.cssIdentity}" size="42" />
+                        <h:outputText value="#{profile.record.cssIdentity}" size="42" />
 
                         <h:outputText value="First Name: " />
-                        <h:inputText value="#{profile.firstname}" size="42" />
+                        <p:inputText value="#{profile.firstname}" size="42" />
 
                         <h:outputText value="Surname: " />
-                        <h:inputText value="#{profile.surname}" size="42" />
+                        <p:inputText value="#{profile.surname}" size="42" />
 
                         <h:outputText value="E-mail: " />
-                        <h:inputText value="#{profile.email}" size="42" />
+                        <p:inputText value="#{profile.email}" size="42" />
 
                         <h:outputText value="Sex: " />
                         <p:selectOneMenu value="#{profile.sex}">
@@ -47,13 +47,13 @@
                         </p:selectOneMenu>
 
                         <h:outputText value="Home Location: " />
-                        <h:inputText title='The city where you live, e.g. "Athens"' value="#{profile.homelocation}" size="42" />
+                        <p:inputText title='The city where you live, e.g. "Athens"' value="#{profile.homelocation}" size="42" />
 
                         <h:outputText value="Workplace: " />
-                        <h:inputText title='The city where you work, e.g. "Dublin"' value="#{profile.workplace}" size="42" />
+                        <p:inputText title='The city where you work, e.g. "Dublin"' value="#{profile.workplace}" size="42" />
 
                         <h:outputText value="Position: " />
-                        <h:inputText title='Your work position, e.g. "Project Manager"' value="#{profile.position}" size="42" />
+                        <p:inputText title='Your work position, e.g. "Project Manager"' value="#{profile.position}" size="42" />
 
                         <h:outputText value="Profile Type: " />
                         <p:selectOneMenu value="#{profile.entity}">
