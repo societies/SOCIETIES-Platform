@@ -145,7 +145,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 			//LOG.info("3. Generate Transition Dictionary : "+dictionary);
 
 			if (LOG.isDebugEnabled())LOG.debug("4. Assign context to actions");
-			HashMap<String,List<String>> ctxActionsMap =  assignContextToAction(dictionary.get(1));
+			contextActionsMap =  assignContextToAction(dictionary.get(1));
 			///LOG.info("4. Assign context to actions : "+ctxActionsMap);
 			//LOG.info("5. Generate Transition Propability Dictionary (step2)");
 			try {
@@ -156,7 +156,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				//LOG.info("6. Generate UserIntentModelData");
 				ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
 				UserIntentModelData modelData = null;
-				modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,this.sriMap);
+				modelData = cmodel.constructNewModel(trans2ProbDictionary,contextActionsMap,this.sriMap);
 
 				CtxAttribute ctxAttr = storeModelCtxDB(modelData);
 				if(!modelData.getActionModel().isEmpty()) printCAUIModel(modelData.getActionModel());
@@ -164,7 +164,6 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				//	if (LOG.isDebugEnabled())LOG.debug("modelData "+ modelData.getActionModel());
 
 				//	LOG.debug("*********** model created *******"+ modelData.getActionModel());
-
 
 				// performance log code
 				byte entBytes [] = toByteArray(modelData);
@@ -281,9 +280,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						if(locationValues.size()== 1){
 							String location = locationValues.get(0);
 							int locValueOccurences = locMap.get(locationValues);
-							if(locValueOccurences/actionOccurences > 0.5){
+							if(locValueOccurences/actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"="+location);
-							}
+							} else contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"="); 
 						}
 					}
 				}
@@ -293,9 +292,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						if(dowValues.size()== 1){
 							String dow = dowValues.get(0);
 							int dowValueOccurences = dowMap.get(dowValues);
-							if(dowValueOccurences/actionOccurences > 0.5){
+							if(dowValueOccurences/actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"="+dow);
-							}
+							}else contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"=");
 						}
 					}
 				}
@@ -306,9 +305,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						if(hodValues.size()== 1){
 							String hod = hodValues.get(0);
 							int temperatureValueOccurences = hodMap.get(hodValues);
-							if(temperatureValueOccurences/actionOccurences > 0.5){
+							if(temperatureValueOccurences/actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.HOUR_OF_DAY+"="+hod);
-							}
+							}else contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"=");
 						}
 					}
 				}

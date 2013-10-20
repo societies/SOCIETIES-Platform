@@ -46,7 +46,11 @@ import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentModelData;
@@ -64,24 +68,30 @@ public class CACIPrediction {
 	private ICtxBroker ctxBroker;
 	private ICAUITaskManager caciTaskManager;
 	private ICommManager commsMgr ;
+	private IServiceDiscovery serviceDiscovery;
+
 
 	static boolean caciPredictionEnabled = true;
 	static boolean caciFreshness = false;
 	static boolean cacimodelExist = false;
-	
+
 	public UserIntentModelData currentCACIModelData;
-	
+
 	public CACIPrediction(ICtxBroker ctxBroker, ICommManager commsMgr){
 
 		this.ctxBroker = ctxBroker;
 		this.commsMgr = commsMgr;
 	}
 
-	public CACIPrediction(ICtxBroker ctxBroker, ICAUITaskManager caciTaskManager, ICommManager commsMgr){
+	public CACIPrediction(ICtxBroker ctxBroker, ICAUITaskManager caciTaskManager, ICommManager commsMgr, IServiceDiscovery serviceDiscovery){
 
 		this.ctxBroker = ctxBroker;
 		this.caciTaskManager = caciTaskManager;
 		this.commsMgr = commsMgr;
+		this.serviceDiscovery = serviceDiscovery;
+
+		if (LOG.isDebugEnabled())LOG.debug("this.serviceDiscovery " +this.serviceDiscovery);
+
 		if (LOG.isDebugEnabled())LOG.debug("inside CACIPrediction ");
 
 		//when css joins a new cis, will automatically register for caci model events.
@@ -92,9 +102,10 @@ public class CACIPrediction {
 		} catch (Exception e) {
 			LOG.error("Exception while trying to register for new community join events " +e.getLocalizedMessage());
 		}
+		if (LOG.isDebugEnabled())LOG.debug("CACIPrediction initiated ");
 	}
 
-	
+
 	public List<IUserIntentAction> getPrediction(IIdentity requestor,
 			IAction action){
 
@@ -106,15 +117,15 @@ public class CACIPrediction {
 		String val = action.getvalue();
 
 		if(currentCACIModelData != null ) 	{
-			
+
 			if (LOG.isDebugEnabled())LOG.debug("set latest CACI model " + currentCACIModelData);
 			this.caciTaskManager.updateModel(currentCACIModelData);
 		}
-		
-		
-		
+
+
+
 		if (LOG.isDebugEnabled())LOG.debug("cacimodel to be used for prediction: "+ this.caciTaskManager.getCAUIActiveModel() );
-		
+
 		List<IUserIntentAction> actionsList = this.caciTaskManager.retrieveActionsByTypeValue(par, val);
 		if (LOG.isDebugEnabled())LOG.debug("1. CACIMODEL TaskManager.retrieveActionsByTypeValue(par, val) " +actionsList);
 
@@ -137,7 +148,15 @@ public class CACIPrediction {
 					//doubleConf = 70.0;
 					nextAction.setConfidenceLevel(doubleConf.intValue());
 					//LOG.info("6. nextActionsMap " +nextAction);
-					results.add(nextAction);
+					// find and set local sri for community action
+					if(setLocalSri(nextAction) != null){
+						IUserIntentAction localSRIAction = setLocalSri(nextAction);	
+						results.add(localSRIAction);
+					} else {
+						results.add(nextAction);
+					}
+
+
 
 					if (LOG.isDebugEnabled())LOG.debug(" ****** caci prediction map created "+ results);
 				}
@@ -146,6 +165,58 @@ public class CACIPrediction {
 		if (LOG.isInfoEnabled())LOG.info("CACI: getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+results);
 		return results;
 	}
+
+
+
+
+	private IUserIntentAction setLocalSri( IUserIntentAction action){
+
+		IUserIntentAction resultAction = null;
+
+		List<Service> servicesListLocal = new ArrayList<Service>();
+		ServiceResourceIdentifier communityActionSRI = null;
+
+
+		if (LOG.isDebugEnabled())LOG.debug("setLocalSri for comm action:"+action +" with service ID:"+action.getServiceID() );
+		try {
+			servicesListLocal = this.serviceDiscovery.getLocalServices().get();
+		} catch (Exception e) {
+			LOG.error("Exception while retrieving SRIs:" +e.getLocalizedMessage());
+			e.printStackTrace();
+		} 
+
+
+		if (LOG.isDebugEnabled())LOG.debug("setLocalSri servicesListLocal:"+servicesListLocal);
+
+		if(!servicesListLocal.isEmpty()){
+
+			for (Service serviceLocal : servicesListLocal){
+				if (serviceLocal.getServiceIdentifier().getServiceInstanceIdentifier().equalsIgnoreCase(action.getServiceID().getServiceInstanceIdentifier())){
+					communityActionSRI = serviceLocal.getServiceIdentifier();
+					if (LOG.isDebugEnabled())LOG.debug("setLocalSri local sri found:"+communityActionSRI);
+					break;
+				}
+			}
+
+		}
+
+		if(communityActionSRI != null){
+			this.caciTaskManager.createModel();
+			resultAction =  this.caciTaskManager.createAction(communityActionSRI, action.getServiceType(), 
+					action.getparameterName(), action.getvalue());
+			resultAction.setCommunity(true);
+
+			if (LOG.isDebugEnabled())LOG.debug("setLocalSri succesfull, action with id :"+resultAction.getActionID());
+
+		}	else {
+			LOG.warn("No local SRI found for action "+ action.getActionID()+" original action is returned "+action.getActionID());
+			return action;
+		}
+
+		return resultAction;
+	}
+
+
 
 
 	/*
@@ -218,7 +289,7 @@ public class CACIPrediction {
 
 		return bestAction;
 	}
-	
+
 
 	public void storeCaciModelDB(UserIntentModelData modelData){
 

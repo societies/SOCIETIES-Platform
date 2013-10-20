@@ -53,6 +53,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.personalisation.model.IAction;
+import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 
 import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
@@ -65,6 +66,9 @@ import org.societies.personalisation.common.api.management.IInternalPersonalisat
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.societies.api.internal.personalisation.model.FeedbackEvent;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+
 import java.util.concurrent.ExecutionException;
 
 
@@ -90,6 +94,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	private ICAUIDiscovery cauiDiscovery;
 	private ICACIDiscovery caciDiscovery;
+	private IServiceDiscovery serviceDiscovery;
+
 
 
 	private ICommManager commsMgr;
@@ -130,15 +136,15 @@ public class CAUIPrediction implements ICAUIPrediction{
 		//set caui Active model if exists in ctx DB
 		retrieveCAUIModelDB();
 
-		//set caui Active model if exists in ctx DB
-		retrieveCACIModelDB();
 
 		// creates (if don't exist) caui and caci(local) attributes 
 		// registers for modifications events of both 
 		registerForCAUI_CACI_ModelEvent();
 
 
-		this.caciPredictor = new CACIPrediction(this.ctxBroker, this.caciTaskManager, this.commsMgr);
+		this.caciPredictor = new CACIPrediction(this.ctxBroker, this.caciTaskManager, this.commsMgr, this.serviceDiscovery);
+		//set caui Active model if exists in ctx DB
+		retrieveCACIModelDB();
 
 	}
 
@@ -178,17 +184,17 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 	@Override
 	public List<List<String>> getPredictionHistory() {
-		
-		
+
+
 		List<List<String>> result = new ArrayList<List<String>>();
 		//java.util.List<java.util.Map.Entry<String,String>> predictionPairList
-		
+
 		if(! predictionPairList.isEmpty()){
-			
+
 			for(java.util.Map.Entry<String,String> listEntry : predictionPairList){
 				String perfAction = listEntry.getKey();
 				String predictedAction = listEntry.getKey();
-			
+
 				List<String> coupleEntry = new ArrayList<String>();
 				coupleEntry.add(perfAction);
 				coupleEntry.add(predictedAction);
@@ -203,7 +209,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			IAction action) {
 
 		long startTime = System.currentTimeMillis();
-	
+
 		if (LOG.isDebugEnabled())LOG.debug("getPrediction user prediction enabled:"+ enableCauiPrediction);
 		predictionRequestsCounter = predictionRequestsCounter +1;
 		this.recordMonitoredAction(action);
@@ -290,6 +296,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 
+	
+	
+	
 
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, CtxAttribute contextAttribute) {
@@ -735,15 +744,16 @@ public class CAUIPrediction implements ICAUIPrediction{
 	//*** helper context class 
 	//***********************************
 
-	private void retrieveCAUIModelDB(){
+	private UserIntentModelData retrieveCAUIModelDB(){
 
+		UserIntentModelData newUIModelData = null;
 		try {
 			List<CtxIdentifier>	listModels = this.ctxBroker.lookup(this.getOwnerId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.CAUI_MODEL).get();
 
 			if(listModels != null && !listModels.isEmpty() ){
 				CtxAttribute modelAttr = (CtxAttribute) this.ctxBroker.retrieve(listModels.get(0)).get();
 				if(modelAttr.getBinaryValue() != null ){
-					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(modelAttr.getBinaryValue(), this.getClass().getClassLoader());
+					newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(modelAttr.getBinaryValue(), this.getClass().getClassLoader());
 					setCAUIActiveModel(newUIModelData);
 				}
 			}
@@ -751,6 +761,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 			LOG.error("Exception when retrieving CtxAttribute of type CAUI model from local Context DB "+e.getLocalizedMessage());
 			e.printStackTrace();
 		}
+		return newUIModelData;
 	}
 
 
@@ -764,7 +775,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 				CtxAttribute modelAttr = (CtxAttribute) this.ctxBroker.retrieve(listModels.get(0)).get();
 				if(modelAttr.getBinaryValue() != null){
 					UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(modelAttr.getBinaryValue(), this.getClass().getClassLoader());
-					setCACIActiveModel(newUIModelData);	
+					if(!newUIModelData.getActionModel().isEmpty()){
+						setCACIActiveModel(newUIModelData);	
+					} else {
+						throw new NullPointerException("CACI model is corrupted "+ newUIModelData.getActionModel());
+
+					}
 				}				
 			}
 		} catch (Exception e) {
@@ -843,6 +859,13 @@ public class CAUIPrediction implements ICAUIPrediction{
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>> activeCAUIModel = new HashMap<IUserIntentAction, HashMap<IUserIntentAction, Double>>(); 
 
 		if (LOG.isDebugEnabled())LOG.debug("getCAUIActiveModel cauipred from task manager: " +this.cauiTaskManager.getCAUIActiveModel() );
+		UserIntentModelData model = retrieveCAUIModelDB();
+		if( model != null){
+			activeCAUIModel = model.getActionModel();
+			this.setCAUIActiveModel(model);
+		}
+
+
 		if(this.cauiTaskManager.getCAUIActiveModel() != null ){
 			activeCAUIModel = this.cauiTaskManager.getCAUIActiveModel();	
 		}
@@ -872,8 +895,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 		//LOG.debug("generateNewCommunityModel 1 "+ cisId );
 
 		// change association type used... 
-		try {
+		//try {
 
+		if(cisId != null){
+			this.caciDiscovery.generateNewCommunityModel(cisId);
+		}
+		/*
 			if(cisId == null){
 
 				//	List<CtxIdentifier> commEntList = this.ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.COMMUNITY).get();
@@ -904,12 +931,12 @@ public class CAUIPrediction implements ICAUIPrediction{
 				//LOG.debug("generateNewCommunityModel 6 "+ cisId );
 				this.caciDiscovery.generateNewCommunityModel(cisId);	
 			}
+		 */
+		//	} 	catch (Exception e) {
 
-		} 	catch (Exception e) {
-
-			LOG.error("Could not start CACI learning '"
-					+ e.getLocalizedMessage(), e);
-		}
+		//		LOG.error("Could not start CACI learning '"
+		//					+ e.getLocalizedMessage(), e);
+		//		}
 
 	}
 
@@ -995,6 +1022,14 @@ public class CAUIPrediction implements ICAUIPrediction{
 		this.caciDiscovery = caciDiscovery;
 	}
 
+	public IServiceDiscovery getServiceDiscovery() {
+		return serviceDiscovery;
+	}
+
+
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		this.serviceDiscovery = serviceDiscovery;
+	}
 
 	@Override
 	public CtxAttribute retrieveCACIModel(IIdentity cisID) {
@@ -1023,7 +1058,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 					UserIntentModelData newCACIModelData = (UserIntentModelData) SerialisationHelper.deserialise(caciAttr.getBinaryValue(), this.getClass().getClassLoader());
 					//LOG.debug("retrieveCACIModel commEntIDList  4  caciAttr "+newCACIModelData );
 					storeCaciModelDB(newCACIModelData);
-					//setCACIActiveModel(newCACIModelData);	
+					setCACIActiveModel(newCACIModelData);	
 				}
 			}
 		} catch (Exception e) {
@@ -1062,6 +1097,8 @@ public class CAUIPrediction implements ICAUIPrediction{
 	}
 
 
+	
+
 	public List<CtxEntityIdentifier> retrieveOwningCIS(){
 
 		List<CtxEntityIdentifier> commEntIDList = new ArrayList<CtxEntityIdentifier>();
@@ -1082,7 +1119,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 
 				for(CtxEntityIdentifier entId : entIDSet){
 					IIdentity cisId = this.commsMgr.getIdManager().fromJid(entId.getOwnerId());
-				
+
 					CtxEntityIdentifier commId = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
 					commEntIDList.add(commId);
 				}

@@ -48,6 +48,7 @@
 		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
 		<property name="caciTaskManager" ref="caciTaskManager"></property>
 		<property name="commsMgr" ref="commsMgr"></property>
+		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
 	</bean>
 
 	<bean id="cauiDiscovery"
@@ -64,6 +65,7 @@
 		<property name="cauiTaskManager" ref="cauiTaskManager"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="commsMgr" ref="commsMgr"></property>
+		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
 	</bean>
 	
 	<bean id="cristPrediction"

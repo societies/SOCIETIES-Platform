@@ -55,8 +55,15 @@
 					<p:column headerText="Prevailing Escorting Context Values">
 						<h:outputText value="#{CAUIAction.ctxAction}" />
 					</p:column>
+			
+			
 				</p:dataTable>
-
+			
+				<p:commandButton
+						value="refresh"
+						action="#{cauiController.refreshContextAction()}">
+					</p:commandButton>
+			
 			</p:tab>
 
 
@@ -74,6 +81,8 @@
 					<h:outputText value="Select CIS id" />
 					<h:selectOneMenu value="#{cauiController.cisId}">
 
+					
+					
 						<f:selectItems value="#{cauiController.retrieveCisIdList()}" />
 					</h:selectOneMenu>
 
@@ -85,7 +94,7 @@
 
 
 					<p:commandButton
-						value="Refresh community model (for CIS id that user owns or belongs)"
+						value="Retrieve community model (for CIS id that user owns or belongs)"
 						actionListener="#{cauiController.refreshCommunityModels()}"
 						update="communityTable" />
 				</h:panelGrid>

@@ -19,7 +19,6 @@
  */
 package org.societies.personalisation.CACIDiscovery.impl;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +40,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
@@ -57,6 +57,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 	public ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
 	private ICommManager commsMgr;
+	private IServiceDiscovery serviceDiscovery;
 
 	private IIdentity cisIdentifier ;
 
@@ -70,6 +71,20 @@ public class CACIDiscovery implements ICACIDiscovery{
 	public void initialiseCACIDiscovery(){
 
 	}
+
+
+	public IServiceDiscovery getServiceDiscovery() {
+
+		LOG.debug(this.getClass().getName()+": Return IServiceDiscovery");
+		return serviceDiscovery;
+	}
+
+
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		LOG.debug(this.getClass().getName()+": Got serviceDiscovery" +serviceDiscovery );
+		this.serviceDiscovery = serviceDiscovery;
+	}
+
 
 	public ICAUITaskManager getCauiTaskManager() {
 		//System.out.println(this.getClass().getName()+": Return cauiTaskManager");
@@ -152,7 +167,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 			}
 		}
 
-		//System.out.println("mergeModels 2 communityActionsMap "+communityActionsMap);
+		System.out.println("mergeModels 2 communityActionsMap "+communityActionsMap);
 
 		//int i =0;
 		for(UserIntentModelData userModel : userModelList){
@@ -197,12 +212,11 @@ public class CACIDiscovery implements ICACIDiscovery{
 							if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
 								communityActionsMap.put(sourceComAct, null);
 								//System.out.println("**** adding null target for "+sourceComAct);
-							}  else {
-								// if community model already contains an edge for sourceCommAct to some target
-								// but the newly merged model doesn't contain this link recalculate and drop trans prob
-								// TODO recalculate trans prob
-								//System.out.println("**** nothing to do for  "+sourceComAct);
-							}
+							} // else {
+							// if community model already contains an edge for sourceCommAct to some target
+							// but the newly merged model doesn't contain this link recalculate and drop trans prob
+
+							//}
 						}
 
 					}
@@ -383,8 +397,32 @@ public class CACIDiscovery implements ICACIDiscovery{
 	public Boolean areSimilarActions(IUserIntentAction actionA, IUserIntentAction actionB){
 
 		// ignore ServiceInstanceIdentifier, using only service type
-		if(actionA.getServiceType().equalsIgnoreCase(actionB.getServiceType()) && actionA.getparameterName().equals(actionB.getparameterName()) && actionA.getvalue().equals(actionB.getvalue())) {
-			//System.out.println( actionA +" and "+ actionB+"!!!!! are similar");
+		/*	
+		if( actionA == null){
+			LOG.debug("action A null");
+			return false;
+		}
+
+		if(actionB == null){
+			LOG.debug("action B null");
+			return false;
+		}
+		 */
+
+
+		if( actionA != null){
+			LOG.debug("action A "+actionA);
+			LOG.debug("action A serviceID:"+actionA.getServiceID());
+
+		}
+		if( actionB != null){
+			LOG.debug("action B "+actionB);
+			LOG.debug("action B serviceID:"+actionA.getServiceID());
+
+		}
+
+		if(actionA.getparameterName().equals(actionB.getparameterName()) && actionA.getvalue().equals(actionB.getvalue())) {
+			LOG.debug( actionA +" and "+ actionB+"!!!!! are similar");
 			return true;
 		} else return false;
 	}
@@ -528,7 +566,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 		return null;
 	}
 
-
+	
 	/*
 	 * creates a new community action based on the details of the userAction 
 	 */
@@ -643,11 +681,8 @@ public class CACIDiscovery implements ICACIDiscovery{
 								try {
 									newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
 									userModelList.add(newUIModelData);
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch (ClassNotFoundException e) {
-									// TODO Auto-generated catch block
+								} catch (Exception e) {
+									LOG.error("Exception while deserializing CAUI model for attrID:"+uiModelAttr.getId()+"."+ e.getLocalizedMessage());
 									e.printStackTrace();
 								}
 
@@ -657,7 +692,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 				} catch (Exception e) {
-					LOG.error("Exception while retrieving community entity ID "+e.getLocalizedMessage());
+					LOG.error("Exception while retrieving CAUI model from : "+entityId +" "+e.getLocalizedMessage());
 					e.printStackTrace();
 				}
 
