@@ -1016,9 +1016,8 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				final List<String> cisAttrTypes = getPrivPolicyAttributeTypes(this.cisOwnerId, this.cisId);
 				LOG.debug("CssAttributePrefetcher run: cisAttrTypes={}", cisAttrTypes);
 				// TODO Should also check visibility, i.e. private vs. members-only/public
-				if (cisAttrTypes.isEmpty()) {
-					return;
-				}
+				// Add CAUI
+				cisAttrTypes.add(CtxAttributeTypes.CAUI_MODEL);
 				
 				final CtxEntityIdentifier cssEntId = ctxBroker.retrieveIndividualEntityId(
 						requestor, this.cssId).get();
@@ -1030,6 +1029,7 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				}
 				
 				final List<CtxIdentifier> cssAttrIds = new ArrayList<CtxIdentifier>(cisAttrTypes.size());
+				
 				for (final String cisAttrType : cisAttrTypes) {
 					cssAttrIds.addAll(ctxBroker.lookup(cssEntId, CtxModelType.ATTRIBUTE, cisAttrType).get());
 				}
