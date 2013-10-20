@@ -29,12 +29,15 @@
 		<!--<navigation-case> <from-action>#{loginController.loginButtonAction}</from-action> 
 			<from-outcome>true</from-outcome> <to-view-id>/index.xhtml</to-view-id> <redirect/> 
 			</navigation-case> -->
-		<navigation-case>
+		<!--  <navigation-case>
 			<from-action>#{loginController.logoutAction}</from-action>
 			<to-view-id>/index.xhtml</to-view-id>
 			<redirect />
 		</navigation-case>
-
+		
+		 -->
+		 
+		 
 		<!-- Redirect based on Privacy Policy Negotiation queue -->
 		<navigation-case>
 			<from-action>#{ppNegotiation.completeNegotiationAction}</from-action>

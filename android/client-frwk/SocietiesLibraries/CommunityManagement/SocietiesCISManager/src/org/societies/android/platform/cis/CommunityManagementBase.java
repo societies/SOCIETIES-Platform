@@ -750,6 +750,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 							Community cis = communityResult.getCreate().getCommunity();
 							//NOTIFY CALLING CLIENT
 							intent.putExtra(ICisManager.INTENT_RETURN_VALUE, (Parcelable)cis);
+							Toast.makeText(androidContext, "CIS created", Toast.LENGTH_SHORT).show();
 						}
 						intent.putExtra(ICisManager.INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
 					}
