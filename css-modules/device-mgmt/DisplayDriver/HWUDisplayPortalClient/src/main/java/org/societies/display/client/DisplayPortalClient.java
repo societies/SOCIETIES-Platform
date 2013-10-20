@@ -94,7 +94,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	public void Init(){
 		this.LOG.debug("Initialising DisplayPortalClient");
 		try {
-			this.serverIdentity = this.idMgr.fromJid("stuart.societies.local1.macs.hw.ac.uk");
+			this.serverIdentity = this.idMgr.fromJid("stuart.societies.local2.macs.hw.ac.uk");
 		} catch(Exception e) {}
 		//services.getServer(myClientServiceID);
 		this.LOG.debug("Retrieved my server's identity: "+this.serverIdentity.getJid());
