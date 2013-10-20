@@ -12,7 +12,7 @@
     <string name="title_activity_negotiation">Accept Privacy Policy</string>
     <string name="title_activity_radio_popup">Accept Privacy Policy</string>
     <string name="title_activity_checkbox_popup">Accept Privacy Policy</string>
-    <string name="timed_abort_positive_string">Ignore</string>
+    <string name="timed_abort_positive_string">Accept</string>
     <string name="timed_abort_negative_string">Abort</string>
     <string name="simple_notification_accept_string">OK</string>
     <string name="request_history">Request History</string>
