@@ -27,6 +27,7 @@ package org.societies.orchestration.cpa.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.activity.model.Activity;
 import org.societies.api.activity.IActivity;
 import org.societies.api.context.event.CtxChangeEvent;
 import org.societies.api.internal.orchestration.ICisDataCollector;
@@ -62,10 +63,23 @@ public class CPA implements IDataCollectorSubscriber, Runnable
     }
 
 	private void process() {
-		cpaCreationPatterns.analyze(newActivities);
-        newActivities.clear();
-	}
+        List<IActivity> tmpNewActivities = null;
+        synchronized (newActivities){
+            tmpNewActivities = CPA.deepCopyActivities(newActivities);
+            newActivities.clear();
+        }
+        cpaCreationPatterns.analyze(tmpNewActivities);
 
+	}
+    public static List<IActivity> deepCopyActivities(List<IActivity> inp){
+        List<IActivity> ret = new ArrayList<IActivity>();
+        IActivity tmpAct = null;
+        for(IActivity act : inp){
+            tmpAct = new Activity(act);
+            ret.add(tmpAct);
+        }
+        return ret;
+    }
     @Override
     public void receiveNewData(List<?> newData) {
         if(newData.get(0) instanceof IActivity){
@@ -78,7 +92,10 @@ public class CPA implements IDataCollectorSubscriber, Runnable
 
 
     }
-
+    public void receiveNewData(Object newData){
+        if(newData instanceof  IActivity)
+            this.newActivities.add((IActivity)newData);
+    }
     public ICisDataCollector getCollector() {
         return collector;
     }
@@ -98,11 +115,12 @@ public class CPA implements IDataCollectorSubscriber, Runnable
     }
     @Override
     public void run() {
-        newActivities.addAll(safeCast(this.collector.subscribe(this.cisId,this)));
+        if(this.collector != null)
+            newActivities.addAll(safeCast(this.collector.subscribe(this.cisId,this)));
         while (true) {
             try {
                 Date date = new Date();
-                if (date.getTime() >= (lastTemporaryCheck.getTime() + (1000 * 180))) {
+                if (date.getTime() >= (lastTemporaryCheck.getTime() + (1000 * 10))) {
                     process();
                     lastTemporaryCheck.setTime(date.getTime());
                 }
@@ -144,11 +162,11 @@ public class CPA implements IDataCollectorSubscriber, Runnable
         this.cpaCreationPatterns.init();
         LOG.info("new CPA started for CIS "+this.cisId);
     }
-    public List<String> getTrends(int n){
+/*    public List<String> getTrends(int n){
         //ArrayList<String> ret = new ArrayList<String>();
         //this.cpaCreationPatterns.getGraph().getTrends();
         //return ret;
         return cpaCreationPatterns.getGraph().topTrends(n);
-    }
+    }*/
     
 }

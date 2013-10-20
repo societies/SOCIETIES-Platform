@@ -70,15 +70,31 @@ public class ContentComparator implements ActorComparator {
         }
     }
     public void initAnnie() throws GateException {
-        Out.prln("Initialising ANNIE... ");
+        //Out.prln("Initialising ANNIE... ");
         if(Gate.getPluginsHome()==null)
             Gate.setPluginsHome(new File("."));
 
+
         try {
             Gate.setSiteConfigFile(new File(ContentComparator.class.getClassLoader().getResource("gate.xml").toURI()));
-        } catch (URISyntaxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch ( IllegalArgumentException e1 ){
+            LOG.error("could not open uri to gate.xml, trying file approach: ",e1);
+            try{
+                Gate.setSiteConfigFile(new File("gate.xml"));
+            }catch (Exception e2)
+            {
+                LOG.error("could not open file gate.xml, all out of approaches: ",e2);
+            }
+        }catch (Exception e) {
+            LOG.error("could not open uri to gate.xml, trying file approach: ",e);
+            try{
+                Gate.setSiteConfigFile(new File("gate.xml"));
+            }catch (Exception e2)
+            {
+                LOG.error("could not open file gate.xml, all out of approaches: ",e2);
+            }
         }
+
         Gate.init();
         File gateHome = Gate.getGateHome();
         pluginURL =  ContentComparator.class.getClassLoader().getResource("plugins/ANNIE/");
@@ -89,7 +105,7 @@ public class ContentComparator implements ActorComparator {
 /*        } catch (MalformedURLException e) {
             e.printStackTrace();
         }*/
-        Out.prln("...GATE initialised");
+        //Out.prln("...GATE initialised");
 
 
 
@@ -110,7 +126,7 @@ public class ContentComparator implements ActorComparator {
             annieController.add(pr);
         } // for each ANNIE PR
 
-        Out.prln("...ANNIE loaded");
+        //Out.prln("...ANNIE loaded");
     }
     public Corpus makeCorpus(String str) throws GateException {
         DocumentContentImpl content = new DocumentContentImpl(str);
@@ -149,8 +165,8 @@ public class ContentComparator implements ActorComparator {
         }
         if(member1Text.length() == 0 || member1Text.length() == 0)
             return 0;
-        LOG.info("USER: "+member1.getName()+" m1lastTimeStamp: "+m1lastTimeStamp+" member1.getTimestamp(): "+member1.getTimestamp());
-        LOG.info("USER: "+member2.getName()+" m2lastTimeStamp: "+m2lastTimeStamp+" member2.getTimestamp(): "+member2.getTimestamp());
+        //LOG.info("USER: "+member1.getName()+" m1lastTimeStamp: "+m1lastTimeStamp+" member1.getTimestamp(): "+member1.getTimestamp());
+        //LOG.info("USER: "+member2.getName()+" m2lastTimeStamp: "+m2lastTimeStamp+" member2.getTimestamp(): "+member2.getTimestamp());
 /*        LOG.info("comparing two members m1 totaltextlength: "+member1Text.length()+" numberof: "
                 +m1count+ " ratio: "+((double)member1Text.length())/((double)m1count));
         LOG.info("comparing two members m2 totaltextlength: "+member2Text.length()+" numberof: "
@@ -163,8 +179,8 @@ public class ContentComparator implements ActorComparator {
             member1.setTimestamp(m1lastTimeStamp);
             m1annotations = member1.getTerms();
             timespent = (System.currentTimeMillis()-start);
-            LOG.info("annotating "+member1Text.length()+" time spent: "+timespent+" per char: "
-                    +((double)(System.currentTimeMillis()-start))/((double)member1Text.length()));
+            //LOG.info("annotating "+member1Text.length()+" time spent: "+timespent+" per char: "
+            //        +((double)(System.currentTimeMillis()-start))/((double)member1Text.length()));
             Map<String, List<String>> currentAnnotationSets = member1.getTerms();
             annotationsDone++;
 
@@ -180,8 +196,8 @@ public class ContentComparator implements ActorComparator {
             member2.setTimestamp(m2lastTimeStamp);
             m2annotations = member2.getTerms();
             timespent = (System.currentTimeMillis()-start);
-            LOG.info("annotating "+member2Text.length()+" time spent: "+timespent+" per char: "
-                    +((double)(System.currentTimeMillis()-start))/((double)member2Text.length()));
+            //LOG.info("annotating "+member2Text.length()+" time spent: "+timespent+" per char: "
+            //        +((double)(System.currentTimeMillis()-start))/((double)member2Text.length()));
             annotationsDone++;
         } else {
             m2annotations = member2.getTerms();
@@ -210,11 +226,11 @@ public class ContentComparator implements ActorComparator {
             }
         }
         //look for ..
-        LOG.info("fruitfulannotationsDone: "+fruitfulannotationsDone+" annotationsDone: "+annotationsDone+" ret: "+ret);
+        //LOG.info("fruitfulannotationsDone: "+fruitfulannotationsDone+" annotationsDone: "+annotationsDone+" ret: "+ret);
         return ret;
     }
     private Map<String, AnnotationSet> getAnnotations(String str){
-        LOG.info("trying to annotate str of size: "+str.length());
+        //LOG.info("trying to annotate str of size: "+str.length());
 
         Map<String, AnnotationSet> ret = new HashMap<String, AnnotationSet >();
         if(str == null || str.length() == 0){
@@ -237,14 +253,14 @@ public class ContentComparator implements ActorComparator {
         Document doc = null;
         if(corp.size()>0){
             doc = corp.get(0);
-            LOG.info("corp size: "+corp.size());
+            //LOG.info("corp size: "+corp.size());
         }else{
-            LOG.info("corp size 0 ret:"+ret);
+            //LOG.info("corp size 0 ret:"+ret);
             return ret;
         }
         ret = doc.getNamedAnnotationSets();
         if(ret == null){
-            LOG.info("ret is null after getnamedannotation...");
+            //LOG.info("ret is null after getnamedannotation...");
             ret = new HashMap<String, AnnotationSet>();
         }else {
             fruitfulannotationsDone++;

@@ -133,21 +133,21 @@ public class StandAloneAnnieTwitter {
         // argument
         Corpus corpus = (Corpus) Factory.createResource("gate.corpora.CorpusImpl");
         List<IActivity> tweetActs = Tweet2011Extractor.actsFromGzJson(args[0]);
+        String wholeContent="";
         for(IActivity act : tweetActs) {
-            FeatureMap params = Factory.newFeatureMap();
-            params.put("stringContent", act.getObject());
-            params.put("preserveOriginalContent", new Boolean(true));
-            params.put("collectRepositioningInfo", new Boolean(true));
-            Document doc = (Document)
-                    Factory.createResource("gate.corpora.DocumentImpl", params);
-            corpus.add(doc);
-            Out.println("adding: "+act.getObject());
+                             wholeContent += act.getObject()+". ";
         } // for each of args
-
+        FeatureMap params = Factory.newFeatureMap();
+        params.put("stringContent", wholeContent);
+        params.put("preserveOriginalContent", new Boolean(true));
+        params.put("collectRepositioningInfo", new Boolean(true));
+        Document tdoc = (Document)
+                Factory.createResource("gate.corpora.DocumentImpl", params);
+        corpus.add(tdoc);
         // tell the pipeline about the corpus and run it
         annie.setCorpus(corpus);
         annie.execute();
-
+        Out.println("adding: \""+wholeContent+"\" to corpus");
         // for each document, get an XML document with the
         // person and location names added
         Iterator iter = corpus.iterator();
@@ -156,7 +156,10 @@ public class StandAloneAnnieTwitter {
         String startTagPart_2 = "\" title=\"";
         String startTagPart_3 = "\" style=\"background:Red;\">";
         String endTag = "</span>";
-
+        for(String s : tdoc.getNamedAnnotationSets().keySet())
+        {
+            Out.println("annotation key: "+s);
+        }
         while(iter.hasNext()) {
             Out.println("new iter..");
             Document doc = (Document) iter.next();

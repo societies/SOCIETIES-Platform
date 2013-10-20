@@ -32,6 +32,7 @@ import org.societies.api.internal.orchestration.ICisDataCollector;
 import org.societies.api.cis.orchestration.model.ISocialGraph;
 import org.societies.api.osgi.event.*;
 import org.societies.api.schema.cis.community.Community;
+import org.societies.orchestration.cpa.impl.comparison.util.TrendRunnable;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,19 +45,34 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class CPAManager extends EventListener implements ICPA {
     private ConcurrentHashMap<String, CPA> cpaMap;
+    private ConcurrentHashMap<String, Thread> cpaThreadMap;
+    private ConcurrentHashMap<String, TrendRunnable> trendMap;
+    private ConcurrentHashMap<String, Thread> trendThreadMap;
     private ICisDataCollector collector;
     private IEventMgr eventMgr;
+    private Thread thread = null;
     protected static Logger LOG = LoggerFactory.getLogger(CPAManager.class);
     public CPAManager(){
         cpaMap= new ConcurrentHashMap<String, CPA>();
+        trendMap= new ConcurrentHashMap<String, TrendRunnable>();
+        cpaThreadMap= new ConcurrentHashMap<String, Thread>();
+        trendThreadMap = new ConcurrentHashMap<String, Thread>();
     }
 
     public void newCis(String cisId) {
         if(cpaMap.containsKey(cisId)) return;
         CPA newCPA = new CPA(collector,cisId);
         Thread t = new Thread(newCPA);
-        t.start();
         cpaMap.put(cisId,newCPA);
+        cpaThreadMap.put(cisId,t);
+        t.start();
+
+        TrendRunnable trendRunnabler = new TrendRunnable();
+        trendRunnabler.setCollector(collector);
+        trendMap.put(cisId,trendRunnabler);
+        Thread trendRunnableThread = new Thread(trendRunnabler);
+        trendThreadMap.put(cisId, trendRunnableThread);
+        trendRunnableThread.start();
     }
 
     public void removedCis(String cisId) {
@@ -124,7 +140,7 @@ public class CPAManager extends EventListener implements ICPA {
         //TODO: handle cisId null
         if(!cpaMap.containsKey(cisId))
             return null;
-        return cpaMap.get(cisId).getTrends(n);
+        return trendMap.get(cisId).topTrends(n);
     }
 
     @Override
@@ -133,5 +149,13 @@ public class CPAManager extends EventListener implements ICPA {
         if(!cpaMap.containsKey(cisId))
             return null;
         return cpaMap.get(cisId).getCPACreationPatterns().getGraph();
+    }
+
+    public CPA getCPA(String cisId){
+
+        return cpaMap.get(cisId);
+    }
+    public TrendRunnable getTrendRunnable(String cisId){
+        return trendMap.get(cisId);
     }
 }

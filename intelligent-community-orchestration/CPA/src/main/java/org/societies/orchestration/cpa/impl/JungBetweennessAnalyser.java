@@ -24,14 +24,18 @@
  */
 package org.societies.orchestration.cpa.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import edu.uci.ics.jung.algorithms.cluster.EdgeBetweennessClusterer;
 import edu.uci.ics.jung.graph.UndirectedSparseGraph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JungBetweennessAnalyser implements GraphAnalyser {
 	private int numEdgesToRemove;
+    protected static Logger LOG = LoggerFactory.getLogger(JungBetweennessAnalyser.class);
 	public JungBetweennessAnalyser(int numbEdgesToRemove){
 		this.numEdgesToRemove = numbEdgesToRemove;
 	}
@@ -39,16 +43,22 @@ public class JungBetweennessAnalyser implements GraphAnalyser {
 	public Set<Set<SocialGraphVertex>> cluster(SocialGraph sg) {
 		int numEdgesToRemoveNow = numEdgesToRemove;
 		if(sg.getEdges().size()<numEdgesToRemoveNow){
-			System.out.println("something wrong w.r.t. the edges and the numEdgesToRemove: "+this.numEdgesToRemove+" sg.getEdges().size(): "+sg.getEdges().size());
+			//System.out.println("something wrong w.r.t. the edges and the numEdgesToRemove: "+this.numEdgesToRemove+" sg.getEdges().size(): "+sg.getEdges().size());
 			if(sg.getEdges().size()!=1){
 				numEdgesToRemoveNow = sg.getEdges().size()-2;
 			}
 		}
-		
+		if(numEdgesToRemoveNow <= 0 )
+        {
+            //System.out.println("something wrong w.r.t. the edges and the numEdgesToRemove: "+this.numEdgesToRemove+" sg.getEdges().size(): "+sg.getEdges().size());
+            return new HashSet<Set<SocialGraphVertex>>();
+        }
 		EdgeBetweennessClusterer<SocialGraphVertex,SocialGraphEdge> clusterer =
 				new EdgeBetweennessClusterer<SocialGraphVertex,SocialGraphEdge>(numEdgesToRemoveNow);
         UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> undirectedSparseGraph = sg.toJung();
-        Set<Set<SocialGraphVertex>> clusterSet = clusterer.transform(undirectedSparseGraph);
+        //LOG.info(undirectedSparseGraph.getEdgeCount());
+        //Set<Set<SocialGraphVertex>> clusterSet = clusterer.transform(undirectedSparseGraph);
+        Set<Set<SocialGraphVertex>> clusterSet = new HashSet<Set<SocialGraphVertex>>();
 		//List<SocialGraphEdge> edges = clusterer.getEdgesRemoved();
 		return clusterSet;
 	}

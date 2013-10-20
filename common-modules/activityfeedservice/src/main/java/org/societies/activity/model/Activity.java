@@ -68,11 +68,12 @@ public class Activity implements IActivity {
 	public Activity(IActivity iact)
 	{
 		data = new HashMap<String,ActivityString>();
-		this.setActor(iact.getActor());
-		this.setObject(iact.getObject());
-		this.setTarget(iact.getTarget());
-		this.setVerb(iact.getVerb());
-		this.setPublished(iact.getPublished());
+		this.setActor(new String(iact.getActor()));
+		this.setObject(new String(iact.getObject()));
+		this.setTarget(new String(iact.getTarget()));
+		this.setVerb(new String(iact.getVerb()));
+		this.setPublished(new String(iact.getPublished()));
+        this.setTime(new Long(Long.parseLong(iact.getPublished())));
 	}
     public Activity(org.societies.api.schema.activity.MarshaledActivity iAct)
     {

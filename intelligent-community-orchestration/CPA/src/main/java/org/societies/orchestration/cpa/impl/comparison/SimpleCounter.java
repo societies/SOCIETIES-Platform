@@ -42,25 +42,30 @@ public class SimpleCounter implements ActorComparator {
 		
 	}
 	@Override
-	public double compare(SocialGraphVertex member1,SocialGraphVertex member2, List<IActivity> activityDiff) {
-		double ret = 0;
-		for(IActivity act: activityDiff){
-            //add new link (or add weight to an old link)
-            if(contains(member1,act) && contains(member2,act)) ret += 1.0;
-				
-		}
-		
-		return ret;
-	}
+        public double compare(SocialGraphVertex member1,SocialGraphVertex member2, List<IActivity> activityDiff) {
+            double ret = 0;
+/*        try {
+            activityDiff.wait();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }*/
+            for(IActivity act: activityDiff){
+                //add new link (or add weight to an old link)
+                if(contains(member1,act) && contains(member2,act)) ret += 1.0;
 
-	public boolean contains(SocialGraphVertex participant, IActivity act){
-		if(act.getActor()!= null && act.getActor().contains(participant.getName()))
-			return true;
-		if(act.getObject()!= null && act.getObject().contains(participant.getName()))
-			return true;
-		if(act.getTarget()!= null && act.getTarget().contains(participant.getName()))
-			return true;
-		return false;
+            }
+
+            return ret;
+        }
+
+    public boolean contains(SocialGraphVertex participant, IActivity act){
+        if(act.getActor()!= null && act.getActor().contains(participant.getName()))
+            return true;
+        if(act.getObject()!= null && act.getObject().contains(participant.getName()))
+            return true;
+        if(act.getTarget()!= null && act.getTarget().contains(participant.getName()))
+            return true;
+        return false;
 	}
 	
 }

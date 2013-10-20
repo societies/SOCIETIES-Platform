@@ -32,20 +32,27 @@ import org.societies.api.cis.orchestration.model.ISocialGraph;
 import org.societies.api.cis.orchestration.model.ISocialGraphEdge;
 import org.societies.api.cis.orchestration.model.ISocialGraphVertex;
 import org.societies.orchestration.cpa.impl.comparison.ActorComparator;
+import org.societies.orchestration.cpa.impl.comparison.model.Trend;
+import org.societies.orchestration.cpa.impl.comparison.model.TrendSet;
+import org.societies.orchestration.cpa.impl.comparison.model.TrendStats;
+import org.societies.orchestration.cpa.impl.comparison.util.TrendRunnable;
 
 import java.util.*;
 
 public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph {
 	private ArrayList<ISocialGraphEdge> edges;
 	private ArrayList<ISocialGraphVertex> vertices;
-    private HashMap<String,TrendStats> trends;
-    private boolean wordTrends = true;
+
+    private int called=0;
+
     protected static Logger LOG = LoggerFactory.getLogger(SocialGraph.class);
 
 	public SocialGraph(){
 		edges = new ArrayList<ISocialGraphEdge>();
 		vertices = new ArrayList<ISocialGraphVertex>();
-        setTrends(new HashMap<String, TrendStats>());
+
+
+
 	}
 	public List<ISocialGraphEdge> getEdges() {
 		return edges;
@@ -126,37 +133,7 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 	public <T> T[] toArray(T[] a) {
 		return vertices.toArray(a);
 	}
-    public synchronized void handleTrends (String inp){
-        LOG.info("handletrends text: \""+inp+"\"");
-        String[] finalText = {inp};
-        if(wordTrends){
-            String[] words = inp.split("\\s+");
-/*            for (int i = 0; i < words.length; i++) {
-                // You may want to check for a non-word character before blindly
-                // performing a replacement
-                // It may also be necessary to adjust the character class
-                //words[i] = words[i].replaceAll("[^\w]", "");
-            }*/
-            finalText = words;
 
-        }
-        for(String text : finalText){
-            if(getTrends().containsKey(text)){
-                getTrends().get(text).increment();
-            } else {
-                TrendStats ts = new TrendStats();
-                ts.setTrendText(text);
-                getTrends().put(text,ts);
-            }
-            //cleanup
-            for(Iterator<String> it = getTrends().keySet().iterator() ; it.hasNext();)
-                if(getTrends().get(it.next()).tooOld())
-                    it.remove();
-        }
-/*        for(String trend : getTrends().keySet())
-            if(getTrends().get(trend).tooOld())
-                getTrends().remove(trend);*/
-    }
 	public UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> toJung(){
 		UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge> ret = new UndirectedSparseGraph<SocialGraphVertex,SocialGraphEdge>();
 		for(ISocialGraphVertex vertex : this.vertices){
@@ -167,17 +144,21 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 		}
 		return ret;
 	}
-	public void populateFromNewData(List<IActivity> actDiff , long lastTime, ActorComparator actComp){
-
+	public void populateFromNewData(final List<IActivity> actDiff , long lastTime, ActorComparator actComp){
+        if(actDiff.size()==0)
+            return;
 		//creating the vertices
 		//this make take a while the first time..
+
+
+
 
 
 		//actDiff = cis.getActivityFeed().getActivities(lastTimeStr+" "+nowStr);
         SocialGraphVertex newVertex = null;
         SocialGraphVertex found = null;
 		for(IActivity act : actDiff){
-            LOG.info("populate from new data, act: " + act.getActor() + " target: "+act.getTarget());
+            //LOG.info("populate from new data, act: " + act.getActor() + " target: "+act.getTarget());
             found = hasVertex(act.getActor());
 			if(found == null){
                 newVertex = new SocialGraphVertex(act.getActor());
@@ -195,11 +176,11 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 			} else
                 found.addAct(act.getObject());
             //do some more trend calculation : Update Trend tables..
-            handleTrends(act.getObject());
+
 		}
 		//creating the edges..
 		//this aswell !
-		System.out.println("actDiff size:"+actDiff.size()+" getVertices().size():"+getVertices().size());
+		//System.out.println("actDiff size:"+actDiff.size()+" getVertices().size():"+getVertices().size());
 		int newEdges=0; int hasEdges=0;
 		SocialGraphEdge edge = null; SocialGraphEdge searchEdge = null;
 		for(ISocialGraphVertex vertex1 : getVertices()){
@@ -218,38 +199,9 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 				}
 			}
 		}
-		System.out.println("newEdges: "+newEdges);
+		//System.out.println("newEdges: "+newEdges);
 	}
 
-    public HashMap<String, TrendStats> getTrends() {
-        return trends;
-    }
 
-    public void setTrends(HashMap<String, TrendStats> trends) {
-        this.trends = trends;
-    }
-    public class TrendSorter implements Comparator<TrendStats>{
 
-        @Override
-        public int compare(TrendStats o1, TrendStats o2) {
-            return (o1.getCount()==o2.getCount()) ? 0 : ( (o1.getCount()>o2.getCount()) ? -1 : 1) ; //returns 0 if they are equal..
-        }
-
-    }
-    public List<String> topTrends(int n)
-    {
-        List<String> ret = new ArrayList<String>();
-        System.out.println("trends.keySet().size(): "+trends.keySet().size());
-        int m = (n>trends.keySet().size()) ? trends.keySet().size() : n;
-        List<TrendStats> values = new ArrayList<TrendStats>();
-        values.addAll(trends.values());
-        System.out.println("m: "+m);
-        Collections.sort(values,new TrendSorter());
-        for(int i=0;i<m;i++){
-            System.out.println("setting trend: "+values.get(i).getTrendText()+" count: "+values.get(i).getCount()+" trend: "+values.get(i).isTrend());
-            ret.add(values.get(i).getTrendText());
-        }
-        return ret;
-
-    }
 }

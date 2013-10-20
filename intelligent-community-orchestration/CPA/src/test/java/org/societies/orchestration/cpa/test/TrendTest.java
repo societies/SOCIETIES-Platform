@@ -147,12 +147,12 @@ public class TrendTest  extends JApplet {
         cpa.analyze(sim.getActFeed().getActivitiesFromDB(lastAct.getPublished()+" "+Long.toString(System.currentTimeMillis()+100000000L)));
         jf.setVisible(false);jf.setVisible(true);
         vv.revalidate();
-        List<String> topTrends = cpa.getGraph().topTrends(4);
+      /*  List<String> topTrends = cpa.getGraph().topTrends(4);
         System.out.println("topTrends size: "+topTrends.size());
         if(topTrends.size()>0) {
             System.out.println("top trend: "+ topTrends.get(0));
             System.out.println("bottom trend: "+ topTrends.get(topTrends.size()-1));
-        }
+        }*/
     }
     Activity a1 = new Activity();
     Activity a2 = new Activity();

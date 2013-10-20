@@ -185,7 +185,7 @@ public class CPAMockTester {
 
     }
 
-    @Test
+/*    @Test
     public void simpleTrendTest(){
 
         ArrayList list = new ArrayList();
@@ -202,7 +202,7 @@ public class CPAMockTester {
         List<String> trends = cpa.getTrends(2);
         for(String trend : trends)
             LOG.info("trend: "+trend);
-    }
+    }*/
 
     @Test
     public void reutersTest(){
@@ -232,9 +232,9 @@ public class CPAMockTester {
             Thread.sleep(sleepTime);
         } catch (InterruptedException e) {
         }
-        List<String> trends = cpa.getTrends(2);
+        /*List<String> trends = cpa.getTrends(2);
         for(String trend : trends)
-            LOG.info("trend: "+trend);
+            LOG.info("trend: "+trend);*/
     }
 
     public static Activity makeMessage(String user1, String user2, String message, String published){

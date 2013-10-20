@@ -70,7 +70,7 @@ public class CPACreationPatterns
 			analyser = new JungBetweennessAnalyser(5);
 		}
         compSet.addComparator(new SimpleCounter());
-        compSet.addComparator(new ContentComparator());
+        //compSet.addComparator(new ContentComparator());
 	}
 	//private ActorComparator actComp = null;
     private MultiComparator compSet = new MultiComparator();
