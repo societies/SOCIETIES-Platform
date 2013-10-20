@@ -119,6 +119,7 @@ public class EventListener extends Service {
 
         // Timed abort processor needs a context to run in
         TimedAbortProcessor.getInstance().setContext(this);
+    
     }
 
     @Override
@@ -175,6 +176,7 @@ public class EventListener extends Service {
         public void onReceive(Context context, Intent intent) {
             try {
                 Log.d(LOG_TAG, "Received action: " + intent.getAction());
+                Log.d(LOG_TAG, "onReceive");
 
                 //EVENT MANAGER INTENTS
                 if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
@@ -349,23 +351,39 @@ public class EventListener extends Service {
     }
 
     private void displayUserFeedbackNotification(UserFeedbackBean ufBean) {
-
+    	Log.d(LOG_TAG, "displayUserFeedbackNotification");
         //DETERMINE WHICH ACTIVITY TO LAUNCH
         Class activityClass;
         if (ufBean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
 
             // select type of explicit feedback
-            if (ufBean.getType() == 0)
+            if (ufBean.getType() == 0){
                 activityClass = RadioPopup.class;
-            else if (ufBean.getType() == 1)
+            	Log.d(LOG_TAG, "RadioPopup");
+            }
+            else if (ufBean.getType() == 1){
                 activityClass = CheckboxPopup.class;
-            else
+                Log.d(LOG_TAG, "CheckboxPopup");
+            }
+            else{
                 activityClass = AcknackPopup.class;
+            	Log.d(LOG_TAG, "AcknackPopup");
+            }
 
         } else if (ufBean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
             // only one type of implicit feedback
 
             activityClass = TimedAbortPopup.class;
+            Log.d(LOG_TAG, "TimedAbortPopup");
+            
+            if(TimedAbortProcessor.getInstance()==null)
+            {
+            	Log.d(LOG_TAG,"TimedAbort Thread is null!");
+            }
+            else
+            {
+            	Log.d(LOG_TAG, "Our thread has an instance");
+            }
 
             // Add to the background watcher
             TimedAbortProcessor.getInstance().addTimedAbort(ufBean);
@@ -374,14 +392,17 @@ public class EventListener extends Service {
             // only one left is "SHOW_NOTIFICATION"
 
             activityClass = SimpleNotificationPopup.class;
+            Log.d(LOG_TAG, "SimpleNotificationPopup");
         }
 
         //CREATE INTENT FOR LAUNCHING ACTIVITY
+        Log.d(LOG_TAG, "CREATE INTENT FOR LAUNCHING ACTIVITY");
         Intent intent = new Intent(this.getApplicationContext(), activityClass);
         intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         //CREATE ANDROID NOTIFICATION
+        Log.d(LOG_TAG, "CREATE ANDROID NOTIFICATION");
         notifier.notifyMessage(ufBean.getProposalText(),
                 "Input required",
                 activityClass,

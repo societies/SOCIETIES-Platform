@@ -66,6 +66,7 @@ public abstract class UserFeedbackPopup extends Activity {
     protected final String responseIntent;
 
     protected UserFeedbackPopup(int contentViewID, int headerID, int submitButtonID, int optionsMenuID, String responseIntent) {
+    	Log.d(LOG_TAG, "UserFeedbackPopup()");
         this.contentViewID = contentViewID;
         this.headerID = headerID;
         this.submitButtonID = submitButtonID;
@@ -80,6 +81,8 @@ public abstract class UserFeedbackPopup extends Activity {
 
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(contentViewID);
+        
+        Log.d(LOG_TAG, "onCreate UserFeedbackPopup()");
 
         //RETRIEVE USER FEEDBACK BEAN FROM INTENT
         Intent intent = getIntent();
@@ -106,6 +109,7 @@ public abstract class UserFeedbackPopup extends Activity {
 
         TextView txtView = (TextView) findViewById(headerID);
         txtView.setText(userFeedbackBean.getProposalText());
+        Log.d(LOG_TAG, "UserFeedBackPopUp- populateHeader()");
     }
 
     protected abstract void populateOptions();
@@ -124,6 +128,7 @@ public abstract class UserFeedbackPopup extends Activity {
     }
 
     protected void submit() {
+    	Log.d(LOG_TAG, "submit()");
         if (isEventsConnected) {
             Log.d(LOG_TAG, "Connected to eventsManager - resultFlag true");
             publishEvent();
@@ -154,6 +159,7 @@ public abstract class UserFeedbackPopup extends Activity {
 
     protected void publishEvent() {
         try {
+        	Log.d(LOG_TAG, "publishEvent()");
             ExpFeedbackResultBean bean = new ExpFeedbackResultBean();
             List<String> feedback = new ArrayList<String>();
             feedback.addAll(this.resultPayload); // copy to the feedback array

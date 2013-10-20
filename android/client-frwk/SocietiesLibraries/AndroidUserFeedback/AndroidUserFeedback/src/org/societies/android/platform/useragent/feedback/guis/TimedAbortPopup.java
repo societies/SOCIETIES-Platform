@@ -28,7 +28,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
+
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
@@ -42,6 +44,8 @@ public class TimedAbortPopup extends UserFeedbackPopup {
 
     public static final String IGNORE_FLAG = "ignore";
     public static final String ABORT_FLAG = "abort";
+    
+    TextView counterTextView;
 
     public TimedAbortPopup() {
         super(R.layout.activity_timedabort_popup,
@@ -49,15 +53,18 @@ public class TimedAbortPopup extends UserFeedbackPopup {
                 UserFeedbackPopup.NOT_APPLICABLE,
                 UserFeedbackPopup.NOT_APPLICABLE,
                 IAndroidSocietiesEvents.UF_IMPLICIT_RESPONSE_INTENT);
+        Log.d(LOG_TAG, "TimedAbortPopup()");
     }
 
     @Override
     protected void populateOptions() {
         LinearLayout layout = (LinearLayout) findViewById(R.id.timedAbortInnerLinearLayout);
-
+        Log.d(LOG_TAG, "populateOptions()");
         // clear design time sample components
         layout.removeAllViews();
 
+        counterTextView = (TextView) findViewById(R.id.countTextView); 
+        
         Button ignoreButton = new Button(this);
         ignoreButton.setText(R.string.timed_abort_positive_string);
         ignoreButton.setTag(R.string.timed_abort_positive_string);
@@ -69,6 +76,7 @@ public class TimedAbortPopup extends UserFeedbackPopup {
             public void onClick(View v) {
                 getResultPayload().clear();
                 getResultPayload().add(IGNORE_FLAG);
+                Log.d(LOG_TAG, "getResultPayload(): " + getResultPayload().add(IGNORE_FLAG));
 
                 submit();
             }
@@ -84,6 +92,7 @@ public class TimedAbortPopup extends UserFeedbackPopup {
             public void onClick(View v) {
                 getResultPayload().clear();
                 getResultPayload().add(ABORT_FLAG);
+                Log.d(LOG_TAG, "getResultPayload(): " + getResultPayload().add(ABORT_FLAG));
 
                 submit();
             }
@@ -94,12 +103,13 @@ public class TimedAbortPopup extends UserFeedbackPopup {
     protected void populateSubmitButton() {
         // can't use the default behaviour - the two buttons need to set and return different values
 //        super.populateSubmitButton();
-
+    	Log.d(LOG_TAG, "populateSubmitButton");
     }
 
     @Override
     protected void publishEvent() {
         try {
+        	Log.d(LOG_TAG, "publishEvent()");
             ImpFeedbackResultBean bean = new ImpFeedbackResultBean();
             bean.setAccepted(!getResultPayload().contains(ABORT_FLAG));
             bean.setRequestId(getUserFeedbackBean().getRequestId());
