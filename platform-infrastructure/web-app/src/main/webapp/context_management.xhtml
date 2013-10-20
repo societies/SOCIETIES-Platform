@@ -48,7 +48,7 @@
 	       	    </f:facet>
 		        <p:row>
 			        <p:column>
-			         	<h:selectOneMenu id="modelType" value="#{contextManagementController.selectedOperationType}">  
+			         	<p:selectOneMenu id="modelType" value="#{contextManagementController.selectedOperationType}">  
 			                <f:selectItem itemLabel="-- Select Operations --" itemValue="" /> 
 			                <f:selectItem itemLabel="Lookup" itemValue="#{contextManagementController.lookupLabel}" />
 			                <f:selectItem itemLabel="Retrieve" itemValue="#{contextManagementController.retrieveLabel}" />
@@ -57,7 +57,7 @@
 			                	<f:selectItem itemLabel="Link to model" itemValue="#{contextManagementController.linkLabel}" />
 			                </c:if>
 			                <p:ajax event="change" update=":mainForm" listener="#{contextManagementController.operationsListener}"/>
-			            </h:selectOneMenu>  
+			            </p:selectOneMenu>  
 				    </p:column>
 		        </p:row>	  
             </p:panelGrid>  
@@ -69,25 +69,25 @@
 	       	    </f:facet>
 		        <p:row>
 		        	<p:column>
-			         	<h:selectOneMenu id="lookupSelect" value="#{contextManagementController.selectedModelType}">  
+			         	<p:selectOneMenu id="lookupSelect" value="#{contextManagementController.selectedModelType}">  
 							<f:selectItems value="#{contextManagementController.selectItemsForModel}"/>
 			                <p:ajax event="change" update=":mainForm" listener="#{contextManagementController.modelListener}"/>
-			            </h:selectOneMenu> 
+			            </p:selectOneMenu> 
 		            </p:column> 
 		            <p:column rendered="#{contextManagementController.entityLookup}">
-		            	<h:selectOneMenu id="lookupEntityType" value="#{contextManagementController.selectedEntityType}">
+		            	<p:selectOneMenu id="lookupEntityType" value="#{contextManagementController.selectedEntityType}">
 			         		<f:selectItems value="#{contextManagementController.entityTypesItems}" />
-			            </h:selectOneMenu> 	
+			            </p:selectOneMenu> 	
 		            </p:column>
 		            <p:column rendered="#{contextManagementController.associationLookup}">
-		            	<h:selectOneMenu id="lookupAssociationType" value="#{contextManagementController.selectedAssociationType}">
+		            	<p:selectOneMenu id="lookupAssociationType" value="#{contextManagementController.selectedAssociationType}">
 			         		<f:selectItems value="#{contextManagementController.associationTypesItems}" />
-			            </h:selectOneMenu> 	
+			            </p:selectOneMenu> 	
 		            </p:column>
 		            <p:column rendered="#{contextManagementController.attributeLookup}">
-		            	<h:selectOneMenu id="lookupAttributeType" value="#{contextManagementController.selectedAttributeType}">
+		            	<p:selectOneMenu id="lookupAttributeType" value="#{contextManagementController.selectedAttributeType}">
 			         		<f:selectItems value="#{contextManagementController.attributeTypesItems}" />
-			            </h:selectOneMenu> 	
+			            </p:selectOneMenu> 	
 		            </p:column>
 		            <p:column rendered="#{contextManagementController.attributeLookup or contextManagementController.associationLookup or contextManagementController.entityLookup}">
 		            	<p:commandButton  value="Execute" id="executeButton" actionListener="#{contextManagementController.executeLookup}" update=":mainForm"/>
@@ -103,10 +103,10 @@
 	       	    </f:facet>
 		        <p:row>
 		        	<p:column>
-			         	<h:selectOneMenu id="contextIdSelect" value="#{contextManagementController.selectedContextId}">  
+			         	<p:selectOneMenu id="contextIdSelect" value="#{contextManagementController.selectedContextId}">  
 							<f:selectItems value="#{contextManagementController.contextIdItems}"/>
 			                <p:ajax event="change" update=":mainForm" listener="#{contextManagementController.contextIdListener}"/>
-			            </h:selectOneMenu> 
+			            </p:selectOneMenu> 
 		            </p:column> 
 		            <p:column>
 						<p:inputText id="inputContextId" value="#{contextManagementController.inputContextId}" style="width: 400px"/>
@@ -126,7 +126,7 @@
 	       	    </f:facet>
 		        <p:row>
 		        	<p:column>
-			         	<h:selectOneMenu id="newModelSelect" value="#{contextManagementController.selectedModelTypeNewModel}">  
+			         	<p:selectOneMenu id="newModelSelect" value="#{contextManagementController.selectedModelTypeNewModel}">  
 							<f:selectItem itemLabel="-- Select Model Type --" itemValue="" /> 
 							<c:choose>
 								<c:when test="#{contextManagementController.contextModel.is_entity}">
@@ -138,22 +138,22 @@
 				                </c:otherwise>
 			                </c:choose>
 			                <p:ajax event="change" update=":mainForm" listener="#{contextManagementController.modelListenerNewModel}"/>
-			            </h:selectOneMenu> 
+			            </p:selectOneMenu> 
 		            </p:column> 
 		            <p:column rendered="#{contextManagementController.entityNewModel}">
-		            	<h:selectOneMenu id="newmodelEntityType" value="#{contextManagementController.selectedNewModel}">
+		            	<p:selectOneMenu id="newmodelEntityType" value="#{contextManagementController.selectedNewModel}">
 			         		<f:selectItems value="#{contextManagementController.entityTypesItems}" />
-			            </h:selectOneMenu> 	
+			            </p:selectOneMenu> 	
 		            </p:column>
 		            <p:column rendered="#{contextManagementController.associationNewModel}">
-		            	<h:selectOneMenu id="newmodelAssociationType" value="#{contextManagementController.selectedNewModel}">
+		            	<p:selectOneMenu id="newmodelAssociationType" value="#{contextManagementController.selectedNewModel}">
 			         		<f:selectItems value="#{contextManagementController.associationTypesItems}" />
-			            </h:selectOneMenu> 	
+			            </p:selectOneMenu> 	
 		            </p:column>
 		            <p:column rendered="#{contextManagementController.attributeNewModel}">
-		            	<h:selectOneMenu id="newmodelAttributeType" value="#{contextManagementController.selectedNewModel}">
+		            	<p:selectOneMenu id="newmodelAttributeType" value="#{contextManagementController.selectedNewModel}">
 			         		<f:selectItems value="#{contextManagementController.attributeTypesItems}" />
-			            </h:selectOneMenu> 	
+			            </p:selectOneMenu> 	
 			            <h:inputText value="#{contextManagementController.attributeValue}" />
 		            </p:column>
 		            <p:column rendered="#{contextManagementController.attributeNewModel or contextManagementController.associationNewModel or contextManagementController.entityNewModel}">
@@ -170,9 +170,9 @@
 	       	    </f:facet>
 		        <p:row>
 		        	<p:column>
-			         	<h:selectOneMenu id="linkEntitySelect" value="#{contextManagementController.selectedEntityLink}">  
+			         	<p:selectOneMenu id="linkEntitySelect" value="#{contextManagementController.selectedEntityLink}">  
 							<f:selectItems value="#{contextManagementController.entityLinkItems}"/>
-			            </h:selectOneMenu> 
+			            </p:selectOneMenu> 
 		            </p:column> 
 		            <p:column>
 		            	<p:commandButton  value="Link" id="linkButton" actionListener="#{contextManagementController.linkModel}" update=":mainForm"/>
@@ -185,11 +185,11 @@
            			emptyMessage="No Entity found" filteredValue="#{contextManagementController.contextModel.filteredEntity}" rendered="#{not contextManagementController.contextModel.is_entity}" >  
  
 		        <f:facet name="header">  
-		         	<h:outputText value="Entities ( #{fn:length(contextManagementController.contextModel.entity_results)} ) elements" />
+		         	<h:outputText value="Entities: #{fn:length(contextManagementController.contextModel.entity_results)} results" />
 		        </f:facet>  
 		         
 		        <p:column id="deleteEntryColumn" style="width: 5%">
-   					<p:commandButton  id="deleteEntry" icon="ui-icon-trash" actionListener="#{contextManagementController.deleteRow(element.id)}" update=":mainForm:entityTable"/>  
+   					<p:commandButton  id="deleteEntry" icon="ui-icon-trash" actionListener="#{contextManagementController.deleteRow(element.id)}" update=":mainForm:entityTable" disabled="#{element.diplayId eq '1'}" />  
    				</p:column>
 		         
 		        <p:column id="aheadEntryColumn" style="width: 5%">
@@ -202,20 +202,13 @@
 		            <h:outputText value="#{element.diplayId}" />  
 		        </p:column>  
 	  
-		        <p:column id="modelColumn" headerText="Model" style="width: 20%">  
-		            <h:outputText value="#{element.model}" />  
-		        </p:column>  
-	  
 		        <p:column id="typeColumn" filterBy="#{element.type}"   
 		                headerText="Type"  
 		                filterOptions="#{contextManagementController.entityTypesItems}"  
-		                filterMatchMode="exact" style="width: 30%">  
+		                filterMatchMode="exact" style="width: 80%">  
 		            <h:outputText value="#{element.type}" />  
 		        </p:column> 
 		  
-		        <p:column id="qualityColumn" headerText="Quality" style="width: 30%">  
-		            <h:outputText value="#{element.quality}" />  
-		        </p:column>  
 	    	</p:dataTable>  
 			
 			<!-- ATTRIBUTE TABLE SECTION -->
@@ -224,7 +217,7 @@
            			editable="true" >  
  
 		        <f:facet name="header">  
-		         	<h:outputText value="Attributes ( #{fn:length(contextManagementController.contextModel.attr_results)} ) elements" />
+		         	<h:outputText value="Attributes: #{fn:length(contextManagementController.contextModel.attr_results)} results" />
 		        </f:facet>  
 		        
 		        <p:ajax event="rowEdit" listener="#{contextManagementController.modifyRow}" update="@this" /> 
@@ -232,29 +225,22 @@
 		        <p:column id="deleteEntryColumn" style="width: 5%">
    					<p:commandButton  id="deleteEntry" icon="ui-icon-trash" actionListener="#{contextManagementController.deleteRow(element.id)}" update=":mainForm:attributeTable"/>  
    				</p:column>
-   				
+   				<!-- 
    				<p:column id="dialogColumn" style="width: 5%">
    					<p:calendar styleClass="calendarInput" value="#{contextManagementController.predictedDate}" id="popupButtonCal" showOn="button" >
    						<p:ajax event="dateSelect" update=":mainForm:predictedTable" oncomplete="attributeDialog.show();" listener="#{contextManagementController.viewPredictedValues(element.id)}"/>
    					</p:calendar>
    				</p:column>
-   				
+   				 -->
    				<p:column style="width:5%"> 
    					<p:rowEditor />
         		</p:column>  
 		         
 		        <p:column id="idColumn" filterBy="#{element.diplayId}"   
 		                headerText="Id" 
-		                filterMatchMode="contains" style="width: 5%">  
+		                filterMatchMode="contains" style="width: 10%">  
 		            <h:outputText value="#{element.diplayId}" />  
-		        </p:column>  
-	  
-		        <p:column id="modelColumn" filterBy="#{element.model}" 
-		        		headerText="Model" 
-		        		filterOptions="#{contextManagementController.selectItemsForModel}"  
-		                filterMatchMode="exact" style="width: 20%">  
-		            <h:outputText value="#{element.model}" />  
-		        </p:column>  
+		        </p:column>   
 	  
 		        <p:column id="typeColumn" filterBy="#{element.type}"   
 		                headerText="Type"  
@@ -263,7 +249,7 @@
 		            <h:outputText value="#{element.type}" />  
 		        </p:column> 
 		        
-		        <p:column id="valueColumn" headerText="Value" style="width: 20%"> 
+		        <p:column id="valueColumn" headerText="Value" style="width: 35%"> 
 		        	<p:cellEditor>  
 		        		<f:facet name="output"> 
 		            		<h:outputText value="#{element.value}" />  
@@ -274,7 +260,7 @@
 		            </p:cellEditor>
 		        </p:column>  
 		  
-		        <p:column id="qualityColumn" headerText="Quality" style="width: 20%">  
+		        <p:column id="qualityColumn" headerText="Quality" style="width: 25%">  
 		            <h:outputText value="#{element.qualityBean.originType} - #{element.qualityBean.precision}" 
 		            title="#{element.qualityBean.updateFrequency} - #{element.qualityBean.lastUpdated}"/>
 		        </p:column>  
@@ -317,7 +303,7 @@
            			emptyMessage="No Association found" filteredValue="#{contextManagementController.contextModel.filteredAssociation}" rendered="#{contextManagementController.contextModel.is_entity}">  
  
 		        <f:facet name="header">  
-		         	<h:outputText value="Associations ( #{fn:length(contextManagementController.contextModel.asso_results)} ) elements" />
+		         	<h:outputText value="Associations: #{fn:length(contextManagementController.contextModel.asso_results)} results" />
 		        </f:facet>  
 		         
 		        <p:column id="deleteEntryColumn" style="width: 5%">
@@ -332,22 +318,15 @@
 		                headerText="Id" 
 		                filterMatchMode="contains" style="width: 10%">  
 		            <h:outputText value="#{element.diplayId}" />  
-		        </p:column>  
-	  
-		        <p:column id="modelColumn" headerText="Model" style="width: 20%">  
-		            <h:outputText value="#{element.model}" />  
-		        </p:column>  
+		        </p:column>
 	  
 		        <p:column id="typeColumn" filterBy="#{element.type}"   
 		                headerText="Type"  
 		                filterOptions="#{contextManagementController.associationTypesItems}"  
-		                filterMatchMode="exact" style="width: 30%">  
+		                filterMatchMode="exact" style="width: 80%">  
 		            <h:outputText value="#{element.type}" />  
 		        </p:column> 
 		  
-		        <p:column id="qualityColumn" headerText="Quality" style="width: 30%">  
-		            <h:outputText value="#{element.quality}" />  
-		        </p:column>  
 	    	</p:dataTable>  
 	    </section>
 	

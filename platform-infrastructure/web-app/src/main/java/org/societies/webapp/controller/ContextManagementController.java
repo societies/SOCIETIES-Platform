@@ -1,5 +1,6 @@
 package org.societies.webapp.controller;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -44,7 +45,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @ManagedBean(name="contextManagementController")
 @SessionScoped
-public class ContextManagementController extends BasePageController {
+public class ContextManagementController extends BasePageController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -57,7 +58,7 @@ public class ContextManagementController extends BasePageController {
 	
 	private String lookupLabel = "Lookup";
 	private String retrieveLabel = "Retrieve";
-	private String newModelLabel = "New Model";
+	private String newModelLabel = "Create";
 	private String linkLabel = "Link to Model";
 	
 	@ManagedProperty(value = "#{userService}")
@@ -231,6 +232,8 @@ public class ContextManagementController extends BasePageController {
 				contextModel.setEntity_results(ctxList.get(CTX_ENTITY_RESULTS));
 				contextModel.setAsso_results(ctxList.get(CTX_ASSO_RESULTS));
 				contextModel.setAttr_results(ctxList.get(CTX_ATTR_RESULTS));
+				contextModel.setPath(path_parent);
+				path_parent = contextModel.getPath_parent();
 			} else {
 				switch(contextModel.getViewType()){
 				case LINKED_ENTITIES:
@@ -240,9 +243,9 @@ public class ContextManagementController extends BasePageController {
 				default:
 					contextModel.setEntity_results(getAllCtxEntityData(contextModel.getEntityTypes()));
 				}
+				contextModel.setPath(path_parent);
+				path_parent = contextModel.getPath_parent();
 			}
-			contextModel.setPath(path_parent);
-			path_parent = contextModel.getPath_parent();
 		}
 		catch(Exception e){
 			log.error("",e);
@@ -379,7 +382,8 @@ public class ContextManagementController extends BasePageController {
 		list = internalCtxBroker.lookup(string2Model(model), type).get();
 		for (CtxIdentifier id: list){
 			CtxModelObject ctxModelObject = internalCtxBroker.retrieve(id).get();
-			((CtxEntity)ctxModelObject).getAssociations("");
+			if(ctxModelObject instanceof CtxEntity)
+				((CtxEntity)ctxModelObject).getAssociations("");
 			CtxUIElement ctxBean = serliazeCtxModel(internalCtxBroker.retrieve(id).get());
 			results.add(ctxBean);				
 		}
@@ -444,19 +448,19 @@ public class ContextManagementController extends BasePageController {
 
 		CtxUIElement ctxBean = new CtxUIElement();
 		if(elm!= null){
-			log.info("element: "+elm);
+			log.debug("element: "+elm);
 			String ctxValue =  elm.getId().toString().replace("context://", "");
 			String info[] = ctxValue.split("/");
 
 			// Log info
-			log.info("====> Found new Element ");
-			log.info("FULL ID:"+elm.getId().toString());
-			log.info("Source:"+info[0]);
-			log.info("Model:"+info[1]);
-			log.info("Type:"+info[2]);
-			log.info("ID:"+info[info.length-1]);
-			log.info("ID_noSpecChar:"+elm.getId().toString().replaceAll("\\W", ""));
-			log.info("==== ");
+			log.debug("====> Found new Element ");
+			log.debug("FULL ID:"+elm.getId().toString());
+			log.debug("Source:"+info[0]);
+			log.debug("Model:"+info[1]);
+			log.debug("Type:"+info[2]);
+			log.debug("ID:"+info[info.length-1]);
+			log.debug("ID_noSpecChar:"+elm.getId().toString().replaceAll("\\W", ""));
+			log.debug("==== ");
 
 
 			ctxBean.setId(elm.getId().toString());
@@ -472,7 +476,7 @@ public class ContextManagementController extends BasePageController {
 			if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
 
 				CtxAttribute attr = (CtxAttribute) elm;
-				log.info("Ctx Attribute type "+attr.getValueType());
+				log.debug("Ctx Attribute type "+attr.getValueType());
 
 
 				if (attr.getValueType().equals(CtxAttributeValueType.STRING)){
@@ -620,7 +624,6 @@ public class ContextManagementController extends BasePageController {
 	}
 	
 	private void modifySource(String source){
-		log.info("SOURCE--------> "+source);
 		contextModel.setSource(source);
 	}
 
@@ -827,7 +830,7 @@ public class ContextManagementController extends BasePageController {
 	
 //			Future<CtxModelObject> update = internalCtxBroker.update(model);
 			CtxModelObject update = internalCtxBroker.update(model).get();
-			log.info("update: "+update);
+			log.debug("update: "+update);
 			submit();
 			
 	        FacesMessage msg = new FacesMessage(modelType+" Edited", ((CtxUIElement) event.getObject()).getValue());  
@@ -1351,11 +1354,11 @@ public class ContextManagementController extends BasePageController {
 			String type = selectedNewModel;
 			String value = attributeValue;
 			
-			log.info("Param to save: ");
-			log.info("parentId: "+ parentId);
-			log.info("model_req: "+ selectedModel);
-			log.info("type: "+ type);
-			log.info("value: "+ value);
+			log.debug("Param to save: ");
+			log.debug("parentId: "+ parentId);
+			log.debug("model_req: "+ selectedModel);
+			log.debug("type: "+ type);
+			log.debug("value: "+ value);
 	
 			CtxModelObject model = null;
 	
@@ -1365,14 +1368,14 @@ public class ContextManagementController extends BasePageController {
 			}
 	
 			CtxModelType modelType = string2Model(selectedModel);
-			log.info("model type: "+modelType);
+			log.debug("model type: "+modelType);
 	
 			switch (modelType) {
 			case ENTITY:
 				Future<CtxEntity> entity = internalCtxBroker.createEntity(type);
-				log.info("entity: "+entity);
+				log.debug("entity: "+entity);
 				model = entity.get();
-				log.info("model: "+model);
+				log.debug("model: "+model);
 	
 				//if parent is an association I must create map from parent to child
 				if(ctxIdentifier != null && ctxIdentifier.getModelType() == CtxModelType.ASSOCIATION){
@@ -1399,8 +1402,12 @@ public class ContextManagementController extends BasePageController {
 				break;
 			}
 			Future<CtxModelObject> update = internalCtxBroker.update(model);
-			log.info("update: "+update);
+			log.debug("update: "+update);
 			model = update.get();
+			
+			//reset view
+			selectedOperationType = "";
+			operationsListener();
 			submit();
 	
 		}
@@ -1443,12 +1450,11 @@ public class ContextManagementController extends BasePageController {
 		try
 		{
 			
-			
 			Date paramDate = predictedDate;
 			CtxAttributeIdentifier ctx = new CtxAttributeIdentifier(ctxId);
 			
-			log.info("date picked: "+predictedDate);
-			log.info("ctxId: "+ctxId);
+			log.debug("date picked: "+predictedDate);
+			log.debug("ctxId: "+ctxId);
 			
 			List<CtxAttribute> ctxAttributeList = internalCtxBroker.retrieveFuture(ctx, paramDate).get();
 			List<CtxUIElement> ctxDisplayList = null;
@@ -1468,7 +1474,6 @@ public class ContextManagementController extends BasePageController {
 			error.setErrorMessage(e.getMessage());
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Error", error.getErrorMessage()));	
 		}
-		
 	}
 	
 	public void handleClose()
