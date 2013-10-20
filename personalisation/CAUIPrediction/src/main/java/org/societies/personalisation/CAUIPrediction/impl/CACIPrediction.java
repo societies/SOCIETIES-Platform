@@ -97,7 +97,7 @@ public class CACIPrediction {
 		//when css joins a new cis, will automatically register for caci model events.
 		try {
 			if (LOG.isDebugEnabled())LOG.debug("register for cis join and new community model creation");
-			new CommunityJoinMonitor(this.ctxBroker ,this.commsMgr);
+		//	new CommunityJoinMonitor(this.ctxBroker ,this.commsMgr);
 
 		} catch (Exception e) {
 			LOG.error("Exception while trying to register for new community join events " +e.getLocalizedMessage());
