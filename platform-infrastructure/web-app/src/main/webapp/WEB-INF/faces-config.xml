@@ -1,94 +1,91 @@
 <?xml version='1.0' encoding='UTF-8'?>
 
 <faces-config xmlns="http://java.sun.com/xml/ns/javaee"
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
-              version="2.0">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
+	version="2.0">
 
-    <application>
-        <el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
+	<application>
+		<el-resolver>org.springframework.web.jsf.el.SpringBeanFacesELResolver</el-resolver>
 
-        <locale-config>
+		<locale-config>
 
-        </locale-config>
+		</locale-config>
 
-        <resource-bundle>
-            <base-name>MessageResources</base-name>
-            <var>messages</var>
-        </resource-bundle>
+		<resource-bundle>
+			<base-name>MessageResources</base-name>
+			<var>messages</var>
+		</resource-bundle>
 
-    </application>
+	</application>
 
-    <converter>
-        <converter-for-class>org.societies.personalisation.preference.api.model.OperatorConstants</converter-for-class>
-        <converter-class>javax.faces.convert.EnumConverter</converter-class>
-    </converter>
+	<converter>
+		<converter-for-class>org.societies.personalisation.preference.api.model.OperatorConstants</converter-for-class>
+		<converter-class>javax.faces.convert.EnumConverter</converter-class>
+	</converter>
 
-    <navigation-rule>
-        <from-view-id>*</from-view-id>
-        <!--<navigation-case>
-            <from-action>#{loginController.loginButtonAction}</from-action>
-            <from-outcome>true</from-outcome>
-            <to-view-id>/index.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>-->
-        <navigation-case>
-            <from-action>#{loginController.logoutAction}</from-action>
-            <to-view-id>/index.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
+	<navigation-rule>
+		<from-view-id>*</from-view-id>
+		<!--<navigation-case> <from-action>#{loginController.loginButtonAction}</from-action> 
+			<from-outcome>true</from-outcome> <to-view-id>/index.xhtml</to-view-id> <redirect/> 
+			</navigation-case> -->
+		<navigation-case>
+			<from-action>#{loginController.logoutAction}</from-action>
+			<to-view-id>/index.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
 
-        <!-- Redirect based on Privacy Policy Negotiation queue -->
-        <navigation-case>
-            <from-action>#{ppNegotiation.completeNegotiationAction}</from-action>
-            <!--<from-outcome>home</from-outcome>-->
-            <to-view-id>/index.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{ppNegotiation.cancelNegotiationAction}</from-action>
-            <!--<from-outcome>home</from-outcome>-->
-            <to-view-id>/index.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{accessControlController.completeAccessRequestAction}</from-action>
-            <!--<from-outcome>home</from-outcome>-->
-            <to-view-id>/index.xhtml</to-view-id>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{accessControlController.cancelAccessRequestAction}</from-action>
-            <!--<from-outcome>home</from-outcome>-->
-            <to-view-id>/index.xhtml</to-view-id>
-        </navigation-case>
-        <!-- Redirect based on Suggested Friends page buttons -->
-        <navigation-case>
-            <from-action>#{suggestedfriends.getsnsFriendes}</from-action>
-            <to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{suggestedfriends.getfriends}</from-action>
-            <to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{suggestedfriends.getactivities}</from-action>
-            <to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{cismanager.getsuggestedcommunities}</from-action>
-            <to-view-id>/your_suggested_communities_list.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{profile.modifyrecord()}</from-action>
-            <to-view-id>/myProfile.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
-        <navigation-case>
-            <from-action>#{suggestedfriends.search(suggestedfriends.findfriend)}</from-action>
-            <to-view-id>/your_societies_friends_list.xhtml</to-view-id>
-            <redirect/>
-        </navigation-case>
-    </navigation-rule>
+		<!-- Redirect based on Privacy Policy Negotiation queue -->
+		<navigation-case>
+			<from-action>#{ppNegotiation.completeNegotiationAction}</from-action>
+			<!--<from-outcome>home</from-outcome> -->
+			<to-view-id>/index.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{ppNegotiation.cancelNegotiationAction}</from-action>
+			<!--<from-outcome>home</from-outcome> -->
+			<to-view-id>/index.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{accessControlController.completeAccessRequestAction}</from-action>
+			<!--<from-outcome>home</from-outcome> -->
+			<to-view-id>/index.xhtml</to-view-id>
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{accessControlController.cancelAccessRequestAction}</from-action>
+			<!--<from-outcome>home</from-outcome> -->
+			<to-view-id>/index.xhtml</to-view-id>
+		</navigation-case>
+		<!-- Redirect based on Suggested Friends page buttons -->
+		<navigation-case>
+			<from-action>#{suggestedfriends.getsnsFriendes}</from-action>
+			<to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{suggestedfriends.getfriends}</from-action>
+			<to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{suggestedfriends.getactivities}</from-action>
+			<to-view-id>/suggested_societies_friends_list.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{cismanager.getsuggestedcommunities}</from-action>
+			<to-view-id>/your_suggested_communities_list.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{profile.modifyrecord()}</from-action>
+			<to-view-id>/myProfile.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+		<navigation-case>
+			<from-action>#{suggestedfriends.search(suggestedfriends.findfriend)}</from-action>
+			<to-view-id>/your_societies_friends_list.xhtml</to-view-id>
+			<redirect />
+		</navigation-case>
+	</navigation-rule>
 </faces-config>

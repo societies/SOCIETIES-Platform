@@ -53,6 +53,7 @@ import org.societies.api.schema.useragent.feedback.*;
 import org.societies.useragent.api.feedback.IInternalUserFeedback;
 import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 import java.util.*;
 import java.util.concurrent.Future;
@@ -464,7 +465,13 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         try {
 //            return result.get();
-            return result;
+        	List<AccessControlResponseItem> list = result.get();
+        	
+        	for (AccessControlResponseItem item: list){
+            	this.log.debug("uf: Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+
+        	}
+            return new AsyncResult<List<AccessControlResponseItem>>(list);
         } catch (Exception e) {
             log.warn("Error parsing result from Future", e);
             return null;

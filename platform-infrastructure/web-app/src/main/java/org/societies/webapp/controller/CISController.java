@@ -149,11 +149,7 @@ public class CISController extends BasePageController{
 	
 	@Autowired
 	private ICisManager cisManager;
-	
-	@ManagedProperty(value = "#{userFeedback}")
-	@Autowired
-	private IUserFeedback userFeedback;
-	
+
 	@Autowired
 	@ManagedProperty(value = "#{commMngrRef}")
 	private ICommManager commMngrRef;
@@ -192,6 +188,7 @@ public class CISController extends BasePageController{
 //	}
 
 	private String cisname;
+
 	public String getCisname() {
 		return cisname;
 	}
@@ -209,16 +206,6 @@ public class CISController extends BasePageController{
 	}
 	public void setCisdesc(String cisdesc) {
 		this.cisdesc = cisdesc;
-	}
-	
-	public void setUserFeedback(IUserFeedback userFeedback)
-	{
-		this.userFeedback = userFeedback;
-	}
-	
-	public IUserFeedback getUserFeedback()
-	{
-		return this.userFeedback;
 	}
 
 	List<Participant> m_remoteMemberRecords = new ArrayList<Participant>();
@@ -415,10 +402,8 @@ public class CISController extends BasePageController{
 		// real create
 		this.cisManager.createCis(cisname, cistype, h, cisdesc, privacyPolicyXml);
 		//Cis icis = (Cis) localCreateCis(cisname, cistype, cisdesc, h, privacyPolicyXml);
-		String summary = "Community Created!";
-		String detail = "The community, " + cisname + ", has been created!";
-		
 		//cisManager.createCis(cisname, cistype, cisCriteria, cisdesc);
+		//SET CIS CREATED NAME TO SHOW IN DIALOG
 		cisname = "";
 		cistype = "";
 		cisdesc = "";

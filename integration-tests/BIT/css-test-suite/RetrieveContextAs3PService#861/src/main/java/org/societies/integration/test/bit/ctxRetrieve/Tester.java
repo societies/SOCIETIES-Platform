@@ -24,7 +24,9 @@
  */
 package org.societies.integration.test.bit.ctxRetrieve;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -60,19 +62,21 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
  */
 public class Tester {
 	
-	private static final String DEFAULT_NAME_VALUE = "Chuck Norris"; 
-	
+	private static final String DEFAULT_FIRST_NAME_VALUE = "Chuck";// Norris"; 
+	private static final String DEFAULT_LAST_NAME_VALUE = "Norris";
 	private IIdentityManager identityManager;
 	private ICtxBroker ctxBroker;
 	private IIdentity userIdentity;
 	private IndividualCtxEntity cssPersonEntity;
 	private CtxAttribute nameAttribute;
+	private CtxAttribute symLocAtt;
 	
 	/** 
 	 * The name attribute value, i.e. either {@link #DEFAULT_NAME_VALUE} or the
 	 * String value of an existing name attribute. 
 	 */
 	private String nameAttributeValue;
+	private String symLocAttValue;
 	private Requestor requestor;
 	private IIdentity serviceIdentity;
 	//private IPrivacyPreferenceManager privPrefMgr;
@@ -103,17 +107,20 @@ public class Tester {
 		//this.createPPNPreference2();
 	}
 	
-	@After
+	/*@After
 	public void tearDown() throws Exception {
 		
 		for (final CtxIdentifier ctxId : this.testCtxIds) {
 			this.ctxBroker.remove(ctxId);
 		}
-	}
+	}*/
 	
 	@Test
-	public void testRetrieve(){
-			this.helloWorld.retrieveCtxAttribute(CtxAttributeTypes.NAME);
+	public void testRetrieve(){	
+		List<String> types = new ArrayList<String>();
+		types.add(CtxAttributeTypes.NAME);
+		types.add(CtxAttributeTypes.LOCATION_COORDINATES);
+			this.helloWorld.retrieveCtxAttribute(types);
 			this.helloWorld.displayUserLocation();
 	
 		
@@ -143,13 +150,44 @@ public class Tester {
 			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
 					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME);
 			this.nameAttribute = createAttribute.get();
-			this.nameAttribute.setStringValue(DEFAULT_NAME_VALUE);
+			this.nameAttribute.setStringValue(DEFAULT_FIRST_NAME_VALUE.concat(" ").concat(DEFAULT_LAST_NAME_VALUE));
 			this.nameAttribute = (CtxAttribute) this.ctxBroker.update(
 					this.nameAttribute).get();
 			// Add to set of context data items to be removed in {@link #tearDown}
 			this.testCtxIds.add(this.nameAttribute.getId());
 		}
 		this.nameAttributeValue = nameAttribute.getStringValue();
+		/*final Set<CtxAttribute> nameLastAttrs = 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.NAME_LAST); 
+		if (nameLastAttrs.iterator().hasNext()) {
+			this.nameAttribute = nameLastAttrs.iterator().next();
+		} else {
+			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
+					this.cssPersonEntity.getId(), CtxAttributeTypes.NAME_LAST);
+			this.nameAttribute = createAttribute.get();
+			this.nameAttribute.setStringValue(DEFAULT_LAST_NAME_VALUE);
+			this.nameAttribute = (CtxAttribute) this.ctxBroker.update(
+					this.nameAttribute).get();
+			// Add to set of context data items to be removed in {@link #tearDown}
+			this.testCtxIds.add(this.nameAttribute.getId());
+		}
+		this.nameAttributeValue.concat(" " + nameAttribute.getStringValue());*/
+		
+		final Set<CtxAttribute> symLoc = 
+				this.cssPersonEntity.getAttributes(CtxAttributeTypes.LOCATION_COORDINATES); 
+		if (symLoc.iterator().hasNext()) {
+			this.symLocAtt = symLoc.iterator().next();
+		} else {
+			Future<CtxAttribute> createAttribute = this.ctxBroker.createAttribute(
+					this.cssPersonEntity.getId(), CtxAttributeTypes.LOCATION_COORDINATES);
+			this.symLocAtt = createAttribute.get();
+			this.symLocAtt.setStringValue("(2.3509, 48.8566, 542)");
+			this.symLocAtt = (CtxAttribute) this.ctxBroker.update(
+					this.symLocAtt).get();
+			// Add to set of context data items to be removed in {@link #tearDown}
+			this.testCtxIds.add(this.symLocAtt.getId());
+		}
+		this.symLocAttValue = symLocAtt.getStringValue();
 	}
 	
 /*	private void createPPNPreference1(){

@@ -30,6 +30,7 @@ import javax.swing.UIManager;
 
 
 
+
 import org.hibernate.SessionFactory;
 //import org.societies.display.server.dao.impl.MockScreenDAO;
 import org.slf4j.Logger;
@@ -125,6 +126,15 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 
 
 
+	@Override
+	public boolean checkInUse(String location)
+	{
+		if (this.currentlyUsedScreens.containsKey(location))
+		{
+			return true;
+		}
+		return false;
+	}
 
 
 
@@ -148,6 +158,8 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 					return "REFUSED";
 				}
 
+				//ON RETURN IP ADDRESS, ADD THE MAPPING OF THE SCREEN
+				this.currentlyUsedScreens.put(location, identity);
 				return ipAddress;
 			}
 		}
