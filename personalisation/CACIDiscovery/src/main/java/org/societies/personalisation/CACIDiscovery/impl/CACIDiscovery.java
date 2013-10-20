@@ -38,6 +38,9 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
@@ -167,7 +170,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 			}
 		}
 
-		System.out.println("mergeModels 2 communityActionsMap "+communityActionsMap);
+		//System.out.println("mergeModels 2 communityActionsMap "+communityActionsMap);
 
 		//int i =0;
 		for(UserIntentModelData userModel : userModelList){
@@ -258,7 +261,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 			if (LOG.isDebugEnabled())LOG.debug("CIS identifier is not defined");
 			return null;
 		} 		
-		LOG.debug("community model "+modelData.getActionModel() );
+		//LOG.debug("community model "+modelData.getActionModel() );
 
 		CtxAttribute ctxAttrCACIModel = null;
 		try {
@@ -411,18 +414,18 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 		if( actionA != null){
-			LOG.debug("action A "+actionA);
-			LOG.debug("action A serviceID:"+actionA.getServiceID());
+		//	LOG.debug("action A "+actionA);
+		//	LOG.debug("action A serviceID:"+actionA.getServiceID());
 
 		}
 		if( actionB != null){
-			LOG.debug("action B "+actionB);
-			LOG.debug("action B serviceID:"+actionA.getServiceID());
+		//	LOG.debug("action B "+actionB);
+		//	LOG.debug("action B serviceID:"+actionA.getServiceID());
 
 		}
 
 		if(actionA.getparameterName().equals(actionB.getparameterName()) && actionA.getvalue().equals(actionB.getvalue())) {
-			LOG.debug( actionA +" and "+ actionB+"!!!!! are similar");
+			//LOG.debug( actionA +" and "+ actionB+"!!!!! are similar");
 			return true;
 		} else return false;
 	}
@@ -671,10 +674,21 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 					if(modelAttrIDList.size()>0){
 						for(CtxIdentifier attrID : modelAttrIDList){
-
-							//LOG.info(" retrieving attrID  "+ attrID);
+						
+							if (LOG.isDebugEnabled())LOG.debug(" retrieving uiModelAttr  "+ attrID);
 							CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
-							if (LOG.isDebugEnabled())LOG.debug(" retrieving uiModelAttr  "+ uiModelAttr.getId());
+							
+							//LOG.info(" retrieving attrID  "+ attrID);
+							//CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
+							//getIdMananager.getThisNetworkNode().getBareJid()
+							
+						//	final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+						//	final String cssOwnerStr = cssNodeId.getBareJid();
+						//	IIdentity cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+							
+						//	RequestorCis requestor = new RequestorCis(cssOwnerId, cisId);
+						//	CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(requestor, attrID).get();
+							
 
 							if(uiModelAttr.getBinaryValue() != null){
 								UserIntentModelData newUIModelData;
