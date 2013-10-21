@@ -41,11 +41,11 @@ public class RfidWebAppEventListener extends EventListener{
 
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
-		this.logging.debug("Received event: "+event.geteventType()+" name: "+event.geteventName());
+		if(logging.isDebugEnabled()) logging.debug("Received event: "+event.geteventType()+" name: "+event.geteventName());
 		if (event.geteventType().equalsIgnoreCase(RFID_SERVER_EVENT_TYPE)){
 			Hashtable<String, String> payload = (Hashtable<String, String>) event.geteventInfo();
 			if (event.geteventName().equalsIgnoreCase("addNewTag")){
-				this.logging.debug("adding new tag");
+				if(logging.isDebugEnabled()) logging.debug("adding new tag");
 				if (payload.containsKey("tag")){
 					if (payload.containsKey("password")){
 						this.server.addTag(payload.get("tag"), payload.get("password"));

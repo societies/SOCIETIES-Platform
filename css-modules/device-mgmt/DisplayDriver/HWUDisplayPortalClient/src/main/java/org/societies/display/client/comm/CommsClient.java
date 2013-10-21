@@ -149,7 +149,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 
 	@Override
 	public void receiveResult(Stanza stanza, Object result) {
-		this.logging.debug("Received resultBean");
+		if(logging.isDebugEnabled()) logging.debug("Received resultBean");
 		if (result instanceof DisplayPortalServerServiceIDResultBean)
 		{
 			this.serviceIDResults.put(DisplayPortalServerMethodType.GET_SERVER_SERVICE_ID, (DisplayPortalServerServiceIDResultBean) result);
@@ -201,7 +201,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 			}
 			
 			DisplayPortalServerScreenUseBean resultBean = this.screenUseResult.get(DisplayPortalServerMethodType.CHECK_SCREEN_USE);
-			logging.debug("Returning frin checkScreen " + resultBean.isInUse());
+			if(logging.isDebugEnabled()) logging.debug("Returning frin checkScreen " + resultBean.isInUse());
 			this.screenUseResult.remove(DisplayPortalServerMethodType.CHECK_SCREEN_USE);
 			return resultBean.isInUse();
 			
@@ -233,7 +233,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 		
 		while(!this.ipAddressResults.containsKey(DisplayPortalServerMethodType.REQUEST_ACCESS)){
 			try {
-				this.logging.debug("waiting for results");
+				if(logging.isDebugEnabled()) logging.debug("waiting for results");
 				synchronized(this.ipAddressResults){
 				this.ipAddressResults.wait();
 				}
@@ -254,7 +254,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 	@Override
 	public void releaseResource(IIdentity serverIdentity, String identity, String location) {
 		
-		this.logging.debug("Releasing resource");
+		if(logging.isDebugEnabled()) logging.debug("Releasing resource");
 		DisplayPortalServerBean bean = new DisplayPortalServerBean();
 		bean.setIdentity(identity);
 		bean.setLocation(location);
@@ -287,7 +287,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 		
 		while(!this.screenLocationsResults.containsKey(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS)){
 			try {
-				this.logging.debug("waiting for results");
+				if(logging.isDebugEnabled()) logging.debug("waiting for results");
 				synchronized (this.screenLocationsResults){
 					this.screenLocationsResults.wait();
 				}
@@ -327,11 +327,11 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 		Stanza stanza = new Stanza(serverIdentity);
 		
 		try {
-			this.logging.debug("Requesting serviceID");
+			if(logging.isDebugEnabled()) logging.debug("Requesting serviceID");
 			this.commManager.sendIQGet(stanza, bean, this);
 			while (!this.serviceIDResults.containsKey(DisplayPortalServerMethodType.GET_SERVER_SERVICE_ID)){
 				try {
-					this.logging.debug("waiting for results");
+					if(logging.isDebugEnabled()) logging.debug("waiting for results");
 					synchronized(this.serviceIDResults){
 						this.serviceIDResults.wait();
 					}
@@ -340,7 +340,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 					e.printStackTrace();
 				}
 			}
-			this.logging.debug("Received serviceID");
+			if(logging.isDebugEnabled()) logging.debug("Received serviceID");
 			DisplayPortalServerServiceIDResultBean resultBean = this.serviceIDResults.get(DisplayPortalServerMethodType.GET_SERVER_SERVICE_ID);
 			ServiceResourceIdentifier serviceId = resultBean.getServiceID();
 			this.serviceIDResults.remove(DisplayPortalServerMethodType.GET_SERVER_SERVICE_ID);

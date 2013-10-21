@@ -76,19 +76,19 @@ public class ContextEventListener implements CtxChangeEventListener{
 			final IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userIdentity).get();
 			
 			this.ctxBroker.registerForChanges(this, individualCtxEntity.getId(), CtxAttributeTypes.LOCATION_SYMBOLIC);
-			this.LOG.debug("Registered for symloc events");
+			if(LOG.isDebugEnabled()) LOG.debug("Registered for symloc events");
 			//}
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
-            this.LOG.debug("1 " +e.toString());
+            if(LOG.isDebugEnabled()) LOG.debug("1 " +e.toString());
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-            this.LOG.debug("2 " +e.toString());
+            if(LOG.isDebugEnabled()) LOG.debug("2 " +e.toString());
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
-            this.LOG.debug("3 " + e.toString());
+            if(LOG.isDebugEnabled()) LOG.debug("3 " + e.toString());
 			e.printStackTrace();
 		}
 
@@ -105,7 +105,7 @@ public class ContextEventListener implements CtxChangeEventListener{
 	public void onModification(final CtxChangeEvent event) {
 
 		
-		this.LOG.debug("Received context event: "+event.getId().toUriString());
+		if(LOG.isDebugEnabled()) LOG.debug("Received context event: "+event.getId().toUriString());
 
 		new Thread(){
 			public void run(){
@@ -117,7 +117,7 @@ public class ContextEventListener implements CtxChangeEventListener{
 
 					try {
 						CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
-						LOG.debug("Received context event for "+ctxAttribute.getType()+" with value: "+ctxAttribute.getStringValue());
+						if(LOG.isDebugEnabled()) LOG.debug("Received context event for "+ctxAttribute.getType()+" with value: "+ctxAttribute.getStringValue());
 						client.updateUserLocation(ctxAttribute.getStringValue().trim());
 
 					} catch (InterruptedException e) {
@@ -135,7 +135,7 @@ public class ContextEventListener implements CtxChangeEventListener{
 					e.printStackTrace();
 				}
 				
-				LOG.debug("thread of handleInternalEvent method finished executing");
+				if(LOG.isDebugEnabled()) LOG.debug("thread of handleInternalEvent method finished executing");
 			}
 		}.start();
 

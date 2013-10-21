@@ -56,17 +56,17 @@ public class RFIDUpdateTimerTask extends TimerTask{
 	
 	@Override
 	public void run() {
-		this.logging.debug("trexo trexo !!! "+this.tagNumber);
+		if(logging.isDebugEnabled()) logging.debug("trexo trexo !!! "+this.tagNumber);
 		Date currentTimeStamp = new Date();
 		//if current time is more than 5s after the last update timestamp 
 		if ((currentTimeStamp.getTime()-updateInterval)>this.timeStamp.getTime()){
-			this.logging.debug("Location updates no longer sent");
+			if(logging.isDebugEnabled()) logging.debug("Location updates no longer sent");
 			return;
 		}
 		
 		
 			this.rfidServer.sendRemoteUpdate(this.tagNumber, this.symLoc.trim());//(this.userJid, this.symLoc.trim(), this.tagNumber);	
-			this.logging.debug("Sent remote Symbolic Location update message [value:"+this.symLoc+"]");
+			if(logging.isDebugEnabled()) logging.debug("Sent remote Symbolic Location update message [value:"+this.symLoc+"]");
 	
 		
 	}
@@ -83,7 +83,7 @@ public class RFIDUpdateTimerTask extends TimerTask{
 	}
 
 	public void setSymLoc(String newLocation) {
-		this.logging.debug("setting new symloc: "+newLocation+" for: "+this.tagNumber);
+		if(logging.isDebugEnabled()) logging.debug("setting new symloc: "+newLocation+" for: "+this.tagNumber);
 		this.timeStamp = new Date();
 		this.symLoc = newLocation;
 	}

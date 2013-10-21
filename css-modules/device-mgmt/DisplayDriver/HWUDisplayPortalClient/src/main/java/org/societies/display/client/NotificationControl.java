@@ -17,11 +17,13 @@ public class NotificationControl implements Runnable  {
 	private IUserFeedback userFeedback;
 	private String location;
 	private String[] answers;
+	private final String uuid;
 	
 	private static Logger log = LoggerFactory.getLogger(NotificationControl.class);
 	
-	public NotificationControl(DisplayPortalClient displayClient, IUserFeedback userFeedback, String location)
+	public NotificationControl(String uuid, DisplayPortalClient displayClient, IUserFeedback userFeedback, String location)
 	{
+		this.uuid = uuid;
 		this.displayClient = displayClient;
 		this.userFeedback = userFeedback;
 		this.location=location;
@@ -34,7 +36,7 @@ public class NotificationControl implements Runnable  {
 	{
 		List<String> feedback = new ArrayList<String>();
 		try {
-			log.debug("SENDING NOTIFICATION");
+			if(log.isDebugEnabled()) log.debug("SENDING NOTIFICATION");
 			feedback = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent("Do you want to start a session with "+ this.location+"?", answers)).get();
 		} catch (InterruptedException e) {
 			log.error("ERROR", e);
@@ -45,10 +47,14 @@ public class NotificationControl implements Runnable  {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		log.debug(feedback.toString());
+		if(log.isDebugEnabled()) log.debug(feedback.toString());
 		if(feedback.get(0).equals("Yes"))
 		{
 			displayClient.sendStartSessionRequest(this.location);
+		}
+		else
+		{
+			displayClient.acknowledgeRefuse(this.location);
 		}
 	}
 	
@@ -57,6 +63,9 @@ public class NotificationControl implements Runnable  {
 	public void run() {
 		sendStartNotification();
 	}
-	
+
+	public String getUuid() {
+		return uuid;
+	}
 
 }

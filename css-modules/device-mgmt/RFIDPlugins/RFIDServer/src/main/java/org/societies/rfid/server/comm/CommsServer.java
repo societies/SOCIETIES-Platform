@@ -102,12 +102,12 @@ public class CommsServer implements IFeatureServer {
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		this.LOG.debug("Received message ");
+		if(LOG.isDebugEnabled()) LOG.debug("Received message ");
 		if (payload instanceof RfidServerBean){
 			RfidServerBean rfidServerBean = (RfidServerBean) payload;
 			if(rfidServerBean.getMethod().equals(RfidServerMethodType.REGISTER_RFID_TAG))
 			{
-				this.LOG.debug("Received Register RfidServerBean: tag: "+rfidServerBean.getTagNumber()+" from:"+rfidServerBean.getIdentity());
+				if(LOG.isDebugEnabled()) LOG.debug("Received Register RfidServerBean: tag: "+rfidServerBean.getTagNumber()+" from:"+rfidServerBean.getIdentity());
 				this.rfidServer.registerRFIDTag(rfidServerBean.getTagNumber(), rfidServerBean.getIdentity(), rfidServerBean.getServiceID(), rfidServerBean.getPassword());
 
 			}
@@ -115,17 +115,17 @@ public class CommsServer implements IFeatureServer {
 
 			else if(rfidServerBean.getMethod().equals(RfidServerMethodType.UNREGISTER_RFID_TAG))
 			{
-				this.LOG.debug("Received Unregister RfidServerBean: tag: "+rfidServerBean.getTagNumber()+" from:"+rfidServerBean.getIdentity());
+				if(LOG.isDebugEnabled()) LOG.debug("Received Unregister RfidServerBean: tag: "+rfidServerBean.getTagNumber()+" from:"+rfidServerBean.getIdentity());
 				this.rfidServer.unregisterRFIDTag(rfidServerBean.getTagNumber(), rfidServerBean.getIdentity(), rfidServerBean.getServiceID(), rfidServerBean.getPassword());
 			}
 			else if(rfidServerBean.getMethod().equals(RfidServerMethodType.ACK_DELETE_TAG))
 			{
-				this.LOG.debug("Received delete RfidServerBean: tag: "+rfidServerBean.getTagNumber());
+				if(LOG.isDebugEnabled()) LOG.debug("Received delete RfidServerBean: tag: "+rfidServerBean.getTagNumber());
 				this.rfidServer.deleteTag(rfidServerBean.getTagNumber());
 			}
 		}
 		else{
-			this.LOG.debug("Payload object not of type: "+RfidServerBean.class.getName()+ ". Ignoring message from: "+stanza.getFrom().getJid());
+			if(LOG.isDebugEnabled()) LOG.debug("Payload object not of type: "+RfidServerBean.class.getName()+ ". Ignoring message from: "+stanza.getFrom().getJid());
 		}
 	}
 

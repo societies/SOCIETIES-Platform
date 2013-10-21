@@ -128,7 +128,7 @@ public class RFidClientController extends BasePageController{
 
 	public void retrieveRfidInfo(){
 
-		this.log.debug("Retrieving RFID information from context");
+		if(log.isDebugEnabled()) log.debug("Retrieving RFID information from context");
 		try {
 			List<CtxIdentifier> list = this.ctxBroker.lookup(CtxModelType.ENTITY, RFID_INFO).get();
 			log.debug("SIZE OF LIST - " + list.size());
@@ -177,7 +177,7 @@ public class RFidClientController extends BasePageController{
 				if (iterator.hasNext()){
 					CtxAttribute attribute = iterator.next();
 					this.registered = attribute.getStringValue().trim().equalsIgnoreCase("true");
-					this.log.debug("Retrieved "+RFID_REGISTERED+" attribute, value: "+attribute.getStringValue()+" this.registered: "+this.registered);
+					if(log.isDebugEnabled()) log.debug("Retrieved "+RFID_REGISTERED+" attribute, value: "+attribute.getStringValue()+" this.registered: "+this.registered);
 					//IF WEBAPP IS WAITING FOR A RESPONSE, SEND IT
 					setIsDone(true);
 				}
@@ -208,7 +208,7 @@ public class RFidClientController extends BasePageController{
 	
 	
 	public void register()  {
-		this.log.debug("Register button clicked");
+		if(log.isDebugEnabled()) log.debug("Register button clicked");
 
 		if(this.myRfidTag!=null && !this.mypasswd.isEmpty() && !this.serverJid.getJid().isEmpty())
 		{
@@ -223,7 +223,7 @@ public class RFidClientController extends BasePageController{
 			InternalEvent event = new InternalEvent("org/societies/rfid", "registerRequest", this.getClass().getName(), hash);
 			try {
 				this.eventManager.publishInternalEvent(event);
-				this.log.debug("Published registration event");
+				if(log.isDebugEnabled()) log.debug("Published registration event");
 				//setRegisterStatus(true);
 
 			} catch (EMSException e) {
@@ -275,7 +275,7 @@ public class RFidClientController extends BasePageController{
 		//this.registerStatus = false;
 		setRegistered(false);
 		//setRegisterStatus(false);
-		this.log.debug("Unregister button clicked");
+		if(log.isDebugEnabled()) log.debug("Unregister button clicked");
 
 		Hashtable<String, String> hash = new Hashtable<String, String>();
 
@@ -287,7 +287,7 @@ public class RFidClientController extends BasePageController{
 		InternalEvent event = new InternalEvent("org/societies/rfid", "unregisterRequest", this.getClass().getName(), hash);
 		try {
 			this.eventManager.publishInternalEvent(event);
-			this.log.debug("Published unregistration event");
+			if(log.isDebugEnabled()) log.debug("Published unregistration event");
 		//	setRegisterStatus(false);
 
 		} catch (EMSException e) {

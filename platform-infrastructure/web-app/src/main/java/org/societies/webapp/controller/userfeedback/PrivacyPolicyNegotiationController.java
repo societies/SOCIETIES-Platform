@@ -45,7 +45,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
         {
         	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/index.xhtml");
         }
-        log.debug("REDIRECT PAGE: " + redirectPage);
+        if(log.isDebugEnabled()) log.debug("REDIRECT PAGE: " + redirectPage);
         //QUICK HACK TO REDIRECT USER TO MY_COMMUNITIES PAGE 
         if(redirectPage.equals("/societies/your_suggested_communities_list.xhtml"))
         {
@@ -169,14 +169,14 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
 
         selectedRequestItem.getConditions().add(condition);
 
-        log.debug("Adding condition {} to request item for {}",
+        if(log.isDebugEnabled()) log.debug("Adding condition {} to request item for {}",
                 new String[]{newConditionToAdd.name(), selectedRequestItem.getResource().getDataType()});
 
         newConditionToAdd = null;
     }
 
     public void completeNegotiationAction() {
-        log.debug("completeNegotiation() id=" + eventID);
+        if(log.isDebugEnabled()) log.debug("completeNegotiation() id=" + eventID);
 
         ResponsePolicy responsePolicy = event.getResponsePolicy();
         NegotiationDetailsBean negotiationDetails = event.getNegotiationDetails();
@@ -229,7 +229,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     }
 
     public void cancelNegotiationAction() {
-        log.debug("cancelNegotiation()");
+        if(log.isDebugEnabled()) log.debug("cancelNegotiation()");
 
         ResponsePolicy responsePolicy = getCurrentNegotiationEvent().getResponsePolicy();
         NegotiationDetailsBean negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
@@ -323,7 +323,7 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
     public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
         this.newConditionToAdd = newConditionToAdd;
 
-        log.debug("New condition to add: {}", newConditionToAdd);
+        if(log.isDebugEnabled()) log.debug("New condition to add: {}", newConditionToAdd);
     }
 
     public ConditionConstants getNewConditionToAdd() {

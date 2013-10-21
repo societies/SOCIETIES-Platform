@@ -129,7 +129,7 @@ public class RfidSystem implements IDriverService{
 	public void connect(String ipAddress) {
 		
 		if (sockets.containsKey(ipAddress)){
-			this.logging.debug("Already connected to: "+ipAddress);
+			if(logging.isDebugEnabled()) logging.debug("Already connected to: "+ipAddress);
 			return;
 		}
 
@@ -140,7 +140,7 @@ public class RfidSystem implements IDriverService{
 			socketClient.start();
 			this.sockets.put(ipAddress, socketClient);
 		}else{
-			this.logging.error(ipAddress+" not valid. ignoring request");
+			if(logging.isDebugEnabled()) logging.error(ipAddress+" not valid. ignoring request");
 		}	
 	}
 	

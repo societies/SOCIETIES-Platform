@@ -26,7 +26,10 @@ package org.societies.display.client;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +80,9 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	private String currentUsedScreenLocation = "";
 	private static Logger LOG = LoggerFactory.getLogger(DisplayPortalClient.class);
 
+	private HashMap <String, String> userLocation;
+	private List<String> waitingRequests;
+
 	private ServiceRuntimeSocketServer servRuntimeSocketThread;
 
 	private UserSession userSession;
@@ -87,17 +93,19 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 		this.servRuntimeSocketThread = new ServiceRuntimeSocketServer(this);
 		this.serviceRuntimeSocketPort = this.servRuntimeSocketThread.setListenPort();
 		this.servRuntimeSocketThread.start();
+		userLocation = new HashMap<String, String>();
+		waitingRequests = new ArrayList<String>();
 
 	}
 
 
 	public void Init(){
-		this.LOG.debug("Initialising DisplayPortalClient");
+		if(LOG.isDebugEnabled()) LOG.debug("Initialising DisplayPortalClient");
 		try {
 			this.serverIdentity = this.idMgr.fromJid("stuart.societies.local2.macs.hw.ac.uk");
 		} catch(Exception e) {}
 		//services.getServer(myClientServiceID);
-		this.LOG.debug("Retrieved my server's identity: "+this.serverIdentity.getJid());
+		if(LOG.isDebugEnabled()) LOG.debug("Retrieved my server's identity: "+this.serverIdentity.getJid());
 
 
 		//
@@ -116,7 +124,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 
 		userSession = new UserSession(this.userIdentity.getJid(), this.serviceRuntimeSocketPort);
 
-		this.LOG.debug("DisplayPortalClient initialised");
+		if(LOG.isDebugEnabled()) LOG.debug("DisplayPortalClient initialised");
 
 		//LISTEN TO NEW CONTEXT CHANGES
 		new ContextEventListener(this, ctxBroker, userIdentity, requestor);//.registerForLocationEvents();
@@ -132,10 +140,10 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	{
 		this.screenLocations.clear();
 		String[] locs = this.portalServerRemote.getScreenLocations(serverIdentity);
-		this.LOG.debug("Retrieved screen locations from my server");
+		if(LOG.isDebugEnabled()) LOG.debug("Retrieved screen locations from my server");
 		for (int i=0; i<locs.length; i++){
 			this.screenLocations.add(locs[i]);
-			this.LOG.debug("Screen location: "+i+": "+locs[i]);
+			if(LOG.isDebugEnabled()) LOG.debug("Screen location: "+i+": "+locs[i]);
 		}
 	}
 
@@ -149,7 +157,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/service/lifecycle)" +
 				")";
 		this.evMgr.subscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, eventFilter);
-		this.LOG.debug("Subscribed to "+EventTypes.SERVICE_LIFECYCLE_EVENT+" events");
+		if(LOG.isDebugEnabled()) LOG.debug("Subscribed to "+EventTypes.SERVICE_LIFECYCLE_EVENT+" events");
 
 	}
 	private void unRegisterFromSLMEvents()
@@ -161,7 +169,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 
 		this.evMgr.unSubscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, eventFilter);
 		//this.evMgr.subscribeInternalEvent(this, new String[]{EventTypes.SERVICE_LIFECYCLE_EVENT}, eventFilter);
-		this.LOG.debug("Unsubscribed from "+EventTypes.SERVICE_LIFECYCLE_EVENT+" events");
+		if(LOG.isDebugEnabled()) LOG.debug("Unsubscribed from "+EventTypes.SERVICE_LIFECYCLE_EVENT+" events");
 	}
 	/*
 	 * NOT USED
@@ -186,54 +194,80 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	}
 
 	private boolean matchesLocation(String location){
-		this.LOG.debug("User location length: "+location.length());
+		if(LOG.isDebugEnabled()) LOG.debug("User location length: "+location.length());
 
 		for (int i=0; i<screenLocations.size(); i++){
 			String scrLoc = screenLocations.get(i);
-			this.LOG.debug("Screen location length: "+scrLoc.length());	
+			if(LOG.isDebugEnabled()) LOG.debug("Screen location length: "+scrLoc.length());	
 			if (scrLoc.trim().equalsIgnoreCase(location.trim())){
-				this.LOG.debug(scrLoc+" matches "+location+". Returning true");
+				if(LOG.isDebugEnabled()) LOG.debug(scrLoc+" matches "+location+". Returning true");
 				return true;
 			}
-			this.LOG.debug(scrLoc+" doesn't match "+location);
+			if(LOG.isDebugEnabled()) LOG.debug(scrLoc+" doesn't match "+location);
 
 		}
-		this.LOG.debug("return false");
+		if(LOG.isDebugEnabled()) LOG.debug("return false");
 		return false;
+	}
+
+	public void acknowledgeRefuse()
+	{
+
 	}
 
 	public void sendStartSessionRequest(String location)
 	{
-		this.LOG.debug("Requesting access to screen in location: "+location);
-		//request access
-		String reply = this.portalServerRemote.requestAccess(serverIdentity, userIdentity.getJid(), location);
-		//if access refused do nothing
-		if (reply.equals("REFUSED")){
-			this.LOG.debug("Refused access to screen.");
-			this.userFeedback.showNotification("Sorry, " + location + " is not available any more!");
-		}
-		else //if access is granted 
+
+		synchronized(userLocation)
 		{
-			this.LOG.debug("Access to screen granted. IP Address is: "+reply);
-
-
-			//now setup new screen
-			SocketClient socketClient = new SocketClient(reply);
-
-			socketClient.startSession(userSession);
-			//TODO: send services TO DISPLAY
-			this.currentUsedScreenIP = reply;
-			this.currentUsedScreenLocation = location;
-			this.hasSession = true;
-			DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
-			InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
-			try {
-				this.evMgr.publishInternalEvent(iEvent);
-			} catch (EMSException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			synchronized(waitingRequests)
+			{
+				waitingRequests.remove(location);
 			}
+			if(userLocation.containsValue(location))
+			{
+				if(location.equals(this))
+					if(LOG.isDebugEnabled()) LOG.debug("Requesting access to screen in location: "+location);
+				//request access
+				String reply = this.portalServerRemote.requestAccess(serverIdentity, userIdentity.getJid(), location);
+				//if access refused do nothing
+				if (reply.equals("REFUSED")){
+					if(LOG.isDebugEnabled()) LOG.debug("Refused access to screen.");
+					this.userFeedback.showNotification("Sorry, " + location + " is not available any more!");
+				}
+				else //if access is granted 
+				{
+					if(LOG.isDebugEnabled()) LOG.debug("Access to screen granted. IP Address is: "+reply);
+					//now setup new screen
+					SocketClient socketClient = new SocketClient(reply);
 
+					socketClient.startSession(userSession);
+					//TODO: send services TO DISPLAY
+					this.currentUsedScreenIP = reply;
+					this.currentUsedScreenLocation = location;
+					this.hasSession = true;
+					DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
+					InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
+					try {
+						this.evMgr.publishInternalEvent(iEvent);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			else
+			{
+				this.userFeedback.showNotification("Sorry, the session request for " + location + ", is no longer valid");
+			}
+		}
+	}
+	
+	public void acknowledgeRefuse(String location)
+	{
+		synchronized(waitingRequests)
+		{
+			waitingRequests.remove(location);
 		}
 	}
 
@@ -241,11 +275,17 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 
 		//FOR EVERY UPDATE ON USER LOCATION, GET UPTO DATE SCREEN LOCATIONS
 		retrieveScreenLocations();
+		String uuid = UUID.randomUUID().toString();
+		synchronized(userLocation)
+		{
+			userLocation.clear();
+			userLocation.put(uuid, location);
+		}
 
-		this.LOG.debug("location of user: "+location);
-		this.LOG.debug("Location of screens: ");
+		if(LOG.isDebugEnabled()) LOG.debug("location of user: "+location);
+		if(LOG.isDebugEnabled()) LOG.debug("Location of screens: ");
 		for (int i=0; i<screenLocations.size(); i++){
-			this.LOG.debug("Screen location: "+i+": "+screenLocations.get(i));
+			if(LOG.isDebugEnabled()) LOG.debug("Screen location: "+i+": "+screenLocations.get(i));
 		}
 
 		if (!location.trim().equalsIgnoreCase(currentUsedScreenLocation.trim())){
@@ -253,29 +293,36 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 			if (this.matchesLocation(location)){
 				//check if the user is already using another screen
 				if (this.hasSession){
-					this.LOG.debug("Releasing previous screen session from: "+currentUsedScreenIP);
+					if(LOG.isDebugEnabled()) LOG.debug("Releasing previous screen session from: "+currentUsedScreenIP);
 					//release currently used screen
 					SocketClient sClient = new SocketClient(currentUsedScreenIP);
 					sClient.logOut(userSession);
-					this.LOG.debug("Sent logout msg to: "+currentUsedScreenIP);
+					if(LOG.isDebugEnabled()) LOG.debug("Sent logout msg to: "+currentUsedScreenIP);
 					this.portalServerRemote.releaseResource(serverIdentity, userIdentity.getJid(), currentUsedScreenIP);
-					this.LOG.debug("Released screen: "+currentUsedScreenIP);
+					if(LOG.isDebugEnabled()) LOG.debug("Released screen: "+currentUsedScreenIP);
 				}
 
 				//REQUEST ACCESS - RETURNS FALSE IF NOT IN USE
-				if(!this.portalServerRemote.checkAccess(serverIdentity, location))
+				synchronized(this.waitingRequests)
 				{
-					this.LOG.debug("START NOTIFICATION CONTROL THREAD");
-					new Thread(new NotificationControl(this, this.userFeedback, location)).start();		
+					if(!waitingRequests.contains(location))
+					{
+						waitingRequests.add(location);
+						if(!this.portalServerRemote.checkAccess(serverIdentity, location))
+						{
+							if(LOG.isDebugEnabled()) LOG.debug("START NOTIFICATION CONTROL THREAD");
+							new Thread(new NotificationControl(uuid, this, this.userFeedback, location)).start();		
+						}
+					}
 				}
 
 
 			}//user is not near a screen
 			else{
-				this.LOG.debug("User not near screen");
+				if(LOG.isDebugEnabled()) LOG.debug("User not near screen");
 				//if he's using a screen
 				if (this.hasSession){
-					this.LOG.debug("User in session with portal GUI. Attempting to logout");
+					if(LOG.isDebugEnabled()) LOG.debug("User in session with portal GUI. Attempting to logout");
 					//release resource
 					this.portalServerRemote.releaseResource(serverIdentity, userIdentity.getJid(), currentUsedScreenLocation);
 
@@ -297,11 +344,11 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 						e.printStackTrace();
 					}
 				}else{
-					this.LOG.debug("User not in a session with the screen. Nothing to do.");
+					if(LOG.isDebugEnabled()) LOG.debug("User not in a session with the screen. Nothing to do.");
 				}
 			}
 		}else{
-			this.LOG.debug("Ignoring same value for symloc> new: "+location+" - current: "+this.currentUsedScreenLocation);
+			if(LOG.isDebugEnabled()) LOG.debug("Ignoring same value for symloc> new: "+location+" - current: "+this.currentUsedScreenLocation);
 		}
 	}
 
@@ -439,7 +486,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 
 	public void notifyServiceStarted(String serviceName) {
 		if (this.userSession.containsService(serviceName)){
-			this.LOG.debug("Found service: "+serviceName+". Calling serviceStarted method");
+			if(LOG.isDebugEnabled()) LOG.debug("Found service: "+serviceName+". Calling serviceStarted method");
 			ServiceInfo sInfo = this.userSession.getService(serviceName);
 			if (sInfo!=null){
 				IDisplayableService service = sInfo.getService();
@@ -449,11 +496,11 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 				}
 			}
 		}
-		this.LOG.debug("Could not find service: "+serviceName);
+		if(LOG.isDebugEnabled()) LOG.debug("Could not find service: "+serviceName);
 	}
 	public void notifyServiceStopped(String serviceName) {
 		if (this.userSession.containsService(serviceName)){
-			this.LOG.debug("Found service: "+serviceName+". Calling serviceStopped method");
+			if(LOG.isDebugEnabled()) LOG.debug("Found service: "+serviceName+". Calling serviceStopped method");
 			ServiceInfo sInfo = this.userSession.getService(serviceName);
 			if (sInfo!=null){
 				IDisplayableService service = sInfo.getService();
@@ -464,7 +511,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 			}
 		}
 
-		this.LOG.debug("Could not find service: "+serviceName);
+		if(LOG.isDebugEnabled()) LOG.debug("Could not find service: "+serviceName);
 
 	}
 
