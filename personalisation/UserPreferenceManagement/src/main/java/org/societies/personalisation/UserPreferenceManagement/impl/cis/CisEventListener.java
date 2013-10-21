@@ -88,7 +88,7 @@ public class CisEventListener extends EventListener{
 		this.userPrefMgr = pcm.getPreferenceManager();
 		this.pcm = pcm;
 		this.tempTable = new Hashtable<String, PreferenceDetails>();
-		pcm.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.CIS_SUBS, EventTypes.SERVICE_LIFECYCLE_EVENT, EventTypes.CIS_UNSUBS}, null);
+		//pcm.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.CIS_SUBS, EventTypes.SERVICE_LIFECYCLE_EVENT, EventTypes.CIS_UNSUBS}, null);
 		
 	}
 
