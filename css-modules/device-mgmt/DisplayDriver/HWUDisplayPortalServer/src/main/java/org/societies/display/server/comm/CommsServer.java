@@ -41,6 +41,7 @@ import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.D
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerIPAddressResultBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerMethodType;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenLocationResultBean;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenUseBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerServiceIDResultBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
@@ -144,6 +145,18 @@ public class CommsServer implements IFeatureServer{
 				
 				
 			}
+			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.CHECK_SCREEN_USE)){
+				this.LOG.debug("getQuery: "+DisplayPortalServerMethodType.CHECK_SCREEN_USE);
+			//	String identity = ((DisplayPortalServerBean) payload).getIdentity();
+				String location = ((DisplayPortalServerBean) payload).getLocation();
+				boolean inUse = this.displayPortalServer.checkInUse(location);
+				//String ipAddress =  this.displayPortalServer.requestAccess(identity, location);
+				DisplayPortalServerScreenUseBean resultBean = new DisplayPortalServerScreenUseBean();
+				resultBean.setInUse(inUse);
+				this.LOG.debug("Returning result of in user request: "+inUse);
+				return resultBean;
+			}
+			
 			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.REQUEST_ACCESS)){
 				this.LOG.debug("getQuery: "+DisplayPortalServerMethodType.REQUEST_ACCESS);
 				String identity = ((DisplayPortalServerBean) payload).getIdentity();

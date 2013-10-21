@@ -142,8 +142,6 @@ public class ContextModel implements Serializable {
 		path_parent = oldPath;
 		String source = getSource();
 		String parentId = getParent_id();
-		logger.debug("source: "+source);
-		logger.debug("parentId: "+parentId);
 		String temp = parentId.replace("context://", "");
 			source = (source != null && temp != null && temp.indexOf("/") < 0) ? source : temp.substring(0,temp.indexOf("/"));
 		if(path_parent == null || viewType == ViewType.ALL_ENTITIES){
@@ -225,7 +223,7 @@ public class ContextModel implements Serializable {
 			List<CtxIdentifier> list = internalCtxBroker.lookup(string2Model(model), type).get();
 			for(CtxIdentifier ctxId : list){
 				result.add(ctxId.getUri());
-				logger.info("Add ID:"+ctxId.getUri());
+				//logger.info("Add ID:"+ctxId.getUri());
 			}
 		} 
 		catch (CtxException e) {

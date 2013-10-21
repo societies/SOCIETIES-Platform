@@ -112,6 +112,8 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 
 	/** The executor service. */
 	private ExecutorService executorService = Executors.newSingleThreadExecutor();
+	
+	private ExecutorService threadPoolExecutorService = Executors.newCachedThreadPool();
 
 	@Autowired(required=true)
 	CssCisCtxMonitor(IEventMgr eventMgr, PubsubClient pubsubClient,
@@ -520,7 +522,10 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 				final CtxAssociation hasMembersAssoc = 
 						(CtxAssociation) ctxBroker.retrieve(hasMembersAssocId).get();
 				hasMembersAssoc.addChildEntity(cssEntId);
-				ctxBroker.update(hasMembersAssoc);				
+				ctxBroker.update(hasMembersAssoc);
+				
+				// Pre-fetch attributes of the new member to allow community context estimation
+				threadPoolExecutorService.submit(new CssAttributePrefetcher(cisOwnerId, myCisId, cssId));
 
 			} catch (InvalidFormatException ife) {
 
@@ -979,5 +984,67 @@ public class CssCisCtxMonitor extends EventListener implements Subscriber {
 						+ "':" + e.getLocalizedMessage(), e);
 			}
 		}
+	}
+	
+	private class CssAttributePrefetcher implements Runnable {
+
+		private final IIdentity cisOwnerId;
+		
+		private final IIdentity cisId;
+		
+		private final IIdentity cssId;
+		
+		private CssAttributePrefetcher(final IIdentity cisOwnerId,
+				final IIdentity cisId, final IIdentity cssId) {
+			
+			this.cisOwnerId = cisOwnerId;
+			this.cisId = cisId;
+			this.cssId = cssId;
+		}
+		
+		/*
+		 * @see java.lang.Runnable#run()
+		 */
+		@Override
+		public void run() {
+			
+			LOG.debug("CssAttributePrefetcher run: cisOwnerId={}, cisId={}, cssId={}",
+					new Object[] { this.cisOwnerId, this.cisId, this.cssId });
+			
+			try {
+				final Requestor requestor = new RequestorCis(cisOwnerId, cisId);
+				final List<String> cisAttrTypes = getPrivPolicyAttributeTypes(this.cisOwnerId, this.cisId);
+				LOG.debug("CssAttributePrefetcher run: cisAttrTypes={}", cisAttrTypes);
+				// TODO Should also check visibility, i.e. private vs. members-only/public
+				// Add CAUI
+				cisAttrTypes.add(CtxAttributeTypes.CAUI_MODEL);
+				
+				final CtxEntityIdentifier cssEntId = ctxBroker.retrieveIndividualEntityId(
+						requestor, this.cssId).get();
+				if (cssEntId == null) {
+					LOG.error("Failed to pre-fetch attributes of user '" + this.cssId
+							+ "' for estimating context of community '" + this.cisId
+							+ "': Could not retrieve IndividualCtxEntity ID");
+					return;
+				}
+				
+				final List<CtxIdentifier> cssAttrIds = new ArrayList<CtxIdentifier>(cisAttrTypes.size());
+				
+				for (final String cisAttrType : cisAttrTypes) {
+					cssAttrIds.addAll(ctxBroker.lookup(cssEntId, CtxModelType.ATTRIBUTE, cisAttrType).get());
+				}
+				LOG.debug("CssAttributePrefetcher run: cssAttrIds={}", cssAttrIds);
+				if (cssAttrIds.isEmpty()) {
+					return;
+				}
+				ctxBroker.retrieve(requestor, cssAttrIds).get();
+				
+			} catch (Exception e) {
+				LOG.error("Failed to pre-fetch attributes of user '" + this.cssId
+						+ "' for estimating context of community '" + this.cisId + "': "
+						+ e.getLocalizedMessage(), e);
+			}
+		}
+		
 	}
 }

@@ -139,7 +139,7 @@ public class ExternalCtxBrokerTest {
 		internalCtxBroker.setCtxAccessController(mockCtxAccessController);
 		
 		ctxBroker = new CtxBroker(internalCtxBroker);
-		ctxBroker.setIdentityMgr(mockIdentityMgr);
+		//ctxBroker.setIdentityMgr(mockIdentityMgr);
 		//ctxBroker.setCtxAccessController(mockCtxAccessController);
 		
 	//	when(internalCtxBroker.getLocalRequestor()).thenReturn(mockRequestor);

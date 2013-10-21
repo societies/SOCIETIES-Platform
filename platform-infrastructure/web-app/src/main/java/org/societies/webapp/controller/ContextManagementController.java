@@ -1,6 +1,5 @@
 package org.societies.webapp.controller;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,7 +44,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 @ManagedBean(name="contextManagementController")
 @SessionScoped
-public class ContextManagementController extends BasePageController implements Serializable {
+public class ContextManagementController extends BasePageController {
 
 	private static final long serialVersionUID = 1L;
 	

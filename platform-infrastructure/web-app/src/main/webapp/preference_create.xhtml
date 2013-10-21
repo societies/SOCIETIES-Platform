@@ -191,12 +191,15 @@
 
 			<h:panelGrid columns="2" cellpadding="5">
 
-				<h:outputLabel for="serviceTypeDlg" value="Service Type:"></h:outputLabel>
-				<h:inputText id="serviceTypeDlg"
-					value="#{PreferenceCreateBean.preferenceDetails.serviceType}"></h:inputText>
 				<h:outputLabel for="serviceIDDlg" value="Service ID:"></h:outputLabel>
-				<h:inputText id="serviceIDDlg"
-					value="#{PreferenceCreateBean.serviceIDStr}"></h:inputText>
+				<p:selectOneMenu id="serviceIDDlg" process="@this"
+					value="#{PreferenceCreateBean.serviceIDStr}">
+					<f:selectItems value="#{RequestorsController.localServices}"
+						var="localServices" itemLabel="#{localServices.serviceName}"
+						itemValue="#{RequestorsController.getServiceIDAsString(localServices.serviceIdentifier)}" />	
+				</p:selectOneMenu>
+				
+					
 				<h:outputLabel for="preferenceNameDlg" value="Preference Name:"></h:outputLabel>
 				<h:inputText id="preferenceNameDlg"
 					value="#{PreferenceCreateBean.preferenceDetails.preferenceName}"></h:inputText>

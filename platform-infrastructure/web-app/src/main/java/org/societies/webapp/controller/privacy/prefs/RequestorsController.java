@@ -88,6 +88,8 @@ public class RequestorsController implements Serializable{
 	private List<CssAdvertisementRecord> cssAdvertisements;
 
 	private List<CisAdvertisementRecord> cisAdvertisements;
+	
+	private List<Service> localServices;
 
 	private Hashtable<String, List<CisAdvertisementRecord>> resultTable = new Hashtable<String, List<CisAdvertisementRecord>>();
 
@@ -135,7 +137,8 @@ public class RequestorsController implements Serializable{
 		}
 		return cisAdvertisements;
 	}
-
+	
+	
 	public List<Service> getServiceListByOwner(String ownerID){
 		if (logging.isDebugEnabled()){
 			this.logging.debug("getServiceListByOwner("+ownerID+")");
@@ -266,6 +269,33 @@ public class RequestorsController implements Serializable{
 
 
 	
+	public List<Service> getLocalServices() {
+		try {
+			//localServices.get(0).
+			
+			return this.serviceDiscovery.getLocalServices().get();
+			
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return new ArrayList<Service>();
+	}
+
+	public void setLocalServices(List<Service> localServices) {
+		this.localServices = localServices;
+	}
+
+
+
 	private class CisDirectoryCallback implements ICisDirectoryCallback{
 
 		

@@ -24,9 +24,9 @@
  */
 package org.societies.integration.test.bit.community.preferences;
 
+import org.societies.api.cis.management.ICisManager;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
-import org.societies.api.useragent.monitoring.IUserActionMonitor;
 import org.societies.integration.test.IntegrationTestCase;
 import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
@@ -45,6 +45,8 @@ public class TestCommPrefs extends IntegrationTestCase{
 	private static IUserPreferenceConditionMonitor userPCM;
 	private static ICommunityPreferenceManager commPrefMgr;
 	private static IUserPreferenceManagement preferenceManager;
+	private static ICisManager cisManager;
+	
 	
 	public TestCommPrefs(){
 		super(1874, new Class[]{Tester.class});
@@ -84,7 +86,7 @@ public class TestCommPrefs extends IntegrationTestCase{
 		return userPCM;
 	}
 
-	public static void setUserPCM(IUserPreferenceConditionMonitor userPCM) {
+	public  void setUserPCM(IUserPreferenceConditionMonitor userPCM) {
 		TestCommPrefs.userPCM = userPCM;
 		preferenceManager = TestCommPrefs.userPCM.getPreferenceManager();
 	}
@@ -93,7 +95,7 @@ public class TestCommPrefs extends IntegrationTestCase{
 		return commPrefMgr;
 	}
 
-	public static void setCommPrefMgr(ICommunityPreferenceManager commPrefMgr) {
+	public  void setCommPrefMgr(ICommunityPreferenceManager commPrefMgr) {
 		TestCommPrefs.commPrefMgr = commPrefMgr;
 		
 	}
@@ -102,7 +104,15 @@ public class TestCommPrefs extends IntegrationTestCase{
 		return preferenceManager;
 	}
 
-	public static void setPreferenceManager(IUserPreferenceManagement preferenceManager) {
+	public  void setPreferenceManager(IUserPreferenceManagement preferenceManager) {
 		TestCommPrefs.preferenceManager = preferenceManager;
+	}
+
+	public static ICisManager getCisManager() {
+		return cisManager;
+	}
+
+	public  void setCisManager(ICisManager cisManager) {
+		TestCommPrefs.cisManager = cisManager;
 	}
 }

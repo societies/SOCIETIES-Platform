@@ -21,8 +21,8 @@ xmlns="http://societies.org/api/internal/schema/personalisation/comms"
 		<xs:sequence>
 			<xs:element name="cisId" type="xs:string"/>
 			<xs:element name="methodType" type="CommunityPersonalisationMethodType" />
-			<xs:element name="details" type="tns1:PreferenceDetailsBean" maxOccurs="unbounded"/>
-			<xs:element name="models" type="tns1:PreferenceTreeModelBean" maxOccurs="unbounded"/>
+			<xs:element name="details" type="tns1:PreferenceDetailsBean" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element name="models" type="tns1:PreferenceTreeModelBean" maxOccurs="unbounded" minOccurs="0"/>
 			<xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false" />
 		</xs:sequence>
 	</xs:complexType>
@@ -39,8 +39,8 @@ xmlns="http://societies.org/api/internal/schema/personalisation/comms"
 	
 	<xs:complexType name="CommunityPersonalisationResultBean">
 		<xs:sequence>
-			<xs:element name="models" type="tns1:PreferenceTreeModelBean" maxOccurs="unbounded"/>
-			<xs:element name="details" type="tns1:PreferenceDetailsBean" maxOccurs="unbounded" />
+			<xs:element name="models" type="tns1:PreferenceTreeModelBean" maxOccurs="unbounded" minOccurs="0"/>
+			<xs:element name="details" type="tns1:PreferenceDetailsBean" maxOccurs="unbounded" minOccurs="0"/>
 			<xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false" />
 		</xs:sequence>
 	</xs:complexType>

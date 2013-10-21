@@ -25,6 +25,8 @@
 package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -465,6 +467,21 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	public CommunitiesHandler getCommunitiesHandler() {
 		// TODO Auto-generated method stub
 		return this.communitiesHandler;
+	}
+
+
+	@Override
+	public void pushPreferencesToCommunities(Calendar calendar) {
+		
+		this.communitiesHandler.scheduleUploaderTask(calendar);
+		
+	}
+
+
+	@Override
+	public void downloadPreferencesFromCommunities(Calendar calendar) {
+		this.communitiesHandler.scheduleDownloaderTask(calendar);
+		
 	}
 
 	
