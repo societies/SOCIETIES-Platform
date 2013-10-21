@@ -63,12 +63,12 @@ public class SocketClient {
 			connected = true;
 			return  true;
 		} catch (UnknownHostException e) {
-			this.logging.debug("Don't know about host: "+displayAddress);
+			if(logging.isDebugEnabled()) logging.debug("Don't know about host: "+displayAddress);
 			//System.exit(1);
 		} catch (IOException e) {
 			System.err.println("Couldn't get I/O for "
 					+ "the connection to: "+displayAddress);
-			this.logging.debug("Couldn't get I/O for "
+			if(logging.isDebugEnabled()) logging.debug("Couldn't get I/O for "
 					+ "the connection to: "+displayAddress);
 		} 
 		return false;
@@ -185,7 +185,7 @@ public class SocketClient {
 	public void logOut(UserSession userSession){
 		String message = "LOGOUT\n"+userSession.getUserIdentity()+"\n";
 		this.sendMessage(message);
-		this.logging.debug("Sent LOGOUT message");
+		if(logging.isDebugEnabled()) logging.debug("Sent LOGOUT message");
 	}
 	
 	public void startService(ServiceInfo sInfo){

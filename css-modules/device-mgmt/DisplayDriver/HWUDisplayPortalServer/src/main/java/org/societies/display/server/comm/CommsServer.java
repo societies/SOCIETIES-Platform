@@ -129,14 +129,14 @@ public class CommsServer implements IFeatureServer{
 		if (payload instanceof DisplayPortalServerBean){
 			
 			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS)){
-				LOG.debug("getQuery: "+DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS);
+				if(LOG.isDebugEnabled()) LOG.debug("getQuery: "+DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS);
 				String[] locations = this.displayPortalServer.getScreenLocations();
 				
 				try {
 					byte[] serialisedObj = SerialisationHelper.serialise(locations);
 					DisplayPortalServerScreenLocationResultBean resultBean = new DisplayPortalServerScreenLocationResultBean();
                     resultBean.setScreenLocations(serialisedObj);
-					this.LOG.debug("Returning screen locations");
+					if(LOG.isDebugEnabled()) LOG.debug("Returning screen locations");
 					return resultBean;
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -146,35 +146,35 @@ public class CommsServer implements IFeatureServer{
 				
 			}
 			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.CHECK_SCREEN_USE)){
-				this.LOG.debug("getQuery: "+DisplayPortalServerMethodType.CHECK_SCREEN_USE);
+				if(LOG.isDebugEnabled()) LOG.debug("getQuery: "+DisplayPortalServerMethodType.CHECK_SCREEN_USE);
 			//	String identity = ((DisplayPortalServerBean) payload).getIdentity();
 				String location = ((DisplayPortalServerBean) payload).getLocation();
 				boolean inUse = this.displayPortalServer.checkInUse(location);
 				//String ipAddress =  this.displayPortalServer.requestAccess(identity, location);
 				DisplayPortalServerScreenUseBean resultBean = new DisplayPortalServerScreenUseBean();
 				resultBean.setInUse(inUse);
-				this.LOG.debug("Returning result of in user request: "+inUse);
+				if(LOG.isDebugEnabled()) LOG.debug("Returning result of in user request: "+inUse);
 				return resultBean;
 			}
 			
 			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.REQUEST_ACCESS)){
-				this.LOG.debug("getQuery: "+DisplayPortalServerMethodType.REQUEST_ACCESS);
+				if(LOG.isDebugEnabled()) LOG.debug("getQuery: "+DisplayPortalServerMethodType.REQUEST_ACCESS);
 				String identity = ((DisplayPortalServerBean) payload).getIdentity();
 				String location = ((DisplayPortalServerBean) payload).getLocation();
 				String ipAddress =  this.displayPortalServer.requestAccess(identity, location);
-				this.LOG.debug("Got access response :"+ipAddress+" for: "+identity+" and location: "+location);
+				if(LOG.isDebugEnabled()) LOG.debug("Got access response :"+ipAddress+" for: "+identity+" and location: "+location);
 				DisplayPortalServerIPAddressResultBean resultBean = new DisplayPortalServerIPAddressResultBean();
 				resultBean.setIpAddress(ipAddress);
-				this.LOG.debug("Returning result of access request: "+ipAddress);
+				if(LOG.isDebugEnabled()) LOG.debug("Returning result of access request: "+ipAddress);
 				return resultBean;
 			}
 			
 			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.GET_SERVER_SERVICE_ID)){
-				this.LOG.debug("getQuery: "+DisplayPortalServerMethodType.GET_SERVER_SERVICE_ID);
+				if(LOG.isDebugEnabled()) LOG.debug("getQuery: "+DisplayPortalServerMethodType.GET_SERVER_SERVICE_ID);
 				ServiceResourceIdentifier serviceId = displayPortalServer.getServerServiceId();
 				DisplayPortalServerServiceIDResultBean resultBean = new DisplayPortalServerServiceIDResultBean();
 				resultBean.setServiceID(serviceId);
-				this.LOG.debug("Returning serviceID: "+serviceId.getServiceInstanceIdentifier()+" "+serviceId.getIdentifier());
+				if(LOG.isDebugEnabled()) LOG.debug("Returning serviceID: "+serviceId.getServiceInstanceIdentifier()+" "+serviceId.getIdentifier());
 				return resultBean;
 				
 			}

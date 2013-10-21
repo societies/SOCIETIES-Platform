@@ -79,6 +79,7 @@ public class ScreenData implements Serializable {
 
     //CHECKS IP IS VALID IP
     public boolean checkIp(String sip) {
+    	if(log.isDebugEnabled())
         log.debug(sip);
         pattern = Pattern.compile(IPADDRESS_PATTERN);
         matcher = pattern.matcher(sip);
@@ -88,7 +89,7 @@ public class ScreenData implements Serializable {
 
     //CHECKS USER INPUT THEN ADDS SCREEN TO DB
     public void addScreen(Screen screen) {
-        log.debug("IN VALIDATION");
+        if(log.isDebugEnabled()) log.debug("IN VALIDATION");
         RequestContext context = RequestContext.getCurrentInstance();
         FacesMessage msg = null;
         boolean screenAdded = false;
@@ -103,19 +104,19 @@ public class ScreenData implements Serializable {
                 screenAdded = true;
                 screenDAO.save(screen);
                 refreshScreens();
-                log.debug("Screen: " + screenID + " added to DB.");
+                if(log.isDebugEnabled()) log.debug("Screen: " + screenID + " added to DB.");
                 msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Screen successfully added", "Screen: " + screenID + " has successfully been " +
                         "added to the database.");
             }
             else
             {
-                log.debug("Screen: " + screenID + " does NOT have valid IP - NOT added to DB.");
+                if(log.isDebugEnabled()) log.debug("Screen: " + screenID + " does NOT have valid IP - NOT added to DB.");
                 screenAdded = false;
                 msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid IP", "Please give a valid IP address for: " + screenID +".");
             }
         }
         else {
-            log.debug("User left all fields empty.");
+            if(log.isDebugEnabled()) log.debug("User left all fields empty.");
             screenAdded = false;
             msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "Invalid fields!", "Please ensure all fields are filled in.");
         }
@@ -129,7 +130,7 @@ public class ScreenData implements Serializable {
         screenList = screenDAO.getAllScreens();
         this.screenDataModel = new ScreenDataModel(screenList);
         this.displayPortalServer.setScreens();
-        log.debug("Current Screen List: " + screenList.toString());
+        if(log.isDebugEnabled()) log.debug("Current Screen List: " + screenList.toString());
     }
 
 
@@ -151,7 +152,7 @@ public class ScreenData implements Serializable {
         FacesMessage msg = null;
         for(Screen screens : selectedScreens)
         {
-            log.debug("Deleting screen with ID: " + screens.getScreenID());
+            if(log.isDebugEnabled()) log.debug("Deleting screen with ID: " + screens.getScreenID());
             screenDAO.deleteScreens(screens);
             count++;
         }

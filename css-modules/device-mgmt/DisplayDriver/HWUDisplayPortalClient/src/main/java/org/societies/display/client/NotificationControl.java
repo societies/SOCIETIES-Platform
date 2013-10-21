@@ -36,7 +36,7 @@ public class NotificationControl implements Runnable  {
 	{
 		List<String> feedback = new ArrayList<String>();
 		try {
-			log.debug("SENDING NOTIFICATION");
+			if(log.isDebugEnabled()) log.debug("SENDING NOTIFICATION");
 			feedback = this.userFeedback.getExplicitFB(ExpProposalType.ACKNACK, new ExpProposalContent("Do you want to start a session with "+ this.location+"?", answers)).get();
 		} catch (InterruptedException e) {
 			log.error("ERROR", e);
@@ -47,7 +47,7 @@ public class NotificationControl implements Runnable  {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		log.debug(feedback.toString());
+		if(log.isDebugEnabled()) log.debug(feedback.toString());
 		if(feedback.get(0).equals("Yes"))
 		{
 			displayClient.sendStartSessionRequest(this.location);
