@@ -443,7 +443,7 @@ public class NotificationsController extends BasePageController {
 	private final Map<String, UserFeedbackAccessControlEvent> unansweredAccessControlEvents = new HashMap<String, UserFeedbackAccessControlEvent>();
 
 	public NotificationsController() {
-		log.debug("NotificationsController ctor()");
+		if(log.isDebugEnabled()) log.debug("NotificationsController ctor()");
 		timedAbortProcessor = new TimedAbortProcessor(timedAbortsToWatch);
 		timedAbortProcessorThread = new Thread(timedAbortProcessor);
 		timedAbortProcessorThread.setName("TimedAbortProcessor");
@@ -535,7 +535,7 @@ public class NotificationsController extends BasePageController {
 
 	private void submitItem(String itemId, Object result) {
 
-		log.debug("submitItem() id=" + itemId);
+		if(log.isDebugEnabled()) log.debug("submitItem() id=" + itemId);
 
 		if (itemId == null) {
 			log.warn("Null itemId when calling submitItem(), cannot continue");
@@ -665,7 +665,7 @@ public class NotificationsController extends BasePageController {
 		try {
 			if (internalUserFeedback != null)
 				accessControlEvents = internalUserFeedback.listIncompleteAccessRequests();
-			log.debug("Access Control Events Retrieved: " + String.valueOf(accessControlEvents.size()));
+			if(log.isDebugEnabled()) log.debug("Access Control Events Retrieved: " + String.valueOf(accessControlEvents.size()));
 		} catch (Exception ex) {
 			log.warn("Recoverable error: Error recalling AC records: " + ex.getMessage());
 		}
@@ -703,7 +703,7 @@ public class NotificationsController extends BasePageController {
 
 						if (acList != null)
 							for (UserFeedbackAccessControlEvent ac : acList) {
-								log.debug(""+ac.getResponseItems().size());
+								if(log.isDebugEnabled()) log.debug(""+ac.getResponseItems().size());
 								NotificationQueueItem item = NotificationQueueItem.forAccessControl(ac.getRequestId(), ac);
 								addItemToQueue(item);
 							}

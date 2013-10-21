@@ -99,7 +99,7 @@ public class RFidServerController extends BasePageController {
 
 	public void addTag(){
 
-		this.log.debug("Add button clicked");
+		if(log.isDebugEnabled()) log.debug("Add button clicked");
 		FacesMessage msg = null;
 		RequestContext context = RequestContext.getCurrentInstance();
 		boolean tagAdded = false;
@@ -115,7 +115,7 @@ public class RFidServerController extends BasePageController {
 			InternalEvent event = new InternalEvent(RFID_SERVER_EVENT_TYPE, "addNewTag", this.getClass().getName(), hash);
 			try {
 				this.eventManager.publishInternalEvent(event);
-				this.log.debug("Published add new tag event");
+				if(log.isDebugEnabled()) log.debug("Published add new tag event");
 			} catch (EMSException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -135,7 +135,7 @@ public class RFidServerController extends BasePageController {
 
 
 	public void deleteTag(){
-		this.log.debug("Delete rfid record");
+		if(log.isDebugEnabled()) log.debug("Delete rfid record");
 		Hashtable<String, String> hash = new Hashtable<String, String>();
 
 
@@ -143,7 +143,7 @@ public class RFidServerController extends BasePageController {
 		InternalEvent event = new InternalEvent(RFID_SERVER_EVENT_TYPE, "deleteTag", this.getClass().getName(), hash);
 		try {
 			this.eventManager.publishInternalEvent(event);
-			this.log.debug("Published deletion event");
+			if(log.isDebugEnabled()) log.debug("Published deletion event");
 		} catch (EMSException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -185,14 +185,14 @@ public class RFidServerController extends BasePageController {
 	}
 
 	public RfidBean getSelectedRfidBean() {
-		this.log.debug("Get selectedRfidBean");
+		if(log.isDebugEnabled()) log.debug("Get selectedRfidBean");
 		return selectedRfidBean;
 
 	}
 
 	public void setSelectedRfidBean(RfidBean selectedRfidBean) {
 		this.selectedRfidBean = selectedRfidBean;
-		this.log.debug("Set selectedRfidBean");
+		if(log.isDebugEnabled()) log.debug("Set selectedRfidBean");
 	}
 
 	public List<RfidBean> getRfidBeans() {
@@ -202,7 +202,7 @@ public class RFidServerController extends BasePageController {
 		Hashtable<String,String> tagToPassword = contextRetriever.getTagToPassword();
 		Hashtable<String,String> tagToSymloc = contextRetriever.getTagToSymloc();
 
-		this.log.debug("GOT BEANS: " + tagToSymloc.toString());
+		if(log.isDebugEnabled()) log.debug("GOT BEANS: " + tagToSymloc.toString());
 		
 		Enumeration<String> rfidTags = tagToPassword.keys();
 
@@ -225,13 +225,13 @@ public class RFidServerController extends BasePageController {
 	}
 
 	public RfidBean getAddRfidBean() {
-		this.log.debug("Get addRfidBean");
+		if(log.isDebugEnabled()) log.debug("Get addRfidBean");
 		return addRfidBean;
 	}
 
 	public void setAddRfidBean(RfidBean addRfidBean) {
 		this.addRfidBean = addRfidBean;
-		this.log.debug("Set addRfidBean");
+		if(log.isDebugEnabled()) log.debug("Set addRfidBean");
 
 	}
 }

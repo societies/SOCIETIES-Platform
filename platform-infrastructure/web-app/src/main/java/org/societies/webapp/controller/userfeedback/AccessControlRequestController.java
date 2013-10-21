@@ -225,7 +225,7 @@ public class AccessControlRequestController extends BasePageController {
 
         selectedRequestItem.getConditions().add(condition);
 
-        log.debug("Adding condition {} to request item for {}",
+        if(log.isDebugEnabled()) log.debug("Adding condition {} to request item for {}",
                 new String[]{newConditionToAdd.name(), selectedRequestItem.getResource().getDataType()});
 
         newConditionToAdd = null;
@@ -370,7 +370,7 @@ public class AccessControlRequestController extends BasePageController {
     } */
     
     public void completeAccess() {
-        log.debug("completeAccessRequestAction()");
+        if(log.isDebugEnabled()) log.debug("completeAccessRequestAction()");
 
         if (event == null) {
             log.warn("'event' is null - cannot proceed with cancelAccessRequestAction() method");
@@ -381,13 +381,13 @@ public class AccessControlRequestController extends BasePageController {
         for (AccessControlResponseItem item : this.responseItems){
         	newResponseItems.add(item);
 
-        	this.log.debug("Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+        	if(log.isDebugEnabled()) log.debug("Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
         }
         event.getResponseItems().clear();
         event.setResponseItems(newResponseItems);
-        log.debug(event.getResponseItems().toString());
+        if(log.isDebugEnabled()) log.debug(event.getResponseItems().toString());
         for (AccessControlResponseItem item : event.getResponseItems()){
-        	this.log.debug("Returning: ! "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+        	if(log.isDebugEnabled()) log.debug("Returning: ! "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
         }
         prepareEventForTransmission();
 
@@ -395,7 +395,7 @@ public class AccessControlRequestController extends BasePageController {
         try {
             for (AccessControlResponseItem item : event.getResponseItems()){
 
-            	this.log.debug("HEH !! Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+            	if(log.isDebugEnabled()) log.debug("HEH !! Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
             }
 
 			userFeedback.submitAccessControlResponse(eventID, event.getResponseItems(), event.getRequestor());
@@ -447,20 +447,20 @@ public class AccessControlRequestController extends BasePageController {
     private void prepareEventForTransmission() {
         // Convert ResponseItemWrappers back to ResponseItems if necessary
         for (AccessControlResponseItem response : this.event.getResponseItems()) {
-        	log.debug("PREPARING:" +  response.isRemember());
+        	if(log.isDebugEnabled()) log.debug("PREPARING:" +  response.isRemember());
         }
         AccessControlResponseItemWrapper.unwrapList(this.event.getResponseItems());
         for (AccessControlResponseItem response : this.event.getResponseItems()) {
-        	log.debug("PREPARING2:" +  response.isRemember());
+        	if(log.isDebugEnabled()) log.debug("PREPARING2:" +  response.isRemember());
         }
 
         for (ResponseItem response : this.event.getResponseItems()) {
         	
-        	log.debug(response.toString());
+        	if(log.isDebugEnabled()) log.debug(response.toString());
 
             RequestItemWrapper requestItemWrapper = (RequestItemWrapper) response.getRequestItem();
 
-        	log.debug(requestItemWrapper.toString());
+        	if(log.isDebugEnabled()) log.debug(requestItemWrapper.toString());
 
             // Action strings need to be converted back to Actions
             // Actually we're just filtering out the unselected ones
@@ -495,7 +495,7 @@ public class AccessControlRequestController extends BasePageController {
     public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
         this.newConditionToAdd = newConditionToAdd;
 
-        log.debug("New condition to add: {}", newConditionToAdd);
+        if(log.isDebugEnabled()) log.debug("New condition to add: {}", newConditionToAdd);
     }
 
     public ConditionConstants getNewConditionToAdd() {

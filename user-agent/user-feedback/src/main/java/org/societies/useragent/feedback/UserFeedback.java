@@ -99,7 +99,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
 
     public void initialiseUserFeedback() {
-        log.debug("User Feedback initialising");
+        if(log.isDebugEnabled()) log.debug("User Feedback initialising");
 
         expResults.clear();
         impResults.clear();
@@ -115,11 +115,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
 
         //get cloud ID
         myCloudID = commsMgr.getIdManager().getThisNetworkNode();
-        log.debug("Got my cloud ID: " + myCloudID);
+        if(log.isDebugEnabled()) log.debug("Got my cloud ID: " + myCloudID);
 
         //create pubsub node
         try {
-            log.debug("Creating user feedback pubsub node");
+            if(log.isDebugEnabled()) log.debug("Creating user feedback pubsub node");
             pubsub.addSimpleClasses(EVENT_SCHEMA_CLASSES);
             pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.REQUEST);
             pubsub.ownerCreate(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE);
@@ -131,14 +131,14 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL);
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP);
             pubsub.ownerCreate(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE);
-            log.debug("Pubsub node created!");
+            if(log.isDebugEnabled()) log.debug("Pubsub node created!");
         } catch (Exception e) {
             log.error("Error creating user feedback pubsub nodes", e);
         }
 
         //register for events from created pubsub node
         try {
-            log.debug("Registering for user feedback pubsub node");
+            if(log.isDebugEnabled()) log.debug("Registering for user feedback pubsub node");
             pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.REQUEST, this);
             pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.EXPLICIT_RESPONSE, this);
             pubsub.subscriberSubscribe(myCloudID, UserFeedbackEventTopics.IMPLICIT_RESPONSE, this);
@@ -146,7 +146,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_NEGOTIATION_REMOVE_POPUP, this);
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_RESPONSE, this);
             pubsub.subscriberSubscribe(myCloudID, EventTypes.UF_PRIVACY_ACCESS_CONTROL_REMOVE_POPUP, this);
-            log.debug("Pubsub registration complete!");
+            if(log.isDebugEnabled()) log.debug("Pubsub registration complete!");
         } catch (Exception e) {
             log.error("Error registering for user feedback pubsub nodes", e);
         }
@@ -400,9 +400,9 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         if (log.isDebugEnabled()) {
             log.debug("processing negotiationFeedback request");
             if (policy == null) {
-                log.debug("Policy parameter is null");
+                if(log.isDebugEnabled()) log.debug("Policy parameter is null");
             } else {
-                log.debug("Policy contains: " + policy.getResponseItems().size() + " responseItems");
+                if(log.isDebugEnabled()) log.debug("Policy contains: " + policy.getResponseItems().size() + " responseItems");
             }
         }
 
@@ -468,7 +468,7 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         	List<AccessControlResponseItem> list = result.get();
         	
         	for (AccessControlResponseItem item: list){
-            	this.log.debug("uf: Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
+            	if(log.isDebugEnabled()) log.debug("uf: Returning: "+item.getRequestItem().getResource().getDataType()+" decision: "+item.getDecision()+" remember set: "+item.isRemember()+" and obfuscationSelected: "+item.isObfuscationInput());
 
         	}
             return new AsyncResult<List<AccessControlResponseItem>>(list);

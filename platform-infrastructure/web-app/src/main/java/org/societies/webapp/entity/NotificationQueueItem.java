@@ -45,7 +45,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public static NotificationQueueItem forNotification(String itemId, String title) {
-    	log.debug("GETTING NEW NOTIF");
+    	if(log.isDebugEnabled()) log.debug("GETTING NEW NOTIF");
     	try{
         return new NotificationQueueItem(itemId, TYPE_NOTIFICATION, title, null);
     	}catch(Exception e){log.error("ERROR>", e);}

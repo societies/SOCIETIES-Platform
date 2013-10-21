@@ -55,7 +55,7 @@ public class UserFeedbackTestController extends BasePageController {
                         EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE,
                         this);
 
-                log.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " events");
+                if(log.isDebugEnabled()) log.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " events");
             } catch (Exception e) {
                 addGlobalMessage("Error subscribing to pubsub notifications",
                         e.getMessage(),
