@@ -138,9 +138,8 @@ public class CISDataCollector implements Subscriber, IActivityFeedCallback {
     public void pubsubEvent(IIdentity pubsubService, String node, String itemId, Object item) {
         if(item.getClass().equals(org.societies.api.schema.activity.MarshaledActivity.class)){
             MarshaledActivity a = (MarshaledActivity)item;
-            LOG.info("pubsubevent with acitvity " + a.getActor() + " " +a.getVerb()+ " " +a.getTarget());
         }else{
-            LOG.info("something weird came on the pubsub");
+            LOG.error("something weird came on the pubsub");
         }
     }
     final Object syncObj = new Object();

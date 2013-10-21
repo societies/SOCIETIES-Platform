@@ -150,15 +150,9 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 		//creating the vertices
 		//this make take a while the first time..
 
-
-
-
-
-		//actDiff = cis.getActivityFeed().getActivities(lastTimeStr+" "+nowStr);
         SocialGraphVertex newVertex = null;
         SocialGraphVertex found = null;
 		for(IActivity act : actDiff){
-            //LOG.info("populate from new data, act: " + act.getActor() + " target: "+act.getTarget());
             found = hasVertex(act.getActor());
 			if(found == null){
                 newVertex = new SocialGraphVertex(act.getActor());
@@ -180,7 +174,6 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 		}
 		//creating the edges..
 		//this aswell !
-		//System.out.println("actDiff size:"+actDiff.size()+" getVertices().size():"+getVertices().size());
 		int newEdges=0; int hasEdges=0;
 		SocialGraphEdge edge = null; SocialGraphEdge searchEdge = null;
 		for(ISocialGraphVertex vertex1 : getVertices()){
@@ -199,7 +192,6 @@ public class SocialGraph implements Collection<ISocialGraphVertex>,ISocialGraph 
 				}
 			}
 		}
-		//System.out.println("newEdges: "+newEdges);
 	}
 
 

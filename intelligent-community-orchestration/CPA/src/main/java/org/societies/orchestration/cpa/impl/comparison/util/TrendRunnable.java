@@ -40,10 +40,8 @@ public class TrendRunnable implements Runnable,IDataCollectorSubscriber {
             "english-left3words-distsim.tagger");
     public synchronized void handleTrends (String inp, Long timestamp){
         called++;
-        //LOG.info("handletrends text: \""+inp+"\" called: "+called);
         String[] finalText = {inp};
         HashSet<String> hashSet = new HashSet<String>();
-        //Sentence s = Sentence.
         String deUrlifyTmp[] = inp.split(" ");
         inp = "";
         for(String s : deUrlifyTmp){
@@ -68,8 +66,6 @@ public class TrendRunnable implements Runnable,IDataCollectorSubscriber {
         if(tagged == null)
             return;
 
-        // Output the result
-        // System.out.println(tagged);
         String[] x = tagged.split(" ");
 
         ArrayList<String> list = new ArrayList<String>();
@@ -78,7 +74,6 @@ public class TrendRunnable implements Runnable,IDataCollectorSubscriber {
         {
             if (x[i].substring(x[i].lastIndexOf("_")+1).startsWith("N"))
             {
-                //LOG.info("x: "+x+" adding: "+x[i].split("_")[0]);
                 if(x[i].split("_")[0].length()!=0)
                     list.add(x[i].split("_")[0]);
             }
@@ -93,12 +88,10 @@ public class TrendRunnable implements Runnable,IDataCollectorSubscriber {
                 continue;
             if(getTrends().containsKey(text)){ //cannot be incremented twice in one activity!
                 getTrends().get(text).increment(timestamp);
-                //LOG.info("incrementing a trend: "+text+" getTrends().get(text).getCount(): "+getTrends().get(text).getCount());
             } else {
                 TrendStats ts = new TrendStats(timestamp);
                 ts.setTrendText(text);
                 getTrends().put(text,ts);
-                //LOG.info("adding a new trend");
             }
 
         }
@@ -107,7 +100,6 @@ public class TrendRunnable implements Runnable,IDataCollectorSubscriber {
         for(Iterator<String> it = getTrends().keySet().iterator() ; it.hasNext();) {
             tmpKey = it.next();
             if(getTrends().get(tmpKey).tooOld()){
-                //LOG.info("removing trend: "+getTrends().get(tmpKey).getTrendText());
                 it.remove();
             }
         }

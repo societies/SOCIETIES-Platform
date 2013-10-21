@@ -42,23 +42,17 @@ public class ActivityFeedCallback implements ICommCallback {
 
 	@Override
 	public void receiveResult(Stanza stanza, Object payload) {
-		LOG.info("receive result received");
 		// community namespace
-		if (payload instanceof MarshaledActivityFeed) {
-			LOG.info("Callback with result");
+		if (payload instanceof MarshaledActivityFeed) {        //TODO: what does this do?
             MarshaledActivityFeed a = (MarshaledActivityFeed) payload ;
 			
 			if(a.getDeleteActivityResponse() != null) {
-				LOG.info("Delete Activity Response received and equal to " + a.getDeleteActivityResponse().isResult());
             }
 			if(a.getAddActivityResponse() != null) {
-				LOG.info("Add Activity Response received and equal to " + a.getAddActivityResponse().isResult());
             }
 			if(a.getCleanUpActivityFeedResponse() != null) {
-				LOG.info("CleanUp Activity Feed Response received and equal to " + a.getCleanUpActivityFeedResponse().getResult());	
             }
 			if(a.getGetActivitiesResponse() !=null) {
-				LOG.info("Get Activities Response received");
             }
 			
 		}

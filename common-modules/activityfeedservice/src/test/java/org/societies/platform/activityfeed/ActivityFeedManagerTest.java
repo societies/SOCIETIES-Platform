@@ -102,7 +102,6 @@ public class  ActivityFeedManagerTest {
     public void beforeTest(){
         activityFeedManagerUnderTest = new ActivityFeedManager();
         activityFeedManagerUnderTest.setCommManager(mockCSSendpoint);
-        LOG.info("setting sessionManager: "+this.sessionFactory);
         activityFeedManagerUnderTest.setSessionFactory(this.sessionFactory);
         activityFeedManagerUnderTest.setPubSubClient(this.mockPubsubClient);
     }

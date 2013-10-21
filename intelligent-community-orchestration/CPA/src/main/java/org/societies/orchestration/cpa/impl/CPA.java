@@ -133,21 +133,6 @@ public class CPA implements IDataCollectorSubscriber, Runnable
         }
     }
 
-//    @Override
-//    public void receiveResult(Activityfeed activityFeedObject) {
-//        String lastTimeStr = Long.toString(lastTime);
-//        String nowStr = Long.toString(System.currentTimeMillis());
-//        = new ArrayList<IActivity>();
-//        System.out.println("icis.getActivityFeed(): "+cises.get(0).getActivityFeed());
-//        for(ICisOwned icis : cises){
-//            IActivityFeedCallback c = new ActivityFeedCallback();
-//            icis.getActivityFeed().getActivities(lastTimeStr+" "+nowStr,null)
-//            actDiff.addAll(); //getting the diff.
-//        }
-//    }
-
-
-    
     public CPACreationPatterns getCPACreationPatterns() {
     	return cpaCreationPatterns;
     }
@@ -160,13 +145,7 @@ public class CPA implements IDataCollectorSubscriber, Runnable
         this.lastTemporaryCheck = new Date(0);
         this.cpaCreationPatterns = new CPACreationPatterns();
         this.cpaCreationPatterns.init();
-        LOG.info("new CPA started for CIS "+this.cisId);
     }
-/*    public List<String> getTrends(int n){
-        //ArrayList<String> ret = new ArrayList<String>();
-        //this.cpaCreationPatterns.getGraph().getTrends();
-        //return ret;
-        return cpaCreationPatterns.getGraph().topTrends(n);
-    }*/
+
     
 }

@@ -179,12 +179,10 @@ public class RemoteActivityFeed implements IActivityFeed {
 			Stanza stanza = new Stanza(remoteCISid);
 			ActivityFeedCallback commsCallback = new ActivityFeedCallback(
 					stanza.getId(), callback);
-
 			try {
-				LOG.debug("Sending stanza");
 				this.iCommMgr.sendIQGet(stanza, c, commsCallback);
 			} catch (CommunicationException e) {
-				LOG.info("Communication error during sending of xmpp: ",e);
+				LOG.error("Communication error during sending of xmpp: ",e);
 			}
 
 	}

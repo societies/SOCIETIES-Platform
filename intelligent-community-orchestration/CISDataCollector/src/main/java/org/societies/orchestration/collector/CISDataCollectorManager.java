@@ -79,7 +79,6 @@ public class CISDataCollectorManager extends EventListener implements ICisDataCo
     }
 
     public void newCis(String cisId) {
-        LOG.info("in newCIS in cis data collector");
         synchronized (mtx){
             if(collectors.containsKey(cisId)) return;
             ICisOwned cis = getCisManager().getOwnedCis(cisId);

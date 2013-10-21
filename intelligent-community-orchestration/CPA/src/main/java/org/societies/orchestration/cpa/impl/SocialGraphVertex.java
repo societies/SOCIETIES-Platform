@@ -40,7 +40,7 @@ public class SocialGraphVertex implements ISocialGraphVertex {
     private boolean trend = false;
     private long timestamp; //timestamp of last text added.
     //this will contain TERM -> value, e.g. "Person" -> "John"
-    private HashMap<String, List<String>> terms;
+    private HashMap<String, Integer> terms;
 	public SocialGraphVertex(){
         init();
 	}
@@ -52,7 +52,7 @@ public class SocialGraphVertex implements ISocialGraphVertex {
         edges = new ArrayList<ISocialGraphEdge>();
         trends = new ArrayList<String>();
         lastActs = new LinkedList<String>();
-        terms = new HashMap<String, List<String>>();
+        terms = new HashMap<String,Integer>();
     }
 	public String getName() {
 		return name;
@@ -96,37 +96,25 @@ public class SocialGraphVertex implements ISocialGraphVertex {
     public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
-    public void addTerm(String key, List<String> value){
+    public void addTerm(String key, Integer value){
         terms.put(key,value);
     }
-    public List<String> getTerm(String key){
+    public Integer  getTerm(String key){
         return terms.get(key);
     }
-    public HashMap<String, List<String>> getTerms(){
+    public HashMap<String, Integer> getTerms(){
         return terms;
     }
-    public void merge(Map<String, AnnotationSet> annotationSetMap){
+    public void merge(Map<String, Integer> annotationSetMap){
         boolean found = false;
         List<String> tmpNewTerm = null;
         Iterator<Annotation> annotationIterator;
         for(String key : annotationSetMap.keySet()){
             if(terms.containsKey(key)){ //the key is present in the cache, check if it conaints the same amount of captured terms..
-                found = false;
-                annotationIterator  = annotationSetMap.get(key).iterator();
-                Annotation cur = null;
-                while(annotationIterator.hasNext()){
-                    cur = annotationIterator.next();
-                    if(!terms.get(key).contains(cur.toString()))
-                        terms.get(key).add(cur.toString());
-                }
+                terms.put(key,terms.get(key)+annotationSetMap.get(key));
             } else  //the key is not present in cache, add to cache
             {
-                tmpNewTerm = new ArrayList<String>();
-                annotationIterator = annotationSetMap.get(key).iterator();
-                while(annotationIterator.hasNext()){
-                    tmpNewTerm.add(annotationIterator.next().toString());
-                }
-                terms.put(key,tmpNewTerm);
+                terms.put(key,annotationSetMap.get(key));
             }
         }
     }

@@ -95,7 +95,6 @@ public class TrendStats {
         this.trendText = trendText;
     }
     public HashMap<Long,Integer> getHistoGram(){
-        //LOG.info("making histogram for trend word: \""+trendText+"\" count: "+count+ " mentions size: "+mentions.size());
         HashMap<Long,Integer> histoGram = new HashMap<Long, Integer>();
         int steps = 10;
         //if this trend is REALLY small return nonsensical histogram
@@ -116,7 +115,6 @@ public class TrendStats {
         long first = mentions.first();
         long last = mentions.last();
         long interval = (last-first)/steps;
-        //LOG.info("making histogram with interval: "+(double)interval/1000.0d+" seconds");
         Iterator<Long> it = mentions.iterator();
         long start = 0 , stop=0;
         Long cur = null;

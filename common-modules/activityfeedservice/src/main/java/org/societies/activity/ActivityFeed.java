@@ -177,7 +177,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     public int count(){
         Session session = null;
-        LOG.info("in persistedactivityfeedcount");
         int ret = -1;
         try {
             session = this.getSessionFactory().openSession();
@@ -199,7 +198,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
        boolean err = false;
         Activity newAct = new Activity(activity);
         newAct.setPublished(Long.toString(new Date().getTime())); // NOTICE THAT THE TIME IS BEING SET IN THE SERVER
-        LOG.info("adding activity with id: "+ this.getId());
         newAct.setOwnerId(this.getId());
         long actv_id = 0;
         Session session = null;
@@ -226,7 +224,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
         // Publishing TO PUBSUB
         if(!err && isPubSubEnabled() && getPubSubcli() !=null){
             try {
-                LOG.info("going to call pubsub");
                 getPubSubcli().publisherPublish(this.ownerCSS, this.getId(), Long.toString(actv_id), iactivToMarshActiv(newAct));
             } catch (XMPPError e) {
                 LOG.error("XMPPError publishing activity to pubsub: ",e);
@@ -305,12 +302,10 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
 
     public void init()
     {
-        LOG.info("in activityfeed init");
     }
 
     public void close()
     {
-        LOG.info("in activityfeed close");
     }
 
     public boolean deleteActivity(IActivity activity) {
@@ -408,7 +403,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
     //timeperiod: "millisecondssinceepoch millisecondssinceepoch+n"
     //where n has to be equal to or greater than 0
     public List<IActivity> getActivitiesFromDB(String timePeriod) {
-        LOG.info("in persisted activityfeed getActivitiesFromDB, gettin data from DB ownerID:"+this.getId());
         ArrayList<IActivity> ret = new ArrayList<IActivity>();
         String times[] = timePeriod.split(" ",2);
         if(times.length < 2){
@@ -437,7 +431,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             }
         }
 
-        LOG.info("time period: "+fromTime+" - " + toTime);
         if(retList != null){
             for(Activity act : retList){
                 if(Long.parseLong(act.getPublished())>=fromTime && Long.parseLong(act.getPublished())<=toTime){
@@ -465,7 +458,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             LOG.error("Error parsing JSON: ",e);
             return ret;
         }
-        LOG.info("loaded JSON");
         String methodName; String filterBy; String filterValue;
         try {
             methodName = (new JSONArray(arr.getString("filterOp"))).getString(0);
@@ -475,7 +467,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             LOG.error("Error parsing JSON: ",e1);
             return ret;
         }
-        LOG.info("loaded JSON values");
         Method method;
         try {
             method = ActivityString.class.getMethod(methodName, String.class);
@@ -489,7 +480,6 @@ public class ActivityFeed implements IActivityFeed, ILocalActivityFeed {
             }
             return ret;
         }
-        LOG.debug("created method");
         //filter..
         try {
             for(IActivity act : tmp){

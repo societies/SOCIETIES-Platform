@@ -77,7 +77,6 @@ public class ActivityFeedManager implements IActivityFeedManager {
                 return feed;
             }
         }
-        LOG.info("did not find feedid creating new..");
         IIdentity identity = null;
         try {
             identity = commManager.getIdManager().fromJid(owner);

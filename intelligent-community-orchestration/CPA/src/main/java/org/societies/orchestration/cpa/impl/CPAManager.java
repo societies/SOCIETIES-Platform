@@ -80,10 +80,8 @@ public class CPAManager extends EventListener implements ICPA {
     }
     public void init(){
         this.eventMgr.subscribeInternalEvent(this,new String[]{EventTypes.CIS_CREATION,EventTypes.CIS_DELETION},null);
-        LOG.info("CPAManager bean started");
     }
     public void destroy(){
-        LOG.info("shutting down CPAManager bean");
     }
 
 
