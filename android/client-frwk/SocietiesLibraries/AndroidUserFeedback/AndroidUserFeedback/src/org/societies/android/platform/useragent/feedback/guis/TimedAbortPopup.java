@@ -24,6 +24,7 @@
  */
 package org.societies.android.platform.useragent.feedback.guis;
 
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -63,7 +64,7 @@ public class TimedAbortPopup extends UserFeedbackPopup {
         // clear design time sample components
         layout.removeAllViews();
 
-        counterTextView = (TextView) findViewById(R.id.countTextView); 
+        //counterTextView = (TextView) findViewById(R.id.countTextView);      
         
         Button ignoreButton = new Button(this);
         ignoreButton.setText(R.string.timed_abort_positive_string);
