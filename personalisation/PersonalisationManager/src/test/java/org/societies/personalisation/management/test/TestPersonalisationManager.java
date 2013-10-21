@@ -26,6 +26,7 @@ package org.societies.personalisation.management.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Future;
 
 import junit.framework.TestCase;
@@ -88,7 +89,7 @@ public class TestPersonalisationManager {
 	private Future<List<CRISTUserAction>> cristOutcomes;
 	private PersonalisationManager personalisationManager;
 	private CtxChangeEvent ctxChangeEvent;
-	
+	private String uuid = UUID.randomUUID().toString();
 	
 	@Before
 	public void Setup(){
@@ -208,7 +209,7 @@ public class TestPersonalisationManager {
 			Mockito.when(broker.lookup(CtxModelType.ATTRIBUTE, "cristConfidenceLevel")).thenReturn(new AsyncResult(new ArrayList<CtxIdentifier>()));
 			Mockito.when(broker.retrieve(ctxLocationAttributeId)).thenReturn(new AsyncResult(locationAttribute));
 			Mockito.when(idm.fromJid(ctxLocationAttributeId.getOperatorId())).thenReturn(mockId);
-			Mockito.when(pcm.getOutcome(mockId, locationAttribute)).thenReturn(prefOutcomes);
+			Mockito.when(pcm.getOutcome(mockId, locationAttribute, uuid)).thenReturn(prefOutcomes);
 			Mockito.when(dianne.getOutcome(mockId, locationAttribute)).thenReturn(dianneOutcomes);
 			Mockito.when(cauiPrediction.getPrediction(mockId, locationAttribute)).thenReturn(cauiOutcomes);
 			Mockito.when(cristPrediction.getCRISTPrediction(mockId, locationAttribute)).thenReturn(cristOutcomes);

@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -82,6 +83,7 @@ public class TestContextEvent  {
 	private IPreference preference;
 	private CtxAttributeIdentifier ctxLocationAttributeId;
 	private CtxAttribute locationAttribute;
+	private String uuid = UUID.randomUUID().toString();
 	
 	@Before
 	public void Setup(){
@@ -143,7 +145,7 @@ public class TestContextEvent  {
 		Mockito.when(broker.lookup(CtxModelType.ENTITY, "PREFERENCE")).thenReturn(new AsyncResult(tempPrefEntityIDsList));
 		pcm.processServiceStarted(mockId, "media", serviceID);
 		
-		Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, locationAttribute);
+		Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, locationAttribute, this.uuid);
 		List<IPreferenceOutcome> outcomes = futureOutcomes.get();
 		
 		if (outcomes==null){
@@ -218,7 +220,7 @@ public class TestContextEvent  {
 			action.setServiceID(sId);
 			action.setServiceType("media");			
 			
-			Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, action);
+			Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, action, uuid);
 			List<IPreferenceOutcome> outcomes = futureOutcomes.get();
 			
 			if (outcomes==null){

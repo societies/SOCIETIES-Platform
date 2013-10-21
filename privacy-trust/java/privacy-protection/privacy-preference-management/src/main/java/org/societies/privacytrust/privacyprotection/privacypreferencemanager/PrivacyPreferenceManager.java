@@ -173,26 +173,35 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	@Override
 	public List<ResponseItem> checkPermission(RequestorBean requestor,
 			List<DataIdentifier> dataIds, Action action)
-			throws PrivacyException {
-		
+					throws PrivacyException {
+
 		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
 		if (dataIds.size()==1){
 			List<ResponseItem> permissions = new ArrayList<ResponseItem>();
-			permissions.add(accCtrlMgr.checkPermission(requestor, dataIds.get(0), action));
+			
+			permissions.add(this.checkPermission(requestor, dataIds.get(0), action));
 			return permissions;
 		}else{
-			return accCtrlMgr.checkPermission(requestor, dataIds, action);
+			List<ResponseItem> checkPermission = accCtrlMgr.checkPermission(requestor, dataIds, action);
+			for (ResponseItem item : checkPermission){
+				this.logging.info("checkPermission for requestor: "+org.societies.api.identity.util.RequestorUtils.toString(requestor)+" on : "+item.getRequestItem().getResource().getDataType()+" for action: "+item.getRequestItem().getActions().get(0)+". Returning Decision: "+item.getDecision());
+			}
+			return checkPermission;
 		}
 	}
 
 	@Override
 	public ResponseItem checkPermission(RequestorBean requestor,
 			DataIdentifier dataIds, Action action)
-			throws PrivacyException {
+					throws PrivacyException {
 		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
-		return accCtrlMgr.checkPermission(requestor, dataIds, action);
+		ResponseItem item = accCtrlMgr.checkPermission(requestor, dataIds, action);
+		
+		this.logging.info("checkPermission for requestor: "+org.societies.api.identity.util.RequestorUtils.toString(requestor)+" on : "+item.getRequestItem().getResource().getDataType()+" for action: "+item.getRequestItem().getActions().get(0)+". Returning Decision: "+item.getDecision());
+
+		return item;
 	}
-	
+
 	@Override
 	@Deprecated
 	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
@@ -202,15 +211,26 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		for (Action action: actions){
 			permissions.addAll(accCtrlMgr.checkPermission(requestor, dataIds, action));
 		}
+
+		for (ResponseItem item : permissions){
+
+			try{
+				this.logging.info("checkPermission for requestor: "+org.societies.api.identity.util.RequestorUtils.toString(requestor)+" on : "+item.getRequestItem().getResource().getDataType()+" for action: "+item.getRequestItem().getActions().get(0)+". Returning Decision: "+item.getDecision());
+			}catch(NullPointerException npe){
+				this.logging.error("NPE probably on actions list", npe);
+			}
+		}
 		return permissions;
 	}
 
+	
+	
 	@Override
 	@Deprecated
 	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId,
 			List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
-		
-		
+
+
 		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
 		dataIds.add(dataId);
 		List<ResponseItem> permissions = checkPermission(RequestorUtils.toRequestorBean(requestor), dataIds, ActionUtils.toActionBeans(actions));
@@ -263,11 +283,11 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 			AgreementEnvelope agreementEnv = this.agreementMgr.getAgreement(RequestorUtils.toRequestor(details.getRequestor(), this.idm));
 			if (agreementEnv!=null){
 				IAgreement agreement = agreementEnv.getAgreement();
-				
+
 				for (ResponseItem item: agreement.getRequestedItems()){
 					if (item.getRequestItem().getResource().getDataType().equals(details.getResource().getDataType())){
 						conditions  = item.getRequestItem().getConditions();
-						
+
 						//JOptionPane.showMessageDialog(null, "Found conditions in agreement");
 					}
 				}

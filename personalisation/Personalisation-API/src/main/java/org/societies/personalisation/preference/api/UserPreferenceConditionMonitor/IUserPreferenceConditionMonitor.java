@@ -30,9 +30,11 @@ import java.util.concurrent.Future;
 
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.internal.personalisation.model.FeedbackEvent;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.common.api.model.ActionInformation;
 import org.societies.personalisation.preference.api.IUserPreferenceManagement;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 
@@ -50,7 +52,7 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param attribute
 	 * @param callback
 	 */
-	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute);
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute, String uuid);
 	
 
 	/**
@@ -59,7 +61,7 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param action
 	 * @param callback
 	 */
-	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, IAction action);
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, IAction action, String uuid);
 	
 	
 	/**
@@ -71,11 +73,16 @@ public interface IUserPreferenceConditionMonitor {
 	 */
 	public Future<IOutcome> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
 	
+	
+	
+	public void sendFeedback(FeedbackEvent fEvent, ActionInformation actionInformation);
+	
 	/**
 	 * Returns the PreferenceManager service
 	 * @return PreferenceManager service
 	 */
 	public IUserPreferenceManagement getPreferenceManager();
+	
 	
 	
 	/*

@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -47,12 +48,45 @@ public class PreferenceEvaluator {
 
 	private PrivateContextCache contextCache;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private UserPreferenceConditionMonitor monitor;
 
-	public PreferenceEvaluator(PrivateContextCache cache){
+	public PreferenceEvaluator(PrivateContextCache cache, UserPreferenceConditionMonitor monitor){
 
 		this.contextCache = cache;
+		this.monitor = monitor;
 	}
 
+	public Hashtable<IPreferenceOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn, String uuid){
+		Hashtable<IPreferenceOutcome,List<CtxIdentifier>> temp = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
+		IPreference p = this.evaluatePreferenceInternal(ptn);
+		if (p!=null){
+			ArrayList<CtxIdentifier> ctxIds = new ArrayList<CtxIdentifier>();
+
+			Object[] objs = p.getUserObjectPath();
+			for (Object obj : objs){
+				if (obj instanceof IPreferenceCondition){
+					ctxIds.add( ((IPreferenceCondition) obj).getCtxIdentifier());
+				}
+			}
+
+			/*IPreference[] prefs = (IPreference[]) p.getUserObjectPath();
+			for (int i = 0; i<prefs.length; i++){
+				if (null!=prefs[i].getUserObject()){
+					if (prefs[i].isBranch()){
+						IPreferenceCondition condition = prefs[i].getCondition();
+						ctxIds.add(condition.getCtxIdentifier());
+					}
+				}
+			}*/
+
+			this.monitor.addEvaluationResult(uuid, p);
+			temp.put(p.getOutcome(), ctxIds);
+			return temp;
+		}else{
+			return new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
+		}
+	}
+	
 	public Hashtable<IPreferenceOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn){
 		Hashtable<IPreferenceOutcome,List<CtxIdentifier>> temp = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
 		IPreference p = this.evaluatePreferenceInternal(ptn);
@@ -76,7 +110,7 @@ public class PreferenceEvaluator {
 				}
 			}*/
 
-
+			
 			temp.put(p.getOutcome(), ctxIds);
 			return temp;
 		}else{
