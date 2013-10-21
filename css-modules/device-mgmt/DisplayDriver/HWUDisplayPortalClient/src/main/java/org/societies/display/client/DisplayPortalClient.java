@@ -26,7 +26,10 @@ package org.societies.display.client;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +80,9 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	private String currentUsedScreenLocation = "";
 	private static Logger LOG = LoggerFactory.getLogger(DisplayPortalClient.class);
 
+	private HashMap <String, String> userLocation;
+	private List<String> waitingRequests;
+
 	private ServiceRuntimeSocketServer servRuntimeSocketThread;
 
 	private UserSession userSession;
@@ -87,6 +93,8 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 		this.servRuntimeSocketThread = new ServiceRuntimeSocketServer(this);
 		this.serviceRuntimeSocketPort = this.servRuntimeSocketThread.setListenPort();
 		this.servRuntimeSocketThread.start();
+		userLocation = new HashMap<String, String>();
+		waitingRequests = new ArrayList<String>();
 
 	}
 
@@ -202,38 +210,64 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 		return false;
 	}
 
+	public void acknowledgeRefuse()
+	{
+
+	}
+
 	public void sendStartSessionRequest(String location)
 	{
-		this.LOG.debug("Requesting access to screen in location: "+location);
-		//request access
-		String reply = this.portalServerRemote.requestAccess(serverIdentity, userIdentity.getJid(), location);
-		//if access refused do nothing
-		if (reply.equals("REFUSED")){
-			this.LOG.debug("Refused access to screen.");
-			this.userFeedback.showNotification("Sorry, " + location + " is not available any more!");
-		}
-		else //if access is granted 
+
+		synchronized(userLocation)
 		{
-			this.LOG.debug("Access to screen granted. IP Address is: "+reply);
-
-
-			//now setup new screen
-			SocketClient socketClient = new SocketClient(reply);
-
-			socketClient.startSession(userSession);
-			//TODO: send services TO DISPLAY
-			this.currentUsedScreenIP = reply;
-			this.currentUsedScreenLocation = location;
-			this.hasSession = true;
-			DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
-			InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
-			try {
-				this.evMgr.publishInternalEvent(iEvent);
-			} catch (EMSException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			synchronized(waitingRequests)
+			{
+				waitingRequests.remove(location);
 			}
+			if(userLocation.containsValue(location))
+			{
+				if(location.equals(this))
+					this.LOG.debug("Requesting access to screen in location: "+location);
+				//request access
+				String reply = this.portalServerRemote.requestAccess(serverIdentity, userIdentity.getJid(), location);
+				//if access refused do nothing
+				if (reply.equals("REFUSED")){
+					this.LOG.debug("Refused access to screen.");
+					this.userFeedback.showNotification("Sorry, " + location + " is not available any more!");
+				}
+				else //if access is granted 
+				{
+					this.LOG.debug("Access to screen granted. IP Address is: "+reply);
+					//now setup new screen
+					SocketClient socketClient = new SocketClient(reply);
 
+					socketClient.startSession(userSession);
+					//TODO: send services TO DISPLAY
+					this.currentUsedScreenIP = reply;
+					this.currentUsedScreenLocation = location;
+					this.hasSession = true;
+					DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
+					InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
+					try {
+						this.evMgr.publishInternalEvent(iEvent);
+					} catch (EMSException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+			else
+			{
+				this.userFeedback.showNotification("Sorry, the session request for " + location + ", is no longer valid");
+			}
+		}
+	}
+	
+	public void acknowledgeRefuse(String location)
+	{
+		synchronized(waitingRequests)
+		{
+			waitingRequests.remove(location);
 		}
 	}
 
@@ -241,6 +275,12 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 
 		//FOR EVERY UPDATE ON USER LOCATION, GET UPTO DATE SCREEN LOCATIONS
 		retrieveScreenLocations();
+		String uuid = UUID.randomUUID().toString();
+		synchronized(userLocation)
+		{
+			userLocation.clear();
+			userLocation.put(uuid, location);
+		}
 
 		this.LOG.debug("location of user: "+location);
 		this.LOG.debug("Location of screens: ");
@@ -263,10 +303,17 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 				}
 
 				//REQUEST ACCESS - RETURNS FALSE IF NOT IN USE
-				if(!this.portalServerRemote.checkAccess(serverIdentity, location))
+				synchronized(this.waitingRequests)
 				{
-					this.LOG.debug("START NOTIFICATION CONTROL THREAD");
-					new Thread(new NotificationControl(this, this.userFeedback, location)).start();		
+					if(!waitingRequests.contains(location))
+					{
+						waitingRequests.add(location);
+						if(!this.portalServerRemote.checkAccess(serverIdentity, location))
+						{
+							this.LOG.debug("START NOTIFICATION CONTROL THREAD");
+							new Thread(new NotificationControl(uuid, this, this.userFeedback, location)).start();		
+						}
+					}
 				}
 
 

@@ -196,12 +196,18 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 
 				Dictionary<String, Object> dic = new Hashtable<String, Object>();
 
-				dic.put(DeviceStateVariableConstants.IP_ADDRESS_STATE_VARIABLE, "137.195.27.197");
+				dic.put(DeviceStateVariableConstants.IP_ADDRESS_STATE_VARIABLE, "137.195.27.199");
 				iAction.invokeAction(dic);
 
-				dic = new Hashtable<String, Object>();
+			/*	dic = new Hashtable<String, Object>();
 				dic.put(DeviceStateVariableConstants.IP_ADDRESS_STATE_VARIABLE, "137.195.27.198");
 				iAction.invokeAction(dic);
+				
+				dic = new Hashtable<String, Object>();
+				dic.put(DeviceStateVariableConstants.IP_ADDRESS_STATE_VARIABLE, "137.195.27.197");
+				iAction.invokeAction(dic);*/
+				
+				
 			}
 
 			//this.rfidDriver.connect("137.195.27.197");

@@ -17,11 +17,13 @@ public class NotificationControl implements Runnable  {
 	private IUserFeedback userFeedback;
 	private String location;
 	private String[] answers;
+	private final String uuid;
 	
 	private static Logger log = LoggerFactory.getLogger(NotificationControl.class);
 	
-	public NotificationControl(DisplayPortalClient displayClient, IUserFeedback userFeedback, String location)
+	public NotificationControl(String uuid, DisplayPortalClient displayClient, IUserFeedback userFeedback, String location)
 	{
+		this.uuid = uuid;
 		this.displayClient = displayClient;
 		this.userFeedback = userFeedback;
 		this.location=location;
@@ -50,6 +52,10 @@ public class NotificationControl implements Runnable  {
 		{
 			displayClient.sendStartSessionRequest(this.location);
 		}
+		else
+		{
+			displayClient.acknowledgeRefuse(this.location);
+		}
 	}
 	
 	
@@ -57,6 +63,9 @@ public class NotificationControl implements Runnable  {
 	public void run() {
 		sendStartNotification();
 	}
-	
+
+	public String getUuid() {
+		return uuid;
+	}
 
 }
