@@ -243,7 +243,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 				"(" + CSSEventConstants.EVENT_NAME + "=" + DeviceMgmtEventConstants.RFID_READER_EVENT + ")" +
 				"(" + CSSEventConstants.EVENT_SOURCE + "=" + deviceId + ")" +
 				")";
-		this.logging.debug("Registering for RFIDEvent: "+eventFilter);
+		if(logging.isDebugEnabled()) logging.debug("Registering for RFIDEvent: "+eventFilter);
 
 		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.RFID_UPDATE_EVENT}, eventFilter);
 
@@ -283,24 +283,24 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 	public void sendUpdate(String wUnit, String rfidTagNumber) {
 
 		if (this.wUnitToSymlocTable.containsKey(wUnit)){
-			this.logging.debug("wUnit: "+wUnit+" matches symloc: "+wUnitToSymlocTable.get(wUnit));
+			if(logging.isDebugEnabled()) logging.debug("wUnit: "+wUnit+" matches symloc: "+wUnitToSymlocTable.get(wUnit));
 			if (this.tagToTimerTable.containsKey(rfidTagNumber)){
 
 				this.tagToTimerTable.get(rfidTagNumber).setSymLoc(this.wUnitToSymlocTable.get(wUnit));
-				this.logging.debug("setting symloc: "+this.wUnitToSymlocTable.get(wUnit)+" to: "+rfidTagNumber);
+				if(logging.isDebugEnabled()) logging.debug("setting symloc: "+this.wUnitToSymlocTable.get(wUnit)+" to: "+rfidTagNumber);
 			}else{
 				if (this.tagtoIdentityTable.containsKey(rfidTagNumber)){
-					this.logging.debug("tag "+rfidTagNumber+" registered to identity "+tagtoIdentityTable.get(rfidTagNumber));
+					if(logging.isDebugEnabled()) logging.debug("tag "+rfidTagNumber+" registered to identity "+tagtoIdentityTable.get(rfidTagNumber));
 					RFIDUpdateTimerTask task = new RFIDUpdateTimerTask(this, rfidTagNumber, this.wUnitToSymlocTable.get(wUnit), this.tagtoIdentityTable.get(rfidTagNumber));
 					this.tagToTimerTable.put(rfidTagNumber, task);
 					Timer timer = new Timer();
 					timer.schedule(task, new Date(), 5000);
-					this.logging.debug("Created timer");
+					if(logging.isDebugEnabled()) logging.debug("Created timer");
 				}
 			}
 
 		}else{
-			this.logging.debug("wUnit :"+wUnit+" doesn't match any symLoc");
+			if(logging.isDebugEnabled()) logging.debug("wUnit :"+wUnit+" doesn't match any symLoc");
 		}
 
 
@@ -384,7 +384,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
 		this.ctxRetriever.setTagToPassword(tagToPasswordTable);
 		this.ctxRetriever.updateContext();
-		this.logging.debug("deleted rfidTag: "+tag);
+		if(logging.isDebugEnabled()) logging.debug("deleted rfidTag: "+tag);
 		this.printInformation();
 	}
 
@@ -411,9 +411,9 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		while(keys.hasMoreElements()){
 			String nextElement = keys.nextElement();
 			if (this.tagtoIdentityTable.containsKey(nextElement)){
-				this.logging.debug("Rfid record "+i+") rfidTag: "+nextElement+", password: "+tagToPasswordTable.get(nextElement)+", identity: "+this.tagtoIdentityTable.get(nextElement));
+				if(logging.isDebugEnabled()) logging.debug("Rfid record "+i+") rfidTag: "+nextElement+", password: "+tagToPasswordTable.get(nextElement)+", identity: "+this.tagtoIdentityTable.get(nextElement));
 			}else{
-				this.logging.debug("Rfid record "+i+") rfidTag: "+nextElement+", password: "+tagToPasswordTable.get(nextElement));
+				if(logging.isDebugEnabled()) logging.debug("Rfid record "+i+") rfidTag: "+nextElement+", password: "+tagToPasswordTable.get(nextElement));
 			}
 			i++;
 		}
@@ -488,14 +488,14 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		//		if (event.geteventInfo() instanceof RFIDUpdateEvent){
 		//			RFIDUpdateEvent rfidEvent = (RFIDUpdateEvent) event.geteventInfo();
 		//			this.sendUpdate(rfidEvent.getWakeupUnit(), rfidEvent.getRFIDTagNumber());
-		//			this.logging.debug("Received RFIDUpdateEvent: "+rfidEvent.getWakeupUnit()+" - "+rfidEvent.getRFIDTagNumber() );
+		//			if(logging.isDebugEnabled()) logging.debug("Received RFIDUpdateEvent: "+rfidEvent.getWakeupUnit()+" - "+rfidEvent.getRFIDTagNumber() );
 		//		}
 
 
 		HashMap<String, String> payload = (HashMap<String, String>)event.geteventInfo();
-		this.logging.debug("Received RFIDUpdateEvent: "+payload.get("wakeupUnit")+" - "+ payload.get("tagNumber"));
+		if(logging.isDebugEnabled()) logging.debug("Received RFIDUpdateEvent: "+payload.get("wakeupUnit")+" - "+ payload.get("tagNumber"));
 		this.sendUpdate(payload.get("wakeupUnit"), payload.get("tagNumber"));
-		this.logging.debug("Sent rfid update WU:"+payload.get("wakeupUnit")+" tag: "+payload.get("tagNumber"));
+		if(logging.isDebugEnabled()) logging.debug("Sent rfid update WU:"+payload.get("wakeupUnit")+" tag: "+payload.get("tagNumber"));
 
 
 	}

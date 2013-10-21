@@ -93,7 +93,7 @@ public class CommsClient implements IRfidServer, ICommCallback{
 	@Override
 	public void registerRFIDTag(String serverIdentity, String tagNumber,
 			String userIdentity, String serviceID, String password) {
-		this.logging.debug("Sending message - registerRFIDTag");
+		if(logging.isDebugEnabled()) logging.debug("Sending message - registerRFIDTag");
 		try{
 		IIdentity toIdentity = idMgr.fromJid(serverIdentity);
 		
@@ -107,13 +107,13 @@ public class CommsClient implements IRfidServer, ICommCallback{
 		Stanza stanza = new Stanza(toIdentity);
 		
 		commManager.sendMessage(stanza, serverBean);
-		this.logging.debug("Sent message - registerRFIDTag");
+		if(logging.isDebugEnabled()) logging.debug("Sent message - registerRFIDTag");
 		} catch (InvalidFormatException e) {
-			this.logging.debug("Error sending message - registerRFIDTag");
+			if(logging.isDebugEnabled()) logging.debug("Error sending message - registerRFIDTag");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CommunicationException e) {
-			this.logging.debug("Error sending message - registerRFIDTag");
+			if(logging.isDebugEnabled()) logging.debug("Error sending message - registerRFIDTag");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -122,7 +122,7 @@ public class CommsClient implements IRfidServer, ICommCallback{
 	
 	@Override
 	public void ackDeleteTag(String serverJid, String tag) {
-		this.logging.debug("Sending message - deleteTag");
+		if(logging.isDebugEnabled()) logging.debug("Sending message - deleteTag");
 		try{
 		IIdentity toIdentity = idMgr.fromJid(serverJid);
 		
@@ -132,13 +132,13 @@ public class CommsClient implements IRfidServer, ICommCallback{
 		Stanza stanza = new Stanza(toIdentity);
 		
 		commManager.sendMessage(stanza, serverBean);
-		this.logging.debug("Sent message - deleteTag");
+		if(logging.isDebugEnabled()) logging.debug("Sent message - deleteTag");
 		} catch (InvalidFormatException e) {
-			this.logging.debug("Error sending message - deleteTag");
+			if(logging.isDebugEnabled()) logging.debug("Error sending message - deleteTag");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CommunicationException e) {
-			this.logging.debug("Error sending message - deleteTag");
+			if(logging.isDebugEnabled()) logging.debug("Error sending message - deleteTag");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -149,7 +149,7 @@ public class CommsClient implements IRfidServer, ICommCallback{
 	@Override
 	public void unregisterRFIDTag(String serverIdentity, String tagNumber,
 			String userIdentity, String serviceID, String password) {
-		this.logging.debug("Sending message - unregisterRFIDTag");
+		if(logging.isDebugEnabled()) logging.debug("Sending message - unregisterRFIDTag");
 		try{
 		IIdentity toIdentity = idMgr.fromJid(serverIdentity);
 		
@@ -163,13 +163,13 @@ public class CommsClient implements IRfidServer, ICommCallback{
 		Stanza stanza = new Stanza(toIdentity);
 		
 		commManager.sendMessage(stanza, serverBean);
-		this.logging.debug("Sent message - unregisterRFIDTag");
+		if(logging.isDebugEnabled()) logging.debug("Sent message - unregisterRFIDTag");
 		} catch (InvalidFormatException e) {
-			this.logging.debug("Error sending message - unregisterRFIDTag");
+			if(logging.isDebugEnabled()) logging.debug("Error sending message - unregisterRFIDTag");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (CommunicationException e) {
-			this.logging.debug("Error sending message - unregisterRFIDTag");
+			if(logging.isDebugEnabled()) logging.debug("Error sending message - unregisterRFIDTag");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -107,7 +107,7 @@ public class ClientGUIFrame extends JFrame
 			ServiceResourceIdentifier serviceID) 
 	{
 		super( "My RFID location monitoring application" );
-		this.logging.debug("Starting clientGUI");
+		if(logging.isDebugEnabled()) logging.debug("Starting clientGUI");
 		this.rfidServer = server;
 		this.userIdentity = userIdentity;
 		this.serverIdentity = serverIdentity;
@@ -217,7 +217,7 @@ public class ClientGUIFrame extends JFrame
 		setContentPane( pnPanel0 );
 		pack();
 		setVisible( true );
-		this.logging.debug("Started client GUI");
+		if(logging.isDebugEnabled()) logging.debug("Started client GUI");
 	} 
 	
 	private void setUp(){
@@ -345,7 +345,7 @@ public class ClientGUIFrame extends JFrame
 			} catch (CtxException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				this.logging.debug("Error updating "+attr.getType()+" attribute ");	
+				if(logging.isDebugEnabled()) logging.debug("Error updating "+attr.getType()+" attribute ");	
 			}
 			this.tfTagNumber.setText(rfidTagNumber);
 			JOptionPane.showMessageDialog(this, "Successfully registered tag: "+this.rfidTagNumber);

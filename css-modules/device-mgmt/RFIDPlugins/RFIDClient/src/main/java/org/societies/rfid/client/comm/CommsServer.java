@@ -101,22 +101,22 @@ public class CommsServer implements IFeatureServer {
 	/* Put your functionality here if there is NO return object, ie, VOID  */
 	@Override
 	public void receiveMessage(Stanza stanza, Object payload) {
-		this.LOG.debug("Received a message: "+payload);
+		if(LOG.isDebugEnabled()) LOG.debug("Received a message: "+payload);
 		if (payload instanceof RfidClientBean){
 			RfidClientBean clientBean = (RfidClientBean) payload;
 			if (clientBean.getMethod().equals(RfidClientMethodType.ACKNOWLEDGE_REGISTRATION)){
 				this.rfidClient.acknowledgeRegistration(clientBean.getRStatus());
 			}else if(clientBean.getMethod().equals(RfidClientMethodType.SEND_UPDATE)){
-				this.LOG.debug("Received rfid update: "+clientBean.getSymLoc()+" for my tag number: "+clientBean.getTagNumber());
+				if(LOG.isDebugEnabled()) LOG.debug("Received rfid update: "+clientBean.getSymLoc()+" for my tag number: "+clientBean.getTagNumber());
 				this.rfidClient.sendUpdate(clientBean.getSymLoc().trim(), clientBean.getTagNumber().trim());
 			}else if(clientBean.getMethod().equals(RfidClientMethodType.DELETE_TAG)){
 				String serverJid = stanza.getFrom().getJid();
 				String tag = clientBean.getTagNumber();
-				//this.LOG.debug("Received rfid update: "+clientBean.getSymLoc()+" for my tag number: "+clientBean.getTagNumber());
+				//if(LOG.isDebugEnabled()) LOG.debug("Received rfid update: "+clientBean.getSymLoc()+" for my tag number: "+clientBean.getTagNumber());
 				this.rfidClient.deleteContext(serverJid, tag);
 			}
 			else{
-				this.LOG.debug("Payload object not of type: "+RfidClientBean.class.getName()+". Ignoring message from: "+stanza.getFrom().getJid());
+				if(LOG.isDebugEnabled()) LOG.debug("Payload object not of type: "+RfidClientBean.class.getName()+". Ignoring message from: "+stanza.getFrom().getJid());
 			}
 		}
 
