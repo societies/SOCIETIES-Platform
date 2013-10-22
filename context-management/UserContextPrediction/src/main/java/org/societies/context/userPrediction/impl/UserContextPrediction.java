@@ -319,9 +319,9 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 
 
 		HashMap<String, Vector<String>> dataSet = this.createDataSet(type);
-		if (LOG.isDebugEnabled())	LOG.debugLOG.debug("2. create dataset:: "+dataSet );
+		if (LOG.isDebugEnabled())	LOG.debug("2. create dataset:: "+dataSet );
 
-		if (LOG.isDebugEnabled())	LOG.debugLOG.debug("3. train neural network");
+		if (LOG.isDebugEnabled())	LOG.debug("3. train neural network");
 		runNNFromMapOfContext(dataSet, 5);
 
 		String todValue = situation.get(HoD);
@@ -343,7 +343,7 @@ public class UserContextPrediction implements IUserCtxPredictionMgr {
 		outcome = numberToType(type , netOut);
 
 		//System.out.println("\n prediction string value:" + outcome);
-		if (LOG.isDebugEnabled())	LOG.debugLOG.debug("\n prediction string value:" + outcome);
+		if (LOG.isDebugEnabled())	LOG.debug("\n prediction string value:" + outcome);
 
 		return outcome;
 	}
