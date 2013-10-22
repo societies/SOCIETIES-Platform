@@ -364,7 +364,7 @@ public class CAUIController extends BasePageController {
 			for(Entry<String,String> entry : tempResultList){
 				String performed = entry.getKey();
 				String predicted = entry.getValue();
-				CAUIActionLog cauiLog = new CAUIActionLog(performed,predicted);
+				CAUIActionLog cauiLog = new CAUIActionLog(performed,predicted, null, predicted);
 				if (LOG.isDebugEnabled())LOG.debug("getPredictionLog  cauiLog : "+ cauiLog);
 				result.add(cauiLog);
 			}

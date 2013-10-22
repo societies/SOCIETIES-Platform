@@ -1118,6 +1118,7 @@ public class ContextManagementController extends BasePageController {
 		contextForm.setType(type);
 		contextForm.setCtxID("");
 		contextForm.setValue("");
+		resetSelectItemView();
 		submit();
 	}
 	
@@ -1132,6 +1133,7 @@ public class ContextManagementController extends BasePageController {
 		contextForm.setType("");
 		contextForm.setCtxID(ctxId);
 		contextForm.setValue(value);
+		resetSelectItemView();
 		submit();
 	}
 
@@ -1404,9 +1406,7 @@ public class ContextManagementController extends BasePageController {
 			log.debug("update: "+update);
 			model = update.get();
 			
-			//reset view
-			selectedOperationType = "";
-			operationsListener();
+			resetSelectItemView();
 			submit();
 	
 		}
@@ -1433,6 +1433,7 @@ public class ContextManagementController extends BasePageController {
 			
 			asso.addChildEntity(entityId);
 			internalCtxBroker.update(asso).get();
+			resetSelectItemView();
 			submit();
 			
 		}
@@ -1478,6 +1479,12 @@ public class ContextManagementController extends BasePageController {
 	public void handleClose()
 	{
 		predictedDate = null;
+	}
+	
+	public void resetSelectItemView()
+	{
+		selectedOperationType = "";
+		operationsListener();
 	}
 	
 }

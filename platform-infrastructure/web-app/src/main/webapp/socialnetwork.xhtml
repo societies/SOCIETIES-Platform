@@ -2,105 +2,135 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://java.sun.com/jsp/jstl/core"
+                xmlns:h="http://java.sun.com/jsf/html"                
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES</title>
+        <title>SOCIETIES</title>
     </ui:define>
 
     <ui:define name="body">
 
         <div class="hr grid_12 clearfix"></div>
         
-        <img alt="" src="images/Under-Construction.gif" height="200" width="200"/>
-        
-       
+       <!--   <img alt="" src="images/Under-Construction.gif" height="200" width="200"/> -->
         
 		<!-- Left Column -->
 		
-	<!--	
 		<section id="left_col" class="grid_8">
 			<div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>	
-		</section>
-			
-		 
-				
 			<h4 class="form_title">Your Social Networks</h4>
-			<div class="hr dotted clearfix"></div>
-			<h6>Connected Networks</h6>
-			<ol class="keyinfolist">
-				<li class="keyinfo">
-					<figure class="gravatar">
-						<a href="#"><img alt="" src="images/Facebook.png" height="48" width="48" /></a>
-						<a class="keyinfo-reply-link" href="#">INFO</a>
-					</figure>
-					<div class="keyinfo_content">
-						<div class="clearfix">
-							<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
-							<br/>
-							<cite class="author_name"><a href="#">Facebook</a></cite>
-						</div>
-						<div class="keyinfo_text">
-							<p>Latest details... Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. </p>
-						</div>
-					</div>
-				</li>
-				<li class="keyinfo">
-					<figure class="gravatar">
-						<img alt="" src="images/Foursquare.png" height="48" width="48" />
-						<a class="keyinfo-reply-link" href="">INFO</a>
-					</figure>
-					<div class="keyinfo_content">
-						<div class="clearfix">
-							<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
-							<br/>
-							<cite class="author_name"><a href="">Foursquare</a></cite>
-						</div>
-						<div class="keyinfo_text">
-						<p>Latest details... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque orci velit, malesuada et varius ac, egestas eget nunc. Donec non porttitor massa.</p>
-						</div>
-					</div>
-				</li>
-			</ol>
-			<h6>Connect to Other Social Networks</h6>
-			<ul class="social-network">
-				<li><a href="" ></a><img src="images/Linkedin.png" width="48" height="48" alt="Search" /></li>
-				<li><a href="" ></a><img src="images/Twitter.png" width="48" height="48" alt="Search" /></li>
-			</ul>
-			<div class="hr clearfix"></div>
-			</section>
 		</section>
-		 
-	-->
+		
+		<p:messages id="messages_socialNetworks" showDetail="true"/> 
+		
+		<div class="hr dotted clearfix"></div>
+		<h5>Connected Networks</h5>
+		<ol class="keyinfolist">
+		<ui:repeat var="p" value="#{socialDataController.socialDataModel.activities}" >
+			<li class="keyinfo">
+				<figure class="gravatar">
+					<p:graphicImage value="#{p.icon}" height="48" width="48" />
+					<a class="keyinfo-reply-link" href="#">INFO</a>
+	   			</figure>
+	   			<div class="keyinfo_content">
+	   				<div class="clearfix">
+	   					<time class="keyinfo-meta keyinfometadata">#{p.date}</time>
+						<br/>
+						<cite class="author_name">
+						<p:commandLink id="authorLink" >  
+	       					<h:outputText value="#{p.name}" />  
+	   					</p:commandLink>
+						</cite>
+	   				</div>
+	   				<div class="keyinfo_text">
+						<p>#{p.verb} : #{p.content}</p>
+					</div>
+	   			</div>
+   			</li>
+    	</ui:repeat>
+    	
+			<li class="keyinfo">
+				<figure class="gravatar">
+					<a href="#"><img alt="" src="images/Facebook.png" height="48" width="48" /></a>
+					<a class="keyinfo-reply-link" href="#">INFO</a>
+				</figure>
+				<div class="keyinfo_content">
+					<div class="clearfix">
+						<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
+						<br/>
+						<cite class="author_name"><a href="#">Facebook</a></cite>
+					</div>
+					<div class="keyinfo_text">
+						<p>Latest details... Aliquam risus elit, luctus vel, interdum vitae, malesuada eget, elit. </p>
+					</div>
+				</div>
+			</li>
+			<li class="keyinfo">
+				<figure class="gravatar">
+					<img alt="" src="images/Foursquare.png" height="48" width="48" />
+					<a class="keyinfo-reply-link" href="">INFO</a>
+				</figure>
+				<div class="keyinfo_content">
+					<div class="clearfix">
+						<time datetime="2012-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am</time>
+						<br/>
+						<cite class="author_name"><a href="">Foursquare</a></cite>
+					</div>
+					<div class="keyinfo_text">
+					<p>Latest details... Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque orci velit, malesuada et varius ac, egestas eget nunc. Donec non porttitor massa.</p>
+					</div>
+				</div>
+			</li>
+		</ol>
 		
 		<!-- Right Column / Sidebar -->
-	
-	<!--
 		
 		<aside id="sidebar_right" class="grid_4">
-			<div class="sidebar_top_BG"></div>		
 			<div class="hr dotted clearfix"></div>	
 			<section>
 				<header>
-					<h3>Social Friends</h3>
+					<h5>Social Friends (#{socialDataController.socialDataModel.totFriends})</h5>
 				</header>
 				<ul class="sidebar">
+				<ui:repeat var="friend" value="#{socialDataController.socialDataModel.friends}">
+					<li>
+						<p:graphicImage value="#{friend.icon}" height="24" width="24"/>
+						<p:graphicImage value="#{friend.thumb}" height="24" width="24"/>
+						<p:commandLink id="friendLink">  
+			       			<h:outputText value="#{friend.name}" />  
+			   			</p:commandLink>
+			   			
+		   			</li>
+				</ui:repeat>
 					<li><a href="">John Doe</a></li>
 					<li><a href="">Tim Bloggs</a></li>
 				</ul>
 			</section>
 			<section>
 				<header>
-					<h3>Subscribed Groups</h3>
+					<h5>Subscribed Groups (#{socialDataController.socialDataModel.totGroups})</h5>
 				</header>
 				<ul class="sidebar">
+				<ui:repeat var="group" value="#{socialDataController.socialDataModel.groups}">
+				<li>
+					<p:graphicImage value="#{group.icon}" height="24" width="24"/>
+					<p:graphicImage value="#{group.thumb}" height="24" width="24"/>
+					<p:commandLink id="groupLink">  
+		       			<h:outputText value="#{group.name}" />  
+		   			</p:commandLink>
+		   		</li>
+				</ui:repeat>
 					<li><a href="">Group 1</a></li>
 					<li><a href="">Group 2</a></li>
 				</ul>
 			</section>
 			<section>
 				<header>
-					<h3>Connected Profiles</h3>
+					<h5>Connected Profiles</h5>
 				</header>
 				<div class="hr dotted clearfix"></div>
 				<ul class="contact_data">	
@@ -110,7 +140,7 @@
 			</section>
 			<section>
 				<header>
-					<h3>Other Activity</h3>
+					<h4>Other Activity</h4>
 				</header>
 				<div class="hr dotted clearfix"></div>
 				<ul class="contact_data">
@@ -130,8 +160,60 @@
 			<div class="hr dotted clearfix"></div>
 			<div class="sidebar_bottom_BG"></div>
 		</aside>
+		
+		<aside id="sidebar_right" class="grid_4">
+			<section>
+				<header>
+					<h5>Connect to Other Social Networks</h5>
+				</header>
+				<div class="hr dotted clearfix"></div>
+				<ul class="social-network">
+					<ui:repeat var="p" value="#{socialDataController.socialDataModel.iconForDisconnected}" >
+					<li>
+					<p:commandLink ajax="false" action="#{socialDataController.connectSN(p)}">
+						<p:graphicImage value="#{p}" height="48" width="48">
+						</p:graphicImage>
+					</p:commandLink>
+					</li>
+					</ui:repeat>
+				</ul>
+			</section>
+			<section>
+				<header>
+					<h5>Disconnect Social Networks</h5>
+				</header>
+				<div class="sidebar_top_BG"></div>		
+				<div class="hr dotted clearfix"></div>
+				<ul class="social-network">
+					<ui:repeat var="prof" value="#{socialDataController.socialDataModel.profileList}" >
+					<li>
+					<p:commandLink ajax="false" action="#{socialDataController.disconnectSN(prof.connection_id)}">
+						<p:graphicImage value="#{prof.icon}" height="48" width="48">
+						</p:graphicImage>
+					</p:commandLink>
+					</li>
+					</ui:repeat>
+				</ul>
+			</section>
+			<section>
+				<div class="hr clearfix"></div>
+				<div>
+					<header>
+						<h5>Post a message!</h5>
+					</header>
+					<div class="sidebar_top_BG"></div>		
+					<div class="hr dotted clearfix"></div>
+					<p:inputTextarea value="#{socialDataController.messagePost}" rows="7" cols="51"/>
+					<p:selectManyCheckbox id="lineDirection" value="#{socialDataController.selectedSocialToPost}">  
+						<f:selectItems value="#{socialDataController.selectSocialItems}"/>
+		       		</p:selectManyCheckbox>  
+		       		<div style="text-align:center">
+		       			<p:commandButton value="Post!" id="postButton" actionListener="#{socialDataController.postMessage}" update=":mainForm"/>
+		       		</div>
+				</div>
+			</section>
+		</aside>
 	
-	-->
 		<div class="hr grid_12 clearfix"></div>
 
     </ui:define>
