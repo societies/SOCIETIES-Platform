@@ -586,8 +586,8 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 			IIdentity providerNode = getCommMngr().getIdManager().fromJid(serviceToInstall.getServiceInstance().getFullJid());
 			INetworkNode myNode = getCommMngr().getIdManager().getThisNetworkNode();
 			
-			if(logger.isDebugEnabled())
-				logger.debug("Got the provider IIdentity, now creating the Requestor");
+
+			logger.debug("Got the provider IIdentity {}, now creating the Requestor",providerNode.getJid());
 		
 			RequestorService provider = new RequestorService(providerNode, serviceToInstall.getServiceIdentifier());
 			
@@ -1241,6 +1241,12 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 		ServiceControlResult returnResult = new ServiceControlResult();
 		returnResult.setServiceId(service.getServiceIdentifier());
 		
+		if(!service.getServiceType().equals(ServiceType.THIRD_PARTY_SERVER)){
+			logger.debug("{} is not a server, so we can't share it!",service.getServiceName());
+			returnResult.setMessage(ResultMessage.SERVICE_TYPE_NOT_SUPPORTED);
+			return new AsyncResult<ServiceControlResult>(returnResult);
+		}
+		
 		try {
 			
 			// First we check if the service is already in the repository
@@ -1590,8 +1596,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 
 				String serviceLocation = oldService.getServiceLocation();
 				
-				if(logger.isDebugEnabled())
-					logger.debug("Checking if Bundle with location: " + serviceLocation + " exists in OSGI...");
+				logger.debug("Checking if Bundle with location: {} exists in OSGI...",serviceLocation);
 				
 				Bundle thisBundle = this.bundleContext.getBundle(serviceLocation);
 				
@@ -1605,8 +1610,7 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 					int index = serviceLocation.indexOf('@');	
 					String newServiceLocation = serviceLocation.substring(index+1);
 	
-					if(logger.isDebugEnabled())
-						logger.debug("ServiceLocation: " + serviceLocation);
+					logger.debug("ServiceLocation: {}", serviceLocation);
 					
 					URI bundleLocation = new URI(newServiceLocation);
 		
@@ -1634,14 +1638,13 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 							
 							sendEvent(ServiceMgmtEventType.SERVICE_RESTORED,newService,null);
 							sendEvent(ServiceMgmtEventType.SERVICE_STARTED,newService,null);
-							
-							if(logger.isDebugEnabled())
-								logger.debug("Installed service " + newService.getServiceName());
+
+							logger.debug("Installed service {}", newService.getServiceName());
 							
 						} else{
 							if(logger.isDebugEnabled()){
 								logger.debug("Installation of "+ ServiceModelUtils.serviceResourceIdentifierToString(oldService.getServiceIdentifier()) +" was not successful");
-								logger.debug("Deleting the service from database: " + oldService);
+								logger.debug("Deleting the service from database: {}", oldService);
 							}
 								deleteServices.add(oldService);
 								List<String> cisShared = getServiceReg().retrieveCISSharedService(oldService.getServiceIdentifier());
@@ -1651,14 +1654,15 @@ public class ServiceControl implements IServiceControl, BundleContextAware {
 						}
 					} else{
 						if(logger.isDebugEnabled()){
-							logger.debug("Bundle for " + ServiceModelUtils.serviceResourceIdentifierToString(oldService.getServiceIdentifier()) + " can't be found at: " + bundleLocation);
-							logger.debug("Deleting the service from database: " + oldService);
+							logger.debug("Bundle for {} can't be found at: {}",ServiceModelUtils.serviceResourceIdentifierToString(oldService.getServiceIdentifier()), bundleLocation);
+							//logger.debug("Deleting the service from database: {}", oldService);
 						}
+						/*
 							deleteServices.add(oldService);
 							List<String> cisShared = getServiceReg().retrieveCISSharedService(oldService.getServiceIdentifier());
 							for(String cisJid: cisShared){
 								this.unshareService(oldService, cisJid);
-							}
+							}*/
 					}
 					
 				} else{
