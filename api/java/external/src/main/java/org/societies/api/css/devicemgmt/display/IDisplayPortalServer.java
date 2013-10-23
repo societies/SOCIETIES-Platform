@@ -38,6 +38,8 @@ public interface IDisplayPortalServer {
     public void setScreens();
     
     public boolean checkInUse(String location);
+    
+    public void releaseResource(String location);
 
 	public String requestAccess(String identity, String location);
 	

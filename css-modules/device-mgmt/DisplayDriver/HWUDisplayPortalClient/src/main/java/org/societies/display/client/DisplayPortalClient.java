@@ -241,28 +241,37 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 					//now setup new screen
 					SocketClient socketClient = new SocketClient(reply);
 
-					socketClient.startSession(userSession);
-					//TODO: send services TO DISPLAY
-					this.currentUsedScreenIP = reply;
-					this.currentUsedScreenLocation = location;
-					this.hasSession = true;
-					DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
-					InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
-					try {
-						this.evMgr.publishInternalEvent(iEvent);
-					} catch (EMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if(socketClient.startSession(userSession))
+					{
+						//TODO: send services TO DISPLAY
+						this.currentUsedScreenIP = reply;
+						this.currentUsedScreenLocation = location;
+						this.hasSession = true;
+						DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
+						InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
+						try {
+							this.evMgr.publishInternalEvent(iEvent);
+						} catch (EMSException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					else
+					{
+						this.userFeedback.showNotification("Sorry, a session could not be started with + " + location + ". Is the portal on " + location + " running? Contact the SOCIETIES team!");
+						if(LOG.isDebugEnabled()) LOG.debug("Comms with " + location + " could not be established");
+						this.portalServerRemote.releaseResource(serverIdentity, userIdentity.getJid(), location);
 					}
 				}
 			}
 			else
 			{
 				this.userFeedback.showNotification("Sorry, the session request for " + location + ", is no longer valid");
+				if(LOG.isDebugEnabled()) LOG.debug("User is no longer near " + location);
 			}
 		}
 	}
-	
+
 	public void acknowledgeRefuse(String location)
 	{
 		synchronized(waitingRequests)

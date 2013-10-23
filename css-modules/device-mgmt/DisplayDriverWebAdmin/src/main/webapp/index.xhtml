@@ -28,6 +28,10 @@
             <p:column headerText="IP Address">
                  <h:outputText value="#{screen.ipAddress}" />
             </p:column>
+            
+            <p:column headerText="Release Resource">
+            <h:commandButton onclick="#{screenData.releaseResource(screen.locationID)}"/>
+            </p:column>
 
             <p:column selectionMode="multiple"  style="width:4%"/>
 
