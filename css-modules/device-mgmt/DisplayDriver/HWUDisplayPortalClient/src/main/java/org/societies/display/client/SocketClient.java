@@ -125,7 +125,7 @@ public class SocketClient {
 
 
 
-	public void startSession(UserSession userSession){
+	public boolean startSession(UserSession userSession){
 		String message = "LOGIN\n" +
 				"USER:"+userSession.getUserIdentity()+"\n"+
 				"PORTAL_PORT:"+userSession.getServiceRuntimeSocketPort()+"\n"+
@@ -147,14 +147,14 @@ public class SocketClient {
 		}
 		
 		message = message.concat("END_SERVICES\n");
-		this.sendMessage(message);
+		return this.sendMessage(message);
 	}
 
 	
-	public void endSession(String userIdentity){
+	public boolean endSession(String userIdentity){
 		String message = "LOGOUT\n"+
 				userIdentity+"\n";
-		this.sendMessage(message);
+		return this.sendMessage(message);
 	}
 	
 	public void startService(UserSession userSession, String serviceName){
@@ -182,10 +182,10 @@ public class SocketClient {
 		
 	}
 	
-	public void logOut(UserSession userSession){
-		String message = "LOGOUT\n"+userSession.getUserIdentity()+"\n";
-		this.sendMessage(message);
+	public boolean logOut(UserSession userSession){
+		String message = "LOGOUT\n"+userSession.getUserIdentity()+"\n";		
 		if(logging.isDebugEnabled()) logging.debug("Sent LOGOUT message");
+		return this.sendMessage(message);
 	}
 	
 	public void startService(ServiceInfo sInfo){

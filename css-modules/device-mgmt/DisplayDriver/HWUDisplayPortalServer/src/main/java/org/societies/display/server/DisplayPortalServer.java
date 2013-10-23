@@ -183,6 +183,16 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		}
 
 	}
+	
+	//Release resource call from webapp
+	@Override
+	public void releaseResource(String location)
+	{
+		if(LOG.isDebugEnabled()) LOG.debug("CURRENTLY USED SCREENS: " + this.currentlyUsedScreens.keys().toString());
+		if(LOG.isDebugEnabled()) LOG.debug("RELEASING RESOURCE : " + location);
+		this.currentlyUsedScreens.remove(location);
+		if(LOG.isDebugEnabled()) LOG.debug("USE SCREENS ARE NOW: " + this.currentlyUsedScreens.keys().toString());
+	}
 
 	@Override
 	public String[] getScreenLocations() {
