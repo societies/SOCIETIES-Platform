@@ -18,7 +18,6 @@ import org.societies.platform.socialdata.converters.GroupConverter;
 import org.societies.platform.socialdata.converters.GroupConveterFactory;
 import org.societies.platform.socialdata.converters.PersonConverter;
 import org.societies.platform.socialdata.converters.PersonConverterFactory;
-import org.springframework.scheduling.annotation.Async;
 
 public class PullDataFromSN {
 

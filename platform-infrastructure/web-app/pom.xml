@@ -365,7 +365,10 @@
 					</supportedProjectTypes>
 					<instructions>
 						<Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
-						<Export-Package>!*</Export-Package>
+						<Export-Package>
+							org.apache.shindig.social.opensocial.*,   
+						    !*
+						</Export-Package>
 						<Include-Resource>{maven-resources}</Include-Resource>
 						<Import-Package>
 							javassist.util.proxy;resolution:=optional,
@@ -643,12 +646,11 @@
 							org.jfree.data.category;resolution:=optional,
 							org.jfree.data.general;resolution:=optional,
 							org.societies.api.privacytrust.privacy.util.privacypolicy;resolution:=optional,
+							<!-- Shindig -->
+							org.apache.shindig.social.opensocial.*;resolution:=optional,
 							<!-- Other -->
 							*;resolution:=optional
 						</Import-Package>
-						<Export-Package>
-						    org.apache.shindig.social.opensocial.*
-						</Export-Package>
 						<Bundle-ClassPath>WEB-INF/classes,.</Bundle-ClassPath>
 						<Webapp-Context>societies</Webapp-Context>
 						<Web-ContextPath>societies</Web-ContextPath>
@@ -707,6 +709,12 @@
 									<type>war</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${spring.osgi.deploy.dir}</outputDirectory>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.apache.shindig</groupId>
+									<artifactId>shindig-social-api</artifactId>
+									<version>3.0.0-beta4</version>
+									<type>jar</type>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.springframework.osgi</groupId>

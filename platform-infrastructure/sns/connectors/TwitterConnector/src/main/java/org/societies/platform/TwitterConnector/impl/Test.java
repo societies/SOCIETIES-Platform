@@ -31,7 +31,7 @@ import org.societies.platform.TwitterConnector.TwitterConnector;
 class Test {
 
 	public static void main(String[] args) {
-		String Token = "787965889-emwjMz8srYln1zlsi8ncfUF5iAigKDCHLNZPP7WS,3Lb5hvuxKABvHkvYVwbCaTJz5TT6RknRh2Ady8UTKw";
+		String Token = "873720120-quN1rMU8vdOTGo24eaCv7eTr8w9l6OA84yYsxjPR,BfZpZjXP1zYo2rdA0cV6AWol6BLUY8QxVOAd2c";
 		TwitterConnectorImpl t = new TwitterConnectorImpl(Token, "dingqi");
 
 		testProfileExtraction(t);

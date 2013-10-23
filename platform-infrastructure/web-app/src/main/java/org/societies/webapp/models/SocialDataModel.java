@@ -256,12 +256,14 @@ public class SocialDataModel {
 
 				String date = entry.getUpdated();
 				try {
-					Date parse = facebookFormat.parse(entry.getUpdated());
-					date = societiesFormat.format(parse).toString();
+					if(entry.getUpdated() != null)
+					{
+						Date parse = facebookFormat.parse(entry.getUpdated());
+						date = societiesFormat.format(parse).toString();
+					}
 					
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e.getMessage(),e);
 				}
 				
 				Map<String,String> activity = new HashMap<String, String>();
