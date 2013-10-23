@@ -194,7 +194,15 @@ public class XmlDocument extends HttpServlet {
 	}
 	
 	private InputStream getInputStream(HttpServletRequest request) throws DaRestException {
-		
+
+		if(!ServletFileUpload.isMultipartContent(request)) {
+			try {
+				return request.getInputStream();
+			} catch (IOException e) {
+				throw new DaRestException(e);
+			}
+		} 
+
 		// Create a factory for disk-based file items
 		FileItemFactory factory = new DiskFileItemFactory();
 

@@ -156,6 +156,9 @@ public class ServiceClientJar extends HttpServlet {
 	@Override
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
 		
+		// TODO: handle also non-multipart PUT requests, just as in XmlDocument
+		// TODO: It seems SC_BAD_REQUEST is returned instead of 200 even if everything finishes OK
+		
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
 		String cert = request.getParameter(UrlPath.URL_PARAM_CERT);
