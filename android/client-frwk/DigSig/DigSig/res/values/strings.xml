@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Signing Demo Application</string>
+    <string name="app_name">Dig Sig</string>
     <string name="listFilesActivityName">Please select a file</string>
     <string name="listIdentitiesActivityName">Please select digital identity</string>
     <string name="ok">OK</string>
