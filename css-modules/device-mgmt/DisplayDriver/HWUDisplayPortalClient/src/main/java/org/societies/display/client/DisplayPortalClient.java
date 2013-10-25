@@ -210,11 +210,6 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 		return false;
 	}
 
-	public void acknowledgeRefuse()
-	{
-
-	}
-
 	public void sendStartSessionRequest(String location)
 	{
 
@@ -309,6 +304,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 					if(LOG.isDebugEnabled()) LOG.debug("Sent logout msg to: "+currentUsedScreenIP);
 					this.portalServerRemote.releaseResource(serverIdentity, userIdentity.getJid(), currentUsedScreenIP);
 					if(LOG.isDebugEnabled()) LOG.debug("Released screen: "+currentUsedScreenIP);
+					this.hasSession = false;
 				}
 
 				//REQUEST ACCESS - RETURNS FALSE IF NOT IN USE
@@ -316,6 +312,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 				{
 					if(!waitingRequests.contains(location))
 					{
+						if(LOG.isDebugEnabled()) LOG.debug("CURRENT LOCATION IS NOT STORED IN WAITING REQUESTS, CHECK ACCESS!");
 						waitingRequests.add(location);
 						if(!this.portalServerRemote.checkAccess(serverIdentity, location))
 						{
@@ -323,6 +320,8 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 							new Thread(new NotificationControl(uuid, this, this.userFeedback, location)).start();		
 						}
 					}
+					if(LOG.isDebugEnabled()) LOG.debug("CURRENT LOCATION IS IN WAITING REQUESTS, DO NOTHING!");
+
 				}
 
 
