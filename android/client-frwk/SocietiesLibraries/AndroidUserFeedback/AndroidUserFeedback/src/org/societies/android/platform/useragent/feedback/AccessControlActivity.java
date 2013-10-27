@@ -120,6 +120,7 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
             @Override
             public void onClick(View v) {
             	for (AccessControlResponseItem item: accessControlEvent.getResponseItems()){
+            		item.setRemember(true);
             		item.setDecision(Decision.PERMIT);
             	}
                 publishEvent();

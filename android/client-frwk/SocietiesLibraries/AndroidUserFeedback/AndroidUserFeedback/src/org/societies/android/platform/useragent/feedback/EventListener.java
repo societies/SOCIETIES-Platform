@@ -47,6 +47,7 @@ import org.societies.api.schema.useragent.feedback.FeedbackMethodType;
 import org.societies.api.schema.useragent.feedback.UserFeedbackBean;
 
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Set;
 
 /**
@@ -59,7 +60,7 @@ public class EventListener extends Service {
     private static final String LOG_TAG = EventListener.class.getName();
 
     private AndroidNotifier notifier;
-
+    private Hashtable<String, Integer> notificationIDs = new Hashtable<String, Integer>();
 
     //TRACKING CONNECTION TO EVENTS MANAGER
     private boolean boundToEventMgrService = false;
@@ -89,7 +90,6 @@ public class EventListener extends Service {
 
 
     public EventListener() {
-
     }
 
 
@@ -242,6 +242,9 @@ public class EventListener extends Service {
 
                     Log.d(LOG_TAG, "General Permission request event received: id=" + id);
                     displayUserFeedbackNotification(eventPayload);
+                }
+                else {
+                	notifier.notifyMessage(intent.getAction(), "Printing event action", getClass());
                 }
             } catch (Exception ex) {
                 Log.e(LOG_TAG, "Error receiving pubsub event", ex);
@@ -403,11 +406,13 @@ public class EventListener extends Service {
 
         //CREATE ANDROID NOTIFICATION
         Log.d(LOG_TAG, "CREATE ANDROID NOTIFICATION");
-        notifier.notifyMessage(ufBean.getProposalText(),
+        int notificationId = notifier.notifyMessage(ufBean.getProposalText(),
                 "Input required",
                 activityClass,
                 intent,
                 "SOCIETIES");
+        
+        
     }
 
 }

@@ -142,7 +142,7 @@ public class AndroidNotifier {
      * @param intent          intent used to start new Activity
      * @param title           notification title - will override default Societies title
      */
-    public void notifyMessage(String message, String notificationTag, Class clazz, Intent intent, String title) {
+    public int notifyMessage(String message, String notificationTag, Class clazz, Intent intent, String title) {
         Dbc.require("Message cannot be null", null != message && message.length() > 0);
         Dbc.require("Notification tag must be valid", null != notificationTag && notificationTag.length() > 0);
         Dbc.require("Notification title must be valid", null != title && title.length() > 0);
@@ -168,5 +168,6 @@ public class AndroidNotifier {
         PendingIntent contentIntent = PendingIntent.getActivity(this.context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
         notification.setLatestEventInfo(context, title, message, contentIntent);
         this.notifyMgr.notify(notificationTag, nextNotificationID++, notification);
+        return nextNotificationID;
     }
 }
