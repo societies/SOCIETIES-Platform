@@ -85,6 +85,11 @@ public class ScreenData implements Serializable {
         matcher = pattern.matcher(sip);
         return matcher.matches();
     }
+    
+    public void releaseResource(String location)
+    {
+    	displayPortalServer.releaseResource(location);
+    }
 
 
     //CHECKS USER INPUT THEN ADDS SCREEN TO DB

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -210,11 +211,6 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 		return false;
 	}
 
-	public void acknowledgeRefuse()
-	{
-
-	}
-
 	public void sendStartSessionRequest(String location)
 	{
 
@@ -241,28 +237,38 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 					//now setup new screen
 					SocketClient socketClient = new SocketClient(reply);
 
-					socketClient.startSession(userSession);
-					//TODO: send services TO DISPLAY
-					this.currentUsedScreenIP = reply;
-					this.currentUsedScreenLocation = location;
-					this.hasSession = true;
-					DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
-					InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
-					try {
-						this.evMgr.publishInternalEvent(iEvent);
-					} catch (EMSException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					if(socketClient.startSession(userSession))
+					{
+						//TODO: send services TO DISPLAY
+						this.currentUsedScreenIP = reply;
+						this.currentUsedScreenLocation = location;
+						this.hasSession = true;
+						DisplayEvent dEvent = new DisplayEvent(this.currentUsedScreenIP, DisplayEventConstants.DEVICE_AVAILABLE);
+						InternalEvent iEvent = new InternalEvent(EventTypes.DISPLAY_EVENT, "displayUpdate", "org/societies/css/device", dEvent);
+						try {
+							this.evMgr.publishInternalEvent(iEvent);
+						} catch (EMSException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						LOG.info(this.userIdentity.getBareJid() + " has started a screen session with " + location);
+					}
+					else
+					{
+						this.userFeedback.showNotification("Sorry, a session could not be started with + " + location + ". Is the portal on " + location + " running? Contact the SOCIETIES team!");
+						if(LOG.isDebugEnabled()) LOG.debug("Comms with " + location + " could not be established");
+						this.portalServerRemote.releaseResource(serverIdentity, userIdentity.getJid(), location);
 					}
 				}
 			}
 			else
 			{
 				this.userFeedback.showNotification("Sorry, the session request for " + location + ", is no longer valid");
+				if(LOG.isDebugEnabled()) LOG.debug("User is no longer near " + location);
 			}
 		}
 	}
-	
+
 	public void acknowledgeRefuse(String location)
 	{
 		synchronized(waitingRequests)
@@ -300,6 +306,8 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 					if(LOG.isDebugEnabled()) LOG.debug("Sent logout msg to: "+currentUsedScreenIP);
 					this.portalServerRemote.releaseResource(serverIdentity, userIdentity.getJid(), currentUsedScreenIP);
 					if(LOG.isDebugEnabled()) LOG.debug("Released screen: "+currentUsedScreenIP);
+					this.hasSession = false;
+					LOG.info(this.userIdentity.getBareJid() + " has finished a session with " + currentUsedScreenLocation);
 				}
 
 				//REQUEST ACCESS - RETURNS FALSE IF NOT IN USE
@@ -307,6 +315,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 				{
 					if(!waitingRequests.contains(location))
 					{
+						if(LOG.isDebugEnabled()) LOG.debug("CURRENT LOCATION IS NOT STORED IN WAITING REQUESTS, CHECK ACCESS!");
 						waitingRequests.add(location);
 						if(!this.portalServerRemote.checkAccess(serverIdentity, location))
 						{
@@ -314,6 +323,8 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 							new Thread(new NotificationControl(uuid, this, this.userFeedback, location)).start();		
 						}
 					}
+					if(LOG.isDebugEnabled()) LOG.debug("CURRENT LOCATION IS IN WAITING REQUESTS, DO NOTHING!");
+
 				}
 
 
