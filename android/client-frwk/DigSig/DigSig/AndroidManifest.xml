@@ -53,8 +53,10 @@
 		<provider android:name="org.societies.security.digsig.sign.contentprovider.DocContentProvider"
         		  android:authorities="org.societies.security.digsig.provider"
         		  android:exported="true"
-        		  android:permission="org.societies.security.digsig.provider.permission.SIGN"
         		  >
-        </provider>
+<!--
+        		  android:permission="org.societies.security.digsig.provider.permission.SIGN"
+-->
+		</provider>
 		</application>
 </manifest>
