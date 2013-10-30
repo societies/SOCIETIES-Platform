@@ -166,13 +166,15 @@ public class SignService extends IntentService {
 	
 	private InputStream getDocToSign(Intent intent) throws DigSigException {
 		
-		try {
-			byte[] val = intent.getByteArrayExtra(Sign.Params.DOC_TO_SIGN);
-			if (val != null) {
-				return new ByteArrayInputStream(val);
-			}
-			else {
-				String docUrl = intent.getStringExtra(Sign.Params.DOC_TO_SIGN_URL);
+		byte[] val = intent.getByteArrayExtra(Sign.Params.DOC_TO_SIGN);
+		String docUrl = intent.getStringExtra(Sign.Params.DOC_TO_SIGN_URL);
+		if (val != null) {
+			Log.v(TAG, "Document is passed in the intent");
+			return new ByteArrayInputStream(val);
+		}
+		else if (docUrl != null) {
+			Log.v(TAG, "Document is passed as URL: " + docUrl);
+			try {
 				URL url = new URL(docUrl);
 				String protocol = url.getProtocol();
 				if (protocol.equals("file")) {
@@ -183,9 +185,13 @@ public class SignService extends IntentService {
 				} else {
 					throw new DigSigException("Unsupported protocol: " + url.getProtocol());
 				}
+			} catch (Exception e) {
+				throw new DigSigException(e);
 			}
-		} catch (Exception e) {
-			throw new DigSigException(e);
+		}
+		else {
+			throw new DigSigException("Invalid intent, missing either " +
+					Sign.Params.DOC_TO_SIGN + " extra, or " + Sign.Params.DOC_TO_SIGN_URL + " extra.");
 		}
 	}
 

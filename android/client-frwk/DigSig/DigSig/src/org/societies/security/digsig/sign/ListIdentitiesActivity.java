@@ -78,8 +78,8 @@ public class ListIdentitiesActivity extends ListActivity {
 		
 		int count = 0;
 		X509Certificate cert;
-		while ((cert = secureStorage.getCertificate(count)) != null) {
-
+		while ((secureStorage.containsCertificateAndKey(count))) {
+			cert = secureStorage.getCertificate(count);
 			// Add cert to list
 			certNames.add(cert.getSubjectDN().toString());
 			certNumbers.add(count);
