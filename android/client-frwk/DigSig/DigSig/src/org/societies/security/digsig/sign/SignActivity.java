@@ -23,11 +23,20 @@ public class SignActivity extends Activity {
 
 	/** Called when the activity is first created. */
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "onCreate");
 		setContentView(R.layout.sign);
 		initWidgets();
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		Log.i(TAG, "onStart()");
+		
+		Log.d(TAG, "Extra " + Sign.Params.DOC_TO_SIGN + " = " + getIntent().getByteArrayExtra(Sign.Params.DOC_TO_SIGN));
+		Log.d(TAG, "Extra " + Sign.Params.DOC_TO_SIGN_URL + " = " + getIntent().getStringExtra(Sign.Params.DOC_TO_SIGN_URL));
 	}
 	
 	private void initWidgets() {
@@ -93,6 +102,8 @@ public class SignActivity extends Activity {
 			
 			Intent intent = new Intent(this, SignService.class);
 			intent.putExtras(getIntent());
+			Log.d(TAG, "Extra " + Sign.Params.DOC_TO_SIGN + " = " + getIntent().getByteArrayExtra(Sign.Params.DOC_TO_SIGN));
+			Log.d(TAG, "Extra " + Sign.Params.DOC_TO_SIGN_URL + " = " + getIntent().getStringExtra(Sign.Params.DOC_TO_SIGN_URL));
 			intent.putExtra(Sign.Params.IDENTITY, data.getIntExtra(Sign.Params.IDENTITY, -1));
 			intent.putExtra(Sign.Params.SIGNED_DOC_URL, signedDocPath);
 			intent.putExtra(Sign.Params.SESSION_ID, sid);

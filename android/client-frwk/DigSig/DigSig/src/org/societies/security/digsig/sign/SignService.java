@@ -3,9 +3,9 @@ package org.societies.security.digsig.sign;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
+import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -23,6 +23,7 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.trust.SecureStorage;
+import org.societies.security.digsig.utility.Net;
 import org.societies.security.digsig.utility.Storage;
 import org.w3c.dom.DOMConfiguration;
 import org.w3c.dom.Document;
@@ -180,7 +181,8 @@ public class SignService extends IntentService {
 				if (protocol.equals("file")) {
 					return new FileInputStream(url.getPath());
 				} else if (protocol.startsWith("http") || protocol.startsWith("ftp")) {
-					download((url), TMP_FILE_PATH);
+					OutputStream os = openFileOutput(TMP_FILE_PATH, MODE_PRIVATE);
+					download(url.toURI(), os);
 					return openFileInput(TMP_FILE_PATH);
 				} else {
 					throw new DigSigException("Unsupported protocol: " + url.getProtocol());
@@ -195,30 +197,11 @@ public class SignService extends IntentService {
 		}
 	}
 
-	private void download(URL url, String path) throws DigSigException {
+	private void download(URI uri, OutputStream os) {
 		
-		Log.d(TAG, "download(" + url + ", " + path + ")");
-
-		FileOutputStream fos;
+		Log.d(TAG, "download(" + uri + ")");
 		
-		try {
-			HttpURLConnection c = (HttpURLConnection) url.openConnection();
-			c.setRequestMethod("GET");
-			c.setDoOutput(true);
-			c.connect();
-			InputStream is = c.getInputStream();
-
-			fos = openFileOutput(path, MODE_PRIVATE);
-
-			byte[] buffer = new byte[1024 * 1024];
-			int len = 0;
-			while ( (len = is.read(buffer)) > 0 ) {
-				fos.write(buffer, 0, len);
-			}
-			fos.close();
-
-		} catch (Exception e) {
-			throw new DigSigException(e);
-		}
+		Net net = new Net(uri);
+		net.get(os);
 	}
 }
