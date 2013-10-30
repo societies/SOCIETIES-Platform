@@ -75,7 +75,7 @@ public class ResourceDao {
 			log.warn("Could not read from data source", e);
 			throw e;
 		} finally {
-			if (session != null) {
+			if (session != null && session.isOpen()) {
 				session.close();
 			}
 		}
@@ -107,7 +107,7 @@ public class ResourceDao {
 			log.warn("Could not read from data source", e);
 			throw e;
 		} finally {
-			if (session != null) {
+			if (session != null && session.isOpen()) {
 				session.close();
 			}
 		}
@@ -127,7 +127,7 @@ public class ResourceDao {
 			log.warn("Could not delete from data source", e);
 			throw e;
 		} finally {
-			if (session != null) {
+			if (session != null && session.isOpen()) {
 				session.close();
 			}
 		}
@@ -154,7 +154,7 @@ public class ResourceDao {
 			// This code is always called. 
 			// If a session has been open it should always be closed,
 			// regardless if an exception was thrown or not.
-			if (session != null) {
+			if (session != null && session.isOpen()) {
 				session.close();
 			}
 		}
@@ -180,7 +180,7 @@ public class ResourceDao {
 			throw he;
 		}
 		finally{
-			if (session != null){
+			if (session != null && session.isOpen()){
 				session.close();
 			}
 		}
