@@ -29,11 +29,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Future;
 
+import javax.swing.JOptionPane;
+
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
@@ -51,6 +54,7 @@ import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.useragent.decisionmaking.IDecisionMaker;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.useragent.decisionmaking.DecisionMakingBean;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CAUI.api.model.UserIntentAction;
@@ -71,7 +75,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 public class TestPersonalisationManager {
 
 	ICtxBroker broker = Mockito.mock(ICtxBroker.class);
-	IDecisionMaker userAgent = Mockito.mock(IDecisionMaker.class);
+	IDecisionMaker decisionMaker = Mockito.mock(IDecisionMaker.class);
 	IDIANNE dianne = Mockito.mock(IDIANNE.class);
 	ICAUIPrediction cauiPrediction = Mockito.mock(ICAUIPrediction.class);
 	ICRISTUserIntentPrediction cristPrediction = Mockito.mock(ICRISTUserIntentPrediction.class);
@@ -83,10 +87,10 @@ public class TestPersonalisationManager {
 	private CtxEntity ctxEntity;
 	private MyIdentity mockId;
 	private CtxAttribute locationAttribute;
-	private Future<List<IPreferenceOutcome>> prefOutcomes;
-	private Future<List<IDIANNEOutcome>> dianneOutcomes;
-	private Future<List<IUserIntentAction>> cauiOutcomes;
-	private Future<List<CRISTUserAction>> cristOutcomes;
+	private List<IPreferenceOutcome> prefOutcomes = new ArrayList<IPreferenceOutcome>();
+	private List<IDIANNEOutcome> dianneOutcomes = new ArrayList<IDIANNEOutcome>();
+	private List<IUserIntentAction> cauiOutcomes = new ArrayList<IUserIntentAction>();
+	private List<CRISTUserAction> cristOutcomes = new ArrayList<CRISTUserAction>();
 	private PersonalisationManager personalisationManager;
 	private CtxChangeEvent ctxChangeEvent;
 	private String uuid = UUID.randomUUID().toString();
@@ -105,7 +109,7 @@ public class TestPersonalisationManager {
 		personalisationManager.setCauiPrediction(cauiPrediction);
 		personalisationManager.setCristPrediction(cristPrediction);
 		personalisationManager.setCtxBroker(broker);
-		personalisationManager.setDecisionMaker(userAgent);
+		personalisationManager.setDecisionMaker(decisionMaker);
 		personalisationManager.setDianne(dianne);
 		//instead of: personalisationManager.setIdm(idm);
 		Mockito.when(commsMgr.getIdManager()).thenReturn(idm);
@@ -132,12 +136,13 @@ public class TestPersonalisationManager {
 		/**
 		 * setup dianne outcomes
 		 */
-		IDIANNEOutcome dOut = new MockDIANNEOutcome(this.getAServiceID("google", "youtube"), "media", "volume", "20", 56);
+		IDIANNEOutcome dOut = new MockDIANNEOutcome(this.getAServiceID("google", "youtube"), "media", "playback", "friends", 56);
 		IDIANNEOutcome dOut2 = new MockDIANNEOutcome(this.getAServiceID("google", "weather"), "news", "volume", "50", 90);
-		ArrayList<IDIANNEOutcome> diannes = new ArrayList<IDIANNEOutcome>();
-		diannes.add(dOut);
-		diannes.add(dOut2);
-		this.dianneOutcomes = new AsyncResult<List<IDIANNEOutcome>>(diannes);
+	
+		dianneOutcomes.add(dOut);
+		showOutcomes("DIANNE", dOut);
+		dianneOutcomes.add(dOut2);
+		showOutcomes("DIANNE", dOut2);
 		
 		
 		/**
@@ -147,11 +152,10 @@ public class TestPersonalisationManager {
 		pOut.setConfidenceLevel(60);
 		PreferenceOutcome pOut2 = new PreferenceOutcome(this.getAServiceID("societies", "nearMe"), "connect", "bColour", "#F2F3F4");
 		pOut.setConfidenceLevel(100);
-		ArrayList<IPreferenceOutcome> prefs = new ArrayList<IPreferenceOutcome>();
-		prefs.add(pOut);
-		prefs.add(pOut2);
-		this.prefOutcomes = new AsyncResult<List<IPreferenceOutcome>>(prefs);
-		
+		prefOutcomes.add(pOut);
+		showOutcomes("PREF" , pOut);
+		prefOutcomes.add(pOut2);
+		showOutcomes("PREF" , pOut2);	
 		/**
 		 * setup caui outcomes
 		 */
@@ -159,11 +163,11 @@ public class TestPersonalisationManager {
 		cauiOut.setConfidenceLevel(80);
 		IUserIntentAction cauiOut2 = new UserIntentAction(this.getAServiceID("google", "nearMe"), "connect", "bColour", "#F2F3F4", (long) 2);
 		cauiOut2.setConfidenceLevel(99);
-		ArrayList<IUserIntentAction> cauis = new ArrayList<IUserIntentAction>();
-		cauis.add(cauiOut);
-		cauis.add(cauiOut2);
-		this.cauiOutcomes = new AsyncResult<List<IUserIntentAction>>(cauis);
-		
+
+		cauiOutcomes.add(cauiOut);
+		showOutcomes("CAUI", cauiOut);
+		cauiOutcomes.add(cauiOut2);
+		showOutcomes("CAUI", cauiOut2);
 		
 		/**
 		 * setup crist outcomes
@@ -182,14 +186,28 @@ public class TestPersonalisationManager {
 		cristOut2.setvalue("pop");
 		cristOut2.setConfidenceLevel(99);
 		
-		ArrayList<CRISTUserAction> crists = new ArrayList<CRISTUserAction>();
-		crists.add(cristOut);
-		crists.add(cristOut2);
-		this.cristOutcomes = new AsyncResult<List<CRISTUserAction>>(crists);
+
+		cristOutcomes.add(cristOut);
+		showOutcomes("CRIST", cristOut);
+		cristOutcomes.add(cristOut2);
+		showOutcomes("CRIST", cristOut2);
 		
 		
 		
 		
+	}
+	
+	private void showOutcomes(String type, IOutcome outcome){
+		
+		StringBuilder strBuilder = new StringBuilder();
+		strBuilder.append("Type: "+type+"\n");
+		strBuilder.append("Parameter: "+outcome.getparameterName()+"\n");
+		strBuilder.append("Value: "+outcome.getvalue()+"\n");
+		strBuilder.append("isContextDependent: "+outcome.isContextDependent()+"\n");
+		strBuilder.append("isImplementable:" +outcome.isImplementable()+"\n");
+		strBuilder.append("isProactive: "+outcome.isProactive()+"\n");
+		//JOptionPane.showMessageDialog(null, strBuilder);
+		System.out.println(strBuilder);
 	}
 
 	private ServiceResourceIdentifier getAServiceID(String css, String serviceName){
@@ -200,7 +218,6 @@ public class TestPersonalisationManager {
 	}
 
 	@Test
-	@Ignore
 	public void testContextEventReceivedNoConflicts(){
 		try {
 			Mockito.when(broker.lookup(CtxModelType.ATTRIBUTE, "dianneConfidenceLevel")).thenReturn(new AsyncResult(new ArrayList<CtxIdentifier>()));
@@ -209,14 +226,22 @@ public class TestPersonalisationManager {
 			Mockito.when(broker.lookup(CtxModelType.ATTRIBUTE, "cristConfidenceLevel")).thenReturn(new AsyncResult(new ArrayList<CtxIdentifier>()));
 			Mockito.when(broker.retrieve(ctxLocationAttributeId)).thenReturn(new AsyncResult(locationAttribute));
 			Mockito.when(idm.fromJid(ctxLocationAttributeId.getOperatorId())).thenReturn(mockId);
-			Mockito.when(pcm.getOutcome(mockId, locationAttribute, uuid)).thenReturn(prefOutcomes);
-			Mockito.when(dianne.getOutcome(mockId, locationAttribute)).thenReturn(dianneOutcomes);
-			Mockito.when(cauiPrediction.getPrediction(mockId, locationAttribute)).thenReturn(cauiOutcomes);
-			Mockito.when(cristPrediction.getCRISTPrediction(mockId, locationAttribute)).thenReturn(cristOutcomes);
+			Mockito.when(pcm.getOutcome(Mockito.eq(mockId), Mockito.eq(locationAttribute), Mockito.anyString())).thenReturn(new AsyncResult<List<IPreferenceOutcome>>(prefOutcomes));
+			Mockito.when(dianne.getOutcome(mockId, locationAttribute)).thenReturn(new AsyncResult<List<IDIANNEOutcome>>(dianneOutcomes));
+			Mockito.when(cauiPrediction.getPrediction(mockId, locationAttribute)).thenReturn(new AsyncResult<List<IUserIntentAction>>(cauiOutcomes));
+			Mockito.when(cristPrediction.getCRISTPrediction(mockId, locationAttribute)).thenReturn(new AsyncResult<List<CRISTUserAction>>(cristOutcomes));
 			personalisationManager.onModification(ctxChangeEvent);
 			
-/*			List<IOutcome> prefOutcomes = ((MockDecisionMaker) userAgent).getPreferences();
-			List<IOutcome> intentOutcomes = ((MockDecisionMaker) userAgent).getIntent();
+			ArgumentCaptor<List<IOutcome>> intentArguments = ArgumentCaptor.forClass((Class<List<IOutcome>>)(Class)List.class);
+			ArgumentCaptor<List<IOutcome>> preferenceArguments = ArgumentCaptor.forClass((Class<List<IOutcome>>)(Class)List.class);
+
+			//waiting for the thread to finish:
+			Thread.sleep(200);
+			Mockito.verify(decisionMaker).makeDecision(intentArguments.capture(), preferenceArguments.capture(), Mockito.anyString());
+			
+			
+			List<IOutcome> prefOutcomes = preferenceArguments.getValue();
+			List<IOutcome> intentOutcomes = intentArguments.getValue();
 			
 			for (IOutcome prefOutcome : prefOutcomes){
 				System.out.println(prefOutcome.toString());
@@ -224,7 +249,7 @@ public class TestPersonalisationManager {
 			
 			for (IOutcome intentOutcome : intentOutcomes){
 				System.out.println(intentOutcome.toString());
-			}*/
+			}
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
