@@ -292,7 +292,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 			this.predictionPerformanceLog(endTime-startTime);
 		}
 
-		for(IUserIntentAction actionResult : results){
+		List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+		
+		for(IUserIntentAction actionResult : clearedResults){
 			if(!actionResult.isImplementable()){
 				if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
 				results.remove(actionResult);
@@ -388,15 +390,26 @@ public class CAUIPrediction implements ICAUIPrediction{
 			if (LOG.isInfoEnabled())LOG.info("situation context :"+ situationContext);
 			if (LOG.isInfoEnabled())LOG.info("action prediction based on ctx update: "+ results);	
 
+			List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+			for(IUserIntentAction actionResult : clearedResults){
+				if(!actionResult.isImplementable()){
+					if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
+					results.remove(actionResult);
+				}
+			}
 
 			return new AsyncResult<List<IUserIntentAction>>(results);
 
+			
+			
 		}else if(enableCACIPrediction == true && caciModelExist == true) {
 
 			if (LOG.isDebugEnabled())LOG.debug("CAUI predictor not able to perform prediction ... CACI model is not supporting context based prediction");
 			//results = this.caciPredictor.getPrediction(requestor, action);
-
-			for(IUserIntentAction actionResult : results){
+			List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+			
+			for(IUserIntentAction actionResult : clearedResults){
+			
 				if(!actionResult.isImplementable()){
 					if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
 					results.remove(actionResult);
@@ -411,8 +424,9 @@ public class CAUIPrediction implements ICAUIPrediction{
 		if (LOG.isInfoEnabled())LOG.info("context updated :"+ contextAttribute.getId());
 		if (LOG.isInfoEnabled())LOG.info("situation context :"+ situationContext);
 		if (LOG.isInfoEnabled())LOG.info("action prediction based on ctx update: "+ results);	
-
-		for(IUserIntentAction actionResult : results){
+		
+		List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+		for(IUserIntentAction actionResult : clearedResults){
 			if(!actionResult.isImplementable()){
 				if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
 				results.remove(actionResult);
