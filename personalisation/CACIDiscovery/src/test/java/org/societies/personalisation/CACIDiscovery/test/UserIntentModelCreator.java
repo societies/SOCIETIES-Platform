@@ -96,8 +96,8 @@ public class UserIntentModelCreator {
 
 			//		System.out.println("6. Generate UserIntentModelData");
 			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null); 
-			intentModelA = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
-
+			//intentModelA = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
+			intentModelA = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap(),mockData);
 			//		System.out.println("*********** model created *******"+ intentModelA.getActionModel());
 			/*
 				for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){

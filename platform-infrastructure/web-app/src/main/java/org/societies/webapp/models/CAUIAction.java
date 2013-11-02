@@ -37,13 +37,22 @@ public class CAUIAction implements Serializable{
 		
 		if(ctxActionMap.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null ){
 			ctxAction = "location:"+  ctxActionMap.get(CtxAttributeTypes.LOCATION_SYMBOLIC);
+		} else {
+			ctxAction = "location: n/a";
+		
 		}
+		
+		 
 		if(ctxActionMap.get(CtxAttributeTypes.HOUR_OF_DAY) != null ){
 			ctxAction = ctxAction +", HOUR_OF_DAY:"+  ctxActionMap.get(CtxAttributeTypes.HOUR_OF_DAY);
+		} else {
+			ctxAction = ctxAction +", HOUR_OF_DAY: n/a";
 		}
 		
 		if(ctxActionMap.get(CtxAttributeTypes.DAY_OF_WEEK) != null ){
 			ctxAction = ctxAction +", DAY_OF_WEEK:"+  ctxActionMap.get(CtxAttributeTypes.DAY_OF_WEEK);
+		} else {
+			ctxAction = ctxAction +", DAY_OF_WEEK: n/a";
 		}
 	
 	}

@@ -54,7 +54,8 @@ public class ConstructUIModel {
 	}
 
 
-	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap, Map<String , ServiceResourceIdentifier> sriMap){
+	public UserIntentModelData constructNewModel(LinkedHashMap<List<String>,HashMap<String,Double>> transDictionaryAll, HashMap<String,List<String>> ctxActionsMap,
+			Map<String , ServiceResourceIdentifier> sriMap, List<MockHistoryData> mockDataList ){
 
 		if (LOG.isDebugEnabled())LOG.debug("constructNewModel ... cauiTaskManager "+cauiTaskManager);
 		UserIntentModelData modelData = cauiTaskManager.createModel();
@@ -76,12 +77,48 @@ public class ConstructUIModel {
 			}
 			
 			IUserIntentAction userAction = cauiTaskManager.createAction(sri,action[3],action[1],action[2]);
-			//LOG.debug("userAction created "+userAction);
-			//LOG.debug("userAction service id "+userAction.getServiceID());
-			//LOG.debug("userAction service instance id "+userAction.getServiceID().getServiceInstanceIdentifier());
-			//LOG.debug("userAction service id "+userAction.getServiceID().getIdentifier());
-			
+			LOG.debug("userAction created "+userAction);
+			LOG.debug("userAction service id "+userAction.getServiceID());
+			LOG.debug("userAction service instance id "+userAction.getServiceID().getServiceInstanceIdentifier());
+			LOG.debug("userAction service id "+userAction.getServiceID().getIdentifier());
 			//LOG.debug("userAction ctxActionsMap"+ctxActionsMap);
+			LOG.debug("userAction service id "+userAction.getServiceID().getIdentifier());
+			
+			//System.out.println("userAction created "+userAction);
+			//System.out.println("userAction service id "+userAction.getServiceID().getIdentifier());
+			
+			for(MockHistoryData mockHocData : mockDataList  ){
+				
+				//System.out.println("mockHocData Action: "+mockHocData);
+				//System.out.println("mockHocData Action serviceID: "+mockHocData.getServiceId());
+				
+				if( mockHocData.getParameterName().equals(userAction.getparameterName()) && mockHocData.getActionValue().equals(userAction.getvalue())
+						&& mockHocData.getServiceId().equals(userAction.getServiceID().getServiceInstanceIdentifier())){
+							
+							if(mockHocData.getIsImplementable()) {
+								userAction.setImplementable(true);
+								LOG.debug("IMPLEMENTABLE SET true");
+								//System.out.println("IMPLEMENTABLE SET true "+ userAction.isImplementable());
+							}	else if (!mockHocData.getIsImplementable()){
+								LOG.debug("IMPLEMENTABLE SET false");
+								userAction.setImplementable(false);
+								//System.out.println("IMPLEMENTABLE SET false "+ userAction.isImplementable());
+							}
+							
+							if(mockHocData.getIsProactive()) {
+								userAction.setProactive(true);
+								LOG.debug("Proactive SET true");
+								//System.out.println("IMPLEMENTABLE SET true "+ userAction.isImplementable());
+							}	else if (!mockHocData.getIsProactive()){
+								LOG.debug("Proactive SET false");
+								userAction.setProactive(false);
+								//System.out.println("IMPLEMENTABLE SET false "+ userAction.isImplementable());
+							}
+							
+				break;
+				}
+			}
+			
 			
 			if(ctxActionsMap.get(actionTemp)!=null){
 				List<String> contexValuesStringList = ctxActionsMap.get(actionTemp);

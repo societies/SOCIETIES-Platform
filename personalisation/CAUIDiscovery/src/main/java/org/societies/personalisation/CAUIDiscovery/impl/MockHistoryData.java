@@ -30,6 +30,8 @@ public class MockHistoryData {
 	// The service id that the action refers to 
 	String serviceId = "";
 		
+	boolean implementable = true;
+	boolean proactive = true;
 	// Context data that escort an action
 	Map<String,String> contextMap = new HashMap<String,String>();
 	
@@ -41,7 +43,19 @@ public class MockHistoryData {
 		this.serviceId  = serviceId;
 		this.serviceType = serviceType;
 	}
-
+	
+	public MockHistoryData(String parameterName,String actionValue, Map<String,String> context, Date timestamp, 
+			String serviceId, String serviceType, boolean implementable, boolean proactive ){
+		this.parameterName = parameterName;
+		this.actionValue = actionValue;
+		this.contextMap = context;
+		this.timestamp = timestamp;
+		this.serviceId  = serviceId;
+		this.serviceType = serviceType;
+		this.implementable = implementable;
+		this.proactive = proactive;
+	}
+	
 	public Map<String,String> getContext() {
 		return contextMap;
 	}
@@ -101,6 +115,22 @@ public class MockHistoryData {
 
 	public void setServiceId(String serviceId) {
 		this.serviceId = serviceId;
+	}
+	
+	public boolean getIsImplementable(){
+		return this.implementable;
+	}
+	
+	public void setIsImplementable(boolean isImplementable){
+		this.implementable = isImplementable; 
+	}
+	
+	public boolean getIsProactive(){
+		return this.proactive;
+	}
+	
+	public void setIsProactive(boolean isProactive){
+		this.proactive = isProactive; 
 	}
 	
 	public String toString(){

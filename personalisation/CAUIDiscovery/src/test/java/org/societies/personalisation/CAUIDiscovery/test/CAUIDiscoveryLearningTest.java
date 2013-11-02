@@ -80,9 +80,9 @@ public class CAUIDiscoveryLearningTest {
 		}
 	*/	
 		
-		
-		HashMap<String,List<String>> ctxActionsMap =  discover.assignContextToAction(dictionary.get(1));
 		System.out.println("4. assignContextToAction");
+		HashMap<String,List<String>> ctxActionsMap =  discover.assignContextToAction(dictionary.get(1));
+		
 		//System.out.println(ctxActionsMap);
 
 
@@ -101,11 +101,13 @@ public class CAUIDiscoveryLearningTest {
 			System.out.println("6. Generate UserIntentModelData");
 			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null);
 			System.out.println("6. discover.getSriMap()" +discover.getSriMap());
-			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
-
+			//UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
+			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap(),mockData );
 			System.out.println("*********** model created *******"+ modelData.getActionModel());
 			for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){
 					System.out.println(userAction);
+					System.out.println("is implementable: "+userAction.isImplementable());
+					System.out.println("is proactive: "+userAction.isProactive());
 					//System.out.println(userAction.getActionContext());
 			}
 		
@@ -177,11 +179,12 @@ public class CAUIDiscoveryLearningTest {
 		//create actions
 		action1 = new Action(serviceId1, "testService", "volume", "high");
 		IAction action2 = new Action(serviceId2, "testService", "volume", "low");
+		
 		IAction action3 = new Action(serviceId1, "testService", "volume", "mute");
-		IAction actionX = new Action(serviceId1, "testService", "XXXX", "XXXX");
+		IAction actionX = new Action(serviceId1, "testService", "XXXX", "XXXX",false,false,false);
 		IAction action4 = new Action(serviceId2, "testService", "colour", "blue");
 		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
-		IAction actionY = new Action(serviceId1, "testService", "YYYY", "YYYY");
+		IAction actionY = new Action(serviceId1, "testService", "YYYY", "YYYY",false,false,false);
 		//System.out.println ("action service ID "+actionY.getServiceID().getServiceInstanceIdentifier());
 		for (int i=0; i<4; i++){
 

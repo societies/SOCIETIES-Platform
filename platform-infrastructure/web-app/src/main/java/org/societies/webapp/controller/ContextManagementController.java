@@ -164,7 +164,7 @@ public class ContextManagementController extends BasePageController implements S
 			//gestione errore nel msg
 			contextModel = new ContextModel(internalCtxBroker);
 			
-			log.info("====== CONTEXT GUI --> GET");
+			//log.debug("====== CONTEXT GUI --> GET");
 	
 			if(contextForm!= null && contextForm.getViewType()!= null){
 				contextModel.setViewType(contextForm.getViewType());
@@ -200,7 +200,7 @@ public class ContextManagementController extends BasePageController implements S
 		{
 			//gestione errore nel msg
 		
-			log.info("====== CONTEXT GUI --> POST");
+			//log.info("====== CONTEXT GUI --> POST");
 
 			String method 	 = contextForm.getMethod();
 			String id		 = contextForm.getCtxID();
@@ -220,14 +220,14 @@ public class ContextManagementController extends BasePageController implements S
 				contextModel.setEntity_link(getAllCtxEntityData(contextModel.getEntityTypes()));
 			}
 			
-			log.info("Method:"+ method +" Passed Ctx ID:"+id);
+		//	log.info("Method:"+ method +" Passed Ctx ID:"+id);
 
 			if (ACTION_LOOKUP.equalsIgnoreCase(method)){
-				log.info("Lookup (model: "  +  contextForm.getModel() + ", type:"+contextForm.getType()+")");
+				//log.info("Lookup (model: "  +  contextForm.getModel() + ", type:"+contextForm.getType()+")");
 				contextModel.setEntity_results(lookup(contextForm.getModel(), contextForm.getType()));
 			}
 			else if(ACTION_RETRIEVE.equalsIgnoreCase(method)){
-				log.info("Retreive ID: "  + id);
+				//log.info("Retreive ID: "  + id);
 				Map<String, List<CtxUIElement>> ctxList = retrieve(contextForm.getCtxID());
 				contextModel.setEntity_results(ctxList.get(CTX_ENTITY_RESULTS));
 				contextModel.setAsso_results(ctxList.get(CTX_ASSO_RESULTS));
@@ -281,7 +281,7 @@ public class ContextManagementController extends BasePageController implements S
 			modifySource(results.get(0).getSource());
 		}
 
-		log.info("number of found element: "+results.size());
+		//log.info("number of found element: "+results.size());
 		return results;
 	}
 
@@ -289,10 +289,10 @@ public class ContextManagementController extends BasePageController implements S
 	public Map<String,List<CtxUIElement>> retrieve(String ctxID) 
 			throws InterruptedException, ExecutionException, CtxException{
 
-		log.info("ContextGUI ACTION:Retrieve    [id] => "+ctxID);
+		//log.info("ContextGUI ACTION:Retrieve    [id] => "+ctxID);
 		HashMap<String, List<CtxUIElement>> results = new HashMap<String, List<CtxUIElement>>();
 		if (ctxID.length()==0){
-			log.warn("Context ID is empty");
+			//log.warn("Context ID is empty");
 			return results;
 		}
 
@@ -307,13 +307,13 @@ public class ContextManagementController extends BasePageController implements S
 
 			CtxEntity entity = (CtxEntity)ctxModel;
 			attrList.addAll(entity.getAttributes());
-			log.info("added "+attrList.size()+" attributes");
+			//log.info("added "+attrList.size()+" attributes");
 
 			Set<CtxAssociationIdentifier> associations = entity.getAssociations();
 			for(CtxAssociationIdentifier aId: associations){
 				assoList.add((CtxAssociation)internalCtxBroker.retrieve(aId).get());
 			}
-			log.info("added "+assoList.size()+" associations");
+			//log.info("added "+assoList.size()+" associations");
 		}
 
 		else if (ctxModel.getModelType().equals(CtxModelType.ASSOCIATION)){
@@ -341,7 +341,7 @@ public class ContextManagementController extends BasePageController implements S
 			results.get(CTX_ASSO_RESULTS).add(serliazeCtxModel(elm));
 		}
 		
-		log.info(""+results.get(CTX_ENTITY_RESULTS));
+		//log.info(""+results.get(CTX_ENTITY_RESULTS));
 		
 		//workaround to take source
 		if(results.get(CTX_ATTR_RESULTS).size()>0){
@@ -374,7 +374,7 @@ public class ContextManagementController extends BasePageController implements S
 	 */
 	public List<CtxUIElement> lookup(String model, String type) throws InterruptedException, ExecutionException, CtxException{
 
-		log.info("Lookup for model:"+model + ", type:"+type);
+		//log.info("Lookup for model:"+model + ", type:"+type);
 		List<CtxUIElement> results = new ArrayList<CtxUIElement>();
 
 
@@ -387,7 +387,7 @@ public class ContextManagementController extends BasePageController implements S
 			CtxUIElement ctxBean = serliazeCtxModel(internalCtxBroker.retrieve(id).get());
 			results.add(ctxBean);				
 		}
-		log.info("values found for "+type+": "+results.size());
+		//log.info("values found for "+type+": "+results.size());
 
 		//workaround to take source
 		if(results.size()>0){
@@ -405,12 +405,12 @@ public class ContextManagementController extends BasePageController implements S
 		for (String type: entityTypes){
 			List<CtxIdentifier> list = internalCtxBroker.lookup(CtxModelType.ENTITY, type).get();
 
-			log.info("number of entity: "+list.size());
+			//log.info("number of entity: "+list.size());
 			for(CtxIdentifier id : list){
 				CtxEntity  entity = (CtxEntity)internalCtxBroker.retrieve(id).get();
 				Set<CtxAssociationIdentifier> associations = entity.getAssociations();
 
-				log.info("entity id: "+id+" number of ass: "+associations.size());
+			//	log.info("entity id: "+id+" number of ass: "+associations.size());
 				if(associations.size()<=0){
 					results.add(serliazeCtxModel(entity));
 				} else {
@@ -421,7 +421,7 @@ public class ContextManagementController extends BasePageController implements S
 						CtxAssociation assoc = (CtxAssociation)internalCtxBroker.retrieve(assocId).get();
 
 						if(!assoc.getParentEntity().toString().equals(entity.getId().toString())){
-							log.info(id+" has parent: "+assoc.getParentEntity().toString());
+						//	log.info(id+" has parent: "+assoc.getParentEntity().toString());
 							isRoot = false;
 						}
 					}
@@ -438,7 +438,7 @@ public class ContextManagementController extends BasePageController implements S
 			modifySource(results.get(0).getSource());
 		}
 
-		log.info("number of found element: "+results.size());
+	//	log.info("number of found element: "+results.size());
 		return results;
 
 
@@ -448,11 +448,12 @@ public class ContextManagementController extends BasePageController implements S
 
 		CtxUIElement ctxBean = new CtxUIElement();
 		if(elm!= null){
-			log.debug("element: "+elm);
+		//	log.debug("element: "+elm);
 			String ctxValue =  elm.getId().toString().replace("context://", "");
 			String info[] = ctxValue.split("/");
 
 			// Log info
+		/*
 			log.debug("====> Found new Element ");
 			log.debug("FULL ID:"+elm.getId().toString());
 			log.debug("Source:"+info[0]);
@@ -461,7 +462,7 @@ public class ContextManagementController extends BasePageController implements S
 			log.debug("ID:"+info[info.length-1]);
 			log.debug("ID_noSpecChar:"+elm.getId().toString().replaceAll("\\W", ""));
 			log.debug("==== ");
-
+*/
 
 			ctxBean.setId(elm.getId().toString());
 			ctxBean.setType(elm.getType());
@@ -476,7 +477,7 @@ public class ContextManagementController extends BasePageController implements S
 			if (elm.getModelType().equals(CtxModelType.ATTRIBUTE)){
 
 				CtxAttribute attr = (CtxAttribute) elm;
-				log.debug("Ctx Attribute type "+attr.getValueType());
+				//log.debug("Ctx Attribute type "+attr.getValueType());
 
 
 				if (attr.getValueType().equals(CtxAttributeValueType.STRING)){
@@ -534,7 +535,7 @@ public class ContextManagementController extends BasePageController implements S
 	
 	public CtxUIElement serializeCtxAttribute(CtxAttribute attr)
 	{
-		log.info("Ctx Attribute type "+attr.getValueType());
+		//log.info("Ctx Attribute type "+attr.getValueType());
 		
 		CtxUIElement ctxBean = new CtxUIElement();
 
@@ -578,43 +579,43 @@ public class ContextManagementController extends BasePageController implements S
 		attr.setValueType(getCtxAttributeValueType(value));
 		switch(attr.getValueType()){
 		case INTEGER:
-			log.info("value setted as integer");
+			//log.info("value setted as integer");
 			attr.setIntegerValue(Integer.valueOf(value));
 			break;
 		case DOUBLE:
-			log.info("value setted as double");
+			//log.info("value setted as double");
 			attr.setDoubleValue(Double.valueOf(value));
 			break;
 		case STRING:
-			log.info("value setted as string");
+			//log.info("value setted as string");
 			attr.setStringValue(value);
 			break;
 		default: 
-			log.info("value not setted");
+			//log.info("value not setted");
 			break;
 		}
 	}
 
 	private CtxAttributeValueType getCtxAttributeValueType(String value){
-		log.info("searching type for value: "+value+"...");
+	//	log.info("searching type for value: "+value+"...");
 		if(value == null || value.length()<=0){
-			log.info("Attribute is: " +CtxAttributeValueType.EMPTY);
+		//	log.info("Attribute is: " +CtxAttributeValueType.EMPTY);
 			return CtxAttributeValueType.EMPTY;
 		}
 
 		if(isNumber(value)){
 			try{
 				Integer.parseInt(value);
-				log.info("Attribute is: " +CtxAttributeValueType.INTEGER);
+			//	log.info("Attribute is: " +CtxAttributeValueType.INTEGER);
 				return CtxAttributeValueType.INTEGER;
 			} catch (Exception dropped){}
 			try{
 				Double.parseDouble(value);
-				log.info("Attribute is: " +CtxAttributeValueType.DOUBLE);
+			//	log.info("Attribute is: " +CtxAttributeValueType.DOUBLE);
 				return CtxAttributeValueType.DOUBLE;
 			} catch (Exception dropped){}
 		}
-		log.info("Attribute is: " +CtxAttributeValueType.STRING);
+		//log.info("Attribute is: " +CtxAttributeValueType.STRING);
 		return CtxAttributeValueType.STRING;
 
 	}
@@ -732,7 +733,7 @@ public class ContextManagementController extends BasePageController implements S
 	
 	public void changeView(String view)
 	{
-		log.info("Changing view to: "+view);
+	//	log.info("Changing view to: "+view);
 		contextForm = new ContextForm();
 		contextForm.setViewType(view);
 		submit();
@@ -752,7 +753,7 @@ public class ContextManagementController extends BasePageController implements S
 	
 	public void deleteRow(String idElem)
 	{
-		log.info("Removing id: "+idElem);
+	//	log.info("Removing id: "+idElem);
 		
 		try
 		{
@@ -792,7 +793,7 @@ public class ContextManagementController extends BasePageController implements S
 	public void modifyRow(RowEditEvent event)
 	{
 		CtxUIElement elem = ((CtxUIElement) event.getObject());
-		log.info("Editing row: "+elem.getId());
+	//	log.info("Editing row: "+elem.getId());
 		
 		try
 		{
@@ -800,7 +801,7 @@ public class ContextManagementController extends BasePageController implements S
 			CtxModelObject model = null;
 	
 			CtxModelType modelType = string2Model(elem.getModel());
-			log.info("model type: "+modelType);
+		//	log.info("model type: "+modelType);
 	
 	
 			switch (modelType) {
@@ -830,7 +831,7 @@ public class ContextManagementController extends BasePageController implements S
 	
 //			Future<CtxModelObject> update = internalCtxBroker.update(model);
 			CtxModelObject update = internalCtxBroker.update(model).get();
-			log.debug("update: "+update);
+	//		log.debug("update: "+update);
 			submit();
 			
 	        FacesMessage msg = new FacesMessage(modelType+" Edited", ((CtxUIElement) event.getObject()).getValue());  
@@ -1353,13 +1354,13 @@ public class ContextManagementController extends BasePageController implements S
 			String selectedModel = selectedModelTypeNewModel;
 			String type = selectedNewModel;
 			String value = attributeValue;
-			
+		/*	
 			log.debug("Param to save: ");
 			log.debug("parentId: "+ parentId);
 			log.debug("model_req: "+ selectedModel);
 			log.debug("type: "+ type);
 			log.debug("value: "+ value);
-	
+	*/
 			CtxModelObject model = null;
 	
 			CtxIdentifier ctxIdentifier = null;
@@ -1368,14 +1369,14 @@ public class ContextManagementController extends BasePageController implements S
 			}
 	
 			CtxModelType modelType = string2Model(selectedModel);
-			log.debug("model type: "+modelType);
+		//	log.debug("model type: "+modelType);
 	
 			switch (modelType) {
 			case ENTITY:
 				Future<CtxEntity> entity = internalCtxBroker.createEntity(type);
-				log.debug("entity: "+entity);
+			//	log.debug("entity: "+entity);
 				model = entity.get();
-				log.debug("model: "+model);
+			//	log.debug("model: "+model);
 	
 				//if parent is an association I must create map from parent to child
 				if(ctxIdentifier != null && ctxIdentifier.getModelType() == CtxModelType.ASSOCIATION){
@@ -1402,7 +1403,7 @@ public class ContextManagementController extends BasePageController implements S
 				break;
 			}
 			Future<CtxModelObject> update = internalCtxBroker.update(model);
-			log.debug("update: "+update);
+		//	log.debug("update: "+update);
 			model = update.get();
 			
 			//reset view
@@ -1426,7 +1427,7 @@ public class ContextManagementController extends BasePageController implements S
 			String parentId = contextModel.getParent_id();
 			String entityIdStr = selectedEntityLink;
 			
-			log.info("==> linkModel ("+parentId+", "+entityIdStr+")");
+	//		log.info("==> linkModel ("+parentId+", "+entityIdStr+")");
 			
 			CtxAssociationIdentifier assoId = (CtxAssociationIdentifier)CtxIdentifierFactory.getInstance().fromString(parentId);
 			CtxEntityIdentifier entityId = (CtxEntityIdentifier)CtxIdentifierFactory.getInstance().fromString(entityIdStr);
@@ -1453,8 +1454,8 @@ public class ContextManagementController extends BasePageController implements S
 			Date paramDate = predictedDate;
 			CtxAttributeIdentifier ctx = new CtxAttributeIdentifier(ctxId);
 			
-			log.debug("date picked: "+predictedDate);
-			log.debug("ctxId: "+ctxId);
+	//		log.debug("date picked: "+predictedDate);
+	//		log.debug("ctxId: "+ctxId);
 			
 			List<CtxAttribute> ctxAttributeList = internalCtxBroker.retrieveFuture(ctx, paramDate).get();
 			List<CtxUIElement> ctxDisplayList = null;
