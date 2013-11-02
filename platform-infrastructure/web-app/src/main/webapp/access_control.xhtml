@@ -105,7 +105,8 @@
 											display="disContObfuscationLabel" displayTemplate="{value}"
 											style="width: 200px;" minValue="0"
 											maxValue="#{responseItem.requestItemWrapper.obfuscatorInfo.nbOfObfuscationLevelStep - 1}">
-											<p:ajax event="slideEnd" update="disContObfuscationLabel, disContObfuscationExample"
+											<p:ajax event="slideEnd"
+												update="disContObfuscationLabel, disContObfuscationExample"
 												process="disContObfuscationLevel" />
 										</p:slider>
 										<h:inputHidden id="disContObfuscationLevel"
@@ -144,9 +145,9 @@
 							</p:selectOneMenu>
 
 							<h:outputText value="Remember preferences?" />
-							<p:selectOneMenu value="#{responseItem.remember}">					
-								<f:selectItem itemLabel="No" itemValue="#{false}" />
+							<p:selectOneMenu value="#{responseItem.remember}">
 								<f:selectItem itemLabel="Yes" itemValue="#{true}" />
+								<f:selectItem itemLabel="No" itemValue="#{false}" />
 							</p:selectOneMenu>
 						</p:panelGrid>
 

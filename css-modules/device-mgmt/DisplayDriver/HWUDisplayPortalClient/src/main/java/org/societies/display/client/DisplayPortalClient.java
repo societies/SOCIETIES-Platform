@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -250,6 +251,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						LOG.info(this.userIdentity.getBareJid() + " has started a screen session with " + location);
 					}
 					else
 					{
@@ -305,6 +307,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 					this.portalServerRemote.releaseResource(serverIdentity, userIdentity.getJid(), currentUsedScreenIP);
 					if(LOG.isDebugEnabled()) LOG.debug("Released screen: "+currentUsedScreenIP);
 					this.hasSession = false;
+					LOG.info(this.userIdentity.getBareJid() + " has finished a session with " + currentUsedScreenLocation);
 				}
 
 				//REQUEST ACCESS - RETURNS FALSE IF NOT IN USE

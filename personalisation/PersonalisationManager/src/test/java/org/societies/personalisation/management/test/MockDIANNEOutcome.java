@@ -39,22 +39,14 @@ import org.societies.personalisation.DIANNE.api.model.IDIANNEOutcome;
  */
 public class MockDIANNEOutcome extends Action implements IDIANNEOutcome{
 
-	private ServiceResourceIdentifier serviceID;
-	private String serviceType;
-	private String parameterName;
 	private int confidenceLevel;
-	private final String value;
-	private List<String> serviceTypeList;
 	
 	public MockDIANNEOutcome(ServiceResourceIdentifier sID, String type, String pName, String value){
-		this.serviceID = sID;
-		this.serviceType = type;
-		this.parameterName = pName;
-		this.value = value;
+		super(sID, type, pName, value);
 	}
 	
 	public MockDIANNEOutcome(ServiceResourceIdentifier sID, String type, String pName, String value, int confidenceLevel){
-		this(sID, type, pName, value);
+		super(sID, type, pName, value);
 		this.confidenceLevel = confidenceLevel;
 	}
 	
@@ -63,57 +55,5 @@ public class MockDIANNEOutcome extends Action implements IDIANNEOutcome{
 		return confidenceLevel;
 	}
 
-	@Override
-	public ServiceResourceIdentifier getServiceID() {
-		return serviceID;
-	}
-
-	@Override
-	public String getServiceType() {
-		return serviceType;
-	}
-
-	@Override
-	public List<String> getServiceTypes() {
-		List<String> list = new ArrayList<String>();
-		list.add(serviceType);
-		return list;
-	}
-
-	@Override
-	public String getparameterName() {
-		return this.parameterName;
-	}
-
-	@Override
-	public ArrayList<String> getparameterNames() {
-		ArrayList<String> list = new ArrayList<String>();
-		list.add(parameterName);
-		return list;
-	}
-
-	@Override
-	public String getvalue() {
-		return value;
-	}
-
-	@Override
-	public void setServiceID(ServiceResourceIdentifier sID) {
-		this.serviceID = sID;
-		
-	}
-
-	@Override
-	public void setServiceType(String serviceType) {
-		this.serviceType = serviceType;
-		
-	}
-
-	@Override
-	public void setServiceTypes(List<String> list) {
-		this.serviceTypeList = list;
-		// TODO Auto-generated method stub
-		
-	}
 
 }

@@ -421,12 +421,15 @@ public class AccessControlRequestController extends BasePageController {
 
         for (ResponseItem response : event.getResponseItems()) {
 
+        	
             // wrap the sub items
             if (!(response.getRequestItem() instanceof RequestItemWrapper))
                 response.setRequestItem(new RequestItemWrapper(response.getRequestItem()));
 
             // set to permit by default - the user can then change
             response.setDecision(Decision.PERMIT);
+            
+           ((AccessControlResponseItemWrapper) response).setRemember(true);;
 
             // obfucsation
             ObfuscatorInfo obfuscatorInfo = obfuscatorInfoFactory.getObfuscatorInfo(response.getRequestItem().getResource().getDataType());
