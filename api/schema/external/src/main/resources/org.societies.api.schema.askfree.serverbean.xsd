@@ -11,7 +11,7 @@
 			<xs:sequence>
 				<xs:element name="method" type="tns:askFreeMethodType"
 					minOccurs="1" />
-				<xs:element name="userIdentity" type="xs:string" minOccurs="1" />
+				<xs:element name="userLocation" type="xs:string" minOccurs="1" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
@@ -20,7 +20,7 @@
 
 	<xs:simpleType name="askFreeMethodType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="registerForLocationUpdatesAfterRestart" />
+			<xs:enumeration value="updateUserLocation" />
 		</xs:restriction>
 	</xs:simpleType>
 
