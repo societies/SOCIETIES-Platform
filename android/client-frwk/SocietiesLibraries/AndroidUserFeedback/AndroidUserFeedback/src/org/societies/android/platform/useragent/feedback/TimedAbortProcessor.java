@@ -50,7 +50,7 @@ public class TimedAbortProcessor implements Runnable {
         timedAbortProcessorThread = new Thread(instance);
         timedAbortProcessorThread.setName("TimedAbortProcessor");
         timedAbortProcessorThread.setDaemon(true);
-        timedAbortProcessorThread.start();
+        //timedAbortProcessorThread.start();
     }
 
 

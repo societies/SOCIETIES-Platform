@@ -26,12 +26,15 @@
 
 package org.societies.android.platform.androidutils;
 
+import java.util.Random;
+
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
 import org.societies.api.schema.cssmanagement.CssEvent;
 import org.societies.utilities.DBC.Dbc;
 
@@ -51,7 +54,6 @@ public class AndroidNotifier {
     private NotificationManager notifyMgr;
     private Context context;
 
-    private static int nextNotificationID = 1;
 
     /**
      * Constructor for Android Notifier
@@ -167,7 +169,19 @@ public class AndroidNotifier {
 
         PendingIntent contentIntent = PendingIntent.getActivity(this.context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
         notification.setLatestEventInfo(context, title, message, contentIntent);
-        this.notifyMgr.notify(notificationTag, nextNotificationID++, notification);
-        return nextNotificationID;
+        int notifid  = new Random().nextInt();
+        this.notifyMgr.notify(notificationTag, notifid, notification);
+        return notifid;
     }
+    
+    public void cancel(int notificationID)
+    {
+    	this.notifyMgr.cancel(notificationID);
+    }
+    
+    public void cancel(String notificationTag, int notificationID)
+    {
+    	this.notifyMgr.cancel(notificationTag, notificationID);
+    }
+    
 }
