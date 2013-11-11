@@ -74,6 +74,22 @@
                             <div class="keyinfo_text">
                             </div>
                         </div>
+                        <p:commandButton type="button" value="Delete Community" onclick="cdelete.show();" icon="ui-icon-trash"/>
+                        
+
+					<p:confirmDialog id="confirmationDeleteDialog" widgetVar="cdelete"
+						global="true"
+						message="Are you sure you want to delete this community permanently?"
+						icon="ui-icon-alert">
+						<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes"
+							icon="ui-icon-check" action="#{cismanager.deleteCommunity(otherFriend)}"
+							ajax="false" />
+						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
+							icon="ui-icon-close" oncomplete="cdelete.hide();" />
+					</p:confirmDialog>
+					<p:dialog id="cantDeleteDialog" header="Delete Community cannot be done" widgetVar="cantDeleteDlg" modal="true" height="100" dynamic="true" showHeader="true">
+                        	<h:outputText value="Sorry, this CIS has other members. To delete this CIS, please ask the members to leave the CIS." />
+                    </p:dialog>  
                         </li>
                       </c:forEach>
                 </ol>
