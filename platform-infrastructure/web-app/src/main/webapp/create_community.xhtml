@@ -29,9 +29,9 @@
 
 				<div class="hr dotted clearfix"></div>
 				<ul>
-					<li>Community Name: <h:inputText value="#{cismanager.cisname}" /></li>
+					<li>Community Name : * <h:inputText value="#{cismanager.cisname}" /></li>
 
-					<li>Community type: <h:inputText value="#{cismanager.cistype}" /></li>
+					<li>Community type: * <h:inputText value="#{cismanager.cistype}" required="true"/></li>
 
 					<li>Description: <h:inputText value="#{cismanager.cisdesc}" /></li>
 
@@ -47,14 +47,14 @@
 
 						<div>
 							<p:commandButton value="Create Community"
-								action="#{cismanager.createcommunity()}" oncomplete="#{p:widgetVar('createDialog')}.show()" />
+								action="#{cismanager.createcommunity()}"/>
 						</div>
 					</li>
 				</ul>
 
 			</section>
 
-			<p:dialog id="createDialog" header="Community Created">
+			<p:dialog id="createDialog" header="Community Created" widgetVar="createDlg">
 				<p:ajax event="close" update=":mainForm" />
 				<h:outputText
 					value="The community has been created!" />

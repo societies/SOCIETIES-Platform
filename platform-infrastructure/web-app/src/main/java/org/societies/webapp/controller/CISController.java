@@ -409,6 +409,8 @@ public class CISController extends BasePageController{
 		cisname = "";
 		cistype = "";
 		cisdesc = "";
+		
+		RequestContext.getCurrentInstance().execute("createDlg.show();");
 	}
 	
 	private class WhoCallback implements ICisManagerCallback{
