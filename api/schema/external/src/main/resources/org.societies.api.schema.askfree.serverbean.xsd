@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/schema/askfree/serverbean"
+	xmlns:tns="http://societies.org/api/schema/askfree/serverbean"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+
+	<xs:element name="askFreeServerBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="method" type="tns:askFreeMethodType"
+					minOccurs="1" />
+				<xs:element name="userLocation" type="xs:string" minOccurs="1" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+
+	<xs:simpleType name="askFreeMethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="updateUserLocation" />
+		</xs:restriction>
+	</xs:simpleType>
+
+</xs:schema>
+

@@ -28,11 +28,14 @@ package org.societies.android.platform.gui;
 
 
 import android.app.Activity;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.widget.TextView;
 
 public class AboutActivity extends Activity {
+	
+	int curVersion;
     
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,17 @@ public class AboutActivity extends Activity {
     					  "   Bug Reports: https://redmine.ict-societies.eu/"
     			);
         Linkify.addLinks(aboutText, Linkify.WEB_URLS);
+        
+        TextView version = (TextView)findViewById(R.id.textView1);
+        
+        try {
+			curVersion = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionCode;
+			version.setText("Application Version: " + curVersion);
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
     }
 
 }
