@@ -101,7 +101,7 @@ public class UserService implements Serializable {
         this.identity = identity;
         this.userID = userID;
         this.username = username;
-
+        this.log.info("#CODE2#: User "+this.identity.getBareJid()+" logged in on webapp ");
         // let listeners know
         for (ILoginListener listener : loginListeners) {
             try {
@@ -115,7 +115,7 @@ public class UserService implements Serializable {
 
     public void logout() {
         clearCurrentUser();
-
+        this.log.info("User "+this.identity.getBareJid()+" logged out of webapp ");
         // let listeners know
         for (ILoginListener listener : loginListeners) {
             try {

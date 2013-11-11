@@ -29,7 +29,9 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.context.FacesContext;
 
+import org.primefaces.context.RequestContext;
 import org.societies.api.internal.css.ICSSInternalManager;
 import org.societies.orchestration.communitylifecyclemanagementbean.Cis;
 import org.societies.webapp.controller.privacy.PrivacyPolicyUtils;
@@ -409,6 +411,88 @@ public class CISController extends BasePageController{
 		cisdesc = "";
 	}
 	
+	private class WhoCallback implements ICisManagerCallback{
+
+		private List<Participant> participant;
+		private boolean done = false;
+
+		@Override
+		public void receiveResult(CommunityMethods comMethod) {
+			// TODO Auto-generated method stub
+			WhoResponse whoResponse = comMethod.getWhoResponse();
+			setParticipant(whoResponse.getParticipant());
+			done = true;
+		}
+
+		public List<Participant> getParticipant() {
+			return participant;
+		}
+
+		public void setParticipant(List<Participant> participant) {
+			this.participant = participant;
+		}
+
+		public boolean isDone() {
+			return done;
+		}
+
+		
+		
+	}
+	/**
+	 * @author Eliza
+	 */
+	public void deleteCommunity(CisInfo cisInfo){
+		
+		//FacesMessage message = new FacesMessage("User wants to delete this CIS: "+cisInfo.getCisid());
+		//FacesContext.getCurrentInstance().addMessage(null, message);
+		
+		try {
+			WhoCallback callback = new WhoCallback();
+			this.cisManager.getListOfMembers(new Requestor(this.userService.getIdentity()), this.commMngrRef.getIdManager().fromJid(cisInfo.getCisid()), callback);
+			while (!callback.isDone()){
+				Thread.sleep(500);
+			}
+			this.log.debug("Received members of cis ");
+		
+			List<Participant> participant = callback.getParticipant();
+			if (null!=participant){
+				if (participant.size()>1){
+					this.log.debug("Retrieved "+participant.size()+" members of CIS: "+cisInfo.getCisid());
+					for (Participant p: participant){
+						this.log.debug("Participant: "+p.getJid());
+					}
+					RequestContext.getCurrentInstance().execute("cantDeleteDlg.show();");
+					FacesMessage message = new FacesMessage("Sorry, this CIS has other members. To delete this CIS, please ask the members to leave the CIS.");
+					
+					FacesContext.getCurrentInstance().addMessage(null, message);
+					
+					return;
+				}
+			}
+			FacesMessage message; 
+			if (this.cisManager.deleteCis(cisInfo.getCisid())){
+				message = new FacesMessage(cisInfo.getCisname()+" community was deleted. ", "CIS with ID: "+cisInfo.getCisid()+" was successfully deleted. ");
+				this.log.info("#CODE2#: Deleted community: "+cisInfo.getCisname()+" cisID: "+cisInfo.getCisid());
+			}else{
+				message = new FacesMessage(cisInfo.getCisname()+" community was not deleted. ", "Unable to delete CIS with ID: "+cisInfo.getCisid()+"");
+			}
+			
+			 FacesContext.getCurrentInstance().addMessage(null, message);
+			 
+		} catch (InvalidFormatException e) {
+			
+			FacesMessage message = new FacesMessage("An error occurred while trying to delete the CIS");
+			FacesContext.getCurrentInstance().addMessage(null, message );
+			
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		 
+	}
 	public List<CisInfo> getsuggestedcommunities(){
 		log.info("CISController get suggested communities called");
 		

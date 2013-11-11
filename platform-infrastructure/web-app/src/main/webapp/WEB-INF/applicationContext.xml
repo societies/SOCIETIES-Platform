@@ -50,4 +50,5 @@
 	<!-- <osgi:reference id="privacypol" interface="org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;">  -->	
 	</osgi:reference>
 
+	<osgi:reference id="activityFeedManager" interface="org.societies.api.activity.IActivityFeedManager" />
 </beans>

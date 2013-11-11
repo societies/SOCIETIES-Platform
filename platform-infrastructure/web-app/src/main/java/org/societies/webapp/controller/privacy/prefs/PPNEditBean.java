@@ -137,7 +137,7 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	@PostConstruct
 	public void setup(){
-
+		this.logging.info("#CODE2#: Initialising PPNEdit controller");
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setDecisions(Arrays.asList(Decision.values()));
 
