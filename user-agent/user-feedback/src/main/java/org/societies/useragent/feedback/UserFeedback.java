@@ -55,6 +55,8 @@ import org.societies.useragent.api.model.UserFeedbackEventTopics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.AsyncResult;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.Future;
 
@@ -1005,6 +1007,10 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         resultBean.setRequestId(requestId);
         resultBean.setNegotiationDetails(negotiationDetails);
         resultBean.setResponsePolicy(result);
+        resultBean.setRequestDate(new Date());
+        log.debug("I HAVE SET THE DATE!!!"+resultBean.getRequestDate().toString());
+		
+      //  resultBean.setRequestDate(value);
 
         //fire response pubsub event to all user agents
         try {
@@ -1022,10 +1028,11 @@ public class UserFeedback implements IUserFeedback, IInternalUserFeedback, Subsc
         //create user feedback response bean
         UserFeedbackAccessControlEvent resultBean = new UserFeedbackAccessControlEvent();
         resultBean.setMethod(FeedbackMethodType.GET_EXPLICIT_FB);
-        resultBean.setType(ExpProposalType.PRIVACY_NEGOTIATION);
+        resultBean.setType(ExpProposalType.PRIVACY_ACCESS_CONTROL);
         resultBean.setRequestId(requestId);
         resultBean.setResponseItems(responseItems);
         resultBean.setRequestor(requestorBean);
+        resultBean.setRequestDate(new Date());
 
         //fire response pubsub event to all user agents
         try {
