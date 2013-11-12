@@ -114,8 +114,9 @@ public class UserService implements Serializable {
     }
 
     public void logout() {
-        clearCurrentUser();
-        this.log.info("User "+this.identity.getBareJid()+" logged out of webapp ");
+    	this.log.info("User "+this.identity.getBareJid()+" logged out of webapp ");
+    	clearCurrentUser();
+        
         // let listeners know
         for (ILoginListener listener : loginListeners) {
             try {
