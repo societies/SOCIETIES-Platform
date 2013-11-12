@@ -263,10 +263,11 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		//key:ActionName value:[home,free,10]
 		HashMap<String,List<String>> results = new HashMap<String,List<String>>();
+		System.out.println("**** assignContextToAction **** ");
 
 		TransProbCalculator transProb  = new TransProbCalculator();
 		LinkedHashMap<List<String>,ActionDictObject> dic = transProb.getStepDict(dictionaryFull, 1);
-		//System.out.println("dic "+dic);
+		System.out.println("dic "+dic);
 		//System.out.println("_______________________________");
 		String action = "";
 		ActionDictObject dicObj;
@@ -288,11 +289,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 							int locValueOccurences = locMap.get(locationValues);
 							//System.out.println("locValueOccurences: "+locValueOccurences);
 							//System.out.println("locValueOccurences/actionOccurences: "+(float)locValueOccurences/(float)actionOccurences);
-								if((float)locValueOccurences/(float)actionOccurences >= 0.5){
+							if((float)locValueOccurences/(float)actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"="+location);
-							break;
+								break;
 							} else {
-								contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"=n/a"); 
+								if(contextList.isEmpty()) contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"=n/a"); 
+								//System.out.println("=n/a added");
 							}
 							//System.out.println("_contextList: "+contextList);
 						}
@@ -307,7 +309,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 							if((float)dowValueOccurences/(float)actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"="+dow);
 								break;
-							}else contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"=");
+							}else {
+								if(contextList.isEmpty())contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"=n/a");
+							}
 						}
 					}
 				}
@@ -321,7 +325,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 							if((float)temperatureValueOccurences/(float)actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.HOUR_OF_DAY+"="+hod);
 								break;
-							}else contextList.add(CtxAttributeTypes.HOUR_OF_DAY+"=");
+							}else {
+								if(contextList.isEmpty()) contextList.add(CtxAttributeTypes.HOUR_OF_DAY+"=n/a");
+							}
 						}
 					}
 				}
@@ -437,10 +443,10 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					String value = castAttrValuetoString(escortingHocAttr);
 					context.put(escortingHocAttr.getType(), value);
 				}
-				
+
 				//MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, serviceType);
-				
-				
+
+
 				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, 
 						serviceType,retrievedAction.isImplementable(),retrievedAction.isProactive());
 				//System.out.println("mock hoc is impl ******* "+mockHocData.getIsImplementable() );
