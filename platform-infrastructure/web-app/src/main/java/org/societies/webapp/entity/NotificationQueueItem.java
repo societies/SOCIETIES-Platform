@@ -157,19 +157,26 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
 	}
 
 	public String getResult() {
-		if(results == null || results.length == 0 || null == results[0] )
+		if(this.type.equals(TYPE_ACK_NACK))
 		{
-			if  ((this.options!=null || this.options.length>0) && this.options[0]!=null)
+			return null;
+		}
+		else
+		{
+			if(results == null || results.length == 0 || null == results[0] )
 			{
-				return this.options[0];
-			}
-			else{
-				return "";
-			}
-		}  
+				if  ((this.options!=null || this.options.length>0) && this.options[0]!=null)
+				{
+					return this.options[0];
+				}
+				else{
+					return "";
+				}
+			}  
 
 
-		return results[0];
+			return results[0];
+		}
 	}
 
 
