@@ -572,7 +572,7 @@ public class NotificationsController extends BasePageController {
 				feedback.clear();
 			} else {
 				// add one result
-				feedback.add(selectedItem.getResult());
+				feedback.add(selectedItem.getSubmitResult());
 			}
 
 			try {

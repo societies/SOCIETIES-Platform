@@ -155,28 +155,44 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
 	public Date getTimeoutTime() {
 		return timeoutTime;
 	}
+	
+	public String getSubmitResult()
+	{
+		if(null == results || results.length == 0 || null == results[0] )
+		{
+			if  ((this.options!=null || this.options.length>0) && this.options[0]!=null)
+			{
+				return options[0];
+			}
+			else{
+				return "";
+			}
+		}  
+
+
+		return results[0];
+	}
 
 	public String getResult() {
 		if(this.type.equals(TYPE_ACK_NACK))
 		{
 			return null;
 		}
-		else
+
+		if(null == results || results.length == 0 || null == results[0] )
 		{
-			if(results == null || results.length == 0 || null == results[0] )
+			if  ((this.options!=null || this.options.length>0) && this.options[0]!=null)
 			{
-				if  ((this.options!=null || this.options.length>0) && this.options[0]!=null)
-				{
-					return this.options[0];
-				}
-				else{
-					return "";
-				}
-			}  
+				return options[0];
+			}
+			else{
+				return "";
+			}
+		}  
 
 
-			return results[0];
-		}
+		return results[0];
+
 	}
 
 
