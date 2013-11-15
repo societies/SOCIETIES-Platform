@@ -115,9 +115,9 @@ public class ActivityFeedController extends BasePageController{
 	}
 
 	public void postActivity(){
+		logging.debug("Attemping at posting an activity!");
 		if (this.postActivityText.trim().equalsIgnoreCase("") || postActivityText.trim().length()==0){
-			FacesMessage message = new FacesMessage("Post cannot be empty. Please type your message in the textbox");
-			FacesContext.getCurrentInstance().addMessage(null, message);
+			addGlobalMessage("Empty Post", "Post cannot be empty. Please type your message in the textbox", FacesMessage.SEVERITY_WARN);
 			return;
 		}
 		if (this.activityFeed!=null){
@@ -126,8 +126,8 @@ public class ActivityFeedController extends BasePageController{
 			activity.setVerb(postActivityText);
 			String uuid = UUID.randomUUID().toString();
 			activityFeed.addActivity(activity, new ActivityFeedCallback(uuid, Method.POSTACTIVITIES));
-			FacesMessage message = new FacesMessage("Posted message to: "+selectedCIS+" CIS feed");
-			FacesContext.getCurrentInstance().addMessage(null, message);
+			addGlobalMessage("Posted", "Posted message to: "+selectedCIS+" CIS feed", FacesMessage.SEVERITY_INFO);
+
 			
 			synchronized (hash) {
 				while (!hash.containsKey(uuid)){
@@ -143,9 +143,10 @@ public class ActivityFeedController extends BasePageController{
 			this.logging.debug("Done posting activity. removing from hashtable");
 			this.hash.remove(uuid);
 			this.handleSelectedCISChange();
+			this.postActivityText="";
 		}else{
-			FacesMessage message = new FacesMessage("Something is wrong. ActivityFeed is null");
-			FacesContext.getCurrentInstance().addMessage(null, message);
+			addGlobalMessage("Opps, something when wrong!", "Something is wrong. ActivityFeed is null", FacesMessage.SEVERITY_ERROR);
+			
 			return;
 		}
 		
@@ -153,6 +154,7 @@ public class ActivityFeedController extends BasePageController{
 		
 		
 	}
+
 	
 	public void orderByDate(){
 		 Collections.sort(activities, new Comparator<MarshaledActivity>(){

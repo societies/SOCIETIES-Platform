@@ -23,10 +23,11 @@
 			<section class="form_style_main">
 
 				<h4 class="form_title">CIS Activity Feeds</h4>
-				<p:poll interval="7"
-					listener="#{ActivityFeedController.handleSelectedCISChange}"
-					update="feedsAccordionPanel" />
+
+
+
 				<p:panelGrid id="allPanel" columns="1">
+
 					<p:inputTextarea rows="2" cols="150" counter="counter"
 						maxlength="300" counterTemplate="{0} characters remaining."
 						autoResize="false"
@@ -38,13 +39,23 @@
 						<f:selectItems value="#{ActivityFeedController.cisList}" var="cis"
 							itemValue="#{cis.cisId}" itemLabel="#{cis.name}" />
 
-						<p:ajax update="feedsAccordionPanel"
+						<p:ajax event="change" onstart="blockUI.show()" oncomplete="blockUI.hide()"
+							update="feedsAccordionPanel" process="selectCIS"
 							listener="#{ActivityFeedController.handleSelectedCISChange}" />
 					</p:selectOneMenu>
-					<p:commandButton id="postButton" value="Post"
-						actionListener="#{ActivityFeedController.postActivity}"
-						update="feedsAccordionPanel" />
-					<p:accordionPanel id="feedsAccordionPanel" dynamic="true"
+
+					<p:panelGrid columns="2">
+						<p:commandButton id="postButton" value="Post"
+							action="#{ActivityFeedController.postActivity()}"
+							update="feedsAccordionPanel" icon="ui-icon-1-n" />
+
+						<p:commandButton id="refreshButton" value="Refresh"
+							action="#{ActivityFeedController.handleSelectedCISChange}"
+							update="feedsAccordionPanel" icon="ui-icon-arrowrefresh-1-e" />
+					</p:panelGrid>
+
+
+					<p:accordionPanel id="feedsAccordionPanel"
 						value="#{ActivityFeedController.activities}"
 						var="marshalledActivity" multiple="true">
 						<p:tab title="#{marshalledActivity.actor}"
@@ -62,7 +73,10 @@
 
 					</p:accordionPanel>
 				</p:panelGrid>
-				<p:blockUI block="allPanel" trigger="postButton">Posting<br />
+
+
+				<p:blockUI widgetVar="blockUI" id="blockUI" block=":mainForm"
+					trigger="postButton, refreshButton">Refreshing...<br />
 					<p:graphicImage value="/images/ajax-loader.gif" />
 				</p:blockUI>
 
