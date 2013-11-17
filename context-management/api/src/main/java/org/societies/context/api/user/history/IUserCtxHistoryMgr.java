@@ -115,7 +115,7 @@ public interface IUserCtxHistoryMgr {
 	 * @return number of removed records
 	 * @since 0.0.1
 	 */
-	public int removeCtxHistory(CtxAttribute ctxAttribute, Date startDate, Date endDate) throws CtxException;
+	public int removeCtxHistory(CtxAttributeIdentifier ctxAttributeID, Date startDate, Date endDate) throws CtxException;
 
 	/**
 	 * Removes recorded history for the indicated type from the start of the 

@@ -186,13 +186,18 @@ public class CtxDataInitiator {
 					
 					if(escortingHocAttr.getType().equals(CtxAttributeTypes.LOCATION_SYMBOLIC) ){
 						CtxAttributeIdentifier attrID = escortingHocAttr.getId();
-						attrID.setOwnerId(ownerCtxId.toString());
+					
+						if(attrID.getOwnerId().contains("ENTITY/cssNode")) {
+							attrID.setOwnerId(ownerCtxId.toString());	
+						
+							CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(attrID,escortingHocAttr.getLastModified(),escortingHocAttr.getLastUpdated(),escortingHocAttr.getStringValue(),
+									escortingHocAttr.getIntegerValue(), escortingHocAttr.getDoubleValue(), escortingHocAttr.getBinaryValue(),escortingHocAttr.getValueType(),escortingHocAttr.getValueMetric() );
 
-						CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(attrID,escortingHocAttr.getLastModified(),escortingHocAttr.getLastUpdated(),escortingHocAttr.getStringValue(),
-								escortingHocAttr.getIntegerValue(), escortingHocAttr.getDoubleValue(), escortingHocAttr.getBinaryValue(),escortingHocAttr.getValueType(),escortingHocAttr.getValueMetric() );
-
-						fixedEscortingHocAttrList.remove(escortingHocAttr);
-						fixedEscortingHocAttrList.add(correctEscortingHocAttr);
+							fixedEscortingHocAttrList.remove(escortingHocAttr);
+							fixedEscortingHocAttrList.add(correctEscortingHocAttr);
+			
+						}
+					
 					}
 				}
 				byte[] escortingHocAttrsValue = SerialisationHelper.serialise((Serializable) fixedEscortingHocAttrList);
@@ -212,21 +217,22 @@ public class CtxDataInitiator {
 			// this list should be recorded in hoc db
 			
 			
-			/*
-			add code to remove fixed hoc entries
+			
+			//add code to remove fixed hoc entries
 			for( CtxHistoryAttribute hocAttrRemove : hoCAttrsToBeRemoved){
-				this.ctxBroker.removeHistory(hocAttrRemove, arg1, arg2)
-				LOG.debug("storing hoc attr: "+ hocAttr.getId());
+				this.ctxBroker.removeHistory(hocAttrRemove.getId(), null, null);
+				LOG.debug("removing hoc attr: "+ hocAttrRemove.getId());
 			}
-			*/
+			
 			
 			
 			for( CtxHistoryAttribute hocAttr : allHoCAttrsFixed){
 				this.ctxBroker.storeHistoryAttribute(hocAttr);
 				LOG.debug("storing hoc attr: "+ hocAttr.getId());
 			}
+	
 			
-
+			
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

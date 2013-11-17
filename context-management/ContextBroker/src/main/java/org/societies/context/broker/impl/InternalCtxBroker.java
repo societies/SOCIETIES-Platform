@@ -1229,6 +1229,24 @@ public class InternalCtxBroker implements ICtxBroker {
 
 	@Override
 	@Async
+	public Future<Integer> removeHistory(CtxAttributeIdentifier ctxAttrId, Date startDate, Date endDate) throws CtxException {
+	
+		if (ctxAttrId == null)
+			throw new NullPointerException("ctxAttrId can't be null");
+		
+		LOG.debug("removeHistory: attrId={}, startDate={}, endDate={}",
+				new Object[] { ctxAttrId, startDate, endDate });
+			
+		int result = this.userCtxHistoryMgr.removeCtxHistory(ctxAttrId, startDate, endDate);
+		
+		
+		return new AsyncResult<Integer>(result);
+	}
+
+	
+	
+	@Override
+	@Async
 	public Future<List<CtxHistoryAttribute>> retrieveHistory(
 			CtxAttributeIdentifier attrId, int arg1) throws CtxException {
 		// TODO Auto-generated method stub

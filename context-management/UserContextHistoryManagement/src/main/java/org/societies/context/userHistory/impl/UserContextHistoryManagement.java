@@ -48,6 +48,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
+import org.societies.api.context.model.CtxModelObject;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.context.api.user.db.IUserCtxDBMgr;
@@ -129,7 +130,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		UserCtxHistoryAttributeDAO dao = UserCtxHistoryDAOTranslator.getInstance()
 				.fromCtxHistoryAttribute(hocAttr);
 
-		
+
 		final Session session = this.sessionFactory.openSession();
 		Transaction tx = null;
 		try {
@@ -153,7 +154,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 		return result;
 	}
 
-		
+
 	@Override
 	public CtxHistoryAttribute createHistoryAttribute (
 			final CtxAttributeIdentifier attrId, final Date date, 
@@ -305,15 +306,15 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 				//for one of the escorting attrIds retrieve all history and find the latest value
 				if (LOG.isDebugEnabled())
 					LOG.debug("Retrieving history for escorting attribute " + tupleAttrID);
-				
+
 				List<CtxHistoryAttribute> allValues = this.retrieveHistory(tupleAttrID, null, null);
 				//if (LOG.isDebugEnabled())
-					//LOG.debug("Retrieved history " + allValues);
+				//LOG.debug("Retrieved history " + allValues);
 				if (allValues != null){
 					//finding latest hoc value
 					int size = allValues.size();
 					//if (LOG.isDebugEnabled())
-						//LOG.debug("Retrieved history size " + size);
+					//LOG.debug("Retrieved history size " + size);
 					int last = 0;
 					if (size >= 1){
 						last = size-1;
@@ -388,7 +389,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 				results.add(UserCtxHistoryDAOTranslator.getInstance()
 						.fromUserCtxHistoryAttributeDAO(historyDAO));
 		} catch (Exception e) {
-			
+
 			throw new IllegalStateException("Could not retrieve history of context attribute "
 					+ attrId + ": " + e.getLocalizedMessage(), e);
 		}
@@ -396,8 +397,45 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	}
 
 	@Override
-	public int removeCtxHistory(CtxAttribute arg0, Date arg1, Date arg2)
+	public int removeCtxHistory(CtxAttributeIdentifier ctxAttrId, Date start, Date end)
 			throws CtxException {
+
+		if (ctxAttrId == null)
+			throw new NullPointerException("ctxAttr can't be null");
+
+		List<UserCtxHistoryAttributeDAO> retrievedDao;
+		try {
+			retrievedDao = this.retrieve(ctxAttrId, start, end);
+		} catch (Exception e1) {
+			throw new UserCtxHistoryMgrException("Could not retriece hoc data prior to removing '" + ctxAttrId
+					+ "': " + e1.getLocalizedMessage(), e1);
+		}
+		
+		
+		if (retrievedDao == null)
+			return 0;
+
+		for(UserCtxHistoryAttributeDAO dao : retrievedDao ){
+
+			final Session session = sessionFactory.openSession();
+			Transaction tx = null;
+
+			try{
+				tx = session.beginTransaction();
+				session.delete(dao);
+				session.flush();
+				tx.commit();
+			}
+			catch (Exception e) {
+				if (tx != null)
+					tx.rollback();
+				throw new UserCtxHistoryMgrException("Could not remove hoc attr '" + ctxAttrId
+						+ "': " + e.getLocalizedMessage(), e);
+			} finally {
+				if (session != null)
+					session.close();
+			}
+		}
 
 		return 0;
 	}
@@ -427,7 +465,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 					throws CtxException {
 
 		if(this.userCtxDBMgr == null) return null;
-		
+
 		List<CtxAttributeIdentifier> tupleAttrIDs = new ArrayList<CtxAttributeIdentifier>(); 
 
 		final String tupleAttrType = "tuple_"+primaryAttrIdentifier.getType().toString()+"_"+primaryAttrIdentifier.getObjectNumber().toString();
@@ -457,7 +495,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	@Override
 	public Boolean removeCtxHistoryTuples(CtxAttributeIdentifier arg0,
 			List<CtxAttributeIdentifier> arg1) throws CtxException {
-		
+
 		return null;
 	}
 
@@ -483,11 +521,11 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 			// add the escorting attr ids
 			allAttrIds.addAll(listOfEscortingAttributeIds);
 
-			
+
 			// set history flag for all escorting attributes
-						
+
 			for (CtxAttributeIdentifier escortingAttrID : allAttrIds) {
-				
+
 				if (escortingAttrID != null ){
 					CtxAttribute attr = (CtxAttribute) this.userCtxDBMgr.retrieve(escortingAttrID);
 					if(attr != null){
@@ -496,7 +534,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 						this.storeHoCAttribute(attr);
 					}	
 				}
-				
+
 			}
 
 			//this attr will maintain the attr ids of all the (not only the escorting) hoc_attibutes in a blob
@@ -513,7 +551,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 
 		} catch (IOException e) {
 			LOG.error("Exception while setting ctx history tuples for id:"+primaryAttrIdentifier+". "+e.getLocalizedMessage());
-			
+
 			e.printStackTrace();
 		}
 
@@ -524,7 +562,7 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	public List<CtxAttributeIdentifier> updateCtxHistoryTuples(
 			CtxAttributeIdentifier arg0, List<CtxAttributeIdentifier> arg1)
 					throws CtxException {
-		
+
 		return null;
 	}
 

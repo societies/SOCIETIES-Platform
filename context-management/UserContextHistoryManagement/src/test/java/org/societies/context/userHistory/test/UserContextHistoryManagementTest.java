@@ -170,8 +170,20 @@ private static IUserCtxDBMgr mockUserCtxDBMgr = mock(IUserCtxDBMgr.class);
 		
 		List<CtxHistoryAttribute> hocResultsTemperature = this.userCtxHistoryDb.retrieveHistory(attrTemperatureID);
 		
+		int ia = 0;
+		for(CtxHistoryAttribute hocAttr : hocResultsTemperature ){
+			ia++;
+			System.out.println(ia+" temperature results: "+hocAttr );	
+		}
+		
 		System.out.println("temperature results "+hocResultsTemperature.size() );
 		assertEquals(5, hocResultsTemperature.size());
+		
+		this.userCtxHistoryDb.removeCtxHistory(attrTemperature.getId(), null, null);
+		
+		List<CtxHistoryAttribute> hocResultsTemperature2 = this.userCtxHistoryDb.retrieveHistory(attrTemperatureID);
+		
+		System.out.println("REMOVED: temperature results "+hocResultsTemperature2.size() );
 		
 		
 		//for(CtxHistoryAttribute hocAttr: hocResultsTemperature){

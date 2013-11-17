@@ -945,6 +945,17 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	public Future<Integer> removeHistory(String type, Date startDate, Date endDate) throws CtxException;
 
 	/**
+	 * Removes context history records defined by attribute identifier for the specified time period. 
+	 * 
+	 * @param attr ID
+	 * @param startDate
+	 * @param endDate
+	 * @throws CtxException 
+	 */
+	public Future<Integer> removeHistory(CtxAttributeIdentifier ctxAttributeID, Date startDate, Date endDate) throws CtxException;
+
+	
+	/**
 	 * Creates a context history attribute without 
 	 * 
 	 * @param attID
