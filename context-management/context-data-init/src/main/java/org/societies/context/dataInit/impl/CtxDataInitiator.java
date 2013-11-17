@@ -204,12 +204,13 @@ public class CtxDataInitiator {
 				byte[] escortingHocAttrsValue = SerialisationHelper.serialise((Serializable) fixedEscortingHocAttrList);
 				
 				//hocAttrTuple.setBinaryValue() is not allowed
-				CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(hocAttrTuple.getId(),hocAttrTuple.getLastModified(),hocAttrTuple.getLastUpdated(),hocAttrTuple.getStringValue(),
-						hocAttrTuple.getIntegerValue(), hocAttrTuple.getDoubleValue(), hocAttrTuple.getBinaryValue(),hocAttrTuple.getValueType(),hocAttrTuple.getValueMetric() );
+				// creating a new hoc tuple with the correct binary, the rest remain the same
+				CtxHistoryAttribute correctTupleHocAttr = new CtxHistoryAttribute(hocAttrTuple.getId(),hocAttrTuple.getLastModified(),hocAttrTuple.getLastUpdated(),hocAttrTuple.getStringValue(),
+						hocAttrTuple.getIntegerValue(), hocAttrTuple.getDoubleValue(), escortingHocAttrsValue ,hocAttrTuple.getValueType(),hocAttrTuple.getValueMetric() );
 				
 			
 				
-				allHoCAttrsFixed.add(correctEscortingHocAttr);
+				allHoCAttrsFixed.add(correctTupleHocAttr);
 			}
 			
 			LOG.debug("all history tuple records that are fixed: " +allHoCAttrsFixed );
@@ -219,14 +220,14 @@ public class CtxDataInitiator {
 			
 			
 			
-			//add code to remove fixed hoc entries
+			//remove fixed hoc entries
 			for( CtxHistoryAttribute hocAttrRemove : hoCAttrsToBeRemoved){
 				this.ctxBroker.removeHistory(hocAttrRemove.getId(), null, null).get();
 				LOG.debug("removing hoc attr: "+ hocAttrRemove.getId());
 			}
 			
 			
-			
+			//add fixed hoc entries to db
 			for( CtxHistoryAttribute hocAttr : allHoCAttrsFixed){
 				this.ctxBroker.storeHistoryAttribute(hocAttr).get();
 				LOG.debug("storing hoc attr: "+ hocAttr.getId());
