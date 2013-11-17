@@ -41,6 +41,7 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxEntityTypes;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
@@ -116,7 +117,7 @@ public class CtxDataInitiator {
 
 			printCtxAttributes(ownerCtxId);
 			 */		
-			
+
 			LOG.debug("start fixing ctxIDs ");
 			fixHocIdentifiers();
 		} catch (InterruptedException e) {
@@ -141,100 +142,105 @@ public class CtxDataInitiator {
 	private void fixHocIdentifiers(){
 
 		//contains a list of hoc attr (e.g. of type tuple_lastAction_688139) with value a blob which is a list of CtxHistoryAttributes 
-		
+
 		List<CtxHistoryAttribute> allHocActionTuples = new ArrayList<CtxHistoryAttribute>();
 		List<String> allTupleAttTypes = new ArrayList<String>();
-		
+
 		try {
 			// a list with all ids of type last_action
 			List<CtxIdentifier> actionIDList  = this.ctxBroker.lookup(cssOwnerId, CtxAttributeTypes.LAST_ACTION).get();
-			
+
 			for(CtxIdentifier lastActID : actionIDList){
 				String tupleAttrType = "tuple_"+lastActID.getType().toString()+"_"+lastActID.getObjectNumber().toString();
 				allTupleAttTypes.add(tupleAttrType);
 			}
-						
+
 			List<CtxIdentifier> allHocTuples = new ArrayList<CtxIdentifier>();
 			for (String hocTupleType : allTupleAttTypes){
 				allHocTuples = this.ctxBroker.lookup(cssOwnerId, CtxModelType.ATTRIBUTE, hocTupleType).get();
 			}
 
-			
+
 			List<CtxHistoryAttribute> hocTupleList = new ArrayList<CtxHistoryAttribute>();
 			for(CtxIdentifier ctxID :  allHocTuples){
 				hocTupleList =  this.ctxBroker.retrieveHistory((CtxAttributeIdentifier) ctxID, null, null).get();	
 				allHocActionTuples.addAll(hocTupleList);
 			}
-				
-			
+
+
 			LOG.debug("candidate history tuple records that need to be fixed: " +allHocActionTuples );
-			
+
 			List<CtxHistoryAttribute> allHoCAttrsFixed = new ArrayList<CtxHistoryAttribute>();
 			List<CtxHistoryAttribute> hoCAttrsToBeRemoved = new ArrayList<CtxHistoryAttribute>(allHocActionTuples);
-			
+
 			for(CtxHistoryAttribute hocAttrTuple :  allHocActionTuples){
 				// each hocAttr contains a blob value with a list of history objects
 				// action and location are among history objects  
 				List<CtxHistoryAttribute> originalEscortingHocAttrList = (List<CtxHistoryAttribute>) SerialisationHelper.deserialise(hocAttrTuple.getBinaryValue(), this.getClass().getClassLoader());
-				
+
 				List<CtxHistoryAttribute> fixedEscortingHocAttrList = new ArrayList<CtxHistoryAttribute>(originalEscortingHocAttrList);
 
 
 				for (CtxHistoryAttribute escortingHocAttr : originalEscortingHocAttrList){
-					
+
 					LOG.debug("escortingHocAttr attr: "+escortingHocAttr.getId()+ " string value:"+escortingHocAttr.getStringValue());
-					
+
 					if(escortingHocAttr.getType().equals(CtxAttributeTypes.LOCATION_SYMBOLIC) ){
 						CtxAttributeIdentifier attrID = escortingHocAttr.getId();
-					
-						if(attrID.getOwnerId().contains("ENTITY/cssNode")) {
-							attrID.setOwnerId(ownerCtxId.toString());	
+
+						if(attrID.getScope().getType().equals(CtxEntityTypes.CSS_NODE)) {
+
+							CtxAttributeIdentifier newAttrID = new CtxAttributeIdentifier(ownerCtxId, CtxAttributeTypes.LOCATION_SYMBOLIC,attrID.getObjectNumber() ); 
+							//attrID.set(ownerCtxId.toString());	
 							LOG.debug("creating new history attr based on : " +escortingHocAttr );
-							CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(attrID,escortingHocAttr.getLastModified(),escortingHocAttr.getLastUpdated(),escortingHocAttr.getStringValue(),
+							CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(newAttrID,escortingHocAttr.getLastModified(),escortingHocAttr.getLastUpdated(),escortingHocAttr.getStringValue(),
 									escortingHocAttr.getIntegerValue(), escortingHocAttr.getDoubleValue(), escortingHocAttr.getBinaryValue(),escortingHocAttr.getValueType(),escortingHocAttr.getValueMetric() );
-							
+
 							LOG.debug("created escorting hoc attr : " +correctEscortingHocAttr.getId()+" getStringValue:"+  correctEscortingHocAttr.getStringValue());
 							fixedEscortingHocAttrList.remove(escortingHocAttr);
 							fixedEscortingHocAttrList.add(correctEscortingHocAttr);
-			
+
 						}
-					
+
 					}
 				}
 				byte[] escortingHocAttrsValue = SerialisationHelper.serialise((Serializable) fixedEscortingHocAttrList);
-				
+
 				//hocAttrTuple.setBinaryValue() is not allowed
 				// creating a new hoc tuple with the correct binary, the rest remain the same
 				CtxHistoryAttribute correctTupleHocAttr = new CtxHistoryAttribute(hocAttrTuple.getId(),hocAttrTuple.getLastModified(),hocAttrTuple.getLastUpdated(),hocAttrTuple.getStringValue(),
 						hocAttrTuple.getIntegerValue(), hocAttrTuple.getDoubleValue(), escortingHocAttrsValue ,hocAttrTuple.getValueType(),hocAttrTuple.getValueMetric() );
-				
-			
-				
+
+
+
 				allHoCAttrsFixed.add(correctTupleHocAttr);
 			}
-			
-			LOG.debug("all history tuple records that are fixed: " +allHoCAttrsFixed );
+
+			for( CtxHistoryAttribute hocAttrRemove :  allHoCAttrsFixed){
+				LOG.debug("all history tuple records that are fixed: " +hocAttrRemove +" last updated:"+hocAttrRemove );
+			}
+
 			LOG.debug("this list will be saved in hoc db");
 			// allHoCAttrsFixed contains a list of ctxHistoryAttributes that contain tuple values with updated location identifiers
 			// this list should be recorded in hoc db
-			
-			
-			
+
+
+
 			//remove fixed hoc entries
 			for( CtxHistoryAttribute hocAttrRemove : hoCAttrsToBeRemoved){
 				this.ctxBroker.removeHistory(hocAttrRemove.getId(), null, null).get();
-				LOG.debug("removing hoc attr: "+ hocAttrRemove.getId());
+				LOG.debug("removing hoc attr: "+ hocAttrRemove.getId()+ "last updated: "+hocAttrRemove.getLastUpdated() );
 			}
-			
-			
+
+
 			//add fixed hoc entries to db
 			for( CtxHistoryAttribute hocAttr : allHoCAttrsFixed){
 				this.ctxBroker.storeHistoryAttribute(hocAttr).get();
 				LOG.debug("storing hoc attr: "+ hocAttr.getId());
 			}
-	
-			
-			
+
+
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
