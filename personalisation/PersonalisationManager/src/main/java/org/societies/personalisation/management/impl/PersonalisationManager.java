@@ -277,7 +277,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					logging.debug("updated confidence levels");
 				}
 			}
-			
+
 		} catch (CtxException e) {
 
 			if (logging.isDebugEnabled()){ logging.error("Error", e); }
@@ -488,140 +488,147 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	@Override
 	public Future<IAction> getPreference(IIdentity ownerID, String serviceType,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		if (this.logging.isDebugEnabled()){
-			this.logging.debug("Processing request for preference: " + preferenceName + " for serviceType: " + serviceType + " and serviceID " + serviceID.getServiceInstanceIdentifier());
-		}
-
-		Future<List<IDIANNEOutcome>> futureDianneOuts;
-
-		futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
-
-		if (futureDianneOuts == null) {
-			futureDianneOuts = new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
+		try{
 			if (this.logging.isDebugEnabled()){
-				this.logging.debug(".getPreference(...): DIANNE returned null list");
+				this.logging.debug("Processing request for preference: " + preferenceName + " for serviceType: " + serviceType + " and serviceID " + serviceID.getServiceInstanceIdentifier());
 			}
-		}
-		Future<IOutcome> futurePrefOuts;
 
-		futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+			Future<List<IDIANNEOutcome>> futureDianneOuts;
 
+			futureDianneOuts = this.dianne.getOutcome(ownerID, serviceID, preferenceName);
 
-		if (futurePrefOuts == null) {
-			futurePrefOuts = new AsyncResult<IOutcome>(null);
-			if (this.logging.isDebugEnabled()){
-				this.logging.debug(".getPreference(...): PCM returned null list");
+			if (futureDianneOuts == null) {
+				futureDianneOuts = new AsyncResult<List<IDIANNEOutcome>>(new ArrayList<IDIANNEOutcome>());
+				if (this.logging.isDebugEnabled()){
+					this.logging.debug(".getPreference(...): DIANNE returned null list");
+				}
 			}
-		}
-		IAction action;
-		try {
-			List<IDIANNEOutcome> dianneOutList = futureDianneOuts.get();
-			if (dianneOutList.size() > 0) {
+			Future<IOutcome> futurePrefOuts;
 
-				IDIANNEOutcome dianneOut = dianneOutList.get(0);
+			futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+
+
+			if (futurePrefOuts == null) {
+				futurePrefOuts = new AsyncResult<IOutcome>(null);
 				if (this.logging.isDebugEnabled()){
-					this.logging.debug(".getPreference(...): DIANNE returned an outcome: " + dianneOut.toString());
+					this.logging.debug(".getPreference(...): PCM returned null list");
 				}
-				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
+			}
+			IAction action;
+			try {
+				List<IDIANNEOutcome> dianneOutList = futureDianneOuts.get();
+				if (dianneOutList.size() > 0) {
 
-				if (null == prefOut) {
+					IDIANNEOutcome dianneOut = dianneOutList.get(0);
 					if (this.logging.isDebugEnabled()){
-						this.logging.debug(".getPreference(...): PCM didn't return an outcome. Returning DIANNE's outcome: " + dianneOut.toString());
+						this.logging.debug(".getPreference(...): DIANNE returned an outcome: " + dianneOut.toString());
 					}
-					
-					String str = "Request for preference: ";
-					str = str.concat("\nDIANNE outcome:  ");
-					
-					str = str.concat(dianneOut.getparameterName()+" = "+dianneOut.getvalue());
-					
-					str = str.concat("\nPreference outcome is null, returning DIANNE outcome ");
-				
-					this.logging.info(str);
-					
-					return new AsyncResult<IAction>(dianneOut);
-				}
+					IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
 
-				if (this.logging.isDebugEnabled()){
-					this.logging.debug(".getPreference(...): PCM returned an outcome " + prefOut.toString());
-				}
-				if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())) {
-					action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
-					action.setServiceID(serviceID);
-					action.setServiceType(serviceType);
-					if (this.logging.isDebugEnabled()){
-						this.logging.debug(".getPreference(...): returning action: " + action.toString());
+					if (null == prefOut) {
+						if (this.logging.isDebugEnabled()){
+							this.logging.debug(".getPreference(...): PCM didn't return an outcome. Returning DIANNE's outcome: " + dianneOut.toString());
+						}
+
+						String str = "Request for preference: ";
+						str = str.concat("\nDIANNE outcome:  ");
+
+						str = str.concat(dianneOut.getparameterName()+" = "+dianneOut.getvalue());
+
+						str = str.concat("\nPreference outcome is null, returning DIANNE outcome ");
+
+						this.logging.info(str);
+
+						return new AsyncResult<IAction>(dianneOut);
 					}
-					
-					String str = "Request for preference: ";
-					str = str.concat("\nBoth DIANNE and Preferences agree on the following outcome outcome:  ");
-					
-					str = str.concat(action.getparameterName()+" = "+action.getvalue());
-									
-					this.logging.info(str);
-					return new AsyncResult<IAction>(action);
+
+					if (this.logging.isDebugEnabled()){
+						this.logging.debug(".getPreference(...): PCM returned an outcome " + prefOut.toString());
+					}
+					if (dianneOut.getvalue().equalsIgnoreCase(prefOut.getvalue())) {
+						action = new Action(serviceID, serviceType, preferenceName, prefOut.getvalue());
+						action.setServiceID(serviceID);
+						action.setServiceType(serviceType);
+						if (this.logging.isDebugEnabled()){
+							this.logging.debug(".getPreference(...): returning action: " + action.toString());
+						}
+
+						String str = "Request for preference: ";
+						str = str.concat("\nBoth DIANNE and Preferences agree on the following outcome outcome:  ");
+
+						str = str.concat(action.getparameterName()+" = "+action.getvalue());
+
+						this.logging.info(str);
+						return new AsyncResult<IAction>(action);
+					} else {
+						if (this.logging.isDebugEnabled()){
+							this.logging.debug(".getPreference(...): conflict between pcm and dianne.");
+						}
+						IOutcome resolvePreferenceConflicts = this.resolvePreferenceConflicts(dianneOut, prefOut);
+
+						if (null==resolvePreferenceConflicts){
+							String str = "Request for preference: ";
+							str = str.concat("\nPreference outcome:  ");
+
+							str = str.concat(prefOut.getparameterName()+" = "+prefOut.getvalue());
+
+							str = str.concat("\nDIANNE outcome: ");
+
+							str = str.concat(dianneOut.getparameterName()+" = "+dianneOut.getvalue());
+
+							str = str.concat("\nAfter conflict resolution, returning null action: ");
+							this.logging.info(str);
+						}else{
+							String str = "Request for preference: ";
+							str = str.concat("\nPreference outcome:  ");
+
+							str = str.concat(prefOut.getparameterName()+" = "+prefOut.getvalue());
+
+							str = str.concat("\nDIANNE outcome: ");
+
+							str = str.concat(dianneOut.getparameterName()+" = "+dianneOut.getvalue());
+
+							str = str.concat("\nAfter conflict resolution, returning action: "+resolvePreferenceConflicts.getparameterName()+" = "+resolvePreferenceConflicts.getvalue());
+							this.logging.info(str);
+						}
+
+						return new AsyncResult<IAction>(resolvePreferenceConflicts);
+					}
+
 				} else {
-					if (this.logging.isDebugEnabled()){
-						this.logging.debug(".getPreference(...): conflict between pcm and dianne.");
-					}
-					IOutcome resolvePreferenceConflicts = this.resolvePreferenceConflicts(dianneOut, prefOut);
-					
-					if (null==resolvePreferenceConflicts){
+
+					IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
+					if (prefOut != null) {
+						if (this.logging.isDebugEnabled()){
+							this.logging.debug(".getPreference(...): DIANNE didn't return an outcome. Returning PCM's outcome: " + prefOut.toString());
+						}
 						String str = "Request for preference: ";
 						str = str.concat("\nPreference outcome:  ");
-						
-						str = str.concat(prefOut.getparameterName()+" = "+prefOut.getvalue());
-						
-						str = str.concat("\nDIANNE outcome: ");
-						
-						str = str.concat(dianneOut.getparameterName()+" = "+dianneOut.getvalue());
-						
-						str = str.concat("\nAfter conflict resolution, returning null action: ");
-						this.logging.info(str);
-					}else{
-						String str = "Request for preference: ";
-						str = str.concat("\nPreference outcome:  ");
-						
-						str = str.concat(prefOut.getparameterName()+" = "+prefOut.getvalue());
-						
-						str = str.concat("\nDIANNE outcome: ");
-						
-						str = str.concat(dianneOut.getparameterName()+" = "+dianneOut.getvalue());
-						
-						str = str.concat("\nAfter conflict resolution, returning action: "+resolvePreferenceConflicts.getparameterName()+" = "+resolvePreferenceConflicts.getvalue());
-						this.logging.info(str);
-					}
-					
-					return new AsyncResult<IAction>(resolvePreferenceConflicts);
-				}
 
-			} else {
+						str = str.concat(prefOut.getparameterName()+" = "+prefOut.getvalue());
 
-				IPreferenceOutcome prefOut = (IPreferenceOutcome) futurePrefOuts.get();
-				if (prefOut != null) {
-					if (this.logging.isDebugEnabled()){
-						this.logging.debug(".getPreference(...): DIANNE didn't return an outcome. Returning PCM's outcome: " + prefOut.toString());
+						str = str.concat("\nDIANNE outcome is null, returning preference outcome ");
+
+						this.logging.info(str);
+						return new AsyncResult<IAction>(prefOut);
 					}
-					String str = "Request for preference: ";
-					str = str.concat("\nPreference outcome:  ");
-					
-					str = str.concat(prefOut.getparameterName()+" = "+prefOut.getvalue());
-					
-					str = str.concat("\nDIANNE outcome is null, returning preference outcome ");
-				
-					this.logging.info(str);
-					return new AsyncResult<IAction>(prefOut);
 				}
+			} catch (InterruptedException e) {
+
+				if (logging.isDebugEnabled()){ logging.error("Error", e); }
+			} catch (ExecutionException e) {
+
+				if (logging.isDebugEnabled()){ logging.error("Error", e); }
 			}
-		} catch (InterruptedException e) {
 
-			if (logging.isDebugEnabled()){ logging.error("Error", e); }
-		} catch (ExecutionException e) {
-
-			if (logging.isDebugEnabled()){ logging.error("Error", e); }
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug(".getPreference(...): Returning null action");
+			}
 		}
+		catch (Exception e){
+			e.printStackTrace();
+			this.logging.debug("Exception occurred : "+e.getMessage());
 
-		if (this.logging.isDebugEnabled()){
-			this.logging.debug(".getPreference(...): Returning null action");
 		}
 		return new AsyncResult<IAction>(null);
 	}
@@ -639,7 +646,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	@Override
 	public Future<IAction> getIntentAction(Requestor requestor, IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		
+
 		return this.getIntentAction(ownerID, serviceID, preferenceName);
 	}
 
@@ -681,7 +688,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	@Override
 	public Future<IAction> getIntentAction(IIdentity ownerID,
 			ServiceResourceIdentifier serviceID, String preferenceName) {
-		
+
 		Future<IUserIntentAction> futureCAUIOuts;
 		try {
 			futureCAUIOuts = this.cauiPrediction.getCurrentIntentAction(ownerID, serviceID, preferenceName);
@@ -708,12 +715,12 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				} else {
 					String str = "Request for user intent: ";
 					str = str.concat("\nCRIST outcome:  ");
-					
+
 					str = str.concat(cristOut.getparameterName()+" = "+cristOut.getvalue());
-					
+
 					str = str.concat("\nCAUI outcome is null, returning CRIST outcome ");
-					
-			
+
+
 					this.logging.info(str);
 					return new AsyncResult<IAction>(cristOut);
 				}
@@ -721,11 +728,11 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				if (cristOut == null) {
 					String str = "Request for user intent: ";
 					str = str.concat("\nCAUI outcome:  ");
-					
+
 					str = str.concat(cauiOut.getparameterName()+" = "+cauiOut.getvalue());
-					
+
 					str = str.concat("\nCRIST outcome is null, returning CAUI outcome ");
-					
+
 					this.logging.info(str);
 					return new AsyncResult<IAction>(cauiOut);
 				}
@@ -736,36 +743,36 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				action = new Action(serviceID, "", preferenceName, cauiOut.getvalue());
 				String str = "Request for user intent: ";
 				str = str.concat("\nCAUI and CRIST agree on the following action:  ");
-												
+
 				str = str.concat(action.getparameterName()+" = "+action.getvalue());
-				
+
 				this.logging.info(str);
 				return new AsyncResult<IAction>(action);
 			} else {
-				
+
 				IOutcome resolveIntentConflicts = this.resolveIntentConflicts(cristOut, cauiOut);
 				if (null==resolveIntentConflicts){
 					String str = "Request for user intent: ";
 					str = str.concat("\nCRIST outcome:  ");
-					
+
 					str = str.concat(cristOut.getparameterName()+" = "+cristOut.getvalue());
-					
+
 					str = str.concat("\nCAUI outcome: ");
-					
+
 					str = str.concat(cauiOut.getparameterName()+" = "+cauiOut.getvalue());
-					
+
 					str = str.concat("\nAfter conflict resolution, returning null action: ");
 					this.logging.info(str);
 				}else{
 					String str = "Request for user intent: ";
 					str = str.concat("\nCRIST outcome:  ");
-					
+
 					str = str.concat(cristOut.getparameterName()+" = "+cristOut.getvalue());
-					
+
 					str = str.concat("\nCAUI outcome: ");
-					
+
 					str = str.concat(cauiOut.getparameterName()+" = "+cauiOut.getvalue());
-					
+
 					str = str.concat("\nAfter conflict resolution, returning action: "+resolveIntentConflicts.getparameterName()+" = "+resolveIntentConflicts.getvalue());
 					this.logging.info(str);
 				}
@@ -816,15 +823,15 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					CtxAttribute ctxAttribute = (CtxAttribute) futureAttribute.get();
 
 					if (null != ctxAttribute) {
-						
-						
+
+
 						if (ctxAttribute instanceof CtxAttribute) {
 							if (logging.isDebugEnabled()){
 								logging.debug("Received event and retrieved value " + ctxAttribute.getStringValue() + " for context attribute: " + ctxAttribute.getType());
 							}
 							String uuid = UUID.randomUUID().toString();
 							ActionInformation info = new ActionInformation(uuid, ctxAttribute);
-							
+
 							CtxAttributeIdentifier ctxId = (CtxAttributeIdentifier) ctxAttribute.getId();
 							IIdentity userId = idm.fromJid(ctxId.getOwnerId());
 							List<IOutcome> preferenceOutcomes = processPreferences(userId, ctxAttribute, info);
@@ -1010,7 +1017,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					this.logging.debug("dianne is registered for events of: " + ctxId.toUriString());
 				}
 				Future<List<IDIANNEOutcome>> futureDianneOutcomes = this.dianne.getOutcome(userId, (CtxAttribute) ctxAttribute);
-				
+
 				if (this.containsCtxId(ctxId, prefMgrList)) {
 					if (logging.isDebugEnabled()){
 						this.logging.debug("pcm is registered for events of: " + ctxId.toUriString());
@@ -1064,7 +1071,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					}
 					for (IPreferenceOutcome pOut : pcmOutcomes) {
 						IDIANNEOutcome dOut = this.dianne.getOutcome(userId, pOut.getServiceID(), pOut.getparameterName()).get().get(0);
-						
+
 						if (null == dOut) {
 							results.add(pOut);
 						} else {
@@ -1094,10 +1101,10 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 
 	private List<IOutcome> comparePreferenceConflicts(List<IDIANNEOutcome> dOuts, List<IPreferenceOutcome> pOuts, ActionInformation info) {
-		
+
 		info.setSentDianneOutcomes(dOuts);
 		info.setSentPreferenceOutcomes(pOuts);
-		
+
 		if (logging.isDebugEnabled()){
 			this.logging.debug("Finding conflicts between dianne and pcm");
 		}
@@ -1116,7 +1123,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					matches = false;
 				}
 			}
-			
+
 			if (!matches) {
 				if (logging.isDebugEnabled()) logging.debug("no conflict (d): "+dOut.getparameterName()+": "+dOut.getvalue());
 
@@ -1256,7 +1263,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	@Override
 	public void handleInternalEvent(final InternalEvent event) {
-		
+
 		if (logging.isDebugEnabled()){
 			this.logging.debug("Received event:");
 			this.logging.debug("Event name " + event.geteventName() +
@@ -1271,18 +1278,18 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				try {
 
 					if (event.geteventType().equals(EventTypes.UIM_EVENT)) {
-						
+
 						UIMEvent uimEvent = (UIMEvent) event.geteventInfo();
-						
+
 						String uuid = UUID.randomUUID().toString();
 						ActionInformation info = new ActionInformation(uuid, uimEvent.getAction());
-						
+
 						Future<List<IUserIntentAction>> futureCauiActions = cauiPrediction.getPrediction(uimEvent.getUserId(), uimEvent.getAction());
 						if (logging.isDebugEnabled()){
 							logging.debug("Requested caui prediction");
 						}
 						List<IUserIntentAction> cauiActions = futureCauiActions.get();
-						
+
 						info.setSentCAUIIntentOutcomes(cauiActions);
 						if (logging.isDebugEnabled()){
 							logging.debug("cauiPrediction returned: " + cauiActions.size() + " outcomes");
@@ -1412,9 +1419,9 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 						// set null preferences
 						//prefNonOverlapping = new ArrayList<IOutcome>();
 
-						
+
 						actionInformation.put(uuid, info);
-						
+
 						printInfo(intentNonOverlapping, prefNonOverlapping, info);
 						//remove non implementable and non proactive actions:
 						Iterator<IOutcome> intentIterator = intentNonOverlapping.iterator();
@@ -1469,7 +1476,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 	}
 
-	
+
 	protected void printInfo(List<IOutcome> intentNonOverlapping,
 			List<IOutcome> prefNonOverlapping, ActionInformation info) {
 		String str = "";
@@ -1478,10 +1485,10 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		}else{
 			str = str.concat("\nPersonalisation: Acquired the following actions after receiving UIM event : "+info.getActionTrigger().getparameterName()+" with value: "+info.getActionTrigger().getvalue());
 		}
-		
+
 		List<IDIANNEOutcome> sentDianneOutcomes = info.getSentDianneOutcomes();
 		str = str.concat("\n"+sentDianneOutcomes.size()+" dianne outcomes: ");
-		
+
 		for (int i=0; i<sentDianneOutcomes.size(); i++){
 			str = str.concat("\n"+sentDianneOutcomes.get(i).getparameterName()+" = "+sentDianneOutcomes.get(i).getvalue());
 		}
@@ -1490,42 +1497,42 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		for (int i=0; i<sentPreferenceOutcomes.size(); i++){
 			str = str.concat("\n"+sentPreferenceOutcomes.get(i).getparameterName()+" = "+sentPreferenceOutcomes.get(i).getvalue());
 		}
-		
+
 		List<IUserIntentAction> sentCAUIIntentOutcomes = info.getSentCAUIIntentOutcomes();
 		str = str.concat("\n"+sentCAUIIntentOutcomes.size()+" caui outcomes: ");
-		
+
 		for(int i=0; i<sentCAUIIntentOutcomes.size(); i++){
 			str = str.concat("\n"+sentCAUIIntentOutcomes.get(i).getparameterName()+" = "+sentCAUIIntentOutcomes.get(i).getvalue());
 		}
-		
-		
+
+
 		List<CRISTUserAction> sentCRISTIntentOutcomes = info.getSentCRISTIntentOutcomes();
 		str = str.concat("\n"+sentCRISTIntentOutcomes.size()+" crist outcomes: ");
 		for(int i=0; i<sentCRISTIntentOutcomes.size(); i++){
 			str = str.concat("\n"+sentCRISTIntentOutcomes.get(i).getparameterName()+" = "+sentCRISTIntentOutcomes.get(i).getvalue());
 		}
-		
+
 		str = str.concat("\nOut of the above, sending the following to the decisionMaker: ");
-		
-		
+
+
 		str = str.concat("\n"+prefNonOverlapping.size()+" preference type outcomes: ");
-		
+
 		for (int i = 0; i< prefNonOverlapping.size(); i++){
 			str = str.concat("\n"+prefNonOverlapping.get(i).getparameterName()+" = "+prefNonOverlapping.get(i).getvalue());
 
 		}
-		
-		
+
+
 		str = str.concat("\n"+intentNonOverlapping.size()+" user intent type outcomes: ");
-		
+
 		for (int i = 0; i< intentNonOverlapping.size(); i++){
 			str = str.concat("\n"+intentNonOverlapping.get(i).getparameterName()+" = "+intentNonOverlapping.get(i).getvalue());
 
 		}
-		
+
 		this.logging.info(str);
 		if (logging.isDebugEnabled()) logging.debug(str);
-		
+
 	}
 
 	protected void updateConfidenceLevels(ActionInformation info, FeedbackEvent fEvent) {
@@ -1555,7 +1562,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					this.dianneConfidenceLevel--;
 				}
 			}
-						
+
 			if (existsinPreferenceList.equals(ImplementationInformation.HAS_CORRECT)){
 				if (this.prefMgrConfidenceLevel<100){
 					this.prefMgrConfidenceLevel++;
@@ -1565,7 +1572,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					this.prefMgrConfidenceLevel--;
 				}
 			}
-			
+
 			if (existsinCAUIList.equals(ImplementationInformation.HAS_CORRECT)){
 				if (this.cauiConfidenceLevel<100){
 					this.cauiConfidenceLevel++;
@@ -1592,7 +1599,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		case SYSTEM_ERROR:
 			break;
 		case USER_ABORTED:
-			
+
 			if (existsinDianneList.equals(ImplementationInformation.HAS_INCORRECT)){
 				if (this.dianneConfidenceLevel<100){
 					this.dianneConfidenceLevel++;
@@ -1602,7 +1609,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					this.dianneConfidenceLevel--;
 				}
 			}
-						
+
 			if (existsinPreferenceList.equals(ImplementationInformation.HAS_INCORRECT)){
 				if (this.prefMgrConfidenceLevel<100){
 					this.prefMgrConfidenceLevel++;
@@ -1612,8 +1619,8 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					this.prefMgrConfidenceLevel--;
 				}
 			}
-			
-			
+
+
 			if (existsinCAUIList.equals(ImplementationInformation.HAS_INCORRECT)){
 				if (this.cauiConfidenceLevel<100){
 					this.cauiConfidenceLevel++;
@@ -1623,7 +1630,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 					this.cauiConfidenceLevel--;
 				}
 			}
-			
+
 			if (existsinCRISTList.equals(ImplementationInformation.HAS_INCORRECT)){
 				if (this.cristConfidenceLevel<100){
 					this.cristConfidenceLevel++;
@@ -1639,16 +1646,16 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 			break;
 		default:
 			break;
-		
+
 		}
-		
-		
+
+
 		this.storeConfidenceLevels();
-		
+
 		this.actionInformation.remove(info.getUuid());
 	}
 
-	
+
 	private IUserIntentAction exists(List<IUserIntentAction> cauiActions, CRISTUserAction crist) {
 		for (IUserIntentAction o : cauiActions) {
 			if (this.outcomesMatch(o, crist)) {
@@ -1697,7 +1704,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 		return false;
 	}
-	
+
 	static enum ImplementationInformation {HAS_CORRECT, HAS_INCORRECT, DOESNT_HAVE};
 
 	private ImplementationInformation existsinDianneList(List<IDIANNEOutcome> outcomes, IAction outcome){
@@ -1710,10 +1717,10 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				}
 			}
 		}
-		
+
 		return ImplementationInformation.DOESNT_HAVE;
 	}
-	
+
 
 	private ImplementationInformation existsinPreferenceList(List<IPreferenceOutcome> outcomes, IAction outcome){
 		for (IOutcome o : outcomes){
@@ -1725,10 +1732,10 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				}
 			}
 		}
-		
+
 		return ImplementationInformation.DOESNT_HAVE;
 	}
-	
+
 	private ImplementationInformation existsinCAUIList(List<IUserIntentAction> outcomes, IAction outcome){
 		for (IOutcome o : outcomes){
 			if (this.outcomesMatch(o, outcome)){
@@ -1739,10 +1746,10 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				}
 			}
 		}
-		
+
 		return ImplementationInformation.DOESNT_HAVE;
 	}
-	
+
 	private ImplementationInformation existsinCRISTList(List<CRISTUserAction> outcomes, IAction outcome){
 		for (IOutcome o : outcomes){
 			if (this.outcomesMatch(o, outcome)){
@@ -1753,7 +1760,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 				}
 			}
 		}
-		
+
 		return ImplementationInformation.DOESNT_HAVE;
 	}
 	private boolean outcomesMatch(IOutcome outcome1, IAction action) {
@@ -1765,8 +1772,8 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 		return false;
 	}
-	
-	
+
+
 	@Override
 	public void handleExternalEvent(CSSEvent arg0) {
 

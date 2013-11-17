@@ -10,6 +10,17 @@
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
  
+ 	<bean id="societiesProperties"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE" />
+		<property name="ignoreResourceNotFound" value="true"></property>
+		<property name="locations">
+			<list>
+				<value>file:${CONFIG_DIR}/org.societies.platform.properties</value>
+			</list>
+		</property>
+	</bean>
+	
 	<bean id="pcm"
 		class="org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor"
 		name="pcm" init-method="initialisePreferenceManagement">
@@ -22,6 +33,7 @@
 		<property name="communityPreferenceMgr" ref="communityPreferenceManager"></property>
 		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
 		<property name="cisManager" ref="cisManager"></property>
+        <property name="doFix" value="${ctx.id.fix}" />
 	</bean>
 
 	

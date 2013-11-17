@@ -27,8 +27,10 @@ package org.societies.useragent.monitoring;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +53,7 @@ import org.societies.useragent.monitoring.model.SnapshotsRegistry;
 
 public class SnapshotManager implements CtxChangeEventListener{
 
-	private static Logger LOG = LoggerFactory.getLogger(SnapshotManager.class);
+	private Logger LOG = LoggerFactory.getLogger(this.getClass());
 
 	/*
 	 * DEFAULT SNAPSHOT DEFINITION
@@ -73,9 +75,12 @@ public class SnapshotManager implements CtxChangeEventListener{
 	private Snapshot defaultSnpsht;
 	private IIdentity myCssID;
 
-	public SnapshotManager(ICtxBroker ctxBroker, IIdentity myCssID){
+	private boolean doFix;
+
+	public SnapshotManager(ICtxBroker ctxBroker, IIdentity myCssID, boolean doFix){
 		this.ctxBroker = ctxBroker;
 		this.myCssID = myCssID;
+		this.doFix = doFix;
 		snpshtRegistry = retrieveSnpshtsRegistry();
 		defaultSnpsht = new Snapshot();
 		initialiseDefaultSnpsht();
@@ -117,8 +122,12 @@ public class SnapshotManager implements CtxChangeEventListener{
 			String attrType = defaultDef[i];
 			//retrieve attribute ID from context
 			try {
-				Future<List<CtxIdentifier>> futureAttributes = ctxBroker.lookup(CtxModelType.ATTRIBUTE, attrType);
-				List<CtxIdentifier> attributes = futureAttributes.get();
+				//16/11/13: replacing following line 
+				//Future<List<CtxIdentifier>> futureAttributes = ctxBroker.lookup(CtxModelType.ATTRIBUTE, attrType);
+				//with the following two lines to get the attribute under Person entity. 
+				IndividualCtxEntity individualCtxEntity = ctxBroker.retrieveIndividualEntity(myCssID).get();
+				List<CtxIdentifier> attributes = ctxBroker.lookup(individualCtxEntity.getId(), CtxModelType.ATTRIBUTE, attrType).get();
+				
 				if(attributes.size() > 0){
 					if (LOG.isDebugEnabled()){
 						LOG.debug("Found "+attrType+" attribute in context - adding to snapshot");
@@ -151,22 +160,40 @@ public class SnapshotManager implements CtxChangeEventListener{
 		}
 		SnapshotsRegistry retrievedReg = null;
 		try {
-			Future<List<CtxIdentifier>> futureAttributes = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.SNAPSHOT_REG);
-			List<CtxIdentifier> attributes = futureAttributes.get();
+			IndividualCtxEntity personEntity = ctxBroker.retrieveIndividualEntity(myCssID).get();
+			Set<CtxAttribute> attributes = personEntity.getAttributes(CtxAttributeTypes.SNAPSHOT_REG);
+			//Future<List<CtxIdentifier>> futureAttributes = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.SNAPSHOT_REG);
+			//List<CtxIdentifier> attributes = futureAttributes.get();
 			if(attributes.size() > 0){  //existing registry attribute found
 				if (LOG.isDebugEnabled()){
 					LOG.debug("Found SnapshotRegistry in context");
 				}
-				CtxIdentifier attrID = attributes.get(0);
-				Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(attrID);
-				CtxAttribute attr = (CtxAttribute)futureAttribute.get();
+				 
+				//Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(attrID);
+				CtxAttribute attr = attributes.iterator().next();
 				retrievedReg = (SnapshotsRegistry)SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
+				
+				//elizap: TODO: add bit to replace cssNode/6 with person/1
+				if (doFix){
+					this.LOG.info("#ctxAttributesFix#: doFix is "+doFix+". Performing context fix");
+					List<CtxIdentifier> list = ctxBroker.lookup(personEntity.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+					if (list.size()==0){
+						LOG.info("#ctxAttributesFix#: did not find "+CtxAttributeTypes.LOCATION_SYMBOLIC+" in the user's DB under the Person entity. Cannot fix anything");
+					}else{
+						retrievedReg.fixWrongKey(personEntity.getId(), (CtxAttributeIdentifier) list.get(0));
+						this.storeReg();
+						LOG.info("#ctxAttributesFix#: end fix");
+					}
+				}else{
+					this.LOG.info("#ctxAttributesFix#: doFix is "+doFix+". Not performing context fix");
+				}
+				
 			}else{  //create new mappings attribute and populate
 				if (LOG.isDebugEnabled()){
 					LOG.debug("SnapshotRegistry does not yet exist in context - creating");
 				}
 				retrievedReg = new SnapshotsRegistry();
-				IndividualCtxEntity personEntity = ctxBroker.retrieveIndividualEntity(myCssID).get(); //get PERSON entity to store mappings for
+				
 				Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute((CtxEntityIdentifier)personEntity.getId(), CtxAttributeTypes.SNAPSHOT_REG);
 				CtxAttribute newAttribute = futureAttribute.get();
 				byte[] blobRegistry = SerialisationHelper.serialise(retrievedReg);
@@ -199,7 +226,7 @@ public class SnapshotManager implements CtxChangeEventListener{
 			defaultSnpsht.setTypeID(type, attrID);
 		}
 		//update snapshot registry
-		snpshtRegistry.updateSnapshots(type, attrID);
+		snpshtRegistry.updateSnapshots(type, attrID, false);
 
 		//update registry in context
 		storeReg();

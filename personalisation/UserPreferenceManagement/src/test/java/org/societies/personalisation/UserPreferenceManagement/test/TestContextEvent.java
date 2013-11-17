@@ -94,7 +94,7 @@ public class TestContextEvent  {
 		pcm.setPersoMgr(persoMgr);
 		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
 		pcm.setCommManager(commManager);
-
+		pcm.setDoFix("false");
 		mockId = new MockIdentity(IdentityType.CSS, "myId", "domain");
 		ctxEntityId = new CtxEntityIdentifier(mockId.getJid(), "Person", new Long(1));
 		ctxEntity = new CtxEntity(ctxEntityId);	

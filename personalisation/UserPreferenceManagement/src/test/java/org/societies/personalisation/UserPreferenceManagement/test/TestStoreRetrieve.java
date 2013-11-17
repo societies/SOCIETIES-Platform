@@ -109,7 +109,7 @@ public class TestStoreRetrieve {
 		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
 		pcm.setCommManager(commManager);
 		
-		
+		pcm.setDoFix("false");
 		setupContextAttributes();
 		setupPreferenceCtxAttributes();
 		this.createPreference();

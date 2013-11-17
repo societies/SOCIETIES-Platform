@@ -104,6 +104,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	private ICisManager cisManager;
 	private CommunitiesHandler communitiesHandler;
 	private Hashtable<String, IPreference> evaluationResults;
+	private String doFix;
 
 	public UserPreferenceConditionMonitor(){
 		this.evaluationResults = new Hashtable<String, IPreference>();
@@ -170,7 +171,11 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	}
 
 	public void initialisePreferenceManagement(){
-		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this);
+		if (doFix.contains("true")){
+			this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this, true);
+		}else{
+			this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this, false);
+		}
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
 
@@ -596,6 +601,16 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		}
 		this.evaluationResults.put(uuid, p);
 
+	}
+
+
+	public String getDoFix() {
+		return doFix;
+	}
+
+
+	public void setDoFix(String doFix) {
+		this.doFix = doFix;
 	}
 
 

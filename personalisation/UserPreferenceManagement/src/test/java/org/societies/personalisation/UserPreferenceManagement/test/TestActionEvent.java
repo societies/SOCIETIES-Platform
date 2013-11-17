@@ -187,6 +187,7 @@ public class TestActionEvent {
 		pcm.setEventMgr(Mockito.mock(IEventMgr.class));
 		pcm.setPersoMgr(Mockito.mock(IInternalPersonalisationManager.class));
 		pcm.setUserPrefLearning(Mockito.mock(IC45Learning.class));
+		pcm.setDoFix("false");
 		pcm.initialisePreferenceManagement();
 		setupContext();
 		upm = pcm.getPreferenceManager();

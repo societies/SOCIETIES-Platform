@@ -58,6 +58,7 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 	private ContextCommunicator ctxComm;
 	String myDeviceID;
 	IIdentity myCssID;
+	private String doFix;
 
 	public void initialiseUserActionMonitor(){
 		System.out.println("Initialising user action monitor!");
@@ -73,8 +74,11 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 			LOG.debug("My CSS ID is: "+myCssID);
 		}
 
-		ctxComm = new ContextCommunicator(ctxBroker, myCssID);
-
+		if (this.doFix.equalsIgnoreCase("true")){
+			ctxComm = new ContextCommunicator(ctxBroker, myCssID, true);
+		}else{
+			ctxComm = new ContextCommunicator(ctxBroker, myCssID, false);
+		}
 		interactableSet = false;
 	}
 
@@ -264,6 +268,14 @@ public class UserActionMonitor implements IUserActionMonitor, IInternalUserActio
 
 	public void setCssMgr(ICSSInternalManager cssMgr){
 		this.cssMgr = cssMgr;
+	}
+
+	public String getDoFix() {
+		return doFix;
+	}
+
+	public void setDoFix(String doFix) {
+		this.doFix = doFix;
 	}
 
 }

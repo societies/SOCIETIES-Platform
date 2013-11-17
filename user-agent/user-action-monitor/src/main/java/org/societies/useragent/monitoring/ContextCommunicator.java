@@ -61,11 +61,15 @@ public class ContextCommunicator {
 	SnapshotManager snpshtMgr;
 	Hashtable<String, CtxAttributeIdentifier> mappings;
 
-	public ContextCommunicator(ICtxBroker ctxBroker, IIdentity myCssID){
+	public ContextCommunicator(ICtxBroker ctxBroker, IIdentity myCssID, boolean doFix){
 		this.ctxBroker = ctxBroker;
-		snpshtMgr = new SnapshotManager(ctxBroker, myCssID);
+		snpshtMgr = new SnapshotManager(ctxBroker, myCssID, doFix);
 		mappings = new Hashtable<String, CtxAttributeIdentifier>();  //quick lookup for serviceId.paramName -> ctxAttrIdentifier
+		if(doFix){
+			fixServiceParameters();
+		}
 	}
+
 
 	public void updateHistory(IIdentity owner, IAction action){
 		//check cache first for ctxAttrIdentifier to update
@@ -360,6 +364,9 @@ public class ContextCommunicator {
 		}
 	}
 
+	private void fixServiceParameters(){
+		//TODO: for Nikos, to be done in UserCtxHistoryManagement
+	}
 	public void updateUID(IIdentity owner, String myDeviceID){
 		try {
 			List<CtxIdentifier> attrIds = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.UID).get();

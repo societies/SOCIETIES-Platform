@@ -140,7 +140,7 @@ public class TestCommunitiesHandler {
 
 		community.setOwnerJid(userId.getJid());
 		upcm = new UserPreferenceConditionMonitor();
-
+		upcm.setDoFix("false");
 		cisManager = Mockito.mock(ICisManager.class);
 		upcm.setCisManager(cisManager);
 

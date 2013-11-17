@@ -123,7 +123,7 @@ public class TestCisEventListener {
 		community.setOwnerJid(userId.getJid());
 		upcm = new UserPreferenceConditionMonitor();
 
-
+		upcm.setDoFix("false");
 		commManager = Mockito.mock(ICommManager.class);
 		idManager = Mockito.mock(IIdentityManager.class);
 		upcm.setCommManager(commManager);
