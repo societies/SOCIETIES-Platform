@@ -123,6 +123,28 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 	}
 
+	private void printHistory(Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData){
+		int i = 0;
+		for(CtxHistoryAttribute ctxHocAttr :mapHocData.keySet()){
+
+			try {
+				IAction action = (IAction)SerialisationHelper.deserialise(ctxHocAttr.getBinaryValue(), this.getClass().getClassLoader());
+				List<CtxHistoryAttribute> escortingAttrList = mapHocData.get(ctxHocAttr);
+				LOG.debug(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: {" +escortingAttrList.get(0).getStringValue()+" "+escortingAttrList.get(1).getStringValue()+" "+escortingAttrList.get(2).getIntegerValue()+"}");
+				i++;
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	
+	
 	@Override
 	public void generateNewUserModel() {
 
@@ -133,6 +155,9 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 			Map<CtxHistoryAttribute, List<CtxHistoryAttribute>> mapHocData = retrieveHistoryTupleData(CtxAttributeTypes.LAST_ACTION);
 
+			
+			if(LOG.isDebugEnabled()) printHistory(mapHocData);
+			
 			if (LOG.isDebugEnabled())LOG.debug("2. Convert History Data");
 			List<MockHistoryData> mockData = convertHistoryData(mapHocData);
 
