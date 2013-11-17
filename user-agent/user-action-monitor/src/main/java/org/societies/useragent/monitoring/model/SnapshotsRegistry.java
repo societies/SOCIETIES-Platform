@@ -38,72 +38,78 @@ import org.societies.api.context.model.CtxIdentifier;
 
 public class SnapshotsRegistry implements Serializable{
 
-	private Logger LOG = LoggerFactory.getLogger(this.getClass());
+	private final static Logger LOG = LoggerFactory.getLogger(SnapshotsRegistry.class);
 
 	private static final long serialVersionUID = 1L;
 	Hashtable<CtxAttributeIdentifier, Snapshot> snpshtMappings;
-	
+
 	public SnapshotsRegistry(){
 		snpshtMappings = new Hashtable<CtxAttributeIdentifier, Snapshot>();
 	}
-	
+
 	public void addMapping(CtxAttributeIdentifier primary, Snapshot snapshot){
 		snpshtMappings.put(primary, snapshot);
 	}
-	
+
 	public void removeMapping(CtxAttributeIdentifier primary){
 		snpshtMappings.remove(primary);
 	}
-	
+
 	public Snapshot getSnapshot(CtxAttributeIdentifier primary){
 		return snpshtMappings.get(primary);
 	}
-	
+
 	public void updateMapping(CtxAttributeIdentifier primary, Snapshot newSnapshot){
 		snpshtMappings.put(primary, newSnapshot);
-		
+
 	}
-	
-	
+
+
 	public void updateSnapshots(String type, CtxAttributeIdentifier ID, boolean logEnabled){
 		Iterator<Snapshot> snpshtMappings_it = snpshtMappings.values().iterator();
 		while(snpshtMappings_it.hasNext()){
 			Snapshot nextSnpsht = snpshtMappings_it.next();
 			if(nextSnpsht.containsType(type)){
+				if (logEnabled){
+					this.LOG.info("#ctxAttributesFix#: Replacing "+nextSnpsht.typeIDs.get(type).toUriString()+" with: "+ID.toUriString());
+				}
 				nextSnpsht.setTypeID(type, ID);
 				if (logEnabled){
-					this.LOG.info("#ctxAttributesFix#: Fixed Snapshot key ("+type+")");
+					this.LOG.info("#ctxAttributesFix#: Fixed Snapshot key ( "+type+" )");
 				}
 			}
 		}
 	}
 
-	public void fixWrongKey(CtxEntityIdentifier id, CtxAttributeIdentifier ctxIdentifier) {
+	public void fixWrongKey(CtxEntityIdentifier id, CtxAttributeIdentifier correctCtxID, CtxAttributeIdentifier incorrectCtxID) {
+
 		
 		//first update all snapshots regardless of primarykey:
-		this.updateSnapshots(ctxIdentifier.getType(), ctxIdentifier, true);
+		this.updateSnapshots(correctCtxID.getType(), correctCtxID, true);
+
 		
 		//now update snapshotmappings key
 		Enumeration<CtxAttributeIdentifier> keys = this.snpshtMappings.keys();
 		while(keys.hasMoreElements()){
 			CtxAttributeIdentifier key = keys.nextElement();
-			if (!key.getScope().toUriString().equalsIgnoreCase(id.toUriString())){
-				this.LOG.info("#ctxAttributesFix#: Found key : "+key+" in snapshot registry");
-				if (key.getType().equalsIgnoreCase(ctxIdentifier.getType())){
-					this.LOG.info("#ctxAttributesFix#: Removing key: "+key+" from snapshot mappings. ");
-					//if found:
-					//remove from snapshotregistry but keep snapshot
-					Snapshot removedSnapshot = snpshtMappings.remove(key);
+			this.LOG.info("#ctxAttributesFix#: Found key : "+key+" in snapshot registry");
+			if (key.toUriString().equalsIgnoreCase(incorrectCtxID.toUriString())){
+				this.LOG.info("#ctxAttributesFix#: Removing key: "+key+" from snapshot mappings. ");
+				//if found:
+				//remove from snapshotregistry but keep snapshot
+				Snapshot removedSnapshot = snpshtMappings.remove(key);
 
-					//put new key (ctxIdentifier) and updated snapshot to snapshot registry
-					this.snpshtMappings.put(ctxIdentifier, removedSnapshot);
-					
-					this.LOG.info("#ctxAttributesFix#: Put new snapshotRegistry key: "+key.toUriString());
-					return ;
-				}
+				//put new key (ctxIdentifier) and updated snapshot to snapshot registry
+				this.snpshtMappings.put(correctCtxID, removedSnapshot);
+
+				this.LOG.info("#ctxAttributesFix#: Put new snapshotRegistry key: "+key.toUriString());
+				return;
+			}else{
+				this.LOG.info("#ctxAttributesFix#: Ignoring key: "+key+" ");
+
 			}
 		}
-		
-		this.LOG.info("#ctxAttributesFix#: ctxID: "+ctxIdentifier.toUriString()+" not found as primary key in snpshtMappings.");
+
+		this.LOG.info("#ctxAttributesFix#: ctxID: "+correctCtxID.toUriString()+" not found as primary key in snpshtMappings.");
 	}
 }

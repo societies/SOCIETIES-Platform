@@ -48,6 +48,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.context.model.CtxEntityTypes;
 import org.societies.useragent.monitoring.model.Snapshot;
 import org.societies.useragent.monitoring.model.SnapshotsRegistry;
 
@@ -82,6 +83,9 @@ public class SnapshotManager implements CtxChangeEventListener{
 		this.myCssID = myCssID;
 		this.doFix = doFix;
 		snpshtRegistry = retrieveSnpshtsRegistry();
+		if (doFix){
+			this.storeReg();
+		}
 		defaultSnpsht = new Snapshot();
 		initialiseDefaultSnpsht();
 	}
@@ -176,12 +180,26 @@ public class SnapshotManager implements CtxChangeEventListener{
 				//elizap: TODO: add bit to replace cssNode/6 with person/1
 				if (doFix){
 					this.LOG.info("#ctxAttributesFix#: doFix is "+doFix+". Performing context fix");
-					List<CtxIdentifier> list = ctxBroker.lookup(personEntity.getId(), CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
-					if (list.size()==0){
-						LOG.info("#ctxAttributesFix#: did not find "+CtxAttributeTypes.LOCATION_SYMBOLIC+" in the user's DB under the Person entity. Cannot fix anything");
+					List<CtxIdentifier> symLocAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+					
+					CtxAttributeIdentifier personSymLocAttributeId = null;
+					CtxAttributeIdentifier cssNodeSymLocAttributeId = null;
+					
+					for (CtxIdentifier ctxID : symLocAttrList){
+						if (((CtxAttributeIdentifier) ctxID).getScope().getType().equals(CtxEntityTypes.CSS_NODE)){
+							cssNodeSymLocAttributeId = (CtxAttributeIdentifier) ctxID; 
+						}
+						if (((CtxAttributeIdentifier) ctxID).getScope().getType().equals(CtxEntityTypes.PERSON)){
+							personSymLocAttributeId = (CtxAttributeIdentifier) ctxID;
+						}
+						
+					}
+					if (personSymLocAttributeId==null || cssNodeSymLocAttributeId==null){
+						LOG.info("#ctxAttributesFix#: did not find "+CtxAttributeTypes.LOCATION_SYMBOLIC+" in the user's DB. Cannot fix anything");
 					}else{
-						retrievedReg.fixWrongKey(personEntity.getId(), (CtxAttributeIdentifier) list.get(0));
-						this.storeReg();
+						retrievedReg.fixWrongKey(personEntity.getId(), personSymLocAttributeId, cssNodeSymLocAttributeId);
+						
+						
 						LOG.info("#ctxAttributesFix#: end fix");
 					}
 				}else{

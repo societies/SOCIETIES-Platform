@@ -93,7 +93,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 
 	//this is a one time thing to fix user trial DBs
 	private void fixCtxIds(){
-		
+		this.logging.info("#ctxAttributesFix#: on UserPrefMgr");
 		try {
 			IIdentity userId = monitor.getCommManager().getIdManager().getThisNetworkNode();
 			IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userId).get();
