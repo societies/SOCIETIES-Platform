@@ -167,9 +167,7 @@ public class CtxDataInitiator {
 			}
 				
 			
-			LOG.debug("all history tuple records that need to be fixed: " +allHocActionTuples );
-			
-			
+			LOG.debug("candidate history tuple records that need to be fixed: " +allHocActionTuples );
 			
 			List<CtxHistoryAttribute> allHoCAttrsFixed = new ArrayList<CtxHistoryAttribute>();
 			List<CtxHistoryAttribute> hoCAttrsToBeRemoved = new ArrayList<CtxHistoryAttribute>(allHocActionTuples);
@@ -184,15 +182,18 @@ public class CtxDataInitiator {
 
 				for (CtxHistoryAttribute escortingHocAttr : originalEscortingHocAttrList){
 					
+					LOG.debug("escortingHocAttr attr: "+escortingHocAttr.getId()+ " string value:"+escortingHocAttr.getStringValue());
+					
 					if(escortingHocAttr.getType().equals(CtxAttributeTypes.LOCATION_SYMBOLIC) ){
 						CtxAttributeIdentifier attrID = escortingHocAttr.getId();
 					
 						if(attrID.getOwnerId().contains("ENTITY/cssNode")) {
 							attrID.setOwnerId(ownerCtxId.toString());	
-						
+							LOG.debug("creating new history attr based on : " +escortingHocAttr );
 							CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(attrID,escortingHocAttr.getLastModified(),escortingHocAttr.getLastUpdated(),escortingHocAttr.getStringValue(),
 									escortingHocAttr.getIntegerValue(), escortingHocAttr.getDoubleValue(), escortingHocAttr.getBinaryValue(),escortingHocAttr.getValueType(),escortingHocAttr.getValueMetric() );
-
+							
+							LOG.debug("created escorting hoc attr : " +correctEscortingHocAttr.getId()+" getStringValue:"+  correctEscortingHocAttr.getStringValue());
 							fixedEscortingHocAttrList.remove(escortingHocAttr);
 							fixedEscortingHocAttrList.add(correctEscortingHocAttr);
 			
@@ -220,14 +221,14 @@ public class CtxDataInitiator {
 			
 			//add code to remove fixed hoc entries
 			for( CtxHistoryAttribute hocAttrRemove : hoCAttrsToBeRemoved){
-				this.ctxBroker.removeHistory(hocAttrRemove.getId(), null, null);
+				this.ctxBroker.removeHistory(hocAttrRemove.getId(), null, null).get();
 				LOG.debug("removing hoc attr: "+ hocAttrRemove.getId());
 			}
 			
 			
 			
 			for( CtxHistoryAttribute hocAttr : allHoCAttrsFixed){
-				this.ctxBroker.storeHistoryAttribute(hocAttr);
+				this.ctxBroker.storeHistoryAttribute(hocAttr).get();
 				LOG.debug("storing hoc attr: "+ hocAttr.getId());
 			}
 	
