@@ -24,8 +24,13 @@
  */
 package org.societies.context.dataInit.impl;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
@@ -36,9 +41,11 @@ import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxEntityIdentifier;
+import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.INetworkNode;
@@ -98,6 +105,7 @@ public class CtxDataInitiator {
 
 			ownerCtxId = this.ctxBroker.retrieveIndividualEntity(this.cssOwnerId).get().getId();
 
+			/*
 			if (ownerCtxId.getOwnerId().equals("john.societies.local")){
 				BaseUser john = new John();
 				addContext(john);
@@ -107,7 +115,10 @@ public class CtxDataInitiator {
 			}
 
 			printCtxAttributes(ownerCtxId);
+			 */		
 			
+			LOG.debug("start fixing ctxIDs ");
+			fixHocIdentifiers();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,6 +133,121 @@ public class CtxDataInitiator {
 			e.printStackTrace();
 		}		
 	}
+
+
+
+
+
+	private void fixHocIdentifiers(){
+
+		//contains a list of hoc attr (e.g. of type tuple_lastAction_688139) with value a blob which is a list of CtxHistoryAttributes 
+		
+		List<CtxHistoryAttribute> allHocActionTuples = new ArrayList<CtxHistoryAttribute>();
+		List<String> allTupleAttTypes = new ArrayList<String>();
+		
+		try {
+			// a list with all ids of type last_action
+			List<CtxIdentifier> actionIDList  = this.ctxBroker.lookup(cssOwnerId, CtxAttributeTypes.LAST_ACTION).get();
+			
+			for(CtxIdentifier lastActID : actionIDList){
+				String tupleAttrType = "tuple_"+lastActID.getType().toString()+"_"+lastActID.getObjectNumber().toString();
+				allTupleAttTypes.add(tupleAttrType);
+			}
+						
+			List<CtxIdentifier> allHocTuples = new ArrayList<CtxIdentifier>();
+			for (String hocTupleType : allTupleAttTypes){
+				allHocTuples = this.ctxBroker.lookup(cssOwnerId, CtxModelType.ATTRIBUTE, hocTupleType).get();
+			}
+
+			
+			List<CtxHistoryAttribute> hocTupleList = new ArrayList<CtxHistoryAttribute>();
+			for(CtxIdentifier ctxID :  allHocTuples){
+				hocTupleList =  this.ctxBroker.retrieveHistory((CtxAttributeIdentifier) ctxID, null, null).get();	
+				allHocActionTuples.addAll(hocTupleList);
+			}
+				
+			
+			LOG.debug("all history tuple records that need to be fixed: " +allHocActionTuples );
+			
+			
+			
+			List<CtxHistoryAttribute> allHoCAttrsFixed = new ArrayList<CtxHistoryAttribute>();
+			List<CtxHistoryAttribute> hoCAttrsToBeRemoved = new ArrayList<CtxHistoryAttribute>(allHocActionTuples);
+			
+			for(CtxHistoryAttribute hocAttrTuple :  allHocActionTuples){
+				// each hocAttr contains a blob value with a list of history objects
+				// action and location are among history objects  
+				List<CtxHistoryAttribute> originalEscortingHocAttrList = (List<CtxHistoryAttribute>) SerialisationHelper.deserialise(hocAttrTuple.getBinaryValue(), this.getClass().getClassLoader());
+				
+				List<CtxHistoryAttribute> fixedEscortingHocAttrList = new ArrayList<CtxHistoryAttribute>(originalEscortingHocAttrList);
+
+
+				for (CtxHistoryAttribute escortingHocAttr : originalEscortingHocAttrList){
+					
+					if(escortingHocAttr.getType().equals(CtxAttributeTypes.LOCATION_SYMBOLIC) ){
+						CtxAttributeIdentifier attrID = escortingHocAttr.getId();
+						attrID.setOwnerId(ownerCtxId.toString());
+
+						CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(attrID,escortingHocAttr.getLastModified(),escortingHocAttr.getLastUpdated(),escortingHocAttr.getStringValue(),
+								escortingHocAttr.getIntegerValue(), escortingHocAttr.getDoubleValue(), escortingHocAttr.getBinaryValue(),escortingHocAttr.getValueType(),escortingHocAttr.getValueMetric() );
+
+						fixedEscortingHocAttrList.remove(escortingHocAttr);
+						fixedEscortingHocAttrList.add(correctEscortingHocAttr);
+					}
+				}
+				byte[] escortingHocAttrsValue = SerialisationHelper.serialise((Serializable) fixedEscortingHocAttrList);
+				
+				//hocAttrTuple.setBinaryValue() is not allowed
+				CtxHistoryAttribute correctEscortingHocAttr = new CtxHistoryAttribute(hocAttrTuple.getId(),hocAttrTuple.getLastModified(),hocAttrTuple.getLastUpdated(),hocAttrTuple.getStringValue(),
+						hocAttrTuple.getIntegerValue(), hocAttrTuple.getDoubleValue(), hocAttrTuple.getBinaryValue(),hocAttrTuple.getValueType(),hocAttrTuple.getValueMetric() );
+				
+			
+				
+				allHoCAttrsFixed.add(correctEscortingHocAttr);
+			}
+			
+			LOG.debug("all history tuple records that are fixed: " +allHoCAttrsFixed );
+			LOG.debug("this list will be saved in hoc db");
+			// allHoCAttrsFixed contains a list of ctxHistoryAttributes that contain tuple values with updated location identifiers
+			// this list should be recorded in hoc db
+			
+			
+			/*
+			add code to remove fixed hoc entries
+			for( CtxHistoryAttribute hocAttrRemove : hoCAttrsToBeRemoved){
+				this.ctxBroker.removeHistory(hocAttrRemove, arg1, arg2)
+				LOG.debug("storing hoc attr: "+ hocAttr.getId());
+			}
+			*/
+			
+			
+			for( CtxHistoryAttribute hocAttr : allHoCAttrsFixed){
+				this.ctxBroker.storeHistoryAttribute(hocAttr);
+				LOG.debug("storing hoc attr: "+ hocAttr.getId());
+			}
+			
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+
+
+
+	}
+
 
 
 	private void addContext(BaseUser user) {
@@ -208,7 +334,7 @@ public class CtxDataInitiator {
 			if (value != null && !value.isEmpty())
 				this.updateCtxAttribute(ownerCtxId, CtxAttributeTypes.SKILLS, value);
 
-			
+
 		} catch (Exception e) {
 			LOG.info("error when initializing context data: "+ e.getLocalizedMessage());
 		}
@@ -247,17 +373,17 @@ public class CtxDataInitiator {
 	}
 
 	private void printCtxAttributes(CtxEntityIdentifier ownerCtxId) throws Exception {
-		
+
 		final IndividualCtxEntity entity = (IndividualCtxEntity) this.ctxBroker.retrieve(ownerCtxId).get();
 		Set<CtxAttribute> attributes = entity.getAttributes();
-		
+
 		LOG.info("CtxEntity :"+entity.getId() );
 		for(CtxAttribute attr : attributes){
 			LOG.info("CtxAttribute :"+ attr +" value "+ attr.getStringValue());	
 		}
-		
-		
-		
+
+
+
 	}
 
 }

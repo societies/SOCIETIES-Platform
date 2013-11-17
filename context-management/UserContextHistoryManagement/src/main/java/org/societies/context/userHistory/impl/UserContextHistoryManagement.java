@@ -115,6 +115,46 @@ public class UserContextHistoryManagement implements IUserCtxHistoryMgr {
 	}
 
 	@Override
+	public CtxHistoryAttribute storeHistoryAttribute(
+			final CtxHistoryAttribute hocAttr) throws CtxException{
+
+		if (hocAttr == null)
+			throw new NullPointerException("attribute can't be null");
+
+		if (ctxRecording == false)
+			throw new UserCtxHistoryMgrException("context history recording is disabled");
+
+		CtxHistoryAttribute result = null;
+
+		UserCtxHistoryAttributeDAO dao = UserCtxHistoryDAOTranslator.getInstance()
+				.fromCtxHistoryAttribute(hocAttr);
+
+		
+		final Session session = this.sessionFactory.openSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			final Serializable historyRecordId = session.save(dao);
+			tx.commit();
+			dao = (UserCtxHistoryAttributeDAO) session.load(
+					UserCtxHistoryAttributeDAO.class, historyRecordId);
+			result = UserCtxHistoryDAOTranslator.getInstance()
+					.fromUserCtxHistoryAttributeDAO(dao);
+
+		} catch (Exception e) {
+			tx.rollback();
+			throw new IllegalStateException("Could not store history for attribute "
+					+ hocAttr + ": " + e.getLocalizedMessage(), e);
+		} finally {
+			if (session != null)
+				session.close();
+		}
+
+		return result;
+	}
+
+		
+	@Override
 	public CtxHistoryAttribute createHistoryAttribute (
 			final CtxAttributeIdentifier attrId, final Date date, 
 			final Serializable value, final CtxAttributeValueType valueType) throws CtxException{

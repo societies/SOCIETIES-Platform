@@ -70,7 +70,7 @@ public class CtxHistoryAttribute extends CtxModelObject {
 	 * 
 	 * @since 0.4
 	 */
-	CtxHistoryAttribute(final CtxAttributeIdentifier attrId, 
+	public CtxHistoryAttribute(final CtxAttributeIdentifier attrId, 
 			final Date lastModified, final Date lastUpdated,
 			final String stringValue, final Integer integerValue,
 			final Double doubleValue, final byte[] binaryValue,

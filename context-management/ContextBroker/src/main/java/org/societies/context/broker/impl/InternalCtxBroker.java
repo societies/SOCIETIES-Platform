@@ -1522,7 +1522,25 @@ public class InternalCtxBroker implements ICtxBroker {
 		return new AsyncResult<CtxHistoryAttribute>(hocAttr);
 	}
 
+	@Override
+	@Async
+	public Future<CtxHistoryAttribute> storeHistoryAttribute(CtxHistoryAttribute hocAttr){
 
+		CtxHistoryAttribute hocAttrStored = null;
+		try {
+			hocAttrStored = this.userCtxHistoryMgr.storeHistoryAttribute(hocAttr);
+		} catch (CtxException e) {
+
+			LOG.error("context attribute not stored in context DB"
+					+ hocAttr.getId() + ": " + e.getLocalizedMessage(), e);
+
+		}	
+
+		return new AsyncResult<CtxHistoryAttribute>(hocAttrStored);
+	}
+	
+	
+	
 	/*
 	 * HoC tuples will be stored in an attribute of type "tuple_attibuteType" (tuple_status)
 	 * the value will contain a list of ICtxHistoricAttribute 
@@ -2553,7 +2571,7 @@ public class InternalCtxBroker implements ICtxBroker {
 			}
 		}
 
-		LOG.debug("retrieveHistory: requestor={}", result);
+		LOG.debug("retrieveHistory: results={}", result);
 		return new AsyncResult<List<CtxHistoryAttribute>>(result);
 	}
 

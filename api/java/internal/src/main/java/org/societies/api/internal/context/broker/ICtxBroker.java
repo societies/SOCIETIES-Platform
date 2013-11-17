@@ -967,4 +967,7 @@ public interface ICtxBroker extends org.societies.api.context.broker.ICtxBroker 
 	 * @throws CtxException 
 	 */
 	public void disableCtxRecording() throws CtxException;
+	
+	
+	public Future<CtxHistoryAttribute> storeHistoryAttribute(CtxHistoryAttribute attribute);
 }

@@ -187,6 +187,9 @@ public interface IUserCtxHistoryMgr {
 	 */
 	public void storeHoCAttribute(CtxAttribute hocAttribute) throws CtxException;
 	
+	public CtxHistoryAttribute storeHistoryAttribute(
+			final CtxHistoryAttribute attribute) throws CtxException;
+	
 	/**
 	 * Creates and stores a historic Attribute to HoC Database. Mainly used for testing purposes
 	 * 
