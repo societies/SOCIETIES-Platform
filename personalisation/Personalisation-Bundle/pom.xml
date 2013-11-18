@@ -172,7 +172,8 @@
 						<Export-Package>
 							org.societies.personalisation.**
 						</Export-Package>
-						<Import-Package>*;resolution:=optional</Import-Package>
+						<Import-Package>javax.swing.event;resolution:=optional,*;resolution:=optional</Import-Package>
+						
 					</instructions>
 				</configuration>
 			</plugin>
