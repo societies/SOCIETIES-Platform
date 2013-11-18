@@ -120,6 +120,9 @@ public class CtxDataInitiator {
 
 			LOG.debug("start fixing ctxIDs ");
 			fixHocIdentifiers();
+
+
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -155,6 +158,7 @@ public class CtxDataInitiator {
 				allTupleAttTypes.add(tupleAttrType);
 			}
 
+			// list with attr id of attributes, each maintaining a list of ctxattrID to be stored as tuples
 			List<CtxIdentifier> allHocTuples = new ArrayList<CtxIdentifier>();
 			for (String hocTupleType : allTupleAttTypes){
 				allHocTuples = this.ctxBroker.lookup(cssOwnerId, CtxModelType.ATTRIBUTE, hocTupleType).get();
@@ -238,6 +242,53 @@ public class CtxDataInitiator {
 				this.ctxBroker.storeHistoryAttribute(hocAttr).get();
 				LOG.debug("storing hoc attr: "+ hocAttr.getId());
 			}
+
+
+
+			///////////////////////////////////////// fix current ctx db tuples
+			List<CtxAttributeIdentifier> fixedAllHocTuples = new ArrayList<CtxAttributeIdentifier>();
+			
+			//iterate through all tuple attributes 
+			for(CtxIdentifier currentCtxAttrTuplesID : allHocTuples){
+				CtxAttribute attr = (CtxAttribute) this.ctxBroker.retrieve(currentCtxAttrTuplesID).get();
+			
+				List<CtxAttributeIdentifier> originalEscortingHocAttrList = new ArrayList<CtxAttributeIdentifier>();
+				List<CtxAttributeIdentifier> fixedEscortingHocAttrList = new ArrayList<CtxAttributeIdentifier>();
+
+				
+				
+				originalEscortingHocAttrList = (List<CtxAttributeIdentifier>) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
+
+				fixedEscortingHocAttrList.addAll(originalEscortingHocAttrList);
+
+				for(CtxAttributeIdentifier originalCtxAttrID : originalEscortingHocAttrList){
+
+					if(originalCtxAttrID.getScope().getType().equals(CtxEntityTypes.CSS_NODE)){
+
+						List<CtxIdentifier> ls = this.ctxBroker.lookup(ownerCtxId, CtxModelType.ATTRIBUTE, originalCtxAttrID.getType()).get();
+
+						if(!ls.isEmpty()){
+							for(CtxIdentifier validAttrID :ls ){
+								CtxAttributeIdentifier personAttrID =  (CtxAttributeIdentifier) validAttrID;
+								fixedEscortingHocAttrList.remove(originalCtxAttrID);
+								fixedEscortingHocAttrList.add(personAttrID);
+							}
+						}
+					}
+				}
+				
+				
+				byte[] fixedAttrBinValue = SerialisationHelper.serialise((Serializable) fixedEscortingHocAttrList);
+				attr.setBinaryValue(fixedAttrBinValue);
+				LOG.debug("storing updated escorting attrIDs:" +fixedEscortingHocAttrList);
+				
+				CtxAttribute fixedAttr = (CtxAttribute) this.ctxBroker.update(attr).get();
+				LOG.debug("updated attrID:" +fixedAttr.getId());
+								
+			}
+			
+			
+			
 
 
 
