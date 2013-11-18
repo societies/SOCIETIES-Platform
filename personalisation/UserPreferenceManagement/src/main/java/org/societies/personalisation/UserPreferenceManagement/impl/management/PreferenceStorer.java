@@ -100,14 +100,23 @@ public class PreferenceStorer {
 		try {
 			
 			model.setLastModifiedDate(new Date());
-			PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
+			
 			
 			CtxAttribute attrPreference = (CtxAttribute) ctxBroker.retrieve(id).get();
 			if (attrPreference==null){
 				return false;
 			}
-
-			attrPreference.setBinaryValue(SerialisationHelper.serialise(modelBean));
+/*			
+ * 			PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
+ 			byte[] serialisedObj = SerialisationHelper.serialise(modelBean);
+			
+			*/
+			
+			byte[] serialisedObj = SerialisationHelper.serialise(model);
+			attrPreference.setBinaryValue(serialisedObj);
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Size of preference obj byte array: "+serialisedObj.length);
+			}
 			ctxBroker.update(attrPreference).get();
 			return true;
 			
@@ -161,7 +170,7 @@ public class PreferenceStorer {
 	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel model, String key){
 		try{
 			model.setLastModifiedDate(new Date());
-			PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
+			//PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
 			Future<List<CtxIdentifier>> futureCtxIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE); 
 			List<CtxIdentifier> ctxIDs = futureCtxIDs.get();
 			if (ctxIDs.size()==0){
@@ -195,7 +204,12 @@ public class PreferenceStorer {
 					this.logging.debug("Created Preference Entity");
 				}
 				CtxAttribute attr = (ctxBroker.createAttribute(preferenceEntity.getId(), key)).get();
-				attr.setBinaryValue(SerialisationHelper.serialise(modelBean));
+				//byte[] serialisedObj = SerialisationHelper.serialise(modelBean);
+				byte[] serialisedObj = SerialisationHelper.serialise(model);
+				if (this.logging.isDebugEnabled()){
+					this.logging.debug("Size of preference obj byte array: "+serialisedObj.length);
+				}
+				attr.setBinaryValue(serialisedObj);
 				ctxBroker.update(attr).get();
 				if(this.logging.isDebugEnabled()){
 					this.logging.debug("Created attribute: "+attr.getType());
@@ -210,7 +224,12 @@ public class PreferenceStorer {
 				}
 				CtxIdentifier preferenceEntityID = ctxIDs.get(0);
 				CtxAttribute attr = (ctxBroker.createAttribute((CtxEntityIdentifier) preferenceEntityID, key)).get();
-				attr.setBinaryValue(SerialisationHelper.serialise(modelBean));
+				//attr.setBinaryValue(SerialisationHelper.serialise(modelBean));
+				byte[] serialisedObj = SerialisationHelper.serialise(model);
+				if (this.logging.isDebugEnabled()){
+					this.logging.debug("Size of preference obj byte array: "+serialisedObj.length);
+				}				
+				attr.setBinaryValue(serialisedObj);
 				ctxBroker.update(attr).get();
 				if(this.logging.isDebugEnabled()){
 					this.logging.debug("Created attribute: "+attr.getType());

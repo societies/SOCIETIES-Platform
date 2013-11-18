@@ -37,6 +37,8 @@ import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.UserPreferenceManagement.impl.Tools;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
 
 /**
  * @author Elizabeth
@@ -79,6 +81,9 @@ public class PrivatePreferenceCache {
 		}
 		IPreferenceTreeModel p = this.idToIPreferenceTreeModel.get(id);
 		if (null !=p){
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Preference found in cache. Returning object: [["+p.getRootPreference().toTreeString()+"]]");
+			}
 			return p;
 		}else{
 			//retrieve the preference from context
@@ -86,6 +91,7 @@ public class PrivatePreferenceCache {
 			if (null!=pref){
 				//if the preference exists in context, put it in the cache and return it 
 				this.idToIPreferenceTreeModel.put(id, pref);
+				this.logging.debug("Preference not found in cache. Found in DB. Returning object: [["+p.getRootPreference().toTreeString()+"]]");
 				return pref;
 			}
 		}

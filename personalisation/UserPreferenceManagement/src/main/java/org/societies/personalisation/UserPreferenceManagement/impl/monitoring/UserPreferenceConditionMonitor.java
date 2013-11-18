@@ -171,11 +171,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	}
 
 	public void initialisePreferenceManagement(){
-		if (doFix.contains("true")){
-			this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this, true);
-		}else{
-			this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this, false);
-		}
+		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this);
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
 
@@ -192,6 +188,10 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	}
 
 
+	@Override
+	public void fixPreferences(){
+		this.merging.fixPreferences();
+	}
 	private void subscribeForStaticUIMEvents() {
 		String eventFilter = "(&" +
 				"(" + CSSEventConstants.EVENT_NAME + "=staticaction)" +

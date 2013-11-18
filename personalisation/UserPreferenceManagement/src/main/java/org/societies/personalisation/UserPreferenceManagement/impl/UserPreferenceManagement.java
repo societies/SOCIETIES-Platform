@@ -77,7 +77,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 	private final Set<PersonalisablePreferenceIdentifier> aggregateActionConsumerPreferences = new HashSet<PersonalisablePreferenceIdentifier>();
 	private UserPreferenceConditionMonitor monitor;
 
-	public UserPreferenceManagement(ICtxBroker broker, UserPreferenceConditionMonitor monitor, boolean doFix) {
+	public UserPreferenceManagement(ICtxBroker broker, UserPreferenceConditionMonitor monitor) {
 
 		this.ctxBroker = broker;
 		this.monitor = monitor;
@@ -86,62 +86,10 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 		
 		outcomeConditionListTable = new Hashtable<IPreferenceOutcome, List<CtxIdentifier>>();
 
-		if (doFix){
-			this.fixCtxIds();
-		}
+
 	}
 
-	//this is a one time thing to fix user trial DBs
-	private void fixCtxIds(){
-		this.logging.info("#ctxAttributesFix#: on UserPrefMgr");
-		try {
-			IIdentity userId = monitor.getCommManager().getIdManager().getThisNetworkNode();
-			IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(userId).get();
-			Set<CtxAttribute> attributes = individualCtxEntity.getAttributes(CtxAttributeTypes.LOCATION_SYMBOLIC);
-			if (attributes.size()==0){
-				this.logging.info("#ctxAttributesFix#: could not find location_symbolic attribute. Exiting fix. Not fixed or no need to fix");
-				return;
-			}
-			
-			CtxAttribute symLocAttribute = attributes.iterator().next();
-			List<PreferenceDetails> preferenceDetailsOfAllPreferences = preferenceCache.getPreferenceDetailsForAllPreferences();
-			for (PreferenceDetails detail : preferenceDetailsOfAllPreferences){
-				String detailStr = ServiceModelUtils.serviceResourceIdentifierToString(detail.getServiceID())+":"+detail.getPreferenceName();
-				IPreferenceTreeModel model = this.preferenceCache.getPreference(detail);
-				
-				IPreference rootPreference = model.getRootPreference();
-				Enumeration<IPreference> depthFirstEnumeration = rootPreference.depthFirstEnumeration();
-				while(depthFirstEnumeration.hasMoreElements()){
-					IPreference preference = depthFirstEnumeration.nextElement();
-					if (preference.getUserObject() instanceof ContextPreferenceCondition){
-						IPreferenceCondition condition = preference.getCondition();
-						CtxAttributeIdentifier ctxID = condition.getCtxIdentifier();
-						if (ctxID.getType().equalsIgnoreCase(CtxAttributeTypes.LOCATION_SYMBOLIC)){
-							condition.setCtxIdentifier(symLocAttribute.getId());
-							this.logging.info("#ctxAttributesFix#: "+detailStr+" Updated condition. Replaced id: "+ctxID.toUriString()+" with: "+symLocAttribute.getId().toUriString());
-						}else{
-							this.logging.info("#ctxAttributesFix#: Ignoring condition with id: "+ctxID.toUriString());
-						}
-						
-					}
-				}
-				model = new PreferenceTreeModel(detail, rootPreference);
-				this.preferenceCache.storePreference(userId, detail, model);
-				
-			}
-				
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CtxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
+
 	/*
 	 *  Get the instance of the context cache held under the preference manager
 	 *

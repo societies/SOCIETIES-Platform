@@ -1,7 +1,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
                 xmlns:ui="http://java.sun.com/jsf/facelets"
-                template="templates/main_template.xhtml">
+                template="templates/main_template.xhtml"
+                xmlns:p="http://primefaces.org/ui">
 
     <ui:define name="html_head">
         <title>SOCIEITES</title>
@@ -25,7 +26,8 @@
                 <p>To manage your user preferences, click <a href="preferences.xhtml">here </a> </p>
                 <p>To manage your user intent model, click <a href="user_intent.xhtml">here </a> </p>
                 
-                
+                <p> To fix your stupid mistakes, click here. <p:commandButton action="#{PreferenceFixController.fixPreferences}" value="Fix" ajax="false"/>
+                </p>
                 <div class="hr dotted clearfix"></div>
             </section>
         </section>

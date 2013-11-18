@@ -36,6 +36,7 @@ import javax.swing.JOptionPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
@@ -72,9 +73,24 @@ public class MergingManager implements IC45Consumer{
 		this.c45Learning = c45Learning;
 		this.prefImpl = prefImpl;
 		this.pcm = pcm;
+
 	}
 
 
+	public void fixPreferences(){
+		IIdentity userId = pcm.getCommManager().getIdManager().getThisNetworkNode();
+		
+		List<PreferenceDetails> preferenceDetailsForAllPreferences = prefImpl.getPreferenceDetailsForAllPreferences();
+		for (PreferenceDetails detail : preferenceDetailsForAllPreferences){
+			prefImpl.deletePreference(userId, detail);
+			this.c45Learning.runC45Learning(new C45ConflictConsumer(userId, detail.getServiceType(), detail.getServiceID(), detail.getPreferenceName(), this.prefImpl), null, userId, detail.getServiceID(), detail.getPreferenceName());
+			
+		}
+		
+		
+		
+	}
+	
 
 	public void explicitlyTriggerLearning(Date date){
 		this.c45Learning.runC45Learning(this, date);

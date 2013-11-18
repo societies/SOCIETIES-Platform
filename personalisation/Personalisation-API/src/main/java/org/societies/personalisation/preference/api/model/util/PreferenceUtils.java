@@ -1,14 +1,19 @@
 package org.societies.personalisation.preference.api.model.util;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxModelBeanTranslator;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.schema.personalisation.model.ContextPreferenceConditionBean;
@@ -131,7 +136,14 @@ public class PreferenceUtils {
 		Enumeration<IPreference> children = node.children();
 		ArrayList<IPreference> preferencesBelow = new ArrayList<IPreference>();
 		while(children.hasMoreElements()){
-			preferencesBelow.add(children.nextElement());
+			
+			if (bean.getChildren()==null){
+				bean.setChildren(new ArrayList<PreferenceTreeNodeBean>());
+			}
+			
+			bean.getChildren().add(toPreferenceTreeNodeBean(children.nextElement()));
+			
+			
 		}
 		
 		return bean;
@@ -169,6 +181,7 @@ public class PreferenceUtils {
 		bean.setServiceID(action.getServiceID());
 		bean.setServiceType(action.getServiceType());
 		bean.setValue(action.getvalue());
+		
 
 		return bean;
 	}
@@ -214,5 +227,60 @@ public class PreferenceUtils {
 		return details;
 		
 		
+	}
+	
+	
+	public static void main(String[] args) throws MalformedCtxIdentifierException{
+		ServiceResourceIdentifier serviceID = ServiceModelUtils.generateServiceResourceIdentifierFromString("ac.hw.mytv.MyTVClient hwuteam.societies.local.macs.hw.ac.uk/MyTv");
+		
+		IPreference root = new PreferenceTreeNode();
+		IPreference conditionPreference = new PreferenceTreeNode(new ContextPreferenceCondition(new CtxAttributeIdentifier("context://university.ict-societies.eu/ENTITY/person/1/ATTRIBUTE/locationSymbolic/8"), OperatorConstants.EQUALS, "home", "location"));
+		
+		String serviceType = "media";
+		String preferenceName = "volume";
+		IPreference outcomePreference = new PreferenceTreeNode(new PreferenceOutcome(serviceID, serviceType, preferenceName, "10"));
+		
+		conditionPreference.add(outcomePreference);
+		root.add(conditionPreference );
+		
+		PreferenceDetails preferenceDetails = new PreferenceDetails(serviceType, serviceID, preferenceName);
+		PreferenceTreeModel model = new PreferenceTreeModel(preferenceDetails, root);
+		
+		System.out.println(model.getChildCount(root));
+		PreferenceTreeModelBean bean = PreferenceUtils.toPreferenceTreeModelBean(model);
+		
+		System.out.println(bean.getPreference().getChildren().size());
+		
+		try {
+			byte[] serialisedObj = SerialisationHelper.serialise(bean);
+			
+			PreferenceTreeModelBean deserialisedBean = (PreferenceTreeModelBean) SerialisationHelper.deserialise(serialisedObj, PreferenceUtils.class.getClassLoader());
+			
+			if (deserialisedBean==null){
+				JOptionPane.showMessageDialog(null, "Null");
+				System.out.println("is null");
+			}else{
+				JOptionPane.showMessageDialog(null, "not Null");
+				System.out.println("not null");
+				if (deserialisedBean.getPreference()==null){
+					JOptionPane.showMessageDialog(null, "preference is Null");
+					System.out.println("preference is null");
+					System.out.println();
+				}else{
+					JOptionPane.showMessageDialog(null, "preference is not Null");
+					System.out.println("preference is not null");
+				}
+			}
+			
+			PreferenceTreeModel preferenceTreeModel = PreferenceUtils.toPreferenceTreeModel(deserialisedBean);
+			
+			System.out.println(((PreferenceTreeNode)preferenceTreeModel.getRootPreference()).toTreeString());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

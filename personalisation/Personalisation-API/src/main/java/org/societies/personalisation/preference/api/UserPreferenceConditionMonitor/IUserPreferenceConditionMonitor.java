@@ -92,4 +92,8 @@ public interface IUserPreferenceConditionMonitor {
 	
 	
 	public void downloadPreferencesFromCommunities(Calendar calendar);
+
+
+	
+	public void fixPreferences();
 }

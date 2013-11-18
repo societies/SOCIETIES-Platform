@@ -49,14 +49,14 @@ import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
  * 
  */
 public class PreferenceRetriever {
-	
+
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private ICtxBroker ctxBroker; 
 
 	public PreferenceRetriever(ICtxBroker broker){
 		this.ctxBroker = broker;
 	}
-	
+
 	public Registry retrieveRegistry(){
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
@@ -68,7 +68,7 @@ public class PreferenceRetriever {
 				if (attrList.size()>0){
 					CtxIdentifier identifier = attrList.get(0);
 					CtxAttribute attr = (CtxAttribute) ctxBroker.retrieve(identifier).get();
-					
+
 					Registry registry = (Registry) SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
 					if (null==registry){
 						if(this.logging.isDebugEnabled()){
@@ -76,9 +76,9 @@ public class PreferenceRetriever {
 						}
 						return new Registry();
 					}
-					
+
 					return registry;
-					
+
 				}
 				if(this.logging.isDebugEnabled()){
 					this.logging.debug("PreferenceRegistry not found in DB. Creating new registry");
@@ -110,7 +110,7 @@ public class PreferenceRetriever {
 		return new Registry();
 	}
 
-	
+
 	private Object convertToObject(byte[] byteArray){
 		try {
 			return SerialisationHelper.deserialise(byteArray, this.getClass().getClassLoader());
@@ -121,7 +121,7 @@ public class PreferenceRetriever {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		/*
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(byteArray));
@@ -135,12 +135,12 @@ public class PreferenceRetriever {
 			e.printStackTrace();
 		}
 		return null;
-		*/
-		
-		
+		 */
+
+
 		return null;
 	}
-	
+
 
 	/*
 	 * retrieves a preference object using that preference object's context identifier to find it
@@ -151,8 +151,63 @@ public class PreferenceRetriever {
 		try{
 			//retrieve directly the attribute in context that holds the preference as a blob value
 			CtxAttribute attrPref = (CtxAttribute) ctxBroker.retrieve(id).get();
-			PreferenceTreeModelBean modelBean = (PreferenceTreeModelBean) SerialisationHelper.deserialise(attrPref.getBinaryValue(), this.getClass().getClassLoader());
-			PreferenceTreeModel model = PreferenceUtils.toPreferenceTreeModel(modelBean);
+			
+			if (attrPref==null){
+				if (this.logging.isDebugEnabled()){
+					this.logging.debug("Retrieve: "+id.toUriString()+" not found in DB");
+				}
+				return null;
+			}else{
+				if (this.logging.isDebugEnabled()){
+					this.logging.debug("Length of byte array retrieved : "+attrPref.getBinaryValue().length);
+				}
+			}
+
+
+
+			//PreferenceTreeModelBean modelBean = (PreferenceTreeModelBean) SerialisationHelper.deserialise(attrPref.getBinaryValue(), this.getClass().getClassLoader());
+			PreferenceTreeModel model = (PreferenceTreeModel) SerialisationHelper.deserialise(attrPref.getBinaryValue(), this.getClass().getClassLoader());
+/*			if (this.logging.isDebugEnabled()){
+				if (modelBean == null){
+					this.logging.debug("Deserialised modelBean is null");
+				}else{
+					this.logging.debug("Deserialised modelBean is NOT null");
+
+					if (modelBean.getPreference()==null){
+						this.logging.debug("Deserialised modelBean.getPreference() is null");
+					}else{
+						this.logging.debug("Deserialised modelBean.getPreference is NOT null");
+						this.logging.debug("Deserialised modelBean.getPreference has "+modelBean.getPreference().getChildren().size()+" children");
+					}
+					
+					if (modelBean.getPreferenceDetails() == null){
+						this.logging.debug("Deserialised modelBean.getPreferenceDetails is null");
+					}else{
+						this.logging.debug("Deserialised modelBean.getPreferenceDetails is NOT null");
+					}
+				}
+			}*/
+			//PreferenceTreeModel model = PreferenceUtils.toPreferenceTreeModel(modelBean);
+			if (this.logging.isDebugEnabled()){
+				if (model == null){
+					this.logging.debug("Deserialised model is null");
+				}else{
+					this.logging.debug("Deserialised model is NOT null");
+
+					if (model.getRootPreference()==null){
+						this.logging.debug("Deserialised model.getRootPreference() is null");
+					}else{
+						this.logging.debug("Deserialised model.getRootPreference is NOT null");
+						this.logging.debug("Deserialised model.getRootPreference has: "+model.getChildCount(model.getRootPreference())+" children");
+					}
+					
+					if (model.getPreferenceDetails() == null){
+						this.logging.debug("Deserialised model.getPreferenceDetails is null");
+					}else{
+						this.logging.debug("Deserialised model.getPreferenceDetails is NOT null");
+					}
+				}
+			}			
 			return model;
 		}
 		catch (CtxException e) {
@@ -174,12 +229,12 @@ public class PreferenceRetriever {
 		//returns null if no preference is found in the database.
 		return null;
 	}
-	
-	
-	
-	
 
-	
+
+
+
+
+
 
 }
 
