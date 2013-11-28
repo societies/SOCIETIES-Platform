@@ -22,71 +22,72 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
+package org.societies.domainauthority.rest.json;
 
-import java.net.URLEncoder;
+import static org.junit.Assert.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.gson.Gson;
 
 /**
- * 
+ * Unit test for {@link DocumentStatus}
  *
  * @author Mitja Vardjan
  *
  */
-public class UrlPath {
-	
-	/**
-	 * Encoding for URL parameters. To be used with {@link URLEncoder#encode(String, String)}
-	 */
-	public static final String ENCODING = "UTF8";
+public class DocumentStatusTest {
 
-	public static final String BASE = "/rest";
-	
-	/**
-	 * URL parameter. File name, including relative path.
-	 */
-	public static final String URL_PARAM_FILE = "file";
-	
-	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
+	private DocumentStatus documentStatus;
 
-	/**
-	 * URL parameter. Operation to perform. Valid values:<br>
-	 * - getfile (default)<br>
-	 * - status<br>
-	 */
-	public static final String URL_PARAM_OPERATION = "operation";
+	private List<String> signers;
+	private final String SIGNER_1 = "Billy Bob";
+	private final String SIGNER_2 = "Joey Ray";
+	
+	private final int numSigners = 76;
+	
+	private final int minNumSigners = 123;
 	
 	/**
-	 * URL parameter. Digital certificate of the uploader of the file (usually the provider).
-	 * Should include only the public key.
+	 * @throws java.lang.Exception
 	 */
-	public static final String URL_PARAM_CERT = "cert";
-	
-	/**
-	 * URL parameter. ID of the service, not a service instance.
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * URL parameter. Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
-	 * Supported protocol is HTTP. On event, a HTTP GET is performed on the given endpoint (HTTP URL).
-	 */
-	public static final String URL_PARAM_NOTIFICATION_ENDPOINT = "endpoint";
-	
-	/**
-	 * URL parameter. Minimal number of signatures (threshold) for notifying the uploader about future sign events.
-	 */
-	public static final String URL_PARAM_NUM_SIGNERS_THRESHOLD = "minnumsig";
+	@Before
+	public void setUp() throws Exception {
+		
+		signers = new ArrayList<String>();
+		signers.add(SIGNER_1);
+		signers.add(SIGNER_2);
+		
+		documentStatus = new DocumentStatus(signers, numSigners, minNumSigners);
+	}
 
 	/**
-	 * Path for servlet that serves files.
+	 * @throws java.lang.Exception
 	 */
-	public static final String PATH_FILES = "/serviceclient";
-	
-	/**
-	 * Path for servlet that serves xml documents.
-	 */
-	public static final String PATH_XML_DOCUMENTS = "/xmldocs";
+	@After
+	public void tearDown() throws Exception {
+		signers = null;
+		documentStatus = null;
+	}
+
+	@Test
+	public void test() {
+		
+		String json = documentStatus.toJson();
+		Gson gson = new Gson();
+		DocumentStatus reconstructed = gson.fromJson(json, DocumentStatus.class);
+		
+		assertNotNull(reconstructed);
+		assertEquals(documentStatus.getNumSigners(), reconstructed.getNumSigners());
+		assertEquals(documentStatus.getMinNumSigners(), reconstructed.getMinNumSigners());
+		assertEquals(documentStatus.getSigners().size(), reconstructed.getSigners().size());
+		for (String signer : documentStatus.getSigners()) {
+			assertTrue(reconstructed.getSigners().contains(signer));
+		}
+	}
 }

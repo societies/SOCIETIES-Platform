@@ -26,6 +26,8 @@ package org.societies.domainauthority.rest.server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -40,6 +42,8 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.signature.XMLSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.DaRestException;
@@ -47,6 +51,7 @@ import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.util.FileName;
 import org.societies.api.security.digsig.DigsigException;
 import org.societies.domainauthority.rest.control.XmlDocumentAccess;
+import org.societies.domainauthority.rest.json.DocumentStatus;
 import org.societies.domainauthority.rest.model.Document;
 
 /**
@@ -88,8 +93,6 @@ public class XmlDocument extends HttpServlet {
 			return;
 		}
 
-		byte[] file;
-
 		if (!XmlDocumentAccess.isAuthorized(path, signature)) {
 			LOG.warn("HTTP GET: Invalid filename or key");
 			// Return HTTP status code 401 - Unauthorized
@@ -98,7 +101,64 @@ public class XmlDocument extends HttpServlet {
 			return;
 		}
 
-		file = XmlDocumentAccess.getDocumentDao().get(path).getXmlDoc();
+		String operation = request.getParameter(UrlPath.URL_PARAM_OPERATION);
+		
+		if (operation == null ||  "getfile".equals(operation)) {
+			respondWithDocumentContents(path, response);
+			return;
+		}
+		else if ("status".equals(operation)) {
+			respondWithDocumentStatus(path, response);
+			return;
+		}
+	}
+	
+	private void respondWithDocumentStatus(String path, HttpServletResponse response) {
+		
+		byte[] file = XmlDocumentAccess.getDocumentDao().get(path).getXmlDoc();
+		int minNumSigners = XmlDocumentAccess.getDocumentDao().get(path).getMinNumSigners();
+		int numSigners = XmlDocumentAccess.getDocumentDao().get(path).getNumSigners();
+		List<XMLSignature> signatures;
+		List<String> signers = new ArrayList<String>();
+		
+		try {
+			signatures = XmlDocumentAccess.extractSignatures(file);
+			for (XMLSignature sig : signatures) {
+				KeyInfo keyInfo = sig.getKeyInfo();
+				X509Certificate cert = keyInfo.getX509Certificate();
+				String cn = cert.getSubjectX500Principal().getName();
+				cn = cn.replaceFirst(".*CN=", "").replaceFirst(",.*", "");
+				signers.add(cn);
+				LOG.debug("Added \"{}\" to list of signer common names" + cn);
+			}
+		} catch (Exception e) {
+			LOG.warn("HTTP GET: Could not get existing signatures", e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+		DocumentStatus documentStatus = new DocumentStatus(signers, numSigners, minNumSigners);
+		try {
+			String json = documentStatus.toJson();
+			byte[] jsonBytes = json.getBytes("UTF-8");
+			
+			LOG.info("HTTP GET: Serving status info for {}", path);
+			
+			response.setContentLength(jsonBytes.length);
+			response.setContentType("application/json");
+			ServletOutputStream stream = response.getOutputStream();
+			stream.write(jsonBytes);
+			stream.flush();
+			response.setStatus(HttpServletResponse.SC_OK);
+		} catch (IOException e) {
+			LOG.warn("HTTP GET: Could not write response", e);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		}
+	}
+
+	private void respondWithDocumentContents(String path, HttpServletResponse response) {
+		
+		byte[] file = XmlDocumentAccess.getDocumentDao().get(path).getXmlDoc();
 
 		LOG.info("HTTP GET: Serving {}", path);
 		
@@ -115,7 +175,7 @@ public class XmlDocument extends HttpServlet {
 			return;
 		}
 	}
-
+	
 	/**
 	 * Method processing HTTP PUT requests.
 	 */

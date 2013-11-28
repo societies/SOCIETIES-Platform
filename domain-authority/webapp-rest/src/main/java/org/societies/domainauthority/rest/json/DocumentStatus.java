@@ -22,71 +22,106 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.api.internal.domainauthority;
+package org.societies.domainauthority.rest.json;
 
-import java.net.URLEncoder;
+import java.util.List;
+
+import org.societies.domainauthority.rest.model.Document;
+
+import com.google.gson.Gson;
 
 /**
- * 
+ * Representation of current status of {@link Document}
  *
  * @author Mitja Vardjan
  *
  */
-public class UrlPath {
-	
-	/**
-	 * Encoding for URL parameters. To be used with {@link URLEncoder#encode(String, String)}
-	 */
-	public static final String ENCODING = "UTF8";
-
-	public static final String BASE = "/rest";
-	
-	/**
-	 * URL parameter. File name, including relative path.
-	 */
-	public static final String URL_PARAM_FILE = "file";
-	
-	/**
-	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
-	 */
-	public static final String URL_PARAM_SIGNATURE = "sig";
+public class DocumentStatus {
 
 	/**
-	 * URL parameter. Operation to perform. Valid values:<br>
-	 * - getfile (default)<br>
-	 * - status<br>
+	 * List of parties that have signed the document so far.
+	 * A party is listed as CN (common name) field value from the certificate.
 	 */
-	public static final String URL_PARAM_OPERATION = "operation";
+	private List<String> signers;
+	
+	private int numSigners;
+
+	private int minNumSigners;
 	
 	/**
-	 * URL parameter. Digital certificate of the uploader of the file (usually the provider).
-	 * Should include only the public key.
+	 * Default constructor
 	 */
-	public static final String URL_PARAM_CERT = "cert";
-	
-	/**
-	 * URL parameter. ID of the service, not a service instance.
-	 */
-	public static final String URL_PARAM_SERVICE_ID = "service";
-	
-	/**
-	 * URL parameter. Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
-	 * Supported protocol is HTTP. On event, a HTTP GET is performed on the given endpoint (HTTP URL).
-	 */
-	public static final String URL_PARAM_NOTIFICATION_ENDPOINT = "endpoint";
-	
-	/**
-	 * URL parameter. Minimal number of signatures (threshold) for notifying the uploader about future sign events.
-	 */
-	public static final String URL_PARAM_NUM_SIGNERS_THRESHOLD = "minnumsig";
+	public DocumentStatus() {
+	}
 
 	/**
-	 * Path for servlet that serves files.
+	 * Constructor
 	 */
-	public static final String PATH_FILES = "/serviceclient";
+	public DocumentStatus(List<String> signers, int numSigners, int minNumSigners) {
+		this.signers = signers;
+		this.numSigners = numSigners;
+		this.minNumSigners = minNumSigners;
+	}
+
+	/**
+	 * @return the signers
+	 */
+	public List<String> getSigners() {
+		return signers;
+	}
+
+	/**
+	 * @param signers the signers to set
+	 */
+	public void setSigners(List<String> signers) {
+		this.signers = signers;
+	}
+
+	/**
+	 * @return the minNumSigners
+	 */
+	public int getMinNumSigners() {
+		return minNumSigners;
+	}
+
+	/**
+	 * @param minNumSigners the minNumSigners to set
+	 */
+	public void setMinNumSigners(int minNumSigners) {
+		this.minNumSigners = minNumSigners;
+	}
 	
 	/**
-	 * Path for servlet that serves xml documents.
+	 * @return the numSigners
 	 */
-	public static final String PATH_XML_DOCUMENTS = "/xmldocs";
+	public int getNumSigners() {
+		return numSigners;
+	}
+
+	/**
+	 * @param numSigners the numSigners to set
+	 */
+	public void setNumSigners(int numSigners) {
+		this.numSigners = numSigners;
+	}
+
+	@Override
+	public String toString() {
+		
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("Threshold: " + minNumSigners + System.getProperty("line.separator"));
+		sb.append("Number of signers: " + numSigners + System.getProperty("line.separator"));
+		sb.append("Signers: ");
+		for (String signer : signers) {
+			sb.append(System.getProperty("line.separator") + "    " + signer);
+		}
+
+		return sb.toString();
+	}
+	
+	public String toJson() {
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
 }
