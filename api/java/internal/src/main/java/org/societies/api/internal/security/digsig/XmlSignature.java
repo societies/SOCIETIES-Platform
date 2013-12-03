@@ -32,5 +32,5 @@ public class XmlSignature {
 	/**
 	 * XPath expression to locate digital signatures in XML document
 	 */
-	public static final String XML_SIGNATURE_XPATH = "/xml/Signature";
+	public static final String XML_SIGNATURE_XPATH = "/*/Signature";
 }

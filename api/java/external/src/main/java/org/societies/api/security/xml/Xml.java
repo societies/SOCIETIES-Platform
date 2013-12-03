@@ -442,6 +442,7 @@ public class Xml {
 	 * 
 	 * @param newXml source of new nodes
 	 * @param xpath XPath to nodes in newXml to be added
+	 * @return Number of new XML nodes inserted
 	 * @throws XmlException
 	 */
 	public int addNodeRecursively(InputStream newXml, String xpath) throws XmlException {
@@ -456,7 +457,7 @@ public class Xml {
 			Node docElement = doc.getDocumentElement();
 			int k;
 			for (k = 0; k < newNodes.getLength(); k++) {
-				Node firstDocImportedNode = doc.adoptNode(newNodes.item(k));
+				Node firstDocImportedNode = doc.importNode(newNodes.item(k), true);
 				docElement.appendChild(firstDocImportedNode);
 			}
 			return k;

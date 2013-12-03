@@ -38,7 +38,7 @@ public class XmlTest extends XMLTestCase {
 
 	private Xml classUnderTest;
 	
-	private static final String xmlStringSource = "<?xml version=\"1.0\"?><xml><a><b></b></a></xml>";
+	private static final String xmlStringSource = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><boo><a><b>ccc</b></a></boo>";
 	
 	@Before
 	public void setUp() throws Exception {
@@ -53,10 +53,63 @@ public class XmlTest extends XMLTestCase {
 
 	@Test
 	public void testAddNodeRecursively() throws Exception {
-		InputStream newXml = new ByteArrayInputStream("<?xml version=\"1.0\"?><xml><x><y>foo</y><y></y></x></xml>".getBytes());
-		int numNodes = classUnderTest.addNodeRecursively(newXml, "/xml/x/y");
+
+		InputStream newXml = new ByteArrayInputStream(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><boo><x><y>foo</y><y></y></x></boo>".getBytes());
+
+		int numNodes = classUnderTest.addNodeRecursively(newXml, "/boo/x/y");
+		
 		assertEquals(2, numNodes, 0.0);
-		assertXMLEqual("<?xml version=\"1.0\"?><xml><a><b></b></a><y>foo</y><y></y></xml>", classUnderTest.toString());
+		assertXMLEqual("<?xml version=\"1.0\" encoding=\"UTF-8\"?><boo><a><b>ccc</b></a><y>foo</y><y></y></boo>", classUnderTest.toString());
+	}
+
+	@Test
+	public void testAddNodeRecursivelyWithAttributes() throws Exception {
+
+		InputStream newXml = new ByteArrayInputStream(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?><boo><x attr1=\"attr1val\"><y attr2=\"attr2val\">foo</y><y></y></x></boo>"
+				.getBytes());
+		
+		int numNodes = classUnderTest.addNodeRecursively(newXml, "/boo/x/y");
+		
+		assertEquals(2, numNodes, 0.0);
+		assertXMLEqual("<?xml version=\"1.0\" encoding=\"UTF-8\"?><boo><a><b>ccc</b></a><y attr2=\"attr2val\">foo</y><y></y></boo>",
+				classUnderTest.toString());
+	}
+
+	@Test
+	public void testAddNodeRecursivelyWithNamespace() throws Exception {
+
+		System.out.println("Origin XML: " + classUnderTest.toString());
+
+		String newXmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+				+ "<boo>"
+				+ "<x attr1=\"attr1val\">"
+				+ "<ds:y xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" attr2=\"attr2val\">foo</ds:y>"
+				+ "<ds:y></ds:y>"
+				+ "</x>"
+				+ "<x></x>"
+				+ "</boo>";
+		InputStream newXml = new ByteArrayInputStream(newXmlStr.getBytes());
+		
+		int numNodes = classUnderTest.addNodeRecursively(newXml, "/boo/x");
+		assertEquals(2, numNodes, 0.0);
+		
+		String merged = classUnderTest.toString();
+		System.out.println("Merged XML: " + merged);
+
+		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+				+ "<boo>"
+				+ "<a><b>ccc</b></a>"
+				+ "<x attr1=\"attr1val\">"
+				+ "<ds:y xmlns:ds=\"http://www.w3.org/2000/09/xmldsig#\" attr2=\"attr2val\">foo</ds:y>"
+				+ "<ds:y/>"
+				+ "</x>"
+				+ "<x/>"
+				+ "</boo>";
+		
+//		assertEquals(expected, merged);
+//		assertXMLEqual(expected, merged);
 	}
 
 	@Test
