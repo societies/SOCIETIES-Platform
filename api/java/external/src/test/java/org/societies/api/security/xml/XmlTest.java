@@ -80,7 +80,7 @@ public class XmlTest extends XMLTestCase {
 	@Test
 	public void testAddNodeRecursivelyWithNamespace() throws Exception {
 
-		System.out.println("Origin XML: " + classUnderTest.toString());
+//		System.out.println("Origin XML: " + classUnderTest.toString());
 
 		String newXmlStr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 				+ "<boo>"
@@ -96,7 +96,7 @@ public class XmlTest extends XMLTestCase {
 		assertEquals(2, numNodes, 0.0);
 		
 		String merged = classUnderTest.toString();
-		System.out.println("Merged XML: " + merged);
+//		System.out.println("Merged XML: " + merged);
 
 		String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
 				+ "<boo>"

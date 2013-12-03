@@ -447,6 +447,8 @@ public class Xml {
 	 */
 	public int addNodeRecursively(InputStream newXml, String xpath) throws XmlException {
 
+		Log.debug("addNodeRecursively(..., {})", xpath);
+		
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		try {
 			DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
