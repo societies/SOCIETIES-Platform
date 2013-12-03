@@ -9,6 +9,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
 
+import org.apache.http.entity.StringEntity;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -137,11 +138,11 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		Net net = new Net(uri);
 		boolean success;
 		
-		success = net.put(path, xml.getBytes());
+		success = net.put(new StringEntity(xml));
 		assertTrue(success);
 		
 		// The file already exists, should get an error
-		success = net.put(path, xml.getBytes());
+		success = net.put(new StringEntity(xml));
 		assertFalse(success);
 	}
 	
@@ -189,10 +190,10 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		URI uri = new URI(uriStr);
 		Net net = new Net(uri);
 		boolean success;
-		
-		success = net.put(path, xmlSigned1.getBytes());
+
+		success = net.put(new StringEntity(xmlSigned1));
 		assertTrue(success);
-		success = net.put(path, xmlSigned2.getBytes());
+		success = net.put(new StringEntity(xmlSigned2));
 		assertTrue(success);
 	}
 	

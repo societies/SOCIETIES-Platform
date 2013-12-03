@@ -187,7 +187,7 @@ public class Net {
 	 * 
 	 * @return True for success, false for error
 	 */
-	public boolean put(String fileName, byte[] fileContents) {
+	public boolean putMultipart(String fileName, byte[] fileContents) {
 
 		LOG.debug("put({}, ...)", fileName);
 
@@ -240,7 +240,24 @@ public class Net {
 	 * @param fileName Name of existing file. Its contents will be put to the {@link URI}.
 	 * @return True for success, false for error
 	 */
-	public boolean put(String fileName) {
-		return put(fileName, null);
+	public boolean putMultipart(String fileName) {
+		return putMultipart(fileName, null);
+	}
+
+	public boolean put(HttpEntity entity) {
+		LOG.debug("put()");
+		HttpPut put = new HttpPut(uri);
+		try {
+			put.setEntity(entity);
+			HttpClient httpclient = new DefaultHttpClient();
+
+			HttpResponse response = httpclient.execute(put);
+			boolean success = 200 == response.getStatusLine().getStatusCode();
+			LOG.debug("put to " + uri + " finished, success = " + success);
+			return success;
+		} catch (Exception e) {
+			LOG.warn("put failed", e);
+			return false;
+		}
 	}
 }

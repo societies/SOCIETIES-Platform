@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.http.entity.FileEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.IIdentity;
@@ -199,7 +200,7 @@ public class ProviderServiceMgr implements INegotiationProviderServiceMgmt {
 				throw new NegotiationException(e);
 			}
 			net = new Net(server);
-			net.put(tmpFile);
+			net.put(new FileEntity(new File(tmpFile), "application/java-archive"));
 		}
 		if (fileUrls != null && fileUrls.length > 0) {
 			File tmp = new File(tmpFile);
