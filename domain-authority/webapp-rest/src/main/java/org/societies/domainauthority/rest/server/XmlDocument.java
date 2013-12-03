@@ -30,6 +30,7 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -42,8 +43,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
-import org.apache.xml.security.keys.KeyInfo;
-import org.apache.xml.security.signature.XMLSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.domainauthority.DaRestException;
@@ -118,14 +117,12 @@ public class XmlDocument extends HttpServlet {
 		byte[] file = XmlDocumentAccess.getDocumentDao().get(path).getXmlDoc();
 		int minNumSigners = XmlDocumentAccess.getDocumentDao().get(path).getMinNumSigners();
 		int numSigners = XmlDocumentAccess.getDocumentDao().get(path).getNumSigners();
-		List<XMLSignature> signatures;
+		Map<String, X509Certificate> signatures;
 		List<String> signers = new ArrayList<String>();
 		
 		try {
-			signatures = XmlDocumentAccess.extractSignatures(file);
-			for (XMLSignature sig : signatures) {
-				KeyInfo keyInfo = sig.getKeyInfo();
-				X509Certificate cert = keyInfo.getX509Certificate();
+			signatures = XmlDocumentAccess.verifyXml(file);
+			for (X509Certificate cert : signatures.values()) {
 				String cn = cert.getSubjectX500Principal().getName();
 				cn = cn.replaceFirst(".*CN=", "").replaceFirst(",.*", "");
 				signers.add(cn);
@@ -257,11 +254,13 @@ public class XmlDocument extends HttpServlet {
 
 		if(!ServletFileUpload.isMultipartContent(request)) {
 			try {
+				LOG.debug("Content is not multipart");
 				return request.getInputStream();
 			} catch (IOException e) {
 				throw new DaRestException(e);
 			}
 		} 
+		LOG.debug("Content is multipart");
 
 		// Create a factory for disk-based file items
 		FileItemFactory factory = new DiskFileItemFactory();

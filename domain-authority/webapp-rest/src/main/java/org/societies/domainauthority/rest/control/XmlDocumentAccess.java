@@ -30,13 +30,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-
-import org.apache.xml.security.signature.XMLSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.security.digsig.XmlSignature;
@@ -47,9 +42,6 @@ import org.societies.api.security.xml.XmlException;
 import org.societies.domainauthority.rest.dao.DocumentDao;
 import org.societies.domainauthority.rest.model.Document;
 import org.societies.domainauthority.rest.util.RemoteNotification;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * 
@@ -189,64 +181,13 @@ public class XmlDocumentAccess {
 	}
 
 	/**
-	 * Extracts all detached signatures under the document element
-	 * 
-	 * @return List of signatures in the document
-	 * @throws DigsigException
+	 * A wrapper around {@link ISignatureMgr#verifyXml(InputStream)}
 	 */
-	public static List<XMLSignature> extractSignatures(org.w3c.dom.Document doc) throws DigsigException {
+	public static Map<String, X509Certificate> verifyXml(byte[] xml) throws DigsigException {
 
-		if (doc == null || doc.getDocumentElement() == null)
-			throw new DigsigException("doc or doc.getDocumentElement() is null");
-
-		NodeList childNodes = doc.getDocumentElement().getChildNodes();
-		if (childNodes == null || childNodes.getLength() == 0)
-			throw new DigsigException("no child nodes found");
-
-		List<XMLSignature> signatures = new ArrayList<XMLSignature>();
+		ByteArrayInputStream xmlIs = new ByteArrayInputStream(xml);
 		
-		for (int i = 0; i < childNodes.getLength(); i++) {
-			Node childNode = childNodes.item(i);
-			if (!(childNode instanceof Element)) {
-				continue;
-			}
-
-			Element elem = (Element) childNode;
-			String elemName = elem.getLocalName();
-			String elemNS = elem.getNamespaceURI();
-			if ("http://www.w3.org/2000/09/xmldsig#".equals(elemNS) && "Signature".equals(elemName)) {
-				try {
-					XMLSignature sig = new XMLSignature(elem, null);
-					signatures.add(sig);
-					LOG.debug("extractSignatures(): extracted signature {}",
-							sig.getElement().getAttribute("Id"));
-				} catch (Exception e) {
-					throw new DigsigException(e, "could not extract signature");
-				}
-			}
-		}
-		return signatures;
-	}
-
-	/**
-	 * Extracts all detached signatures under the document element
-	 * 
-	 * @return List of signatures in the document
-	 * @throws DigsigException
-	 */
-	public static List<XMLSignature> extractSignatures(byte[] docBytes) throws DigsigException {
-
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setNamespaceAware(true);
-		org.w3c.dom.Document doc;
-		
-		try {
-			DocumentBuilder builder = factory.newDocumentBuilder();
-			doc = builder.parse(new ByteArrayInputStream(docBytes));
-		} catch (Exception e) {
-			throw new DigsigException(e);
-		}
-		return extractSignatures(doc);
+		return sigMgr.verifyXml(xmlIs);
 	}
 
 }
