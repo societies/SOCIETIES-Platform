@@ -2,6 +2,8 @@ package org.societies.integration.test.bit.communitysign;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -9,7 +11,8 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.cert.X509Certificate;
 
-import org.apache.http.entity.StringEntity;
+import org.apache.commons.io.IOUtils;
+import org.apache.http.entity.InputStreamEntity;
 import org.custommonkey.xmlunit.XMLTestCase;
 import org.junit.After;
 import org.junit.Before;
@@ -35,14 +38,9 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	private static ISignatureMgr signatureMgr;
 	private static IIdentityManager identityManager;
 	
-	private static final String id1 = "id1";
-	private static final String xml = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-			+ "<xml><node1 Id='" + id1 + "'>abc</node1></xml>";
-	private static final String xmlSigned1 = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-			+ "<xml><node1 Id='" + id1 + "'>abc</node1><Signature>foo</Signature></xml>";
-	private static final String xmlSigned2 = "<?xml version = \"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-			+ "<xml><node1 Id='" + id1 + "'>abc</node1><Signature>bar</Signature></xml>";
 	private static final String path = "foo.xml";
+	
+	private static String originalXml;
 	
 	/**
 	 * Test case number
@@ -84,6 +82,12 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	public void setUp() throws Exception {
 		LOG.info("[#2165] NominalTestCaseLowerTester::setUp");
 		initialization();  // The method is not called automatically despite @BeforeClass annotation
+		
+		InputStream is = getClass().getClassLoader().getResourceAsStream("meeting-minutes.xml");
+		StringWriter writer = new StringWriter();
+		IOUtils.copy(is, writer, "UTF-8");
+		originalXml = writer.toString();
+
 		deletePreviousDocument();
 	}
 
@@ -107,7 +111,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		t4_mergeDocument();
 		t5_downloadMergedDocument();
 		
-		deletePreviousDocument();
+//		deletePreviousDocument();
 	}
 	
 	private void deletePreviousDocument() throws Exception {
@@ -138,11 +142,13 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		Net net = new Net(uri);
 		boolean success;
 		
-		success = net.put(new StringEntity(xml));
+		InputStream is = getClass().getClassLoader().getResourceAsStream("meeting-minutes.xml");
+		success = net.put(new InputStreamEntity(is, -1));
 		assertTrue(success);
 		
-		// The file already exists, should get an error
-		success = net.put(new StringEntity(xml));
+		is = getClass().getClassLoader().getResourceAsStream("meeting-minutes.xml");
+		LOG.info("The file already exists, should get an error");
+		success = net.put(new InputStreamEntity(is, -1));
 		assertFalse(success);
 	}
 	
@@ -156,7 +162,8 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		LOG.info("[#2165] t2_downloadOriginalDocument()");
 
 		byte[] downloaded = download();
-		assertXMLEqual(xml, new String(downloaded));
+
+		assertXMLEqual(originalXml, new String(downloaded));
 	}
 	
 	/**
@@ -190,10 +197,18 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		URI uri = new URI(uriStr);
 		Net net = new Net(uri);
 		boolean success;
-
-		success = net.put(new StringEntity(xmlSigned1));
+		InputStream is;
+		
+		is = getClass().getClassLoader().getResourceAsStream("meeting-minutes-signed-1.xml");
+		success = net.put(new InputStreamEntity(is, -1));
 		assertTrue(success);
-		success = net.put(new StringEntity(xmlSigned2));
+		
+		is = getClass().getClassLoader().getResourceAsStream("meeting-minutes-signed-2.xml");
+		success = net.put(new InputStreamEntity(is, -1));
+		assertTrue(success);
+		
+		is = getClass().getClassLoader().getResourceAsStream("meeting-minutes-signed-3.xml");
+		success = net.put(new InputStreamEntity(is, -1));
 		assertTrue(success);
 	}
 	
@@ -203,13 +218,28 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 
 		byte[] downloaded = download();
 		String downloadedXml = new String(downloaded);
-		assertXMLNotEqual(xml, downloadedXml);
-		assertXpathNotExists(XmlSignature.XML_SIGNATURE_XPATH, xml);
+		
+		assertXMLNotEqual(originalXml, downloadedXml);
+		assertXpathNotExists(XmlSignature.XML_SIGNATURE_XPATH, originalXml);
 		assertXpathExists(XmlSignature.XML_SIGNATURE_XPATH, downloadedXml);
-		assertXpathEvaluatesTo("0", "count(/xml/Signature)",xml);
-		assertXpathEvaluatesTo("2", "count(/xml/Signature)",downloadedXml);
-		assertXpathEvaluatesTo("foo", "/xml/Signature[1]",downloadedXml);
-		assertXpathEvaluatesTo("bar", "/xml/Signature[2]",downloadedXml);
+		assertXpathEvaluatesTo("0", "count(" + XmlSignature.XML_SIGNATURE_XPATH + ")", originalXml);
+		assertXpathEvaluatesTo("3", "count(" + XmlSignature.XML_SIGNATURE_XPATH + ")", downloadedXml);
+		assertXpathValuesNotEqual(
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[1]",
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[2]",
+				downloadedXml);
+		assertXpathValuesNotEqual(
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[1]",
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[3]",
+				downloadedXml);
+		assertXpathValuesNotEqual(
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[2]",
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[3]",
+				downloadedXml);
+		assertXpathValuesEqual(
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[2]",
+				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[2]",
+				downloadedXml);
 	}
 	
 	private byte[] download() throws Exception {

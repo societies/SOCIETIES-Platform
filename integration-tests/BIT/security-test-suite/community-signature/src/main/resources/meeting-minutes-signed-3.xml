@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><a>
+
+<meeting Id="Board001">
+	<conversation>
+		<user>
+			<id>92001</id>
+			<username>John Doe</username>
+		</user>
+		<minute>Hello and welcome to the meeting!</minute>
+	</conversation>
+	<conversation>
+		<user>
+			<id>97001</id>
+			<username>David Smith</username>
+		</user>
+		<minute>Hi John. First things first: we need more drinks.</minute>
+	</conversation>
+	<conversation>
+		<user>
+			<id>92001</id>
+			<username>John Doe</username>
+		</user>
+		<minute>Agreed.</minute>
+	</conversation>
+</meeting>
+
+<ds:Signature xmlns:ds="http://www.w3.org/2000/09/xmldsig#" Id="Signature-c3e4a6c4-df7f-4e4b-be48-efb6b9e1065b">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#Board001">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>MolhS78xi8j1LxO6YKe1mE7l9O0=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+3dDra+ZY/RFQvR8PbFmMw2sHorh9/ITCcMgQcD3Qtwl2vDakB/8sL7SIvmBzxTQexeRiWf6vYIgi
+9WexOvrxRJDyui1bnL8469nmjND81jxyeHvUu7Q0nVnadFCATaInmGRf96Ck/p3UeB3DS8WkwMZS
+54qzjH9rkNqQeDImZ78=
+</ds:SignatureValue>
+<ds:KeyInfo>
+<ds:X509Data>
+<ds:X509Certificate>
+MIICJzCCAZACCQDD70Cjg6UUNTANBgkqhkiG9w0BAQUFADBYMQswCQYDVQQGEwJTSTERMA8GA1UE
+CAwIU2xvdmVuaWExEjAQBgNVBAcMCUxqdWJsamFuYTEPMA0GA1UECgwGU0VUQ0NFMREwDwYDVQQL
+DAhSZXNlYXJjaDAeFw0xMjEyMjAxNDEwNDlaFw0xMzEyMjAxNDEwNDlaMFgxCzAJBgNVBAYTAlNJ
+MREwDwYDVQQIDAhTbG92ZW5pYTESMBAGA1UEBwwJTGp1YmxqYW5hMQ8wDQYDVQQKDAZTRVRDQ0Ux
+ETAPBgNVBAsMCFJlc2VhcmNoMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDnBqyJTi/ofCRq
+oOgzXy3LlKNSv96UwPi6fnUhZZuDgIQhjclOagpbHu3NDmmj+7TSSaYzhTmALm+WKKlQXsB5Y1EE
+IfyLzcbBKKLSBCqJRJck8m71ZhgwGPxzOrabI81K+df+J1G+vPNr3r1dGzEiLuu3XePaP3l57TjS
+nlXLYQIDAQABMA0GCSqGSIb3DQEBBQUAA4GBAAvnG2/hjrkXdgbg4d1FakM6uRdEHmlbGe2SStEY
+aAsWoqQLZ7daly1aVEmaflswvFdmuMiz95IMcKlIEQOx75kHrafa15uxWqXMyxu7OTrmmPrgo1Vn
+s+/R+TlrE076R6TlWiaecJnRfzsR/NM4at0sEUnd2Ae8nWZJStTuvxDf
+</ds:X509Certificate>
+</ds:X509Data>
+</ds:KeyInfo>
+</ds:Signature>
+
+</a>

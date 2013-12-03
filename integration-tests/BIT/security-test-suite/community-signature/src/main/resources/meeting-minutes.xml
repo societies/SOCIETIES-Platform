@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><a>
+
+<meeting Id="Board001">
+	<conversation>
+		<user>
+			<id>92001</id>
+			<username>John Doe</username>
+		</user>
+		<minute>Hello and welcome to the meeting!</minute>
+	</conversation>
+	<conversation>
+		<user>
+			<id>97001</id>
+			<username>David Smith</username>
+		</user>
+		<minute>Hi John. First things first: we need more drinks.</minute>
+	</conversation>
+	<conversation>
+		<user>
+			<id>92001</id>
+			<username>John Doe</username>
+		</user>
+		<minute>Agreed.</minute>
+	</conversation>
+</meeting>
+</a>

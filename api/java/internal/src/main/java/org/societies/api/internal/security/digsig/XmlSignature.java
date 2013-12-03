@@ -30,7 +30,20 @@ package org.societies.api.internal.security.digsig;
 public class XmlSignature {
 
 	/**
-	 * XPath expression to locate digital signatures in XML document
+	 * XPath expression to locate digital signature nodes in an XML document.
+	 * These nodes contain the signature value and all the information about the signature.
 	 */
-	public static final String XML_SIGNATURE_XPATH = "/*/Signature";
+	public static final String XML_SIGNATURE_XPATH =
+			"//*[local-name()='Signature'"
+			+ " and "
+			+ "namespace-uri()='http://www.w3.org/2000/09/xmldsig#']";
+
+	/**
+	 * XPath expression to locate digital signature values in an XML document
+	 * These nodes contain only the signature value.
+	 */
+	public static final String XML_SIGNATURE_VALUE_XPATH =
+			"//*[local-name()='SignatureValue'"
+			+ " and "
+			+ "namespace-uri()='http://www.w3.org/2000/09/xmldsig#']";
 }
