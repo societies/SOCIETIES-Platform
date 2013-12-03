@@ -454,6 +454,9 @@ public class Xml {
 			Document newXmlDoc = builder.parse(newXml);
 	
 			NodeList newNodes = getNodes(newXmlDoc, xpath);
+			if (newNodes == null || newNodes.getLength() == 0) {
+				Log.warn("No nodes found with XPath: " + xpath);
+			}
 			Node docElement = doc.getDocumentElement();
 			int k;
 			for (k = 0; k < newNodes.getLength(); k++) {
