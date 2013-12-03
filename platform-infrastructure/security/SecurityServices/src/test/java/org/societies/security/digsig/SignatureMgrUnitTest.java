@@ -26,10 +26,14 @@
 //
 //import static org.junit.Assert.*;
 //
+//import java.security.cert.X509Certificate;
+//import java.util.Map;
+//
 //import org.junit.After;
 //import org.junit.Before;
 //import org.junit.Test;
 //import org.societies.api.identity.IIdentity;
+//import org.societies.api.security.digsig.DigsigException;
 //import org.societies.api.security.digsig.ISignatureMgr;
 //import org.societies.security.digsig.main.SignatureMgr;
 //
@@ -46,6 +50,7 @@
 //	@Before
 //	public void setUp() throws Exception {
 //		classUnderTest = new SignatureMgr();
+//		classUnderTest.init();
 //	}
 //
 //	/**
@@ -58,35 +63,60 @@
 //
 //	/**
 //	 * Test method for {@link ISignatureMgr#signXml(String, String)}.
+//	 * @throws DigsigException 
 //	 */
 //	@Test
-//	public void testSignXml() {
+//	public void testSignXml() throws DigsigException {
 //		
-//		String xml = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
+//		String xml = "<?xml version=\"1.0\"?><aaa Id=\"nodeId\"><bbb>text</bbb></aaa>";
 //		String xmlNodeId = "nodeA";
-//		IIdentity identity = null;  // FIXME
+//		IIdentity identity = null;
 //		String result;
 //		
 //		result = classUnderTest.signXml(xml, xmlNodeId, identity);
-//		assertEquals(xml, result);  // TODO
+//		assertTrue(result.length() > xml.length() + 10);
 //	}
 //
 //
 //	/**
 //	 * Test method for {@link ISignatureMgr#verifyXml(String)}.
+//	 * @throws DigsigException 
 //	 */
 //	@Test
-//	public void testVerify() {
+//	public void testVerifyXml() throws DigsigException {
 //		
-//		// TODO: use real signatures. Now the test only shows the SignatureMgr is initialized and doesn't crash
-//		String xmlWithValidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
-////		String xmlWithInvalidSig = "<?xml version=\"1.0\"?><aaa><bbb>text</bbb></aaa>";
-//		boolean result;
+//		String xml = "<?xml version=\"1.0\"?><aaa><bbb Id=\"nodeId\">text</bbb></aaa>";
+//		String xmlNodeId = "nodeA";
+//		IIdentity identity = null;
+//		
+//		String xmlWithValidSig = classUnderTest.signXml(xml, xmlNodeId, identity);
+//		
+//		String signatureNode = "<ds:SignatureValue>";
+//		int index = xmlWithValidSig.indexOf(signatureNode);
+//		int offset = 17;
+//		int junkIndex = index + signatureNode.length() + offset;
+//		char ch = xmlWithValidSig.charAt(junkIndex);
+//		if (ch != 'a') {
+//			ch = 'a';
+//		}
+//		else {
+//			ch = 'b';
+//		}
+//		String xmlWithInvalidSig =
+//				xmlWithValidSig.substring(0, junkIndex) +
+//				ch +
+//				xmlWithValidSig.substring(junkIndex + 1);
+//		
+//		Map<String, X509Certificate> result;
 //		
 //		result = classUnderTest.verifyXml(xmlWithValidSig);
-//		assertTrue(result);
+//		assertEquals(1.0, result.size(), 0.0);
 //		
-////		result = classUnderTest.verify(xmlWithInvalidSig);
-////		assertFalse(result);
+//		try {
+//			result = classUnderTest.verifyXml(xmlWithInvalidSig);
+//			fail("DigsigException expected.");
+//		} catch (DigsigException e) {
+//			// OK, this exception is supposed to be thrown
+//		}
 //	}
 //}
