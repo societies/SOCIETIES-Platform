@@ -62,14 +62,14 @@ public class MainActivity extends Activity {
 				Log.i(TAG, "buttonXmlSign clicked");
 				byte[] val = null;
 				try {
-					val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
+					val = "<xml><a Id='Board001'>aadsads</a></xml>".getBytes("UTF-8");
 				} catch (Exception e) {}
 
 				Intent i = new Intent(Sign.ACTION);
 				i.putExtra(Sign.Params.DOC_TO_SIGN, val);
 
 				ArrayList<String> idsToSign = new ArrayList<String>();
-				idsToSign.add("Miki1");
+				idsToSign.add("Board001");
 				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
 
 				startActivityForResult(i, SIGN);
@@ -89,7 +89,7 @@ public class MainActivity extends Activity {
 				i.putExtra(Sign.Params.DOC_TO_SIGN_URL, url);
 
 				ArrayList<String> idsToSign = new ArrayList<String>();
-				idsToSign.add("Miki1");
+				idsToSign.add("Board001");
 				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
 
 				startActivityForResult(i, SIGN);
