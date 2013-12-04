@@ -108,14 +108,14 @@ public class SignatureCheck {
 
 					boolean result = sig.checkSignatureValue(sigCert.getPublicKey());
 					if (!result) {
-						throw new DigsigException("BAD_REQUEST");
+						throw new DigsigException("Invalid signature");
 					}
 					validSigs.put(sig.getId(), sigCert);
 					LOG.debug("verifyAllSignatures(): successfully verified signature {}", sig.getId());
 				} catch (DigsigException e) {
 					throw e;
 				} catch (XMLSignatureException e) {
-					throw new DigsigException(e, "BAD_REQUEST");
+					throw new DigsigException(e, "Invalid XML signature");
 				} catch (Exception e) {
 					throw new DigsigException(e, "INTERNAL_SERVER_ERROR");
 				}
