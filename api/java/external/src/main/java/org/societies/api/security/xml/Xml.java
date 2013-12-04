@@ -69,6 +69,7 @@ public class Xml {
 	public Xml(String source) throws XmlException {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
 		DocumentBuilder db;
 
 		try {
@@ -84,6 +85,7 @@ public class Xml {
 	public Xml(InputStream source) throws XmlException {
 
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
 		DocumentBuilder db;
 
 		try {
@@ -357,7 +359,9 @@ public class Xml {
 			expr = XPathFactory.newInstance().newXPath().compile(xpath);
 			result = expr.evaluate(node, XPathConstants.NODESET);
 			nodes = (NodeList) result;
-		} catch (XPathExpressionException ex) {
+//			Log.debug("Found {} nodes", nodes.getLength());
+		} catch (XPathExpressionException e) {
+			Log.warn("getNodes(..., " + xpath + ")", e);
 		}
 		return nodes;
 	}
@@ -449,9 +453,10 @@ public class Xml {
 
 		Log.debug("addNodeRecursively(..., {})", xpath);
 		
-		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
 		try {
-			DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
+			DocumentBuilder builder = dbf.newDocumentBuilder();
 	
 			Document newXmlDoc = builder.parse(newXml);
 	
@@ -470,6 +475,10 @@ public class Xml {
 			Log.warn("addNodeRecursively", e);
 			throw new XmlException(e);
 		}
+	}
+	
+	public Document getDocument() {
+		return doc;
 	}
 
 	/**
