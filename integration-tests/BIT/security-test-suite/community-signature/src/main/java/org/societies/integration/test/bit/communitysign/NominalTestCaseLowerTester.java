@@ -114,7 +114,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		t4_mergeDocument();
 		t5_downloadMergedDocument();
 		
-//		deletePreviousDocument();
+		deletePreviousDocument();
 	}
 	
 	private void deletePreviousDocument() throws Exception {
