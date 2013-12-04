@@ -40,6 +40,9 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	
 	private static final String path = "foo.xml";
 	
+	private static final String SIGNER_1_CN = "Societies Service Provider";
+	private static final String SIGNER_3_CN = "Janez Novak";
+	
 	private static String originalXml;
 	
 	/**
@@ -162,8 +165,13 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		LOG.info("[#2165] t2_downloadOriginalDocument()");
 
 		byte[] downloaded = download();
-
 		assertXMLEqual(originalXml, new String(downloaded));
+		
+		String status = downloadStatus();
+		assertTrue(status.length() > 0);
+		LOG.debug("Status of original document: {}", status);
+		assertFalse(status.contains(SIGNER_1_CN));
+		assertFalse(status.contains(SIGNER_3_CN));
 	}
 	
 	/**
@@ -241,6 +249,13 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 //				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[2]",
 //				XmlSignature.XML_SIGNATURE_VALUE_XPATH + "[2]",
 //				downloadedXml);
+		
+		
+		String status = downloadStatus();
+		assertTrue(status.length() > 0);
+		LOG.debug("Status of merged document: {}", status);
+		assertTrue(status.contains(SIGNER_1_CN));
+		assertTrue(status.contains(SIGNER_3_CN));
 	}
 	
 	private byte[] download() throws Exception {
@@ -255,6 +270,23 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		byte[] downloaded = os.toByteArray();
 		assertNotNull(downloaded);
 		LOG.info("Size of downloaded xml: {}", downloaded.length);
+		
+		return downloaded;
+	}
+	
+	private String downloadStatus() throws Exception {
+		
+		String uriStr = uriForFileDownload(daUrl, path, signatureMgr.sign(path, identityManager.getThisNetworkNode())) +
+				"&" + UrlPath.URL_PARAM_OPERATION + "=status";
+		int httpCode = getHttpCode(new URL(uriStr));
+		assertEquals(HttpURLConnection.HTTP_OK, httpCode, 0.0);
+		URI uri = new URI(uriStr);
+		Net net = new Net(uri);
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		net.download(os);
+		String downloaded = os.toString("UTF-8");
+		assertNotNull(downloaded);
+		LOG.info("Size of downloaded xml: {}", downloaded.length());
 		
 		return downloaded;
 	}
