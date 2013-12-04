@@ -9,6 +9,7 @@ import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.apiinternal.Trust;
+import org.societies.security.digsig.community.CommunitySigStatusActivity;
 import org.societies.security.digsig.utility.StreamUtil;
 
 import android.app.Activity;
@@ -28,6 +29,9 @@ import android.os.Messenger;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -47,7 +51,7 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-
+		
 		Button installBtn = (Button) findViewById(R.id.buttonMainInstallIdentity);
 		installBtn.setOnClickListener(new View.OnClickListener() {			
 			public void onClick(View v) {
@@ -55,6 +59,14 @@ public class MainActivity extends Activity {
 				startActivity(i);
 			}
 		});
+		
+		((Button) findViewById(R.id.buttonMainCommunitySigStatus)).setOnClickListener(new View.OnClickListener() {			
+			public void onClick(View v) {
+				Intent i = new Intent(MainActivity.this, CommunitySigStatusActivity.class);
+				startActivity(i);
+			}
+		});
+		
 		Button listBtn = (Button) findViewById(R.id.buttonMainXmlSign);
 		listBtn.setOnClickListener(new View.OnClickListener() {		
 			public void onClick(View v) {
@@ -124,6 +136,21 @@ public class MainActivity extends Activity {
 				i.putExtra(Sign.Params.DOC_TO_SIGN, os.toByteArray());
 
 				startActivityForResult(i, VERIFY);
+			}
+		});
+		
+		CheckBox showTestingOptions = (CheckBox) findViewById(R.id.checkBoxMainShowTestingOptions);
+		showTestingOptions.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				int visibility = isChecked ? View.VISIBLE : View.INVISIBLE;
+				findViewById(R.id.buttonMainSign).setVisibility(visibility);
+				findViewById(R.id.buttonMainVerify).setVisibility(visibility);
+				findViewById(R.id.buttonMainXmlSign).setVisibility(visibility);
+				findViewById(R.id.buttonMainXmlSignUrl).setVisibility(visibility);
+				findViewById(R.id.textViewMainSignUrl).setVisibility(visibility);
+				findViewById(R.id.editTextMainSignUrl).setVisibility(visibility);
 			}
 		});
 	}

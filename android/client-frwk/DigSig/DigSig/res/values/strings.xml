@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Dig Sig</string>
     <string name="listFilesActivityName">Please select a file</string>
     <string name="listIdentitiesActivityName">Please select digital identity</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="installIdentity">Install Identity</string>
+    <string name="viewCommunitySigStatus">Community Signature Status</string>
+    <string name="showTestingOptions">Show Testing Options</string>
     <string name="testSigning">Test Signing</string>
     <string name="testXmlSigning">Test XML Signing (doc in intent)</string>
     <string name="testXmlSigningUrl">Test XML Signing (doc url)</string>
@@ -14,4 +17,10 @@
     <string name="testVerification">Test Verification</string>
     <string name="isRequestingToSign">is requesting to sign a document. Allow?</string>
     <string name="unknownApp">Unknown app</string>
+    <string name="title_activity_community_sig_status">CommunitySigStatusActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_section1">Section 1</string>
+    <string name="title_section2">Section 2</string>
+    <string name="title_section3">Section 3</string>
+
 </resources>
