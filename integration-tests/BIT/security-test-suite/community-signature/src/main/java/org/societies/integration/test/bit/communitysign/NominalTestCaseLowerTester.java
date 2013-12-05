@@ -40,8 +40,11 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 	
 	private static final String path = "foo.xml";
 	
-	private static final String SIGNER_1_CN = "Societies Service Provider";
-	private static final String SIGNER_3_CN = "Janez Novak";
+	private static final String[] SIGNERS = new String[] {
+		"Societies Service Provider",
+		"David Smith",
+		"John Doe"
+	};
 	
 	private static String originalXml;
 	
@@ -114,7 +117,7 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		t4_mergeDocument();
 		t5_downloadMergedDocument();
 		
-		deletePreviousDocument();
+//		deletePreviousDocument();
 	}
 	
 	private void deletePreviousDocument() throws Exception {
@@ -170,8 +173,9 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		String status = downloadStatus();
 		assertTrue(status.length() > 0);
 		LOG.debug("Status of original document: {}", status);
-		assertFalse(status.contains(SIGNER_1_CN));
-		assertFalse(status.contains(SIGNER_3_CN));
+		for (String signer : SIGNERS) {
+			assertFalse(status.contains(signer));
+		}
 	}
 	
 	/**
@@ -254,8 +258,9 @@ public class NominalTestCaseLowerTester extends XMLTestCase {
 		String status = downloadStatus();
 		assertTrue(status.length() > 0);
 		LOG.debug("Status of merged document: {}", status);
-		assertTrue(status.contains(SIGNER_1_CN));
-		assertTrue(status.contains(SIGNER_3_CN));
+		for (String signer : SIGNERS) {
+			assertTrue(status.contains(signer));
+		}
 	}
 	
 	private byte[] download() throws Exception {
