@@ -80,6 +80,12 @@ public class Sign {
 		public static final String SESSION_ID = "SESSION_ID";
 		
 		/**
+		 * Optional human readable name or title of the document that is to be signed.
+		 * Type: {@link String}
+		 */
+		public static final String DOC_TITLE = "DOC_TITLE";
+
+		/**
 		 * All supported types of the signature in output document
 		 */
 		public class OutputType {
