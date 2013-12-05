@@ -58,12 +58,16 @@ public class InstallIdentityActivity extends Activity {
 		Log.i(TAG, "onActivityResult: requestCode = " + requestCode + ", resultCode = " + resultCode);
 		super.onActivityResult(requestCode, resultCode, data);
 
-		if (requestCode == LIST_PFX_FILES && resultCode==RESULT_OK) {
+		if (requestCode == LIST_PFX_FILES && resultCode == RESULT_OK) {
 			inputFileName = data.getStringExtra(Sign.Params.IDENTITY);
-			Log.i("InstallIdentityActivity",String.format("Returned this file name %s", inputFileName));
+			Log.i(TAG, String.format("Returned this file name %s", inputFileName));
 
 			Intent i = new Intent(this,PassEntryActivity.class);
 			startActivityForResult(i,PASS_ENTRY);
+		} else if (requestCode == LIST_PFX_FILES && resultCode == RESULT_CANCELED) {
+			Log.i(TAG, "Cancelled");
+			setResult(RESULT_CANCELED);
+			finish();
 		} else if (requestCode == PASS_ENTRY && resultCode==RESULT_OK) {
 			String pass = data.getStringExtra(Trust.Params.PASSWORD);
 
