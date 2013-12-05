@@ -64,7 +64,7 @@ public class InstallIdentityActivity extends Activity {
 
 			Intent i = new Intent(this,PassEntryActivity.class);
 			startActivityForResult(i,PASS_ENTRY);
-		} else if (requestCode == LIST_PFX_FILES && resultCode == RESULT_CANCELED) {
+		} else if (resultCode == RESULT_CANCELED) {
 			Log.i(TAG, "Cancelled");
 			setResult(RESULT_CANCELED);
 			finish();
