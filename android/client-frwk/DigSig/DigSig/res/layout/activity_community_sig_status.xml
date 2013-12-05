@@ -11,12 +11,14 @@
         android:id="@+id/communitySigStatusSigningStartedCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:enabled="false"
         android:text="@string/collaborativeSigningStarted" />
 
     <CheckBox
         android:id="@+id/communitySigStatusThresholdReachedCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:enabled="false"
         android:text="@string/signatureThresholdReached" />
 
     <ProgressBar
@@ -79,9 +81,15 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/communitySigStatusCurrentSignersTextView"
+        android:id="@+id/communitySigStatusCurrentSignersLabelTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/currentSigners" />
 
+    <TextView
+        android:id="@+id/communitySigStatusCurrentSignersTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		/>
+    
 </LinearLayout>

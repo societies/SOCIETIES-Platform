@@ -153,6 +153,10 @@ public class SignServiceRemote extends Service {
 		
 		String notificationEndpoint = data.getString(Verify.Params.NOTIFICATION_ENDPOINT);
 		int numSignersThreshold = data.getInt(Verify.Params.NUM_SIGNERS_THRESHOLD, -1);
+		String title = data.getString(Verify.Params.DOC_TITLE);
+		if (title == null) {
+			title = resourceName;
+		}
 		Log.d(TAG, "generateUris: notificationEndpoint = " + notificationEndpoint +
 				", numSignersThreshold = " + numSignersThreshold);
 
@@ -164,7 +168,7 @@ public class SignServiceRemote extends Service {
 			bundle.putString(Verify.Params.UPLOAD_URI, uploadUri);
 			bundle.putString(Verify.Params.DOWNLOAD_URI, downloadUri);
 			bundle.putBoolean(Verify.Params.SUCCESS, true);
-			store(resourceName, downloadUri);
+			store(title, downloadUri);
 			return bundle;
 		} catch (Exception e) {
 			Log.w(TAG, "generateUris: error", e);
@@ -179,15 +183,6 @@ public class SignServiceRemote extends Service {
 		editor.putString(key, value);
 		editor.commit();
 		Log.d(TAG, "Stored key value pair: " + key + " = " + value);
-	}
-
-	private Map<String, String> restore() {
-		
-		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
-		
-		Map<String, String> all = (Map<String, String>) preferences.getAll();
-		Log.d(TAG, "Restored " + all.size() + " URIs");
-		return all;
 	}
 
 	/**
