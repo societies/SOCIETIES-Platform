@@ -126,7 +126,7 @@ public class XmlDocument extends HttpServlet {
 				String cn = cert.getSubjectX500Principal().getName();
 				cn = cn.replaceFirst(".*CN=", "").replaceFirst(",.*", "");
 				signers.add(cn);
-				LOG.debug("Added \"{}\" to list of signer common names" + cn);
+				LOG.debug("Added \"{}\" to list of signer common names", cn);
 			}
 		} catch (Exception e) {
 			LOG.warn("HTTP GET: Could not get existing signatures", e);
