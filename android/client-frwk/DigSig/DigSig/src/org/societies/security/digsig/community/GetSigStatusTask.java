@@ -89,7 +89,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 		
 		try {
 			result = json.getInt("numSigners");
-			Log.d(TAG, "JSON: meeting ID = " + result);
+			Log.d(TAG, "JSON: numSigners = " + result);
 		} catch (JSONException e) {
 			Log.w(TAG, e);
 			return -1;
@@ -103,7 +103,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 		
 		try {
 			result = json.getInt("minNumSigners");
-			Log.d(TAG, "JSON: meeting subject = " + result);
+			Log.d(TAG, "JSON: minNumSigners = " + result);
 		} catch (JSONException e) {
 			Log.w(TAG, e);
 			return -1;

@@ -1,16 +1,97 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".CommunitySigStatusActivity$DummySectionFragment" >
 
-    <TextView
-        android:id="@+id/section_label"
+    <CheckBox
+        android:id="@+id/communitySigStatusSigningStartedCheckBox"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="@string/collaborativeSigningStarted" />
 
-</RelativeLayout>
+    <CheckBox
+        android:id="@+id/communitySigStatusThresholdReachedCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:enabled="false"
+        android:text="@string/signatureThresholdReached" />
+
+    <ProgressBar
+        android:id="@+id/communitySigStatusProgressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="4sp"
+        android:paddingBottom="4sp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4sp"
+            android:text="@string/signedBy"
+            />
+
+        <TextView
+            android:id="@+id/communitySigStatusSignedByNPartiesTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4sp"
+            android:paddingRight="4sp"
+            android:text="12" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/parties" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4sp"
+            android:text="@string/required" />
+
+        <TextView
+            android:id="@+id/communitySigStatusRequiredTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="4sp"
+            android:paddingRight="4sp"
+            android:text="123" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/parties" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/communitySigStatusCurrentSignersLabelTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/currentSigners" />
+
+    <TextView
+        android:id="@+id/communitySigStatusCurrentSignersTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+		/>
+
+</LinearLayout>

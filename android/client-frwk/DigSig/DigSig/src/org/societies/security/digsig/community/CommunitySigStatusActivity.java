@@ -30,6 +30,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 public class CommunitySigStatusActivity extends FragmentActivity implements
@@ -174,9 +175,16 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	}
 	
 	protected void updateSigStatus(int numSigners, int minNumSigners, ArrayList<String> signers) {
+		
+		Log.d(TAG, "updateSigStatus: numSigners = " + numSigners);
+		Log.d(TAG, "updateSigStatus: minNumSigners = " + minNumSigners);
+		Log.d(TAG, "updateSigStatus: signers = " + signers);
+
 		Fragment fragment = new DummySectionFragment();
 		Bundle args = new Bundle();
-		args.putStringArrayList(DummySectionFragment.ARG_TITLE, signers);
+		args.putInt(DummySectionFragment.ARG_NUM_SIGNERS, numSigners);
+		args.putInt(DummySectionFragment.ARG_MIN_NUM_SIGNERS, minNumSigners);
+		args.putStringArrayList(DummySectionFragment.ARG_SIGNERS, signers);
 		fragment.setArguments(args);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.container, fragment).commit();
@@ -188,22 +196,49 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	 */
 	public static class DummySectionFragment extends Fragment {
 
-		public static final String ARG_TITLE = "TITLE";
+		public static final String ARG_SIGNERS = "SIGNERS";
+		public static final String ARG_NUM_SIGNERS = "NUM_SIGNERS";
+		public static final String ARG_MIN_NUM_SIGNERS = "MIN_NUM_SIGNERS";
 		
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			
 			View rootView = inflater.inflate(
 					R.layout.fragment_community_sig_status_dummy, container,
 					false);
-			TextView dummyTextView = (TextView) rootView.findViewById(R.id.section_label);
 			
-			ArrayList<String> signers = getArguments().getStringArrayList(ARG_TITLE);
+			int numSigners = getArguments().getInt(ARG_NUM_SIGNERS, -1);
+			int minNumSigners = getArguments().getInt(ARG_MIN_NUM_SIGNERS, -1);
+			ArrayList<String> signers = getArguments().getStringArrayList(ARG_SIGNERS);
+			
+			Log.d(TAG, "onCreateView: numSigners = " + numSigners);
+			Log.d(TAG, "onCreateView: minNumSigners = " + minNumSigners);
+			Log.d(TAG, "onCreateView: signers = " + signers);
+
+			TextView textView;
+			CheckBox checkBox;
+			String str;
+			
+			checkBox = (CheckBox) rootView.findViewById(R.id.communitySigStatusSigningStartedCheckBox);
+			checkBox.setChecked(true);
+			
+			checkBox = (CheckBox) rootView.findViewById(R.id.communitySigStatusThresholdReachedCheckBox);
+			checkBox.setChecked(numSigners >= minNumSigners);
+
+			textView = (TextView) rootView.findViewById(R.id.communitySigStatusSignedByNPartiesTextView);
+			str = numSigners >= 0 ? String.valueOf(numSigners) : "?";
+			textView.setText(str);
+			
+			textView = (TextView) rootView.findViewById(R.id.communitySigStatusRequiredTextView);
+			str = minNumSigners >= 0 ? String.valueOf(minNumSigners) : "?";
+			textView.setText(str);
+
+			textView = (TextView) rootView.findViewById(R.id.communitySigStatusCurrentSignersTextView);
 			String signersStr = "";
 			for (String s : signers) {
 				signersStr += s + System.getProperty("line.separator");
 			}
-			dummyTextView.setText(signersStr);
+			textView.setText(signersStr);
 			
 			return rootView;
 		}
