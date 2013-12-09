@@ -26,19 +26,7 @@ public class TaskDiscovery {
 	}
 
 	
-	/*
-	public LinkedHashMap<List<String>,Integer>  populateTaskDictionary(){
-		LinkedHashMap<List<String>,Integer> taskDictionary = null;
-		
-		System.out.println("populateTaskDictionary");
-		
-		LinkedHashMap<String,ActionDictObject> upperModel = getSeqs(0.75);
-		
-		return taskDictionary;
-	}
-	*/
 
-	
 	public LinkedHashMap<String,ActionDictObject> getSeqs(Double limit){
 		LinkedHashMap<String,ActionDictObject> results = new LinkedHashMap<String,ActionDictObject>();
 		
@@ -55,8 +43,8 @@ public class TaskDiscovery {
 			if( totalOccur > score) results.put(act, this.actCtxModel.get(act));	
 		}
 
-		System.out.println("total entries in model "+this.actCtxModel.size()); 
-		System.out.println("entries occured more than "+score); 
+		//System.out.println("total entries in model "+this.actCtxModel.size()); 
+		//System.out.println("entries occured more than "+score); 
 		return results;
 	}
 	

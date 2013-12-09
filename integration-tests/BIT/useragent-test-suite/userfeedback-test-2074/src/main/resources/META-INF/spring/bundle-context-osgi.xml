@@ -11,6 +11,4 @@
 
     <osgi:reference id="userFeedback" interface="org.societies.api.internal.useragent.feedback.IUserFeedback"/>
 
-    <osgi:reference id="userFeedbackHistoryRepository" interface="org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository"/>
-
 </beans>

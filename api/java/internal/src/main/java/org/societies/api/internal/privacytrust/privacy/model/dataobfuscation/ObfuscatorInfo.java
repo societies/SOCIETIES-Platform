@@ -25,9 +25,11 @@
 package org.societies.api.internal.privacytrust.privacy.model.dataobfuscation;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
 
@@ -46,7 +48,7 @@ public abstract class ObfuscatorInfo {
 	protected ObfuscationLevelType obfuscationLevelType;
 	protected int nbOfObfuscationLevelStep;
 	protected String obfuscableDataType;
-	protected Map<Double, String> obfuscationExamples;
+	protected TreeMap<Double, String> obfuscationExamples;
 
 	/**
 	 * To know if this obfuscation can be done on this node
@@ -96,29 +98,36 @@ public abstract class ObfuscatorInfo {
 	 * @return Friendly example of obfuscation. Null if no examples are provided.
 	 */
 	public String getObfuscationExample(double obfuscationLevel) {
-		// - No example: null
+		// - No example: empty
 		if (null == obfuscationExamples || obfuscationExamples.size() <= 0) {
-			return null;
+			return "";
 		}
 		// - Examples: search the good slot
-		double previous = 0;
-		String lastExample = null;
+		int index = 0;
+		double previous = 0.0;
+		String previousExample = "";
 		for(Entry<Double, String> entry : obfuscationExamples.entrySet()) {
 			double current = entry.getKey().doubleValue();
-			lastExample = entry.getValue();
-			// Current slot
-			if (obfuscationLevel >= previous && obfuscationLevel < current) {
-				return lastExample;
+			if (0 == index) {
+				previousExample = entry.getValue();
+				previous = -50000.0;
+				index++;
+				continue;
 			}
+			// Current slot
+			if (obfuscationLevel == previous || (obfuscationLevel >= previous && obfuscationLevel < current)) {
+				return previousExample;
+			}
+			previousExample = entry.getValue();
 			previous = current;
 
 		}
 		// Last slot or not in the slots: return the last one
-		return lastExample;
+		return previousExample;
 	}
 
 	/**
-	 * Retrieve all friendly obfuscation examples
+	 * Retrieve all friendly obfuscation examples (order: more obfuscated to not obfuscated)
 	 * @return All friendly obfuscation examples. Null if no examples are provided.
 	 */
 	public List<String> getAllObfuscationExamples() {
@@ -126,5 +135,44 @@ public abstract class ObfuscatorInfo {
 			return null;
 		}
 		return new ArrayList<String>(obfuscationExamples.values());
+	}
+
+
+	/**
+	 * Retrieve all friendly obfuscation examples (reversed order: not obfuscated to more obfuscated)
+	 * @return All friendly obfuscation examples. Null if no examples are provided.
+	 */
+	public List<String> getAllObfuscationExamplesReversed() {
+		if (null == obfuscationExamples || obfuscationExamples.size() <= 0) {
+			return null;
+		}
+		List<String> exampleList = new ArrayList<String>(obfuscationExamples.values());
+		Collections.reverse(exampleList);
+		return exampleList;
+	}
+
+	/**
+	 * Retrieve all friendly obfuscation examples (reversed order: not obfuscated to more obfuscated)
+	 * @return All friendly obfuscation examples. Null if no examples are provided.
+	 */
+	public List<ObfuscationExample> getObfuscationExamplesReversed() {
+		if (null == obfuscationExamples || obfuscationExamples.size() <= 0) {
+			return new ArrayList<ObfuscationExample>();
+		}
+		List<ObfuscationExample> exampleList = new ArrayList<ObfuscationExample>();
+		int obfuscationLevelStep = 0;
+		for(String content : obfuscationExamples.values()) {
+			exampleList.add(new ObfuscationExample(obfuscationLevelStep, content));
+			obfuscationLevelStep++;
+		}
+		Collections.reverse(exampleList);
+		return exampleList;
+	}
+
+	public double computeObfuscationLevel(int obfuscationLevelStep) {
+		if(ObfuscationLevelType.CONTINUOUS == obfuscationLevelType) {
+			return (double)obfuscationLevelStep/(double)100;
+		}
+		return (double)obfuscationLevelStep/(double)nbOfObfuscationLevelStep;
 	}
 }

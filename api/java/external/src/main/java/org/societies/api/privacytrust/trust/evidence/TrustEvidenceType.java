@@ -79,6 +79,16 @@ public enum TrustEvidenceType {
 	LEFT_COMMUNITY,
 	
 	/**
+	 * The enum constant for installing services.
+	 */
+	INSTALLED_SERVICE,
+	
+	/**
+	 * The enum constant for uninstalling services.
+	 */
+	UNINSTALLED_SERVICE,
+	
+	/**
 	 * The enum constant for using services.
 	 */
 	USED_SERVICE,

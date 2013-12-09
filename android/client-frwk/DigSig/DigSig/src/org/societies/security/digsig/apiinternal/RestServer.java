@@ -27,12 +27,12 @@ package org.societies.security.digsig.apiinternal;
 public class RestServer {
 
 	public static final String BASE = "/rest";
-	
+
 	/**
 	 * URL parameter. File name, including relative path.
 	 */
 	public static final String URL_PARAM_FILE = "file";
-	
+
 	/**
 	 * URL parameter. Digital signature of the uploader of the file (usually the provider).
 	 */

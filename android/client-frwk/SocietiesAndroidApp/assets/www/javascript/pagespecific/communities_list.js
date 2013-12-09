@@ -109,6 +109,9 @@ var	SocietiesCISListService = {
 								);
 			SocietiesPrivacyPolicyManagerService.getPrivacyPolicy('#getPrivacyPolicy', communityObj.ownerJid, communityObj.communityJid, bAdmin);
 			SocietiesCISListService.createSelectServices();
+			// Populate Trust Level
+			jTrustLevel.initRating('#community-trust-level', 'CIS', communityObj.communityJid);
+			jTrustLevel.showDetails('#community-trust-level', 'CIS', communityObj.communityJid);
 		}
 	},
 	

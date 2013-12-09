@@ -4,7 +4,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES</title>
+        <title>SOCIETIES</title>
     </ui:define>
 
     <ui:define name="body">
@@ -17,21 +17,140 @@
                 <h4 class="form_title">Help</h4>
 
                 <div class="hr dotted clearfix"></div>
-                <h6>Subheading</h6>
+                <h1>The Help Page</h1>
 
-                <p>Proin at eros non eros adipiscing mollis. Donec semper turpis sed diam. Sed consequat ligula nec tortor. Integer eget sem. Ut vitae enim eu est vehicula gravida. Morbi ipsum ipsum, porta nec, tempor id, auctor vitae, purus. Pellentesque neque. Nulla luctus erat vitae libero. Integer nec enim. Phasellus aliquam enim et tortor.</p>
-                <!-- Unordered -->
-                <h6>Topics:</h6>
-                <ul>
-                    <li>List item example</li>
-                    <li>List item example
-                        <ul>
-                            <li>Sub list item example</li>
-                            <li>Sub list item example</li>
-                        </ul>
-                    </li>
-                    <li><a class="tooltip" href="#" title="">List item example</a></li>
-                </ul>
+                <p>This is a help page, explaining how to use the GUIs and more. Each section and operation you can do on the Web App has its own part explaining it below, and these can be followed to explain the Android App as well, which is essentially a trimmed down version of the Web App. This is all followed by an FAQ on known and potential issues with the Web App, the Android App, and the 3rd party services you can use during the trial. Help on the normal operation of 3rd party services is available in the form of user guides you should have received. If you have any questions or problems this page does not help you with, please email us at: societies@macs.hw.ac.uk</p>
+<a name="webAppUse"></a>
+<h2>Web App use:</h2>
+
+<a name="mainPage"></a>
+<h3>Main Page</h3>
+
+<p>From the main page of the Web App you can access every other page by navigating the menu items near the top of the screen. Some of these have sub-menus when you hover the mouse over them. Each menu/sub-menu item is discussed in the following</p>
+
+<a name="communityManagement"></a>
+<h3>Community Management</h3>
+
+<p>Allows you to work with SOCIETIES communities, AKA CISs (Community Interaction Spaces). From here you can create communities, edit or delete existing communities you own or belong to, remove yourself from joined communities, invite people to your communities, and join suggested communities. Note that when creating a community, you can decide what to enter for the 'type' and 'description', but the privacy policy has a specific meaning: 'public' means all SOCIETIES users can see the community details; 'members only' means only users belonging to that community can see its details; and 'private' means only the owner can see them. Other than this, each of these community options should be fairly self-explanatory. Communities can be used to shared services with specific groups of people, be recognised by 3rd party services like the Collaborative Quiz for their own purposes, and to direct messages to those groups and their members.</p>
+
+<a name="societiesFriendsManagement"></a>
+<h3>SOCIETIES Friends Management</h3>
+
+<p>Allows you to add and remove your SOCIETIES friends, and send friend requests to other users. You can access a list of suggested friends who you can send requests to, and you can also access a list of requests you have received that you can choose to make friends with or not.</p>
+
+<a name="thirdPartyServiceManagement"></a>
+<h3>3rd Party Service (App) Management</h3>
+
+<p>All the 3rd party services, or Apps, available at the time you access the page are manageable here. You can view them, add them, and remove them. Use this page to run those apps that can be started from your personal computer. When a service is running, it will give you the option to stop it, and also each service lets you specify whether it is shared or not (a shared service will be visible to other users). On the right, there are options to filter the displayed services and view Community Services. Each kind of filter you can place on displayed services is an attribute of services, such as name, so you can e.g. only display services with a certain description or creator. Community services are those services currently shared on a CIS of yours.</p>
+
+<a name="personalisation"></a>
+<h3>Personalisation (Preferences and Intent)</h3>
+
+<p>Preferences are common actions you tend to take with the system and 3rd party services, under particular circumstances known to the context database. The preferences section lets you look at preferences that have been automatically identified for you already -- for example, that you tend to watch a certain channel when you turn on the MyTV channel between 15:00 and 17:00. These can be removed if you do not like them, or edited to e.g. change the conditions when the preference will be enacted.</p>
+
+<p>Intent is similar to preferences, but an intent describes a sequence of actions, possibly with circumstances surrounding them as above. When you start acting out the first one or two actions in an intent sequence, the intent lets the system predict follow-up actions and execute them automatically -- for example, you always start the Collaborative Quiz service when you stand in front of a Learning Zone screen, then select 'take quiz', then select the 'computing' set of questions, etc. As with preferences, these can be edited, deleted, and created in a similar manner.</p>
+
+<a name="privacy"></a>
+<h3>Privacy</h3>
+
+<p>Privacy policies are listed here. These specify what pieces of information stored in your container can be shown to what people, and to what extent. You can directly edit what the privacy policy is for each piece of context data about you, whether you manually entered that data or it was detected on you -- for example, you can set your name as visible to all users, but not let anyone see your GPS co-ordinates, or restrict who can see them.</p>
+
+<a name="profile"></a>
+<h3>Profile</h3>
+
+<p>Your profile information. Most of this should be self-explanatory, except it should be noted that 'position' can be interpreted as you like, although you may want to state 'student' for this. You can edit your profile here after it has already been created.</p>
+
+<a name="trust"></a>
+<h3>Trust</h3>
+
+<p>This gives your current trust levels for services and lets you change them. Trust basically indicates how much you trust this service to know about your information (context attributes), and to what extent. The higher the percentage, the more you trust the service and the more information you would disclose to it that it wants to know; a lower percentage means you would give it less information. For example, the 'NearMe' service will want to know your rough location around certain areas. Giving a 0% trust to this service would mean it could not access your location data, while 100% trust would mean it could.</p>
+<a name="androidAppUse"></a>
+<h2>Android App use:</h2>
+
+<p>The Android App should be fairly straightforward to use if you are familiar with the Web App -- it's essentially a reduced version of it, letting you manage communities, friends, and 3rd party services (apps). See the FAQ below for some user interfaces issues that have been discovered, however.</p>
+
+<h2>FAQ on issues you may have with SOCIETIES</h2>
+<a name="webAppIssues"></a>
+<h3>Web App</h3>
+
+<h4>Known issues</h4>
+<p>"When I try clicking a link, why does it just snap me back to the main page?" - If you reach the main page without logging in, remember to click 'Log in' in the upper right corner of the page first. Otherwise any subpage you go to will resend you back to the main page without explanation.</p>
+<a name="androidAppIssues"></a>
+<h3>Android App</h3>
+
+<h3>Ease of use</h3>
+<p>"Why is it so slow and 'sticky' to scroll through lists?" - The Android App can be slow and clunky when you scroll through large lists, such as lists of communities or friends. This is a performance issue stemming from the nuances of the implementation, and we ask for your patience in working with this.</p>
+<a name="serviceIssues"></a>
+<h2>3rd Party Services</h2>
+<a name="askFree"></a>
+<h3>AskFree</h3>
+
+<h4>Ease of use</h4>
+
+<p>"Can't I write questions any faster?" - Questions have to be entered on your Smartphone's 'digital keyboard', so of course a long question may take a while to type. You may want to keep your questions concise where possible, but if not then there is no time limit for questions so by all means take your time to enter them.</p>
+
+<h4>Known issues</h4>
+
+<p>"Why did my question not appear?" - There is a limit to the number of different (i.e. ones only asked by 1 student) questions viewable on the lecturer's screen at once, which is currently 10. However since the service can group questions on similar themes, it is very unlikely this limit will cause any questions to be blocked.</p>
+<a name="collaborativeQuiz"></a>
+<h3>Collaborative Quiz</h3>
+
+<h4>Ease of use</h4>
+<p> - The service should be fairly self-explanatory; consult the user guide if you are unsure of anything.</p>
+
+<h4>Known issues</h4>
+<p>"Why didn't it pick up my pose or hear what I said?" - Due to the Kinect's limitations, sometimes gestures or poses you make may take some time to register or you may have to try several times. You may also have to speak words 2 or 3 times for it to be recognised. Remember to speak clearly and not too quietly.</p>
+
+<h4>Potential issues</h4>
+<p>"Why did it stop detecting me?" - One person at a time should stand directly in front of the Kinect; if someone cuts in front or walks nearby the Kinect could confuse them for the current user, or lose track of the current user.</p>
+<a name="myTv"></a>
+<h3>MyTV</h3>
+
+<h4>Ease of use</h4>
+<p> - The service should be fairly self-explanatory; consult the user guide if you are unsure of anything.</p>
+
+<h4>Known issues</h4>
+<p>"Why can't I change the channel?" - Only one user can operate the service at once, and that user's ID is not displayed on the current version of the service. So, make sure to keep track of who started the service so only they try to operate on it.</p>
+<a name="nearMe"></a>
+<h3>NearMe</h3>
+
+<h4>Ease of use</h4>
+<p> "I don't understand the category labels on NearMe communities" - When you create a NearMe community, you can specify what it is about from some fixed list options. How this works is: there are three listboxes one after the other, starting from the Category listbox, and each of these gets more specific on the one above. So for example, if you specify the CIS category as 'Music', then the next listbox will let you choose from genres of music, and the one after that lets you choose musicians or something similar. When these communities are displayed or appear as CISs outside NearMe, these three 'category levels' will appear in a form separated by commas, such as 'Music, heavy metal, Aerosmith (apologies to heavy metal fans, we don't really know any bands - suggestions are welcome). Consult the user guide if you are unsure of anything.</p>
+
+<h4>Known issues</h4>
+<p>"Why is it picking up people that aren't nearby?" - The service has a wide range for detecting nearby people, and can pick up people that aren't actually in the same space -- for example they may be in another room nearby, or fairly far across the room.</p>
+<a name="contextAwareWall"></a>
+<h3>Context-Aware Wall</h3>
+
+<h4>Ease of use</h4>
+<p> - The service should be fairly self-explanatory; consult the user guide if you are unsure of anything.</p>
+<a name="geofencing"></a>
+<h3>Geofencing</h3>
+
+<h4>Ease of use</h4>
+<p> - The service should be fairly self-explanatory; consult the user guide if you are unsure of anything.</p>
+
+<h4>Potential issues</h4>
+<p>"Why are some people outside my fence being picked up, and some people inside being left out?" - The precision and accuracy of user location read by the Geofencing service may not be perfect. So, users nearby a Geofence but not actually in it may be picked up as within it, and people in the area may be picked out as outside, etc. It may be wise to make geofences a little generous with the range to ensure the people you want detected are detected.</p>
+<a name="sharedCalendar"></a>
+<h3>Shared Calendar</h3>
+
+<h4>Potential issues</h4>
+<p> - Shared Calendar has not been integrated with the platform until recently, and so may have issues we have not identified. Please report any problems you encounter to societies@macs.hw.ac.uk.</p>
+<a name="crowdTasking"></a>
+<h3>CrowdTasking</h3>
+
+<h4>Ease of use</h4>
+<p> - The service should be fairly self-explanatory; consult the user guide if you are unsure of anything.</p>
+<a name="coBrowser"></a>
+<h3>CoBrowser</h3>
+
+<h4>Ease of use</h4>
+<p> - The service should be fairly self-explanatory; consult the user guide if you are unsure of anything.</p>
+
+<h4>Known issues</h4>
+<p>"What's with the page changing?" - When one user clicks a hyperlink and changes pages, all users will go to that page without warning. You may want to use the chat function to point out when you're moving pages.</p>
+                
                 <div class="hr dotted clearfix"></div>
             </section>
         </section>
@@ -44,24 +163,45 @@
                     <h3>Help Topics</h3>
                 </header>
                 <ul class="sidebar">
-                    <li><a href="">Nav Item 1</a></li>
-                    <li><a href="">Nav Item 2</a></li>
-                    <li><a href="">Nav Item 3</a></li>
-                    <li><a href="">Nav Item 4</a></li>
-                    <li><a href="">Nav Item 5</a></li>
+                    <li><a href="#webAppUse">Web App Use</a></li>
+                        <ul>
+                            <li><a href="#mainPage">Main Page</a></li>
+                            <li><a href="#communityManagement">Community Management</a></li>
+                            <li><a href="#societiesFriendsManagement">SOCIETIES Friends Management</a></li>
+                            <li><a href="#thirdPartyServiceManagement">3rd Party Service (Apps) Management</a></li>
+                            <li><a href="#personalisation">Personalisation</a></li>
+                            <li><a href="#privacy">Privacy</a></li>
+                            <li><a href="#profile">Profile</a></li>
+                            <li><a href="#trust">Trust</a></li>
+                        </ul>
+                    <li><a href="#androidAppUse">Android App Use</a></li>
+                    <li><a href="#webAppIssues">FAQ - Web App Issues</a></li>
+                    <li><a href="#androidAppIssues">FAQ - Android App Issues</a></li>
+                    <li><a href="#serviceIssues">FAQ - 3rd Party Service Issues</a></li>
+                        <ul>
+                            <li><a href="#askFree">AskFree</a></li>
+                            <li><a href="#collaborativeQuiz">Collaborative Quiz</a></li>
+                            <li><a href="#myTv">MyTV</a></li>
+                            <li><a href="#nearMe">NearMe</a></li>
+                            <li><a href="#contextAwareWall">Context-Aware Wall</a></li>
+                            <li><a href="#geofencing">Geofencing</a></li>
+                            <li><a href="#sharedCalendar">Shared Calendar</a></li>
+                            <li><a href="#crowdTasking">Crowd Tasking</a></li>
+                            <li><a href="#coBrowser">CoBrowser</a></li>
+                        </ul>
                 </ul>
             </section>
             <section>
                 <header>
-                    <h3>Other Heading</h3>
+                    <h3>Contact</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
                 <ul class="contact_data">
-                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</li>
+                    <li>Contact us for further help at: societies@macs.hw.ac.uk</li>
                 </ul>
                 <ul class="contact_data">
-                    <li>Links - <a href="#">Link 1</a></li>
-                    <li>Links - <a href="#">Link 2</a></li>
+                    <li>Link - <a href="http://www.macs.hw.ac.uk/puma/">PUMA Lab</a></li>
+                    <li>Link - <a href="http://www.ict-societies.eu/">SOCIETIES Website</a></li>
                 </ul>
             </section>
             <div class="hr dotted clearfix"></div>

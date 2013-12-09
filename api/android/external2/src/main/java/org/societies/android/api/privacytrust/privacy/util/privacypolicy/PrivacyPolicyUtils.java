@@ -32,6 +32,9 @@ import java.util.Map;
 import org.societies.android.api.cis.model.CisAttributeTypes;
 import org.societies.android.api.context.model.CtxAttributeTypes;
 import org.societies.android.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.android.api.context.model.CtxAssociationTypes;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
+import org.societies.android.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
@@ -67,7 +70,7 @@ public class PrivacyPolicyUtils {
 	public static RequestPolicy inferPrivacyPolicy(PrivacyPolicyTypeConstants privacyPolicyType, Map configuration) throws PrivacyException {
 		RequestPolicy privacyPolicy = new RequestPolicy();
 		List<RequestItem> requestItems = new ArrayList<RequestItem>();
-		
+
 		// ---- Add privacy policy type
 		privacyPolicy.setPrivacyPolicyType(privacyPolicyType);
 
@@ -77,30 +80,30 @@ public class PrivacyPolicyUtils {
 		}
 
 		// ---- Add common request items
-//		// --- Prepare common data
-//		PrivacyPolicyBehaviourConstants globalBaheviour = PrivacyPolicyBehaviourConstants.PRIVATE;
-//		if (configuration.containsKey("globalBehaviour")) {
-//			globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
-//		}
-//		// -- Actions: read
-//		List<Action> actions = ActionUtils.createList(ActionConstants.READ, ActionConstants.CREATE);
-//		// -- Conditions
-//		List<Condition> conditions = new ArrayList<Condition>();
-//		// - Common
-//		conditions.add(ConditionUtils.create(ConditionConstants.STORE_IN_SECURE_STORAGE, "Yes"));
-//		// - Visibility
-//		// Public
-//		if (PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
-//			conditions.add(ConditionUtils.createPublic());
-//		}
-//		// Members only
-//		else if (PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
-//			conditions.add(ConditionUtils.createMembersOnly());
-//		}
-//		// Private
-//		else {
-//			conditions.add(ConditionUtils.createPrivate());
-//		}
+		//		// --- Prepare common data
+		//		PrivacyPolicyBehaviourConstants globalBaheviour = PrivacyPolicyBehaviourConstants.PRIVATE;
+		//		if (configuration.containsKey("globalBehaviour")) {
+		//			globalBaheviour = (PrivacyPolicyBehaviourConstants) configuration.get("globalBehaviour");
+		//		}
+		//		// -- Actions: read
+		//		List<Action> actions = ActionUtils.createList(ActionConstants.READ, ActionConstants.CREATE);
+		//		// -- Conditions
+		//		List<Condition> conditions = new ArrayList<Condition>();
+		//		// - Common
+		//		conditions.add(ConditionUtils.create(ConditionConstants.STORE_IN_SECURE_STORAGE, "Yes"));
+		//		// - Visibility
+		//		// Public
+		//		if (PrivacyPolicyBehaviourConstants.PUBLIC.name().equals(globalBaheviour.name())) {
+		//			conditions.add(ConditionUtils.createPublic());
+		//		}
+		//		// Members only
+		//		else if (PrivacyPolicyBehaviourConstants.MEMBERS_ONLY.name().equals(globalBaheviour.name())) {
+		//			conditions.add(ConditionUtils.createMembersOnly());
+		//		}
+		//		// Private
+		//		else {
+		//			conditions.add(ConditionUtils.createPrivate());
+		//		}
 
 		privacyPolicy.setRequestItems(requestItems);
 		return privacyPolicy;
@@ -151,6 +154,11 @@ public class PrivacyPolicyUtils {
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAssociationTypes.HAS_MEMBERS);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
 		// - Location symbolic
 		{
 			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LOCATION_SYMBOLIC);
@@ -182,9 +190,15 @@ public class PrivacyPolicyUtils {
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}
-		// - Occupation
+		// - Languages
 		{
-			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.WORK_POSITION);
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.LANGUAGES);
+			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
+			requestItems.add(requestItem);
+		}
+		// - CACI Model
+		{
+			Resource resource = ResourceUtils.create(DataIdentifierScheme.CONTEXT, "caci_model");
 			RequestItem requestItem = RequestItemUtils.create(resource, actions, conditions, optional);
 			requestItems.add(requestItem);
 		}

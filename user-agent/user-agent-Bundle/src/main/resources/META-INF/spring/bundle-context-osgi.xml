@@ -29,21 +29,13 @@
             <value>org.societies.useragent.api.feedback.IInternalUserFeedback</value>
         </osgi:interfaces>
     </osgi:service>
-
+    
+    
     <osgi:service ref="uaCommsClient">
         <osgi:interfaces>
             <value>org.societies.useragent.api.remote.IUserAgentRemoteMgr</value>
         </osgi:interfaces>
     </osgi:service>
-
-    <osgi:service ref="userFeedbackHistoryRepositoryBean"
-                  interface="org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository"/>
-
-    <osgi:service ref="privacyPolicyNegotiationHistoryRepositoryBean"
-                  interface="org.societies.useragent.api.feedback.IPrivacyPolicyNegotiationHistoryRepository"/>
-
-    <osgi:service ref="accessControlHistoryRepositoryBean"
-                  interface="org.societies.useragent.api.feedback.IAccessControlHistoryRepository"/>
 
 
     <!-- Import External services -->
@@ -71,5 +63,9 @@
     </osgi:reference>
 
     <osgi:reference id="dataSource" interface="javax.sql.DataSource"/>
+    
+    
+    <osgi:reference id="serviceRegistry" interface="org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry">
+    </osgi:reference>
 
 </beans>

@@ -50,6 +50,7 @@ public class TimedAbortProcessor implements Runnable {
         timedAbortProcessorThread = new Thread(instance);
         timedAbortProcessorThread.setName("TimedAbortProcessor");
         timedAbortProcessorThread.setDaemon(true);
+        timedAbortProcessorThread.start();
     }
 
 
@@ -63,7 +64,8 @@ public class TimedAbortProcessor implements Runnable {
     private Context context;
 
     private TimedAbortProcessor() {
-
+    	Log.e(LOG_TAG, "TimedAbortProcessor constructor");
+    	
     }
 
     public Context getContext() {
@@ -76,6 +78,7 @@ public class TimedAbortProcessor implements Runnable {
 
     @Override
     public void run() {
+    	Log.e(LOG_TAG, "in run()");
         while (!abort) {
             try {
                 processTimedAborts();
@@ -84,6 +87,7 @@ public class TimedAbortProcessor implements Runnable {
             }
 
             try {
+            	Log.e(LOG_TAG, "sleeping...");
                 Thread.sleep(500);
             } catch (InterruptedException ex) {
                 Log.e(LOG_TAG, "Error sleeping on timed abort processing thread", ex);
@@ -93,7 +97,7 @@ public class TimedAbortProcessor implements Runnable {
 
     public void stop() {
         abort = true;
-
+        Log.e(LOG_TAG, "finish()");
         //FINISH
         if (eventsHelper != null)
             eventsHelper.tearDownService(new IMethodCallback() {
@@ -112,6 +116,7 @@ public class TimedAbortProcessor implements Runnable {
     }
 
     private void processTimedAborts() {
+    	Log.e(LOG_TAG, "processTimedAborts()");
         synchronized (timedAbortsToWatch) {
             for (int i = 0; i < timedAbortsToWatch.size(); i++) {
                 UserFeedbackBean ufBean = timedAbortsToWatch.get(i);
@@ -134,19 +139,25 @@ public class TimedAbortProcessor implements Runnable {
                 i = 0; // this is really dirty, and will result in us potentially processing some items twice
                 // but it's not a big performance issue, and will prevent us missing any on the off chance that
                 // removeTimedAbort(...) removes more than 1 item
+                
+                /*remove abort event from gui*/
+                
             }
         }
     }
 
     public void addTimedAbort(UserFeedbackBean userFeedbackBean) {
         Date arrivalTime = new Date();
-
+        
+        Log.e(LOG_TAG, "addTimedAbort()");
+        Log.e(LOG_TAG, "arrivalTime: " + arrivalTime.getTime());
+       
         synchronized (timedAbortsToWatch) {
             timedAbortsToWatch.add(userFeedbackBean);
         }
         synchronized (expiryTime) {
             Date expiryDate = new Date(arrivalTime.getTime() + (long) userFeedbackBean.getTimeout());
-
+            Log.e(LOG_TAG, "userFeedbackBean TimeOut: " + userFeedbackBean.getTimeout());
             Log.d(LOG_TAG, "Watching TA event with ID " + userFeedbackBean.getRequestId() + ", expiring " + expiryDate);
 
             expiryTime.put(userFeedbackBean.getRequestId(), expiryDate);
@@ -154,6 +165,7 @@ public class TimedAbortProcessor implements Runnable {
     }
 
     public void removeTimedAbort(String requestId) {
+    	Log.e(LOG_TAG, "removeTimedAbort()");
         synchronized (timedAbortsToWatch) {
             for (int i = 0; i < timedAbortsToWatch.size(); i++) {
                 UserFeedbackBean bean = timedAbortsToWatch.get(i);
@@ -199,6 +211,7 @@ public class TimedAbortProcessor implements Runnable {
     }
 
     private void publishIgnoreEvent(String requestId) {
+    	Log.e(LOG_TAG, "publishIgnoreEvent()");
         try {
             ImpFeedbackResultBean bean = new ImpFeedbackResultBean();
             bean.setAccepted(true);

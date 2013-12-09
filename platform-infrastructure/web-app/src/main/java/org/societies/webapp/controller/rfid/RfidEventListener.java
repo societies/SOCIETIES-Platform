@@ -51,7 +51,7 @@ public class RfidEventListener extends EventListener{
 	public RfidEventListener(RFidClientController controller, IEventMgr eventMgr){
 		this.controller = controller;
 		eventMgr.subscribeInternalEvent(this, new String[]{RFID_EVENT_TYPE}, null);
-		this.log.debug("123456789 - subscribed");
+		if(log.isDebugEnabled()) log.debug("123456789 - subscribed");
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class RfidEventListener extends EventListener{
 
 	public void unsubscribe(){
 		this.controller.getEventManager().unSubscribeInternalEvent(this, new String[]{RFID_EVENT_TYPE}, null);
-		this.log.debug("123456789 - unsubscribed");
+		if(log.isDebugEnabled()) log.debug("123456789 - unsubscribed");
 	}
 
 }

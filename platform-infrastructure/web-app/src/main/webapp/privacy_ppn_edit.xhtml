@@ -136,12 +136,12 @@
 			<h:panelGrid columns="2" cellpadding="5">
 
 				<h:outputLabel for="privacyCondition" value="Privacy Condition:" />
-				<h:selectOneMenu id="privacyCondition"
+				<p:selectOneMenu id="privacyCondition"
 					value="#{PPNeditBean.selectedPrivacyCondition}">
 					<f:selectItems value="#{PPNeditBean.privacyConditions}" />
 					<p:ajax update="privacyConditionValue"
 						listener="#{PPNeditBean.handlePrivacyTypeChange}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 
 				<h:outputLabel for="operator" value="Operator: " />
 				<p:selectOneMenu id="operator"
@@ -174,10 +174,10 @@
 			widgetVar="addOutdlg" resizable="false" dynamic="true">
 			<h:panelGrid columns="2" cellpadding="5">
 				<h:outputLabel for="decision" value="Select your action:" />
-				<h:selectOneMenu id="decision"
+				<p:selectOneMenu id="decision"
 					value="#{PPNeditBean.selectedDecision}">
 					<f:selectItems value="#{PPNeditBean.decisions}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 				<f:facet name="footer">
 					<p:commandButton id="AddOutcomeButton" value="Add"
 						oncomplete="#{p:widgetVar('addOutcomeDialog')}.hide()"

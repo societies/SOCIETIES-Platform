@@ -7,7 +7,6 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 
 public class TestUserFeedback extends IntegrationTestCase {
 
@@ -15,9 +14,7 @@ public class TestUserFeedback extends IntegrationTestCase {
 
     private static PubsubClient pubsub;
     private static ICommManager commsMgr;
-    private static MySQLHelper mySQLHelper;
     private static IUserFeedback userFeedback;
-    private static IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
     public TestUserFeedback() {
         super(2074, Tester.class);
@@ -47,15 +44,6 @@ public class TestUserFeedback extends IntegrationTestCase {
         TestUserFeedback.commsMgr = commsMgr;
     }
 
-    public static MySQLHelper getMySQLHelper() {
-        return mySQLHelper;
-    }
-
-    @SuppressWarnings("MethodMayBeStatic")
-    public void setMySQLHelper(MySQLHelper mySQLHelper) {
-        TestUserFeedback.mySQLHelper = mySQLHelper;
-    }
-
     public static IUserFeedback getUserFeedback() {
         return userFeedback;
     }
@@ -65,12 +53,4 @@ public class TestUserFeedback extends IntegrationTestCase {
         TestUserFeedback.userFeedback = userFeedback;
     }
 
-    @SuppressWarnings("MethodMayBeStatic")
-    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
-        TestUserFeedback.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
-    }
-
-    public static IUserFeedbackHistoryRepository getUserFeedbackHistoryRepository() {
-        return userFeedbackHistoryRepository;
-    }
 }

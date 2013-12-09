@@ -15,6 +15,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.DatatypeConverter;
@@ -94,15 +95,29 @@ public class LoginController extends BasePageController {
     public String logoutAction() {
         log.debug("logoutAction()");
 
-        if (!isLoggedIn())
+        if (!isLoggedIn()){
             return "false";
-
+        }        
+        
+        //redirect
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        try {
+			externalContext.redirect("http://societies.local.macs.hw.ac.uk:8080/societies-platform/index.html");
+			log.debug("redirected to http://societies.local.macs.hw.ac.uk:8080/societies-platform/index.html");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  
         String summary = "User " + getUsername() + " logged out";
         String detail = "User logged out";
 
         userService.logout();
+        
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().remove("contextManagementController");
 
         addGlobalMessage(summary, detail, FacesMessage.SEVERITY_INFO);
+      
 
         return "true";
     }

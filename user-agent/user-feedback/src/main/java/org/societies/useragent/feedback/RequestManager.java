@@ -46,7 +46,7 @@ public class RequestManager {
 		try{
 			nextForm = requestQueue.element();
 		}catch(Exception e){
-			LOG.debug("The feedback request queue is empty");
+			if(LOG.isDebugEnabled()) LOG.debug("The feedback request queue is empty");
 		}
 		return nextForm;
 	}

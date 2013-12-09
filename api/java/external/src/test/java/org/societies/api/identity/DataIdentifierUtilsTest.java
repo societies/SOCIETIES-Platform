@@ -119,7 +119,7 @@ public class DataIdentifierUtilsTest {
 	public void testIsParentType() {
 		String testTitle = "Get scheme";
 		LOG.info("[Test] "+testTitle);
-		DataIdentifier id0 = DataIdentifierFactory.fromType(DataIdentifierScheme.CONTEXT, "ADDRESS_HOME");
+		DataIdentifier id0 = DataIdentifierFactory.fromType(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ADDRESS_HOME);
 		DataIdentifier id1 = DataIdentifierFactory.fromType(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.ADDRESS_HOME_CITY);
 		DataIdentifier id2 = DataIdentifierFactory.create(DataIdentifierScheme.CONTEXT, "me.ict-societies.eu", CtxAttributeTypes.ADDRESS_HOME_CITY);
 		DataIdentifier id3 = DataIdentifierFactory.fromType(DataIdentifierScheme.CONTEXT, CtxAttributeTypes.BIRTHDAY);

@@ -28,6 +28,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -89,6 +90,7 @@ public class TestActionEvent {
 	private final String Service_Type = "media";
 	private CtxAttribute preferenceAttribute;
 	private CtxEntity preferenceEntity;
+	private String uuid = UUID.randomUUID().toString();
 
 	@Ignore
 	@Test
@@ -101,7 +103,7 @@ public class TestActionEvent {
 			 * case 1
 			 */
 			this.changeContext("home", "free");
-			Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, new Action(this.serviceId, Service_Type, VOLUME, "0"));
+			Future<List<IPreferenceOutcome>> futureOutcomes = pcm.getOutcome(mockId, new Action(this.serviceId, Service_Type, VOLUME, "0"), this.uuid);
 			List<IPreferenceOutcome> outcomes = futureOutcomes.get();
 			if (outcomes.size()==0){
 				Assert.fail("PCM didn't return an outcome");
@@ -122,7 +124,7 @@ public class TestActionEvent {
 			 * case 2
 			 */
 			this.changeContext("work","busy");
-			futureOutcomes = pcm.getOutcome(mockId, new Action(this.serviceId, Service_Type, VOLUME, "0"));
+			futureOutcomes = pcm.getOutcome(mockId, new Action(this.serviceId, Service_Type, VOLUME, "0"), this.uuid);
 			outcomes = futureOutcomes.get();
 			if (outcomes.size()==0){
 				Assert.fail("PCM didn't return an outcome");
@@ -141,7 +143,7 @@ public class TestActionEvent {
 			 * case 3
 			 */
 			this.changeContext("", "");
-			futureOutcomes = pcm.getOutcome(mockId, new Action(this.serviceId, Service_Type, VOLUME, "0"));
+			futureOutcomes = pcm.getOutcome(mockId, new Action(this.serviceId, Service_Type, VOLUME, "0"), this.uuid);
 			outcomes = futureOutcomes.get();
 			if (outcomes.size()==0){
 				Assert.fail("PCM didn't return an outcome");

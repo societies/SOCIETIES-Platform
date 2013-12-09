@@ -78,6 +78,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
         aMap.put(TrustEvidenceType.UNFRIENDED_USER, -50.0d);
         aMap.put(TrustEvidenceType.JOINED_COMMUNITY, +10.0d);
         aMap.put(TrustEvidenceType.LEFT_COMMUNITY, -50.0d);
+        aMap.put(TrustEvidenceType.INSTALLED_SERVICE, +10.0d);
+        aMap.put(TrustEvidenceType.UNINSTALLED_SERVICE, -50.0d);
         aMap.put(TrustEvidenceType.USED_SERVICE, +1.0d);
         EVIDENCE_SCORE_MAP = Collections.unmodifiableMap(aMap);
     }
@@ -174,6 +176,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			case WITHHELD_CONTEXT:
 			case FRIENDED_USER:
 			case UNFRIENDED_USER:
+			case INSTALLED_SERVICE:
+			case UNINSTALLED_SERVICE:
 			case USED_SERVICE:
 				final Double oldScore = trustee.getDirectTrust().getScore();
 				if (!(evidence.getInfo() instanceof Double)) {
@@ -374,6 +378,8 @@ public class DirectTrustEngine extends TrustEngine implements IDirectTrustEngine
 			case RATED:
 			case FRIENDED_USER:
 			case UNFRIENDED_USER:
+			case INSTALLED_SERVICE:
+			case UNINSTALLED_SERVICE:
 			case USED_SERVICE:
 				if (trustorId.equals(evidence.getSubjectId())) {
 					result = true;

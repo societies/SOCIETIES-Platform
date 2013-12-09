@@ -65,13 +65,19 @@ public class PrivateContextCache {
 	
 	public String getContextValue(CtxIdentifier id){
 		
-		this.logging.debug("looking for value of context id: "+id.toUriString());
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("looking for value of context id: "+id.toUriString());
+		}
 		this.printCache();
 		if (this.cache.containsKey(id)){
-			this.logging.debug("cache contains context value of id: "+id.toUriString());
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("cache contains context value of id: "+id.toUriString());
+			}
 			return this.cache.get(id);
 		}
-		this.logging.debug("cache doesn't have id:"+id.toUriString());
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("cache doesn't have id:"+id.toUriString());
+		}
 		//cache doesn't contain the context identifier so we're going to get it from context, add it to the cache and return the value
 		this.retrieveContext(id);
 		if (this.cache.containsKey(id)){
@@ -82,15 +88,21 @@ public class PrivateContextCache {
 	}
 
 	public void printCache(){
-		this.logging.debug("********* CONTEXT CACHE CONTENTS START ********************");
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("********* CONTEXT CACHE CONTENTS START ********************");
+		}
 		Enumeration<String> e = mapping.keys();
 		
 		while (e.hasMoreElements()){
 			String type = e.nextElement();
 			CtxIdentifier id = mapping.get(type);
-			this.logging.debug("Type: "+type+" :: ID: "+mapping.get(type).toUriString()+"  VALUE: "+this.cache.get(id));
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("Type: "+type+" :: ID: "+mapping.get(type).toUriString()+"  VALUE: "+this.cache.get(id));
+			}
 		}
-		this.logging.debug("********* CONTEXT CACHE CONTENTS END ********************");
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("********* CONTEXT CACHE CONTENTS END ********************");
+		}
 	}
 	
 	private void retrieveContext(String type){
@@ -121,29 +133,43 @@ public class PrivateContextCache {
 	private void retrieveContext(CtxIdentifier id){
 		//this.updater.registerForContextEvent((CtxAttributeIdentifier) id);
 		this.printCache();
-		this.logging.debug("contacting context DB for retrieving id"+id.toUriString());
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("contacting context DB for retrieving id"+id.toUriString());
+		}
 		try {
 			CtxAttribute attr = (CtxAttribute) broker.retrieve(id).get();
 			if (null!=attr){
-				this.logging.debug ("found id: "+id.toUriString()+" in context DB");
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug ("found id: "+id.toUriString()+" in context DB");
+				}
 				String val = attr.getStringValue();
 				String type = attr.getType();
 				if (type==null){
-					this.logging.debug("context attribute type is null!");
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("context attribute type is null!");
+					}
 				}
 				if (id==null){
-					this.logging.debug("Context ID is null!");
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("Context ID is null!");
+					}
 				}
 				
 				if (val==null){
-					this.logging.debug("String value of attribute is null!");
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("String value of attribute is null!");
+					}
 				}
 				this.mapping.put(type, id);
 				this.cache.put(id,val);
 			
-				this.logging.debug("updated Context Cache for context type: "+type+" with id: "+id.toUriString()+" with value: "+this.cache.get(id));
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("updated Context Cache for context type: "+type+" with id: "+id.toUriString()+" with value: "+this.cache.get(id));
+				}
 			}else{
-				this.logging.debug("id :"+id.toUriString()+" not found in context DB");
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("id :"+id.toUriString()+" not found in context DB");
+				}
 			}
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -161,7 +187,9 @@ public class PrivateContextCache {
 	public void updateCache(CtxAttribute ctxAttr){
 
 		if (ctxAttr==null){
-			this.logging.debug("Attempt to update Preference Manager context cache with null CtxAttribute, ignoring ");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("Attempt to update Preference Manager context cache with null CtxAttribute, ignoring ");
+			}
 			return;
 		}
 		String type = ctxAttr.getType();
@@ -169,7 +197,9 @@ public class PrivateContextCache {
 		CtxIdentifier id = ctxAttr.getId();
 		this.cache.put(id, value);
 		this.mapping.put(type, id);
-		this.logging.debug("updated Context Cache for context type: "+type+" with id: "+id.toUriString()+" with value: "+this.cache.get(id));
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("updated Context Cache for context type: "+type+" with id: "+id.toUriString()+" with value: "+this.cache.get(id));
+		}
 		this.printCache();
 	}
 

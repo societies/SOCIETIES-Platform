@@ -57,8 +57,7 @@ public class ServiceWrapper {
 	private static final Logger log = LoggerFactory.getLogger(ServiceWrapper.class);
 	
 	public ServiceWrapper(Service service, ServicesController controller) {
-		if(log.isDebugEnabled())
-			log.debug("ServiceWrapper created for Service: " + service.getServiceName());
+		log.debug("ServiceWrapper created for Service: {}", service.getServiceName());
 		this.service = service;
 		this.controller = controller;
 		this.mySharedCis = new ArrayList<ICis>();
@@ -121,6 +120,10 @@ public class ServiceWrapper {
 	
 	public String getOwnerJid(){
 		return ServiceModelUtils.getJidFromServiceIdentifier(service.getServiceIdentifier());
+	}
+	
+	public String getEndpoint(){
+		return service.getServiceEndpoint();
 	}
 	
 	public String getOwnerName(){
@@ -247,33 +250,36 @@ public class ServiceWrapper {
 			return;
 		}
 		
-		log.debug("Set Shared CIS, previous {}, now {}", sharedCisList.size(), cisListId.size());
+		if(sharedCisList.size() ==  cisListId.size())
+			return;
 		
+		//log.debug("Set Shared CIS, previous {}, now {}", sharedCisList.size(), cisListId.size());
+
 		if(sharedCisList.size() > cisListId.size()){
-			log.debug("We've stopped sharing with a CIS!");
+			log.debug("{}: We've stopped sharing with a CIS!",getName());
 			String removedCis = null;
 			for(String sharedCis : sharedCisList){
 				if(!cisListId.contains(sharedCis))
 					removedCis = sharedCis;
 			}
 			if(removedCis != null){
-				log.debug("The CIS we need to unshare is: {}", removedCis);
+				log.debug("{}: The CIS we need to unshare is: {}",getName(), removedCis);
 				controller.unshareService(getId(),removedCis);
 			} else{
-				log.warn("Couldn't find the CIS to remove?!");
+				log.warn("{}: Couldn't find the CIS to remove?!",getName());
 			}
 		} else{
-			log.debug("We've added sharing to another CIS!");
+			log.debug("{}: We've added sharing to another CIS!",getName());
 			String newCis = null;
 			for(String sharedCis : cisListId){
 				if(!sharedCisList.contains(sharedCis))
 					newCis = sharedCis;
 			}
 			if(newCis != null){
-				log.debug("The CIS we need to share is: {}", newCis);
+				log.debug("{}: The CIS we need to share is: {}",getName(), newCis);
 				controller.shareService(getId(),newCis);
 			} else{
-				log.warn("Couldn't find the CIS to share?!");
+				log.warn("{}: Couldn't find the CIS to share?!",getName());
 			}
 		}
 		

@@ -37,6 +37,7 @@ import org.societies.personalisation.preference.api.CommunityPreferenceManagemen
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
 public class CommunityPreferenceManagement implements ICommunityPreferenceManager{
 
@@ -58,6 +59,9 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 	@Override
 	public List<IPreferenceTreeModel> getAllCommunityPreferences(IIdentity cisID) {
 
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Request to get all community preferences for cis: "+cisID.getBareJid());
+		}
 		boolean ownCIS = false;
 		List<ICisOwned> listOfOwnedCis = cisManager.getListOfOwnedCis();
 		for (ICisOwned ownedCis : listOfOwnedCis){
@@ -77,15 +81,25 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 				}
 			}
 
+			if(logging.isDebugEnabled()){
+				this.logging.debug("Returning : "+models.size()+" preferences from my community: "+cisID.getBareJid());
+			}
 			return models;
 		}else{
-			return this.communityPreferenceManagementClient.getAllCommunityPreferences(cisID);
+			List<IPreferenceTreeModel> allCommunityPreferences = this.communityPreferenceManagementClient.getAllCommunityPreferences(cisID);
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Returning : "+allCommunityPreferences.size()+" preferences from (not my) community: "+cisID.getBareJid());
+			}
+			return allCommunityPreferences;
 		}
 
 	}
 
 	@Override
 	public void uploadUserPreferences(IIdentity cisId, List<IPreferenceTreeModel> models) {
+		if (this.logging.isDebugEnabled()){
+			this.logging.debug("Uploading : "+models.size()+" preferences to community: "+cisId.getBareJid());
+		}
 		boolean ownCIS = false;
 
 		List<ICisOwned> listOfOwnedCis = cisManager.getListOfOwnedCis();
@@ -99,15 +113,21 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 
 		if (ownCIS){
 			//JOptionPane.showMessageDialog(null, "I own this CIS");
-			this.logging.debug("Uploading new community preferences.");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Uploading "+models.size()+" community preferences to my community: "+cisId.getBareJid());
+			}
 			for (IPreferenceTreeModel newModel : models){
 				PreferenceDetails newDetail = newModel.getPreferenceDetails();
 				IPreferenceTreeModel existingModel = this.prefCache.getPreference(cisId, newDetail);
 				if (existingModel==null){
-					this.logging.debug("There's no previous preference for : "+newDetail.toString()+". Saving as is ");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("There's no previous preference for : "+newDetail.toString()+". Saving as is ");
+					}
 					this.prefCache.storePreference(cisId, newDetail, newModel);
 				}else{
-					this.logging.debug("Merging individual with community preference");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("Merging individual with community preference");
+					}
 					PreferenceMerger merger = new PreferenceMerger();
 					IPreference mergeTrees = merger.mergeTrees(existingModel.getRootPreference(), newModel.getRootPreference(), "");
 					IPreferenceTreeModel mergedModel = new PreferenceTreeModel(newDetail, mergeTrees);
@@ -117,12 +137,18 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 
 		}else{
 			//JOptionPane.showMessageDialog(null, "I do not own this CIS");
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Uploading "+models.size()+" community preferences to someone else's community: "+cisId.getBareJid());
+			}
 			this.communityPreferenceManagementClient.uploadUserPreferences(cisId, models);
 		}
 	}
 
 	@Override
 	public List<PreferenceDetails> getCommunityPreferenceDetails(IIdentity cisId) {
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Request to get all community preference details for cis: "+cisId.getBareJid());
+		}
 		boolean ownCIS = false;
 		List<ICisOwned> listOfOwnedCis = cisManager.getListOfOwnedCis();
 		for (ICisOwned ownedCis : listOfOwnedCis){
@@ -132,9 +158,18 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 		}
 
 		if (ownCIS){
-			return this.prefCache.getPreferenceDetailsForAllPreferences(cisId);
+			ArrayList<PreferenceDetails> preferenceDetailsForAllPreferences = this.prefCache.getPreferenceDetailsForAllPreferences(cisId);
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Returning : "+preferenceDetailsForAllPreferences.size()+" preference details from (my) community: "+cisId.getBareJid());
+			}
+			
+			return preferenceDetailsForAllPreferences;
 		}else{
-			return this.communityPreferenceManagementClient.getCommunityPreferenceDetails(cisId);
+			List<PreferenceDetails> communityPreferenceDetails = this.communityPreferenceManagementClient.getCommunityPreferenceDetails(cisId);
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Returning : "+communityPreferenceDetails.size()+" preference details from (not my) community: "+cisId.getBareJid());
+			}
+			return communityPreferenceDetails;
 		}
 	}
 
@@ -142,6 +177,9 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 	@Override
 	public List<IPreferenceTreeModel> getCommunityPreferences(IIdentity cisId,
 			List<PreferenceDetails> details) {
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Request to get "+details.size()+" community preferences from cis: "+cisId.getBareJid());
+		}
 		boolean ownCIS = false;
 		List<ICisOwned> listOfOwnedCis = cisManager.getListOfOwnedCis();
 		for (ICisOwned ownedCis : listOfOwnedCis){
@@ -157,9 +195,17 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 				models.add(this.prefCache.getPreference(cisId, detail));
 				
 			}
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Returning : "+models.size()+" preferences  from (my) community: "+cisId.getBareJid());
+			}
 			return models;
 		}else{
-			return this.communityPreferenceManagementClient.getCommunityPreferences(cisId, details);
+			
+			List<IPreferenceTreeModel> communityPreferences = this.communityPreferenceManagementClient.getCommunityPreferences(cisId, details);
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Returning : "+communityPreferences.size()+" preferences  from (my) community: "+cisId.getBareJid());
+			}
+			return communityPreferences;
 		}
 	}
 

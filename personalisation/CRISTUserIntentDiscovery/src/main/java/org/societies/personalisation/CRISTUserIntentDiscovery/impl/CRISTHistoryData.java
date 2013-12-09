@@ -25,7 +25,7 @@ public class CRISTHistoryData {
 			
 		this.action = action;
 		this.situation = situation;
-		LOG.info("New CRISTHistoryData: " + ((CRISTUserAction) this.action).getActionID() + ", " + this.situation.getSituationID());
+		//LOG.info("New CRISTHistoryData: " + ((CRISTUserAction) this.action).getActionID() + ", " + this.situation.getSituationID());
 	}
 
 	public IAction getAction() {

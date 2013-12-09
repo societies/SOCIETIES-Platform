@@ -24,8 +24,12 @@
  */
 package org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import javax.swing.JOptionPane;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +42,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.PPNegotiationEvent;
@@ -52,12 +57,16 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
 import org.societies.api.schema.identity.DataIdentifierScheme;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -65,6 +74,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.PrivacyPreference;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlOutcome;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.accesscontrol.AccessControlPreferenceTreeModel;
+import org.societies.privacytrust.privacyprotection.api.util.PrivacyPreferenceUtils;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.AccessControlPreferenceManager;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.PrivacyPreferenceManager;
 
@@ -84,8 +94,9 @@ public class AccessControlPreferenceCreator extends EventListener{
 	private final AccessControlPreferenceManager accCtrlPrefMgr;
 	private PrivacyPreferenceManager ppMgr;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
+	private String[] sensedDataTypes;
 
-	
+
 	public AccessControlPreferenceCreator(PrivacyPreferenceManager ppMgr){
 		this.ppMgr = ppMgr;
 		this.eventMgr = ppMgr.getEventMgr();
@@ -95,11 +106,16 @@ public class AccessControlPreferenceCreator extends EventListener{
 		this.idMgr = ppMgr.getCommsMgr().getIdManager();
 		this.accCtrlPrefMgr = ppMgr.getAccessControlPreferenceManager();
 		try{
-			this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}, "");
+			this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT}, null);
 		}catch(Exception e){
 			System.out.println("could not subscribe to event: "+EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT);
 		}
 
+		sensedDataTypes = new String[]{CtxAttributeTypes.TEMPERATURE, 
+				CtxAttributeTypes.STATUS,
+				CtxAttributeTypes.LOCATION_SYMBOLIC,
+				CtxAttributeTypes.LOCATION_COORDINATES,
+				CtxAttributeTypes.ACTION};
 	}
 	@Override
 	public void handleExternalEvent(CSSEvent arg0) {
@@ -109,35 +125,58 @@ public class AccessControlPreferenceCreator extends EventListener{
 
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
-
+		this.logging.debug("Received event: name: "+event.geteventName()+" - type: "+event.geteventType());
 		if (event.geteventInfo() instanceof PPNegotiationEvent){
 			PPNegotiationEvent ppnEvent = (PPNegotiationEvent) event.geteventInfo();
 			IAgreement agreementObj = ppnEvent.getAgreement();
 			Agreement agreement = AgreementUtils.toAgreementBean(agreementObj);
+			this.logging.debug("Retrieved agreement from PPNegotiationEvent with "+agreement.getRequestedItems().size()+" requestItems");
 
 			List<ResponseItem> responseItems = agreement.getRequestedItems();
+			String dataTypes = "";
 			for (ResponseItem item: responseItems){
 				String dataType = item.getRequestItem().getResource().getDataType();
+				dataTypes = dataTypes.concat(dataType+", ");
+			}
+			this.logging.debug("Agreement contains the following datatypes: "+dataTypes);
+			for (ResponseItem item: responseItems){
+
+				String dataType = item.getRequestItem().getResource().getDataType();
+				this.logging.debug("Processing datatype: "+dataType+" with scheme: "+item.getRequestItem().getResource().getScheme());
 				if (item.getRequestItem().getResource().getScheme().equals(DataIdentifierScheme.CONTEXT)){
+
 					try {
 						if (ctxBroker==null){
 							this.logging.debug("broker null");
 						}
-						List<CtxIdentifier> ctxIDList = this.ctxBroker.lookup(CtxModelType.ATTRIBUTE, dataType).get();
-						if (ctxIDList.size()==0){
-							if (containsCreateAction(item.getRequestItem().getActions())){
-								this.privacyDataManagerInternal.updatePermission(RequestorUtils.toRequestor(agreement.getRequestor(), this.idMgr), ResponseItemUtils.toResponseItem(item));
 
+
+						List<CtxIdentifier> ctxIDList = this.ctxBroker.lookup(this.idMgr.getThisNetworkNode(), CtxModelType.ATTRIBUTE, dataType).get();
+						if (ctxIDList.size()==0){
+
+							if (containsCreateAction(item.getRequestItem().getActions())){
+								this.logging.debug("Updating privacyDataManager for : "+dataType+" with a CREATE action");
+								this.privacyDataManagerInternal.updatePermission(agreement.getRequestor(), item);
+							}else{
+								this.logging.debug("Ignoring handling creating accCtrl preference for dataType: "+dataType+" which does not exist in context and requestItem does  not contain a CREATE action. ");
 							}
 
 						}else{
 							//here, AttributeSelection preferences should be used to select which attribute should be used for this requestor and selected identity
 							//instead, we're going to create the preference for all returned CtxIDs if not sensed
 							for (CtxIdentifier ctxID : ctxIDList){
+								this.logging.debug("Found ctxID: "+ctxID.getUri()+" and creating an access control preference for it");
 								CtxAttribute ctxAttribute = (CtxAttribute) this.ctxBroker.retrieve(ctxID).get();
 								if (ctxAttribute!=null){
-									if (ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.MANUALLY_SET)){
-										this.processThisResource(agreement.getRequestor(), item);
+									//we need to add the ctxIdentifier to the resource
+									item.getRequestItem().getResource().setDataIdUri(ctxID.getUri());
+									//added check in case the attribute is created manually and Quality and OriginType are null
+									if(!isAttributeSensed(ctxAttribute.getType())){
+										//the following line should replace the preceding line when OriginType is properly handled.
+										//if (ctxAttribute.getQuality()==null || ctxAttribute.getQuality().getOriginType()==null || ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.MANUALLY_SET)){
+											this.logging.debug("ctxID: "+ctxID.getUri()+" will get an accessControl preference that is not context dependent");
+											this.processThisResource(agreement.getRequestor(), item);
+										//}
 									}
 								}
 							}
@@ -177,11 +216,30 @@ public class AccessControlPreferenceCreator extends EventListener{
 	}
 
 
+	private boolean isAttributeSensed(String type) {
+
+		for (String sensedType : sensedDataTypes){
+			if (sensedType.equalsIgnoreCase(type)){
+				return true;
+			}
+		}
+
+		return false;
+	}
 	private void processThisResource(RequestorBean requestor, ResponseItem item) throws PrivacyException, InvalidFormatException {
+
 		for (Action action : item.getRequestItem().getActions()){
+
 			AccessControlPreferenceDetailsBean details = new AccessControlPreferenceDetailsBean();
+			details.setAction(action);
+			details.setRequestor(requestor);
+			details.setResource(item.getRequestItem().getResource());
+			this.logging.debug("Creating an accessControl preference for: \n"+PrivacyPreferenceUtils.toString(details));
 			AccessControlPreferenceTreeModel accCtrlPreference = this.accCtrlPrefMgr.getAccCtrlPreference(details);
+
 			if (null!=accCtrlPreference){
+				this.logging.debug("Merging! An accessControl preference already exists for these details:\n"+PrivacyPreferenceUtils.toString(details));
+
 				PrivacyPreferenceMerger merger = new PrivacyPreferenceMerger(this.ctxBroker, this.ppMgr);
 				IPrivacyPreference mergePreferences = merger.mergeAccCtrlPreference(details, accCtrlPreference.getPref(), this.createAccCtrlPreference(item, details).getPref());
 				if (mergePreferences!=null){
@@ -189,10 +247,14 @@ public class AccessControlPreferenceCreator extends EventListener{
 					this.accCtrlPrefMgr.storeAccCtrlPreference(details, model);
 				}
 			}else{
-				this.accCtrlPrefMgr.storeAccCtrlPreference(details, this.createAccCtrlPreference(item, details));
+				this.logging.debug("Creating NEW preference for these details:\n"+PrivacyPreferenceUtils.toString(details));
+				AccessControlPreferenceTreeModel createAccCtrlPreference = this.createAccCtrlPreference(item, details);
+				this.logging.debug("Created new preference: "+createAccCtrlPreference.toString());
+				this.accCtrlPrefMgr.storeAccCtrlPreference(details, createAccCtrlPreference);
 			}
 		}
-		this.privacyDataManagerInternal.updatePermission(RequestorUtils.toRequestor(requestor, this.idMgr), ResponseItemUtils.toResponseItem(item));
+
+		this.privacyDataManagerInternal.updatePermission(requestor, item);
 
 	}
 	private AccessControlPreferenceTreeModel createAccCtrlPreference(
@@ -212,10 +274,12 @@ public class AccessControlPreferenceCreator extends EventListener{
 	}
 	private PrivacyPreference createConditionPreferences(
 			List<Condition> conditions, PrivacyPreference privacyPreference) {
+
 		for (Condition condition : conditions){
+			this.logging.debug("Adding condition to accCtrlPreference: "+ConditionUtils.toString(condition));
 			PrivacyPreference preference = new PrivacyPreference(new PrivacyCondition(condition));
 			preference.add(privacyPreference);
-			privacyPreference = preference;
+			privacyPreference = (PrivacyPreference) preference.getRoot();
 		}
 		return privacyPreference;
 	}

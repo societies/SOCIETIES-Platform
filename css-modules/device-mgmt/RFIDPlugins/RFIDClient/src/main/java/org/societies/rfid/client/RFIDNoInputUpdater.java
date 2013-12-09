@@ -47,9 +47,9 @@ public class RFIDNoInputUpdater extends TimerTask{
 	}
 
 	public void run(){
-		this.logging.debug("No update from RFID in the last 10 seconds. Now sending a null symbolic location");
+		if(logging.isDebugEnabled()) logging.debug("No update from RFID in the last 10 seconds. Now sending a null symbolic location");
 		this.ctxSourceMgr.sendUpdate(ctxSourceId, null);
-		this.logging.debug("Sent null symbolic location");
+		if(logging.isDebugEnabled()) logging.debug("Sent null symbolic location");
 		
 	}
 }

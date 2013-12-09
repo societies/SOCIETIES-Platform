@@ -239,7 +239,10 @@ public class OsgiRegistryListener implements BundleContextAware,
 		
 		boolean isDevice = serviceReference.getServiceType().equals(ServiceType.DEVICE);
 		log.debug("SOCIETIES service {} is a {}",serviceReference.getServiceName(),serviceReference.getServiceType());
-		
+		if(isDevice) {
+			log.debug("For now we are ignoring devices!");
+			return;
+		}
 		// Now we actually get the service!
 		Service service = null;
 		Service existService = null;
@@ -323,32 +326,6 @@ public class OsgiRegistryListener implements BundleContextAware,
 			removeService(bundleService,bundle);
 		}
 		
-		
-		/*
-		if(bundleService == null){
-			if(event.getType() == BundleEvent.STARTED){
-				log.debug("Bundle {} does not refer to an existing service... it could be a new service, we must check!",bundle.getSymbolicName());
-				
-				executor.execute(new BundleStartAsyncHandler(bundle,5000));
-			}
-			return;
-		}
-		
-		// Now we do stuff differently depending on what the event type is...
-		switch(event.getType()){
-			case BundleEvent.STARTED: 
-				startService(bundleService,bundle);
-				break;
-			case BundleEvent.STOPPED: 
-				stopService(bundleService,bundle);
-				break;
-			case BundleEvent.UNINSTALLED: 
-				removeService(bundleService,bundle);
-				break;
-			default: log.warn("Unknown bundle event type... this shouldn't get here!");
-		}
-		*/
-		
 	}
 	
 	
@@ -362,7 +339,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	 * @param serviceReference
 	 * @return 
 	 */
-	private Service getServiceFromOSGIService(ServiceReference<?> serviceReference) {
+	private Service getServiceFromOSGIService(ServiceReference serviceReference) {
 		
 		log.debug("Processing new Service Reference, in order to obtain a SOCIETIES service!");
 		Bundle serviceBundle = serviceReference.getBundle();
@@ -389,8 +366,12 @@ public class OsgiRegistryListener implements BundleContextAware,
 			INetworkNode myNode = commMngr.getIdManager().getThisNetworkNode();
 			
 			//TODO DEAL WITH THIS
-			service.setServiceEndpoint(myNode.getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
-
+			//service.setServiceEndpoint(myNode.getJid()  + "/" +  service.getServiceName().replaceAll(" ", ""));
+			if(service.getServiceEndpoint() != null && !service.getServiceEndpoint().startsWith("/")){
+				log.debug("Service Endpoint was not started with '/', adding it: {}",service.getServiceEndpoint());
+				service.setServiceEndpoint("/"+service.getServiceEndpoint());
+			}
+				
 			//TODO: Do this properly!
 			ServiceInstance si = new ServiceInstance();
 
@@ -432,7 +413,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 			if(service.getServiceType().equals(ServiceType.DEVICE))
 				servImpl.setServiceNameSpace("device."+service.getServiceName()+"."+myNode.getBareJid());
 			else
-				servImpl.setServiceNameSpace(serviceBundle.getSymbolicName());
+				servImpl.setServiceNameSpace(((String[]) serviceReference.getProperty("objectClass"))[0]);
 			
 			servImpl.setServiceProvider((String) serviceReference.getProperty("ServiceProvider"));
 			servImpl.setServiceClient((String) serviceReference.getProperty("ServiceClient"));
@@ -446,21 +427,21 @@ public class OsgiRegistryListener implements BundleContextAware,
 			
 			if(log.isDebugEnabled()){
 				log.debug("**Service MetadataModel Data Read**");
-				log.debug("Service Name: "+service.getServiceName());
-				log.debug("Service Description: "+service.getServiceDescription());
-				log.debug("Service type: "+service.getServiceType().toString());
-				log.debug("Service Location: "+service.getServiceLocation());
-				log.debug("Service Endpoint: "+service.getServiceEndpoint());
-				log.debug("Service PrivacyPolicy: "+service.getPrivacyPolicy());
-				log.debug("Service SecurityPolicy: "+service.getSecurityPolicy());
-				log.debug("Service SecurityPolicy: "+service.getContextSource());
-				log.debug("Service Provider: "+service.getServiceInstance().getServiceImpl().getServiceProvider());
-				log.debug("Service Namespace: "+service.getServiceInstance().getServiceImpl().getServiceNameSpace());
-				log.debug("Service ServiceClient: "+service.getServiceInstance().getServiceImpl().getServiceClient());
-				log.debug("Service Version: "+service.getServiceInstance().getServiceImpl().getServiceVersion());
-				log.debug("Service XMPPNode: "+service.getServiceInstance().getXMPPNode());
-				log.debug("Service FullJid: "+service.getServiceInstance().getFullJid());
-				log.debug("Service CssJid: "+service.getServiceInstance().getCssJid());
+				log.debug("Service Name: {}",service.getServiceName());
+				log.debug("Service Description: {}",service.getServiceDescription());
+				log.debug("Service type: {}",service.getServiceType().toString());
+				log.debug("Service Location: {}",service.getServiceLocation());
+				log.debug("Service Endpoint: {}",service.getServiceEndpoint());
+				log.debug("Service PrivacyPolicy: {}",service.getPrivacyPolicy());
+				log.debug("Service SecurityPolicy: {}",service.getSecurityPolicy());
+				log.debug("Service isContextSource: {}",service.getContextSource());
+				log.debug("Service Provider: {}",service.getServiceInstance().getServiceImpl().getServiceProvider());
+				log.debug("Service Namespace: {}",service.getServiceInstance().getServiceImpl().getServiceNameSpace());
+				log.debug("Service ServiceClient: {}",service.getServiceInstance().getServiceImpl().getServiceClient());
+				log.debug("Service Version: {}",service.getServiceInstance().getServiceImpl().getServiceVersion());
+				log.debug("Service XMPPNode: {}",service.getServiceInstance().getXMPPNode());
+				log.debug("Service FullJid: {}",service.getServiceInstance().getFullJid());
+				log.debug("Service CssJid: {}",service.getServiceInstance().getCssJid());
 			}
 			
 			if(!service.getServiceType().equals(ServiceType.DEVICE)){
@@ -502,18 +483,20 @@ public class OsgiRegistryListener implements BundleContextAware,
 	 */
 	private Service getServiceFromBundle(Bundle bundle) {
 		
-		if(log.isDebugEnabled()) log.debug("Obtaining Service that corresponds to a bundle: " + bundle.getSymbolicName());
+		log.debug("Obtaining Service that corresponds to a bundle: {}", bundle.getSymbolicName());
 		
 		// Preparing the search filter		
 		Service filter = ServiceModelUtils.generateEmptyFilter();
 		filter.getServiceIdentifier().setServiceInstanceIdentifier(bundle.getSymbolicName());
-		filter.setServiceLocation(bundle.getLocation());
+		//filter.getServiceInstance().setCssJid(thisNode.getBareJid());
+		
+		//filter.setServiceLocation(bundle.getLocation());
 		
 		List<Service> listServices;
 		try {
 			listServices = getServiceReg().findServices(filter);
 		} catch (ServiceRetrieveException e) {
-			log.error("Exception while searching for services:" + e.getMessage());
+			log.error("Exception while searching for services: {}",e.getMessage());
 			e.printStackTrace();
 			return null;
 		}
@@ -529,14 +512,18 @@ public class OsgiRegistryListener implements BundleContextAware,
 		for(Service service: listServices){
 			String bundleSymbolic = service.getServiceIdentifier().getServiceInstanceIdentifier();
 			
+			log.debug("Service CSS: {}", service.getServiceInstance().getCssJid());
+			log.debug("Is service mine? {}",ServiceModelUtils.isServiceOurs(service, getCommMngr()));
+
 			if(bundleSymbolic.equals(bundle.getSymbolicName())){
 				result = service;
 				break;
 			}
+				
 		}
 		
 		 if(log.isDebugEnabled() && result != null) 
-			 log.debug("The service corresponding to bundle " + bundle.getSymbolicName() + " is "+ result.getServiceName() );
+			 log.debug("The service corresponding to bundle {} is {}",bundle.getSymbolicName(),result.getServiceName() );
 			
 		// Finally, we return
 		 return result;
@@ -548,7 +535,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 		try{
 			
 			if(service.getServiceType() != ServiceType.THIRD_PARTY_SERVER){
-				log.debug("{} is does not need to process the security stuff!", service.getServiceName());
+				log.debug("{} does not need to process the security stuff!", service.getServiceName());
 				return true;
 			}
 			
@@ -582,7 +569,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 		try{
 			
 			if(service.getServiceType() != ServiceType.THIRD_PARTY_SERVER){
-				log.debug("{} is does not need to process the privacy policy!", service.getServiceName());
+				log.debug("{} does not need to process the privacy policy!", service.getServiceName());
 				return true;
 			}
 			
@@ -594,10 +581,14 @@ public class OsgiRegistryListener implements BundleContextAware,
 			String privacyLocation = service.getPrivacyPolicy();
 			if(privacyLocation != null){
 				log.debug("Attempting to retrieve Privacy Policy from supplied URL: {}",privacyLocation);
-					
-				privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
-				
-			} else{
+				try{	
+					privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
+				} catch(Exception ex){
+					log.warn("Privacy policy was supplied but couldn't be retrieved, we'll try from inside bundle!");
+				}
+			} 
+			
+			if(privacyPolicy== null){
 	
 				log.debug("Privacy Policy URL not supplied, so we check inside the .jar/war, at: {} ", bundle.getLocation());
 
@@ -615,7 +606,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 					privacyLocation = privacyLocation + "/privacy-policy.xml";
 					privacyPolicy = new Scanner( new URL(privacyLocation).openStream(), "UTF-8").useDelimiter("\\A").next();
 					
-				} else 
+				} else {
 					if(bundleFile.isFile()) {
 						
 						if(log.isDebugEnabled())
@@ -628,6 +619,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 						if(log.isDebugEnabled())
 							log.debug("Couldn't get privacy-policy from jar!");
 					}
+				}
 			}
 
 			if(privacyPolicy == null){	
@@ -656,6 +648,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	}
 	
 	private void installService(Service service, Bundle serviceBundle) {
+		log.info("{} has been installed in OSGI",service.getServiceName());
 		log.debug("{} has been installed in OSGI.",ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
 		
 		try{
@@ -690,6 +683,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	}
 		
 	private void startService(Service service, Bundle serviceBundle){
+		log.info("{} has been started in OSGI",service.getServiceName());
 		log.debug("{} has been started in OSGI.",ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
 		
 		try{
@@ -700,13 +694,12 @@ public class OsgiRegistryListener implements BundleContextAware,
 				log.debug("{} is already started in the database, so this is a SOCIETIES restart.",service.getServiceName());
 				
 				if(ServiceModelUtils.isServiceOurs(service, getCommMngr()) && !service.getServiceType().equals(ServiceType.THIRD_PARTY_CLIENT) && !service.getServiceType().equals(ServiceType.DEVICE)){
-					log.debug("{}");
 					if(!updateSecurityPolicy(service,serviceBundle) || !updatePrivacyPolicy(service,serviceBundle)){
-						log.warn("Adding security and privacy failed!");
+						log.warn("{} Adding security and privacy failed!",service.getServiceName());
 						return;
 					}
 					
-					sendEvent(ServiceMgmtEventType.NEW_SERVICE,service,serviceBundle);
+					sendEvent(ServiceMgmtEventType.SERVICE_RESTORED,service,serviceBundle);
 					sendEvent(ServiceMgmtEventType.SERVICE_STARTED,service,serviceBundle);
 				} else{
 					if(log.isDebugEnabled())
@@ -733,6 +726,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	}
 	
 	private void stopService(Service service, Bundle serviceBundle){
+		log.info("{} has been stopped in OSGI",service.getServiceName());
 		log.debug("{} has been stopped in OSGI.",ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
 		
 		try{
@@ -836,7 +830,7 @@ public class OsgiRegistryListener implements BundleContextAware,
 	}
 	
 	private void sendEvent(ServiceMgmtEventType eventType, Service service, Bundle bundle){
-		log.debug("Sending event of type: {} for service {}", eventType,ServiceModelUtils.serviceResourceIdentifierToString(service.getServiceIdentifier()));
+		log.debug("Sending event of type: {} for service {}", eventType, service.getServiceName());
 		ServiceModelUtils.sendServiceMgmtEvent(eventType, service, null, bundle, eventMgr);
 	}
 	

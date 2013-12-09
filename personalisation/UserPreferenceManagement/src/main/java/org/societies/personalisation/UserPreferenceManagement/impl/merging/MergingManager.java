@@ -96,26 +96,39 @@ public class MergingManager implements IC45Consumer{
 	@Override
 	public void handleC45Output(List<IC45Output> list) {
 		try{
-			logging.debug(this.getClass().getName()+ " received C45Output! size of list:" +list.size());
+			if(this.logging.isDebugEnabled()){
+				logging.debug(this.getClass().getName()+ " received C45Output! size of list:" +list.size());
+			}
 			for (IC45Output output : list){
 				
 				IIdentity identity = output.getOwner();
-				this.logging.debug("Processing output for user: "+identity.getIdentifier());
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("Processing output for user: "+identity.getIdentifier());
+				}
 				ServiceResourceIdentifier serviceID = output.getServiceId();
 				String serviceType = output.getServiceType();
 				List<IPreferenceTreeModel> treeList = output.getTreeList();
 				PreferenceMerger prefMerger = new PreferenceMerger(pcm.getUserFeedbackMgr());
-				logging.debug("Trees in C45output: "+treeList.size());
+				if(this.logging.isDebugEnabled()){
+					logging.debug("Trees in C45output: "+treeList.size());
+				}
 				for (IPreferenceTreeModel tree : treeList){
-					logging.debug(tree.toString());
+					if(this.logging.isDebugEnabled()){
+						logging.debug(tree.toString());
+					}
 					String prefName = tree.getPreferenceDetails().getPreferenceName();
 					if (prefName==null){
 						prefName = this.getPreferenceName(tree);
 					}
 					IPreference existingPreference = this.getPreferenceFromPM(identity, serviceType, serviceID, prefName);
-					this.logging.debug("Received preference from PM");
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("Received preference from PM");
+					}
 					if (existingPreference==null){
-						logging.debug("STORING NEW PREFERENCE");
+						
+						if(this.logging.isDebugEnabled()){
+							logging.debug("STORING NEW PREFERENCE");
+						}
 						PreferenceDetails detail = new PreferenceDetails(output.getServiceType(), serviceID, prefName);
 						this.prefImpl.storePreference(identity, detail, tree.getRootPreference());
 						this.pcm.processPreferenceChanged(identity, output.getServiceId(), output.getServiceType(), prefName);
@@ -124,10 +137,14 @@ public class MergingManager implements IC45Consumer{
 					}
 					IPreference mergedTree = prefMerger.mergeTrees(existingPreference, (IPreference) tree.getRootPreference(), "");
 					if (mergedTree == null){
-						logging.debug(this.getClass().getName()+ " CONFLICT!!!! RUNNING C45 AGAIN!!!!");
+						if(this.logging.isDebugEnabled()){
+							logging.debug(this.getClass().getName()+ " CONFLICT!!!! RUNNING C45 AGAIN!!!!");
+						}
 						this.c45Learning.runC45Learning(new C45ConflictConsumer(identity, serviceType, serviceID, prefName, this.prefImpl), null, identity, serviceID, prefName);
 					}else{
-						logging.debug(this.getClass().getName()+" MERGED PREFERENCE: \n"+mergedTree.toTreeString());
+						if(this.logging.isDebugEnabled()){
+							logging.debug(this.getClass().getName()+" MERGED PREFERENCE: \n"+mergedTree.toTreeString());
+						}
 						PreferenceDetails detail = new PreferenceDetails(output.getServiceType(), serviceID, prefName);
 						this.prefImpl.storePreference(identity, detail, mergedTree);
 						
@@ -141,7 +158,9 @@ public class MergingManager implements IC45Consumer{
 		}
 		catch (Exception e){
 			e.printStackTrace();
-			logging.debug(e.toString());
+			if(this.logging.isDebugEnabled()){
+				logging.debug(e.toString());
+			}
 		}
 
 	}
@@ -172,37 +191,55 @@ public class MergingManager implements IC45Consumer{
 
 	public void processActionReceived(IIdentity userId, IAction action){
 		if (this.counters.containsKey(userId)){
-			logging.debug("hashtable for identity: "+userId.toString()+" exists");
+			if(this.logging.isDebugEnabled()){
+				logging.debug("hashtable for identity: "+userId.toString()+" exists");
+			}
 			Hashtable<IAction, Integer> tempTable = counters.get(userId);
 			Enumeration<IAction> e = tempTable.keys();
-			logging.debug(" Processing Action with serviceID: "+action.getServiceID()+ " and identity: "+userId.toString());
+			if(this.logging.isDebugEnabled()){
+				logging.debug(" Processing Action with serviceID: "+action.getServiceID()+ " and identity: "+userId.toString());
+			}
 			boolean actionExists = false;
 			while (e.hasMoreElements()){
 				IAction tempAction = e.nextElement();
 				if (tempAction.getServiceID().equals(action.getServiceID()) && tempAction.getparameterName().equals(action.getparameterName())){
-					logging.debug(this.getClass().getName()+"found inner hashtable for action: "+action.toString());
+					if(this.logging.isDebugEnabled()){
+						logging.debug(this.getClass().getName()+"found inner hashtable for action: "+action.toString());
+					}
 					actionExists = true;
 
 					int counter = tempTable.get(tempAction);
-					this.logging.debug("Counter for service:"+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID())+" parameter: "+action.getparameterName()+" is "+counter);
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("Counter for service:"+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID())+" parameter: "+action.getparameterName()+" is "+counter);
+					}
 					if (counter>=2){
-						this.logging.debug("Counter reached 2, requesting learning and resetting counter");
+						if(this.logging.isDebugEnabled()){
+							this.logging.debug("Counter reached 2, requesting learning and resetting counter");
+						}
 						tempTable.put(tempAction, new Integer(0)); //reset counter
 						IPreferenceTreeModel iptm = this.prefImpl.getModel(userId, action.getServiceType(), action.getServiceID(), action.getparameterName());
 						if (iptm==null){
-							logging.debug(this.getClass().getName()+" runC45Learning!");
+							if(this.logging.isDebugEnabled()){
+								logging.debug(this.getClass().getName()+" runC45Learning!");
+							}
 							
 							this.c45Learning.runC45Learning(this, null, userId,  action.getServiceID(), action.getparameterName());
 						}else{
-							logging.debug(this.getClass().getName()+" runC45Learning!");
+							if(this.logging.isDebugEnabled()){
+								logging.debug(this.getClass().getName()+" runC45Learning!");
+							}
 							Date d = iptm.getLastModifiedDate();
 							this.c45Learning.runC45Learning(this, d, userId, action.getServiceID(), action.getparameterName());
 
 						}
 					}else{
-						logging.debug(this.getClass().getName()+" incrementing counter for action: "+action.toString());
+						if(this.logging.isDebugEnabled()){
+							logging.debug(this.getClass().getName()+" incrementing counter for action: "+action.toString());
+						}
 						counter ++;
-						this.logging.debug("Counter for :"+action.toString()+" is "+counter);
+						if(this.logging.isDebugEnabled()){
+							this.logging.debug("Counter for :"+action.toString()+" is "+counter);
+						}
 						tempTable.put(tempAction, new Integer(counter));
 					}
 				}
@@ -212,7 +249,9 @@ public class MergingManager implements IC45Consumer{
 				
 			}
 		}else{
-			logging.debug(this.getClass().getName()+" adding hashtable for identity: "+userId.toString());
+			if(this.logging.isDebugEnabled()){
+				logging.debug(this.getClass().getName()+" adding hashtable for identity: "+userId.toString());
+			}
 			Hashtable<IAction, Integer> table = new Hashtable<IAction, Integer>();
 			table.put(action, new Integer(0));
 			this.counters.put(userId, table);

@@ -73,6 +73,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Parcelable;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Describe your class here...
@@ -750,6 +751,7 @@ public class CommunityManagementBase implements ICisManager, ICisSubscribed {
 							Community cis = communityResult.getCreate().getCommunity();
 							//NOTIFY CALLING CLIENT
 							intent.putExtra(ICisManager.INTENT_RETURN_VALUE, (Parcelable)cis);
+							Toast.makeText(androidContext, "CIS created", Toast.LENGTH_SHORT).show();
 						}
 						intent.putExtra(ICisManager.INTENT_RETURN_BOOLEAN,communityResult.getCreate().isResult());
 					}

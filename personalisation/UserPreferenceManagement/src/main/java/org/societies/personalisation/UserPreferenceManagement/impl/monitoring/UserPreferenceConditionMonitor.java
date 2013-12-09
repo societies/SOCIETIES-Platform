@@ -25,6 +25,10 @@
 package org.societies.personalisation.UserPreferenceManagement.impl.monitoring;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -37,6 +41,8 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.personalisation.model.FeedbackEvent;
+import org.societies.api.internal.personalisation.model.FeedbackTypes;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
@@ -57,14 +63,19 @@ import org.societies.personalisation.UserPreferenceManagement.impl.cis.CisEventL
 import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler;
 import org.societies.personalisation.UserPreferenceManagement.impl.merging.MergingManager;
 import org.societies.personalisation.common.api.management.IInternalPersonalisationManager;
+import org.societies.personalisation.common.api.model.ActionInformation;
 import org.societies.personalisation.common.api.model.PersonalisationTypes;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 import org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.UserPreferenceLearning.IC45Learning;
+import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceConditionIOutcomeName;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
+import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.IQualityofPreference;
 import org.societies.personalisation.preference.api.model.PreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceTreeNode;
+import org.societies.personalisation.preference.api.model.QualityofPreference;
 import org.springframework.scheduling.annotation.AsyncResult;
 
 /**
@@ -74,7 +85,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
  *
  */
 public class UserPreferenceConditionMonitor extends EventListener implements IUserPreferenceConditionMonitor{
-	
+
 	private MonitoringTable mt;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private List<CtxAttributeIdentifier> registered; 
@@ -84,7 +95,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	private MergingManager merging;
 	private IC45Learning userPrefLearning;
 	private IEventMgr eventMgr;
-	
+
 	private ICommManager commManager;
 	private IUserFeedback userFeedbackMgr;
 	private ICommunityPreferenceManager communityPreferenceMgr;
@@ -92,38 +103,48 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	private IServiceDiscovery serviceDiscovery;
 	private ICisManager cisManager;
 	private CommunitiesHandler communitiesHandler;
-	
+	private Hashtable<String, IPreference> evaluationResults;
+
 	public UserPreferenceConditionMonitor(){
+		this.evaluationResults = new Hashtable<String, IPreference>();
 	}
-	
-	
+
+
 	public ICtxBroker getCtxBroker() {
-		logging.debug(this.getClass().getName()+": Return ctxBroker");
+		if(this.logging.isDebugEnabled()){
+			logging.debug(this.getClass().getName()+": Return ctxBroker");
+		}
 
 		return ctxBroker;
 	}
 
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		logging.debug(this.getClass().getName()+": Got ctxBroker");
-		
+		if(this.logging.isDebugEnabled()){
+			logging.debug(this.getClass().getName()+": Got ctxBroker");
+		}
+
 		this.ctxBroker = ctxBroker;
 	}
 
 
 	public IInternalPersonalisationManager getPersoMgr() {
-		logging.debug(this.getClass().getName()+": Return persoMgr");
+		if(this.logging.isDebugEnabled()){
+			logging.debug(this.getClass().getName()+": Return persoMgr");
+		}
 		return persoMgr;
 	}
 
 
 	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
-		logging.debug(this.getClass().getName()+": Got persoMgr");
+		if(this.logging.isDebugEnabled()){
+			logging.debug(this.getClass().getName()+": Got persoMgr");
+		}
 		this.persoMgr = persoMgr;
 	}
 
 
-	
+
 	/**
 	 * @return the userPrefLearning
 	 */
@@ -147,31 +168,35 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	public void setEventMgr(IEventMgr eventMgr) {
 		this.eventMgr = eventMgr;
 	}
-	
+
 	public void initialisePreferenceManagement(){
-		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker());
+		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this);
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
-		
+
 		merging = new MergingManager(getUserPrefLearning(), prefMgr, this);
 		this.subscribeForStaticUIMEvents();
-		logging.debug(this.getClass().toString()+": INITIALISED");
-		
+		if(this.logging.isDebugEnabled()){
+			logging.debug(this.getClass().toString()+": INITIALISED");
+		}
+
 		this.cisEventListener  = new CisEventListener(this);
 		communitiesHandler = new CommunitiesHandler(this);
 		communitiesHandler.scheduleTasks();
-		
+
 	}
-	
+
 
 	private void subscribeForStaticUIMEvents() {
-        String eventFilter = "(&" +
-                "(" + CSSEventConstants.EVENT_NAME + "=staticaction)" +
-                "(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
-                ")";
-        this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_STATIC_ACTION}, eventFilter);
-        this.logging.debug("Subscribed to " + EventTypes.UIM_STATIC_ACTION + " events");
-		
+		String eventFilter = "(&" +
+				"(" + CSSEventConstants.EVENT_NAME + "=staticaction)" +
+				"(" + CSSEventConstants.EVENT_SOURCE + "=org/societies/useragent/monitoring)" +
+				")";
+		this.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.UIM_STATIC_ACTION}, eventFilter);
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("Subscribed to " + EventTypes.UIM_STATIC_ACTION + " events");
+		}
+
 	}
 
 
@@ -183,38 +208,54 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	 * @return 
 	 */
 	@Override
-	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute){
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute, String uuid){
 		this.prefMgr.updateContext(attribute);
 		/*
 		 * in this method, we need to check what preferences are affected, request re-evaluation of them, compare last ioutcome with new and send it to 
 		 * the proactivity decision maker component
 		 */
-		logging.debug("Processing context event : "+attribute.getType());
+		if(this.logging.isDebugEnabled()){
+			logging.debug("Processing context event : "+attribute.getType());
+		}
 		List<PreferenceDetails> affectedPreferences = this.mt.getAffectedPreferences(attribute.getId());
 		if (affectedPreferences.size()==0){
 			//JOptionPane.showMessageDialog(null, "no affected preferences found for ctxID: "+ctxAttr.getCtxIdentifier().toUriString()+",\n ignoring event");
-			logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
-			this.logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
+			if(this.logging.isDebugEnabled()){
+				logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
+			}
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("no affected preferences found for ctxID: "+attribute.getId().toString()+", ignoring event");
+			}
 			return new AsyncResult<List<IPreferenceOutcome>>(new ArrayList<IPreferenceOutcome>());
 		}else{
-			logging.debug("found affected preferences");
-			this.logging.debug("found affected preferences");
+			if(this.logging.isDebugEnabled()){
+				logging.debug("found affected preferences");
+			}
+
 			if (null == this.prefMgr){
-				
-				this.logging.debug(UserPreferenceManagement.class.getName()+" not found");
+
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug(UserPreferenceManagement.class.getName()+" not found");
+				}
 				return new AsyncResult<List<IPreferenceOutcome>>(new ArrayList<IPreferenceOutcome>());
 			}else{
-				this.logging.debug(UserPreferenceManagement.class.getName()+" Found");
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug(UserPreferenceManagement.class.getName()+" Found");
+				}
 			}
-			
-			List<IPreferenceOutcome> outcomes = prefMgr.reEvaluatePreferences(ownerId,attribute, affectedPreferences);
-			logging.debug("requested re-evaluation of preferences");
-			logging.debug("requested re-evaluation of preferences");
-			logging.debug("Returning outcome");
+
+			List<IPreferenceOutcome> outcomes = prefMgr.reEvaluatePreferences(ownerId,attribute, affectedPreferences, uuid);
+			if(this.logging.isDebugEnabled()){
+				logging.debug("requested re-evaluation of preferences");
+			}
+
+			if(this.logging.isDebugEnabled()){
+				logging.debug("Returning outcome");
+			}
 			return new AsyncResult<List<IPreferenceOutcome>>(outcomes);			
 		}
 	}
-	
+
 
 	/**
 	 * 
@@ -224,7 +265,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	 * @return 
 	 */
 	@Override
-	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, IAction action){
+	public Future<List<IPreferenceOutcome>> getOutcome(IIdentity ownerId, IAction action, String uuid){
 		/*
 		 * an action describes a personalisable parameter that the user (manually) or the User Agent (proactively) changed.
 		 * An action does not describe a change in the state of the service. i.e. starting or stopping a service. Therefore,
@@ -233,13 +274,15 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		 * The PCM is notified of changes in the personalisable parameters of a service using context. the User Action Monitor 
 		 * populates the context database with this information as soon as it receives an action from a service. 
 		 */
-		
-		
+
+
 		if (!this.mt.isServiceRunning(action.getServiceType(), action.getServiceID())){
 			this.processServiceStarted(ownerId, action.getServiceType(), action.getServiceID());
 		}
-		
-		this.logging.debug("request for outcome with input: "+ownerId.getJid()+"\n"+action.toString());
+
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("request for outcome with input: "+ownerId.getJid()+"\n"+action.toString());
+		}
 		this.merging.processActionReceived(ownerId, action);
 		List<IPreferenceOutcome> outcomes = new ArrayList<IPreferenceOutcome>();
 		IPreferenceOutcome outcome = this.prefMgr.getPreference(ownerId, action.getServiceType(), action.getServiceID(), action.getparameterName());
@@ -247,29 +290,37 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 			outcomes.add(outcome);
 		}
 		return new AsyncResult<List<IPreferenceOutcome>>(outcomes);
-		
-		
+
+
 	}
 
-	
+
 	public void processServiceStarted(IIdentity userId, String serviceType, ServiceResourceIdentifier serviceID){
 
-		
+
 		//JOptionPaneshowMessageDialog(null, "Processing service started event: "+serviceID.toUriString());
-		this.logging.debug("Adding "+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+" preference details to tables");
+		if(this.logging.isDebugEnabled()){
+			this.logging.debug("Adding "+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+" preference details to tables");
+		}
 		List<IPreferenceConditionIOutcomeName> conditionIOutcomeName = this.prefMgr.getPreferenceConditions(userId, serviceType, serviceID);
 		//JOptionPaneshowMessageDialog(null, this.myUSERDPI.toUriString()+" received "+conditionIOutcomeName.size()+" preferenceConditions from PrefMgr");
 		for (IPreferenceConditionIOutcomeName info : conditionIOutcomeName){
 			this.mt.addInfo(info.getICtxIdentifier(), serviceID, serviceType, info.getPreferenceName());
-			this.logging.debug("Added: "+info.getICtxIdentifier().toString()+" to"+serviceID.toString()+" affecting preference: "+info.getPreferenceName());
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("Added: "+info.getICtxIdentifier().toString()+" to"+serviceID.toString()+" affecting preference: "+info.getPreferenceName());
+			}
 			//JOptionPaneshowMessageDialog(null, this.myUSERDPI.toUriString()+"Added: "+info.getCtxIdentifier().toUriString()+" to"+serviceID.toUriString()+" affecting preference: "+info.getPreferenceName());
 			if (this.registered.contains(info.getICtxIdentifier())){
-				this.logging.debug("Already subscribed for: "+info.getICtxIdentifier().toUriString());
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("Already subscribed for: "+info.getICtxIdentifier().toUriString());
+				}
 			}else{
 				this.persoMgr.registerForContextUpdate(userId, PersonalisationTypes.UserPreference, info.getICtxIdentifier());
 				//this.registerForContextEvent((CtxAttributeIdentifier) info.getICtxIdentifier());
 				this.registered.add((CtxAttributeIdentifier) info.getICtxIdentifier());
-				this.logging.debug(userId.getJid()+" Registered for :"+info.getICtxIdentifier().toUriString());
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug(userId.getJid()+" Registered for :"+info.getICtxIdentifier().toUriString());
+				}
 			}
 		}
 	}
@@ -279,16 +330,20 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		if (this.mt.isServiceRunning(serviceType, serviceID)){
 			mt.removeServiceInfo(serviceType, serviceID);
 		}else{
-			logging.debug("The details of this service were not properly loaded. Nothing to do!");
+			if(this.logging.isDebugEnabled()){
+				logging.debug("The details of this service were not properly loaded. Nothing to do!");
+			}
 		}
 	}
-	
+
 	public void processPreferenceChanged(IIdentity userID, ServiceResourceIdentifier serviceId, String serviceType, String preferenceName){
 		List<CtxIdentifier> ctxIDs = this.prefMgr.getPreferenceConditions(userID, serviceType, serviceId, preferenceName);
 		for (CtxIdentifier id : ctxIDs){
 			this.mt.addInfo(id, serviceId, serviceType, preferenceName);
 			if (this.registered.contains(id)){
-				this.logging.debug("Already subscribed for: "+id.toUriString());
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("Already subscribed for: "+id.toUriString());
+				}
 			}else{
 				//this.registerForContextEvent((CtxAttributeIdentifier) id);
 				this.registered.add((CtxAttributeIdentifier) id);
@@ -300,17 +355,16 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 			this.logging.debug("Preference Manager returned no new outcomes for serviceType:"+serviceType+" and serviceID: "+serviceId);
 		}else{
 			this.sendToDM(serviceType, serviceId, prefName, out);
-			
+
 		}*/
-	
+
 
 	}
 
 
 
 	@Override
-	public Future<IOutcome> getOutcome(IIdentity ownerID,
-			ServiceResourceIdentifier serviceID, String preferenceName) {
+	public Future<IOutcome> getOutcome(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName) {
 		return new AsyncResult<IOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
 	}
 
@@ -327,7 +381,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	@Override
 	public void handleExternalEvent(CSSEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 
@@ -336,25 +390,25 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		UIMEvent uimEvent = (UIMEvent) internalEvent.geteventInfo();
 		Action action = (Action) uimEvent.getAction();
 		PreferenceDetails details = new PreferenceDetails();
-		
+
 		PreferenceOutcome outcome = new PreferenceOutcome(action.getServiceID(), action.getServiceType(), action.getparameterName(), action.getvalue(), action.isImplementable(), action.isProactive(), action.isContextDependent());
-		
-			details.setServiceID(action.getServiceID());
-		
-		
-			details.setServiceType(action.getServiceType());
-			outcome.setServiceType(action.getServiceType());
-		
-		
+
+		details.setServiceID(action.getServiceID());
+
+
+		details.setServiceType(action.getServiceType());
+		outcome.setServiceType(action.getServiceType());
+
+
 		details.setPreferenceName(action.getparameterName());
 		outcome.setparameterName(action.getparameterName());
 		outcome.setvalue(action.getvalue());
-		
+
 		PreferenceTreeNode preference = new PreferenceTreeNode(outcome);
-		
-		
+
+
 		this.prefMgr.storePreference(uimEvent.getUserId(), details, preference);
-		
+
 	}
 
 
@@ -423,5 +477,126 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		return this.communitiesHandler;
 	}
 
-	
+
+	@Override
+	public void pushPreferencesToCommunities(Calendar calendar) {
+
+		this.communitiesHandler.scheduleUploaderTask(calendar);
+
+	}
+
+
+	@Override
+	public void downloadPreferencesFromCommunities(Calendar calendar) {
+		this.communitiesHandler.scheduleDownloaderTask(calendar);
+
+	}
+
+
+	@Override
+	public void sendFeedback(FeedbackEvent fEvent,	ActionInformation actionInformation) {
+		String uuid = actionInformation.getUuid();
+		if (this.evaluationResults.containsKey(uuid)){
+			String parameterName = fEvent.getAction().getparameterName();
+			ServiceResourceIdentifier serviceID = fEvent.getAction().getServiceID();
+			String serviceType = fEvent.getAction().getServiceType();
+
+			PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, parameterName);
+			IPreferenceTreeModel model = this.prefMgr.getModel(this.commManager.getIdManager().getThisNetworkNode(), details);
+			if (model==null){
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Model doesn't exist for feedback information. This action was not affected by preferences");
+
+				}
+				return;
+			}
+
+			IPreference matchedPref = this.findMatchingPreference(model.getRootPreference(), this.evaluationResults.get(uuid));
+			if (matchedPref==null){
+				if (this.logging.isDebugEnabled()){
+					this.logging.debug("Could not find the feedback preference inside the model. Could not update confidence level.");
+				}
+				return;
+			}
+			IAction action = fEvent.getAction();
+			IPreferenceOutcome outcome = matchedPref.getOutcome();
+
+			if (fEvent.getErrorType().equals(FeedbackTypes.USER_ABORTED)){
+				if(action.getvalue().equalsIgnoreCase(outcome.getvalue())){
+
+					IQualityofPreference qualityofPreference = outcome.getQualityofPreference();
+					qualityofPreference.setLastAborted(Calendar.getInstance().getTime());
+					qualityofPreference.increaseAbortedCounter(1);
+
+					matchedPref.setUserObject(outcome);
+					this.prefMgr.storePreference(this.commManager.getIdManager().getThisNetworkNode(), details, matchedPref.getRoot());
+					if (this.logging.isDebugEnabled()){
+						this.logging.debug("Updated QoS of preference for aborted feedback");
+					}
+				}
+
+			}else if (fEvent.getErrorType().equals(FeedbackTypes.IMPLEMENTED)){
+				if(action.getvalue().equalsIgnoreCase(outcome.getvalue())){
+
+					IQualityofPreference qualityofPreference = outcome.getQualityofPreference();
+					qualityofPreference.setLastSuccess(Calendar.getInstance().getTime());
+					qualityofPreference.increaseSuccessCounter(1);
+
+					matchedPref.setUserObject(outcome);
+					this.prefMgr.storePreference(this.commManager.getIdManager().getThisNetworkNode(), details, matchedPref.getRoot());
+					if (this.logging.isDebugEnabled()){
+						this.logging.debug("Updated QoS of preference for successful feedback");
+					}					
+				}
+			}
+
+
+		}else{
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Received feedback for an action that I did not affect");
+			}
+		}
+	}
+
+
+	private IPreference findMatchingPreference(IPreference rootPreference, IPreference feedbackPreference) {
+
+		Enumeration<IPreference> depthFirstEnumeration = rootPreference.depthFirstEnumeration();
+		while (depthFirstEnumeration.hasMoreElements()){
+			IPreference nextElement = depthFirstEnumeration.nextElement();
+
+			if (nextElement.getDepth()==feedbackPreference.getDepth()){
+				if (logging.isDebugEnabled()){
+					this.logging.debug("In the same depth ");
+
+					if (nextElement.getUserObject() instanceof IPreferenceOutcome){
+						if (logging.isDebugEnabled()){
+							this.logging.debug("Found a preference outcome in the same depth");
+						}
+
+						IPreferenceOutcome outcome = (IPreferenceOutcome) nextElement.getUserObject();
+						IPreferenceOutcome feedbackOutcome = feedbackPreference.getOutcome();
+						if (outcome.getvalue().equalsIgnoreCase(feedbackOutcome.getvalue())){
+							return nextElement;
+						}
+					}
+				}
+			}
+		}
+
+
+		return null;
+
+	}
+
+
+	public void addEvaluationResult(String uuid, IPreference p) {
+		if (this.logging.isDebugEnabled()){
+			this.logging.debug("Adding evaluation result:  "+p.getOutcome().getparameterName()+" = "+p.getOutcome().getvalue());
+		}
+		this.evaluationResults.put(uuid, p);
+
+	}
+
+
 }

@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
@@ -37,8 +38,12 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.INetworkNode;
+import org.societies.api.identity.Requestor;
+import org.societies.api.identity.RequestorCis;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
 import org.societies.personalisation.CACI.api.CACIDiscovery.ICACIDiscovery;
 import org.societies.personalisation.CAUI.api.CAUITaskManager.ICAUITaskManager;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
@@ -55,6 +60,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 	public ICAUITaskManager cauiTaskManager;
 	private ICtxBroker ctxBroker;
 	private ICommManager commsMgr;
+	private IServiceDiscovery serviceDiscovery;
 
 	private IIdentity cisIdentifier ;
 
@@ -68,6 +74,20 @@ public class CACIDiscovery implements ICACIDiscovery{
 	public void initialiseCACIDiscovery(){
 
 	}
+
+
+	public IServiceDiscovery getServiceDiscovery() {
+
+		LOG.debug(this.getClass().getName()+": Return IServiceDiscovery");
+		return serviceDiscovery;
+	}
+
+
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		LOG.debug(this.getClass().getName()+": Got serviceDiscovery" +serviceDiscovery );
+		this.serviceDiscovery = serviceDiscovery;
+	}
+
 
 	public ICAUITaskManager getCauiTaskManager() {
 		//System.out.println(this.getClass().getName()+": Return cauiTaskManager");
@@ -92,12 +112,12 @@ public class CACIDiscovery implements ICACIDiscovery{
 	}
 
 	public void setCommsMgr(ICommManager commsMgr) {
-		LOG.info(this.getClass().getName()+": Got commsMgr");
+		//LOG.info(this.getClass().getName()+": Got commsMgr");
 		this.commsMgr = commsMgr;
 	}
 
 	public ICommManager getCommsMgr() {
-		LOG.info(this.getClass().getName()+": Return CommsMgr");
+		//LOG.info(this.getClass().getName()+": Return CommsMgr");
 		return commsMgr;
 	}
 
@@ -107,7 +127,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 		this.cisIdentifier = cisId;
 
-		LOG.info("Discovering new CACI model for "+ this.cisIdentifier);
+		//LOG.info("Discovering new CACI model for "+ this.cisIdentifier);
 
 		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
 		userModelList = retrieveUIModels(cisId);
@@ -125,24 +145,22 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 		//CACI model
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> communityActionsMap = new HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>>();
-
+		//System.out.println("mergeModels 1 ");
 		// create translation map
-		// translate actions of various user models to a unique actions that will construct a community  model
+		// translate identical actions of various user models to a unique actions that will be part of the community  model
 		// key:commAction -- value: set of user actions
-		Map<IUserIntentAction, Set<IUserIntentAction>> translationMap =  createTranslationMap (userModelList);
-		System.out.println(" translationMap "+translationMap);
+		Map<IUserIntentAction, List<IUserIntentAction>> translationMap =  createTranslationMap (userModelList);
+		//printTranlationMap(translationMap);
 
 		List<UserIntentModelData> userModelsComActionsList = convertUserToCommModels(userModelList,translationMap);
 
 		// A) create a map (communityActionsMap) with key each individual userAction and B) value a map with all possible targets 
 
-		// A)
 		// get each user intent model
 		for(UserIntentModelData userModel : userModelsComActionsList){
-
 			// get actions for this model
 			HashMap<IUserIntentAction,HashMap<IUserIntentAction, Double>> actionsMap = userModel.getActionModel();
-			LOG.debug(" initial actionsMap : "+actionsMap);
+			//LOG.debug(" initial actionsMap : "+actionsMap);
 			// add source actions from all models to map
 			for(IUserIntentAction communitySourceAction : actionsMap.keySet()){
 				//if(!mapContainsKeyAction(communityActionsMap,action)){
@@ -152,55 +170,69 @@ public class CACIDiscovery implements ICACIDiscovery{
 			}
 		}
 
-		LOG.debug(" initial communityActionsMap : "+communityActionsMap);
-		System.out.println("communityActionsMap "+communityActionsMap);
-		//this.printCACIModel(communityActionsMap);		
-		//		printModels(userModelList);
+		//System.out.println("mergeModels 2 communityActionsMap "+communityActionsMap);
 
-
-		int i =0;
+		//int i =0;
 		for(UserIntentModelData userModel : userModelList){
-			i++;
 
-			LOG.debug("model i= "+i );
+			//i++;
+			//System.out.println("model i= "+i );
 			HashMap<IUserIntentAction,  HashMap<IUserIntentAction,Double>> uiModelActions = userModel.getActionModel();
 
 			for (IUserIntentAction sourceUserAct  :uiModelActions.keySet()){
-				LOG.debug("sourceUserAct " +sourceUserAct);
-				
-				System.out.println("communityActionsMap "+communityActionsMap.keySet());
-				
+				//LOG.debug("sourceUserAct " +sourceUserAct);
 				//iterate through commActions and find a commAction similar with user action
 				for(IUserIntentAction sourceComAct : communityActionsMap.keySet()){
-					
-					
-					
-					if(this.equalActions(sourceUserAct, sourceComAct)){
-						// get targets for this userAct
-						HashMap<IUserIntentAction,Double> targetUserActions = uiModelActions.get(sourceUserAct);
-						// translate targets to commAct ?
-						HashMap<IUserIntentAction,Double> targetComActionNew =  translateUsertoComActionMap(translationMap, targetUserActions);
-						LOG.debug("targetComActionNew " +targetComActionNew);
 
-						// if null or map is empty
-						if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
-							communityActionsMap.put(sourceComAct, targetComActionNew);
+					if(this.areSimilarActions(sourceUserAct, sourceComAct)){
 
-						} if(communityActionsMap.get(sourceComAct).size() >0 ){
-							HashMap<IUserIntentAction,Double> targetComActionExisting = communityActionsMap.get(sourceComAct);
+						// get targets for this userAct if exist (e.g. if it is the last action of uimodel no target exist)
+						if(uiModelActions.get(sourceUserAct) != null) {
 
-							HashMap<IUserIntentAction,Double> updatedTargetComMap = mergeTargetMaps(targetComActionNew,targetComActionExisting);
-							communityActionsMap.put(sourceComAct, updatedTargetComMap);
+							HashMap<IUserIntentAction,Double> targetUserActions = uiModelActions.get(sourceUserAct);
+							// translate list of targets user action to commAction 
+							//System.out.println("sourceUserAct "+sourceUserAct);
+							//System.out.println("targetUserActions "+targetUserActions);
+							HashMap<IUserIntentAction,Double> targetComActionNew =  translateUsertoComActionMap(translationMap, targetUserActions);
+							//LOG.debug("targetComActionNew " +targetComActionNew);
+
+							// add translated source community action along with user action to output 
+							// if entry don't exist yet
+							if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
+								communityActionsMap.put(sourceComAct, targetComActionNew);
+							}  
+							// if entry already exists
+							if(communityActionsMap.get(sourceComAct).size() >0 ){
+
+								HashMap<IUserIntentAction,Double> targetComActionExisting = communityActionsMap.get(sourceComAct);
+								HashMap<IUserIntentAction,Double> updatedTargetComMap = mergeTargetMaps(targetComActionNew,targetComActionExisting);
+								communityActionsMap.put(sourceComAct, updatedTargetComMap);
+							}
+
+
+						} else {
+							// this is a final community source action, no target actions exist
+							if(communityActionsMap.get(sourceComAct) == null || communityActionsMap.get(sourceComAct).size() == 0){
+								communityActionsMap.put(sourceComAct, null);
+								//System.out.println("**** adding null target for "+sourceComAct);
+							} // else {
+							// if community model already contains an edge for sourceCommAct to some target
+							// but the newly merged model doesn't contain this link recalculate and drop trans prob
+
+							//}
 						}
+
 					}
 				}
 			}
 			//this.printCACIModel(communityActionsMap);
 		}
 
-		this.printCACIModel(communityActionsMap);
+
 		UserIntentModelData communityModel = new UserIntentModelData();
 		communityModel.setActionModel(communityActionsMap);
+
+		this.printCACIModel(communityActionsMap);
 
 		return communityModel;
 	}
@@ -221,15 +253,15 @@ public class CACIDiscovery implements ICACIDiscovery{
 	private CtxAttribute storeModelCtxDB(UserIntentModelData modelData){
 
 		if(modelData.getActionModel().isEmpty()) {
-			LOG.debug("No community actions in CACI model , couldn't store model to Ctx DB");
+			if (LOG.isDebugEnabled())LOG.debug("No community actions in CACI model , couldn't store model to Ctx DB");
 			return null;
 		}
 
 		if( this.cisIdentifier == null) {
-			LOG.debug("CIS identifier is not defined");
+			if (LOG.isDebugEnabled())LOG.debug("CIS identifier is not defined");
 			return null;
 		} 		
-		LOG.debug("community model "+modelData.getActionModel() );
+		//LOG.debug("community model "+modelData.getActionModel() );
 
 		CtxAttribute ctxAttrCACIModel = null;
 		try {
@@ -248,7 +280,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 				uiModelAttributeId = attr.getId();
 				ctxAttrCACIModel = ctxBroker.updateAttribute(uiModelAttributeId, binaryModel).get();
 			}			
-			LOG.debug("CACI Model stored in community ctx DB" + ctxAttrCACIModel.getId());
+			if (LOG.isDebugEnabled())LOG.debug("CACI Model stored in community ctx DB" + ctxAttrCACIModel.getId());
 
 		}  catch (Exception e) {
 			LOG.error("Exception while storing CACI model in context DB" + e.getLocalizedMessage());
@@ -279,41 +311,35 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 	/*
 	 * merges the target action transition probs
+	 * {(d,0.4),(b,0.6)} + {(c,0.4),(b,0.6)} = {( b,0.6),(c,0.2),(d,0.2)}
 	 */
 	public HashMap<IUserIntentAction,Double> mergeTargetMaps(HashMap<IUserIntentAction,Double> targetComActionNew, 
-			HashMap<IUserIntentAction,Double>targetComActionExisting){
+			HashMap<IUserIntentAction,Double> targetComActionExisting){
 
 		HashMap<IUserIntentAction,Double> result = new HashMap<IUserIntentAction,Double>();
-		result.putAll(targetComActionExisting);
 
 		if( targetComActionExisting.size() == 0 ) {
 			return targetComActionNew;
 		}
+		Set<IUserIntentAction> allKeys = new HashSet<IUserIntentAction>();
+		allKeys.addAll(targetComActionNew.keySet());
+		allKeys.addAll(targetComActionExisting.keySet());
 
-		for(IUserIntentAction newMapAction : targetComActionNew.keySet()){
+		for(IUserIntentAction keyAction : allKeys){
+			Double valueA = 0.0;
+			Double valueB = 0.0;
 
-			LOG.debug("current Action " +newMapAction);
-			if(targetComActionExisting.get(newMapAction) != null){
-				LOG.debug("result" +result);
-				Double existingTransProb = targetComActionExisting.get(newMapAction);
-				Double newTransProb = targetComActionNew.get(newMapAction);
-				Double updatedTrandProb = (existingTransProb+newTransProb);
-				result.put(newMapAction, updatedTrandProb);
-
-
-			} else  {
-				LOG.debug("result" +result);
-				Double newTransProb = targetComActionNew.get(newMapAction);
-				result.put(newMapAction, newTransProb);
-
+			if( targetComActionExisting.get(keyAction) != null){
+				valueA = targetComActionExisting.get(keyAction);
 			}
-			// fix probabilities 
-			// should sum to 1
-			for(IUserIntentAction actionTemp :result.keySet()){
-				Double currentProb = result.get(actionTemp);
-				result.put(actionTemp, currentProb/2);
+
+			if( targetComActionNew.get(keyAction) != null){
+				valueB = targetComActionNew.get(keyAction);
 			}
+			Double average =  (valueA+valueB)/2 ;
+			result.put(keyAction,average);
 		}
+
 		return result;
 	}
 
@@ -321,7 +347,7 @@ public class CACIDiscovery implements ICACIDiscovery{
 	/*
 	 * convert target user actions in map to community user actions in map
 	 */
-	private HashMap<IUserIntentAction,Double> translateUsertoComActionMap(Map<IUserIntentAction, Set<IUserIntentAction>> translationMap ,HashMap<IUserIntentAction,Double> targetUserActions){
+	private HashMap<IUserIntentAction,Double> translateUsertoComActionMap(Map<IUserIntentAction, List<IUserIntentAction>> translationMap ,HashMap<IUserIntentAction,Double> targetUserActions){
 
 		HashMap<IUserIntentAction,Double> targetComActions = new HashMap<IUserIntentAction,Double>();  
 
@@ -352,15 +378,15 @@ public class CACIDiscovery implements ICACIDiscovery{
 	 */
 
 
-	private Boolean mapContainsKeyAction(Map<IUserIntentAction, ?> tranlationMap,  IUserIntentAction action){
+	private Boolean mapContainsSimilarKeyAction(Map<IUserIntentAction, ?> tranlationMap,  IUserIntentAction action){
 
 		for(IUserIntentAction actionKey : tranlationMap.keySet()){
 			if(actionKey == null) {
 				return false;
 			} else {
 				//System.out.println("action 1 "+action +" action 2:"+ actionKey);	
-				if(equalActions (actionKey,action) ){
-						//System.out.println("EQUAL");
+				if(areSimilarActions (actionKey,action) ){
+					//System.out.println("EQUAL");
 					return true;
 				}
 			}
@@ -371,26 +397,37 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 
-	private Boolean equalActions(IUserIntentAction actionA, IUserIntentAction actionB){
+	public Boolean areSimilarActions(IUserIntentAction actionA, IUserIntentAction actionB){
 
-		/*
-		System.out.println("actionA "+actionA);
-		System.out.println("actionB "+actionB);
-
-		System.out.println("A "+actionA.getServiceID().getServiceInstanceIdentifier().toString() +" b "+actionB.getServiceID().getServiceInstanceIdentifier().toString());
-		System.out.println("A "+actionA.getparameterName() +" b "+actionB.getparameterName());
-		System.out.println("A "+actionA.getvalue() +" b "+actionB.getvalue());
-*/
-		System.out.println("actionA "+actionA);
-		System.out.println("actionB "+actionB);
-		System.out.println("A "+actionA.getServiceID().getServiceInstanceIdentifier().toString() +" b "+actionB.getServiceID().getServiceInstanceIdentifier().toString());
-		
-		if(actionA.getServiceID().getServiceInstanceIdentifier().toString().equals(actionB.getServiceID().getServiceInstanceIdentifier().toString()) && actionA.getparameterName().equals(actionB.getparameterName()) 
-				&& actionA.getvalue().equals(actionB.getvalue())) {
-			//		System.out.println( "!!!!!!!!!! MATCH");
-			return true;
+		// ignore ServiceInstanceIdentifier, using only service type
+		/*	
+		if( actionA == null){
+			LOG.debug("action A null");
+			return false;
 		}
-		return false;
+
+		if(actionB == null){
+			LOG.debug("action B null");
+			return false;
+		}
+		 */
+
+
+		if( actionA != null){
+		//	LOG.debug("action A "+actionA);
+		//	LOG.debug("action A serviceID:"+actionA.getServiceID());
+
+		}
+		if( actionB != null){
+		//	LOG.debug("action B "+actionB);
+		//	LOG.debug("action B serviceID:"+actionA.getServiceID());
+
+		}
+
+		if(actionA.getparameterName().equals(actionB.getparameterName()) && actionA.getvalue().equals(actionB.getvalue())) {
+			//LOG.debug( actionA +" and "+ actionB+"!!!!! are similar");
+			return true;
+		} else return false;
 	}
 
 
@@ -405,53 +442,25 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 	/*
-	 *  need to add a method that translates actions with same serviceId, par,val to a unique community action.
-	 *  converts same actions of different ui models to unique actions for all models  
+	 * This method translates actions of various user intent model to community actions based on a translation map created by
+	 * method discovery.createTranslationMap(uiModelList)
+	 * Actions similarity is based on action parameters (serviceType, parameter, value)
+	 * It converts same actions of different ui models to unique actions for all models  
 	 *  
 	 *  e.g. communityActA = {userActA1,userActA2,userActA3}
 	 *  userActionModel {http://testService2#volume=low/1={http://testService1#volume=mute/2=1.0}, http://testService1#YYYY=YYYY/4={http://testService1#XXXX=XXXX/3=0.5, http://testService2#colour=blue/5=0.5}, http://testService1#XXXX=XXXX/3={http://testService1#YYYY=YYYY/4=0.5714285714285714, http://testService1#volume=high/0=0.42857142857142855}, http://testService1#volume=high/0={http://testService2#volume=low/1=1.0}, http://testService2#colour=green/6={http://testService1#YYYY=YYYY/4=1.0}, http://testService2#colour=blue/5={http://testService2#colour=green/6=1.0}, http://testService1#volume=mute/2={http://testService1#XXXX=XXXX/3=1.0}}
 	 *  communityActionModel {http://testService2#volume=low/17={http://testService1#volume=mute/23=1.0}, http://testService1#YYYY=YYYY/18={http://testService1#XXXX=XXXX/19=0.5, http://testService2#colour=blue/22=0.5}, http://testService1#XXXX=XXXX/19={http://testService1#YYYY=YYYY/18=0.5714285714285714, http://testService1#volume=high/20=0.42857142857142855}, http://testService1#volume=high/20={http://testService2#volume=low/17=1.0}, http://testService2#colour=green/21={http://testService1#YYYY=YYYY/18=1.0}, http://testService2#colour=blue/22={http://testService2#colour=green/21=1.0}, http://testService1#volume=mute/23={http://testService1#XXXX=XXXX/19=1.0}}
-	 *
 	 */
-
-	public List<UserIntentModelData> convertUserToCommModels (List<UserIntentModelData> userModelList, Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap){
+	public List<UserIntentModelData> convertUserToCommModels (List<UserIntentModelData> userModelList, Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap){
 
 		List<UserIntentModelData> translatedModels = new ArrayList<UserIntentModelData>();
 
-		/*
-		Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap = new HashMap<IUserIntentAction, Set<IUserIntentAction>>();
-		//create action translator map
-		for (UserIntentModelData userModel : userModelList){
 
-			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> userActionModel = userModel.getActionModel();
-			//	HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> communityActionModel = new HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
-
-			for(IUserIntentAction userAction  : userActionModel.keySet()){
-
-				if(! mapContainsKeyAction(tranlationMap,userAction)){	
-					IUserIntentAction commAction = convertAction(userAction);
-					//if(!tranlationMap.containsKey(commAction)){
-					Set<IUserIntentAction> newUserActionSet = new HashSet<IUserIntentAction>();
-					newUserActionSet.add(userAction);
-					tranlationMap.put(commAction, newUserActionSet);
-				} else {
-					//System.out.println("commAction " + commAction);
-					IUserIntentAction commAction = findComAction(tranlationMap.keySet(), userAction);
-					Set<IUserIntentAction> currentActionSet  = tranlationMap.get(commAction);
-					//System.out.println("currentActionSet " + currentActionSet);
-					currentActionSet.add(userAction);
-					tranlationMap.put(commAction, currentActionSet);
-				}
-			}
-		}		
-		printTranlationMap(tranlationMap);
-		// translation map created 
-		 */
 		// translate userActionModel to community action model
 		for (UserIntentModelData userModel : userModelList){
 
 			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> userActionModel = userModel.getActionModel();
-			LOG.debug("convertUserToCommModels userActionModel 1 " + userActionModel);
+			//LOG.debug("convertUserToCommModels userActionModel 1 " + userActionModel);
 
 			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> communityActionModel =
 					new HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
@@ -468,9 +477,11 @@ public class CACIDiscovery implements ICACIDiscovery{
 					}
 					communityActionModel.put(commAction, communityTargetMap);
 
+				} if(userTargetMap == null ){
+					communityActionModel.put(commAction, null);
 				}
 			}
-			LOG.debug("convertUserToCommModels userActionModel 1 communityActionModel " + communityActionModel);
+			//LOG.debug("convertUserToCommModels userActionModel 1 communityActionModel " + communityActionModel);
 
 			UserIntentModelData communityModel = new UserIntentModelData();
 			communityModel.setActionModel(communityActionModel);
@@ -483,61 +494,58 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 
 
+	// translate identical actions of various user models to a unique actions that will be part of the community  model
+	// key:commAction -- value: set of user actions
+	public Map<IUserIntentAction, List<IUserIntentAction>> createTranslationMap (List<UserIntentModelData> userModelList){
 
-	public Map<IUserIntentAction, Set<IUserIntentAction>> createTranslationMap (List<UserIntentModelData> userModelList){
+		Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap = new HashMap<IUserIntentAction, List<IUserIntentAction>>();
+		//int i =0;
+		List<UserIntentModelData> userModelListNewInst = new ArrayList<UserIntentModelData>();
+		userModelListNewInst.addAll(userModelList);
 
-		Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap = new HashMap<IUserIntentAction, Set<IUserIntentAction>>();
+		for (UserIntentModelData userModel : userModelListNewInst){
 
-		//create action translator map
-		for (UserIntentModelData userModel : userModelList){
-
-			int i =0;
-			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> userActionModel = userModel.getActionModel();
-			//	HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> communityActionModel = new HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
-			i++;
-			System.out.println("1 createTranslationMap current model: "+i + "  "+ userActionModel); 
+			HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>> userActionModel = new HashMap<IUserIntentAction,HashMap<IUserIntentAction,Double>>();
+			userActionModel = userModel.getActionModel();
+			//i++;
+			//System.out.println("1 createTranslationMap current model: "+i + "  "+userModel.getActionModel().keySet()); 
 
 			for(IUserIntentAction userAction  : userActionModel.keySet()){
+				//		System.out.println("loop userAction "+userAction); 
 
-				if(! mapContainsKeyAction(tranlationMap,userAction)){	
+				if(! mapContainsSimilarKeyAction(tranlationMap,userAction)){	
 
-					if(convertAction(userAction) != null){
-						IUserIntentAction commAction = convertAction(userAction);
-						//System.out.println("2 createTranslationMap : "+commAction); 
-						if(!tranlationMap.containsKey(commAction)){
-							Set<IUserIntentAction> newUserActionSet = new HashSet<IUserIntentAction>();
-							newUserActionSet.add(userAction);
-							tranlationMap.put(commAction, newUserActionSet);
-						}
+					IUserIntentAction commAction = createCommunityAction(userAction);
+					List<IUserIntentAction> newUserActionList = new ArrayList<IUserIntentAction>();
+					newUserActionList.add(userAction);
+					tranlationMap.put(commAction, newUserActionList);
 
-					} else {
-						//System.out.println("commAction " + commAction);
-						IUserIntentAction commAction = findComAction(tranlationMap, userAction);
-						if(tranlationMap.get(commAction) != null ){
-							Set<IUserIntentAction> currentActionSet  = tranlationMap.get(commAction);
-							//System.out.println("currentActionSet " + currentActionSet);
-							currentActionSet.add(userAction);
-							tranlationMap.put(commAction, currentActionSet);	
-						}
+				} else {
 
+					IUserIntentAction commAction = findComAction(tranlationMap, userAction);
+					if(tranlationMap.get(commAction) != null ){
+						List<IUserIntentAction> currentActionList  = tranlationMap.get(commAction);
+						//System.out.println("currentActionSet " + currentActionSet);
+						currentActionList.add(userAction);
+						tranlationMap.put(commAction, currentActionList);	
 					}
 				}
-			}	
-		}
-		printTranlationMap(tranlationMap);
-		// translation map created 
 
+			}// action list for loop 	
+		}// model list
+
+		// translation map created 
 		return tranlationMap;
 	}
 
 
 
-	private IUserIntentAction translateUserToComAction(Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap,IUserIntentAction userAction ){
+	private IUserIntentAction translateUserToComAction(Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap,IUserIntentAction userAction ){
 
 		IUserIntentAction communityAction = null;
 
 		for(IUserIntentAction communityActionTemp : tranlationMap.keySet()){
-			Set<IUserIntentAction> actionSet = tranlationMap.get(communityActionTemp);
+			List<IUserIntentAction> actionSet = tranlationMap.get(communityActionTemp);
 			if(actionSet.contains(userAction)) return communityActionTemp;
 		}
 
@@ -549,28 +557,30 @@ public class CACIDiscovery implements ICACIDiscovery{
 	/*
 	 * retrieves a community action identical with the user action declared 
 	 */
-	protected IUserIntentAction findComAction(Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap, IUserIntentAction userAction ){
+	protected IUserIntentAction findComAction(Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap, IUserIntentAction userAction ){
 
 		//	IUserIntentAction communityAction = null;
 
 		for(IUserIntentAction communityAction : tranlationMap.keySet() ){
-			if(this.equalActions(communityAction, userAction)) {
+			if(this.areSimilarActions(communityAction, userAction)) {
 				return communityAction;
 			}
 		}
 		return null;
 	}
 
-
+	
 	/*
 	 * creates a new community action based on the details of the userAction 
 	 */
-	private IUserIntentAction convertAction (IUserIntentAction userAction){
+	private IUserIntentAction createCommunityAction (IUserIntentAction userAction){
 
 		IUserIntentAction commAction = null;
 
+		cauiTaskManager.createModel();
+
 		if(userAction.getServiceID() != null && userAction.getparameterName() != null 
-				&& userAction.getvalue() != null && userAction.getServiceType()!=null){
+				&& userAction.getvalue() != null && userAction.getServiceType() != null){
 
 			commAction = cauiTaskManager.createAction(userAction.getServiceID(), userAction.getServiceType(), 
 					userAction.getparameterName(), userAction.getvalue());
@@ -581,6 +591,8 @@ public class CACIDiscovery implements ICACIDiscovery{
 			LOG.error(" CAUI User Action not valid , action ID:"+  userAction.toString());
 			throw new NullPointerException(" CAUI User Action not valid , action ID:"+  userAction.toString());
 		}
+
+		//System.out.println(" ****** created comm action: "+commAction+" based on user action:" + userAction.toString());
 		return commAction;
 	}
 
@@ -588,13 +600,14 @@ public class CACIDiscovery implements ICACIDiscovery{
 	/*
 	 * print methods  
 	 */
-	void printTranlationMap(Map<IUserIntentAction, Set<IUserIntentAction>> tranlationMap){
-		LOG.debug("tranlationMap start --- ");
+	void printTranlationMap(Map<IUserIntentAction, List<IUserIntentAction>> tranlationMap){
+
 		for(IUserIntentAction action : tranlationMap.keySet()){
-			LOG.debug("tranlated action "+action +tranlationMap.get(action) );	
-			System.out.println("tranlated action "+action +tranlationMap.get(action));
+
+			//System.out.println("com act: "+action +" /user act->"+tranlationMap.get(action));
+			if (LOG.isDebugEnabled())LOG.debug(("com act: "+action +" /user act->"+tranlationMap.get(action)));
 		}	
-		LOG.debug("tranlationMap ends --- ");
+
 	}
 
 	/*
@@ -608,63 +621,99 @@ public class CACIDiscovery implements ICACIDiscovery{
 
 	private void printCACIModel(Map<IUserIntentAction, HashMap<IUserIntentAction,Double>> map){
 
-		LOG.debug("caci model");
-		for( IUserIntentAction sourceAct : map.keySet()){
-			LOG.debug("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
+		//System.out.println("caci model");
+		if (LOG.isInfoEnabled()){ 
+			LOG.info("printing community model");
+
+			for( IUserIntentAction sourceAct : map.keySet()){
+				//System.out.println("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
+				LOG.info("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
+				HashMap<IUserIntentAction, Double> targetActions = map.get(sourceAct);
+
+				for(IUserIntentAction actionTarget : targetActions.keySet()){
+					//System.out.println("--> targetID:"+actionTarget.getActionID() +"confidence level: "+actionTarget.getConfidenceLevel());	
+					LOG.info("--> targetID:"+actionTarget.getActionID() +"confidence level: "+actionTarget.getConfidenceLevel());
+				}
+
+			}
 		}
 	}	
-
 
 
 	@Override
 	public void generateNewCommunityModel() {
 
-
-		System.out.println("SERVICE CALLED ********* " );
-
 	}
 
 
-	private List<UserIntentModelData> retrieveUIModels (IIdentity cisId) {
+	private List<UserIntentModelData> retrieveUIModels (IIdentity cisId)  {
 
 		List<UserIntentModelData> userModelList = new ArrayList<UserIntentModelData>();
-		LOG.info(" retrieving cauis for cisID "+ cisId);
+		//LOG.debug(" retrieving cauis for cisID "+ cisId);
 		CtxEntityIdentifier commEntID;
-		try {
+		CommunityCtxEntity commEnt = null;
+		List<CtxIdentifier> modelAttrIDList = new ArrayList<CtxIdentifier>();
+		try{
 			commEntID = this.ctxBroker.retrieveCommunityEntityId(cisId).get();
-			CommunityCtxEntity commEnt = (CommunityCtxEntity) this.ctxBroker.retrieve(commEntID).get();
+			commEnt = (CommunityCtxEntity) this.ctxBroker.retrieve(commEntID).get();
+		} catch (Exception e) {
+			LOG.error("Exception while retrieving community entity ID "+e.getLocalizedMessage());
+			e.printStackTrace();
+		}
+
+		if(commEnt!=null ){
+
 			Set<CtxEntityIdentifier> membersIDSet = commEnt.getMembers();
 
 			for(CtxEntityIdentifier entityId  : membersIDSet){
-				LOG.info(" retrieving entityIds for cisID "+ entityId);
+				if (LOG.isDebugEnabled())LOG.debug(" retrieving entityIds for cisID "+ entityId);
 
-				List<CtxIdentifier> modelAttrIDList = this.ctxBroker.lookup(entityId, CtxModelType.ATTRIBUTE,CtxAttributeTypes.CAUI_MODEL).get();
+				try{
+					modelAttrIDList = this.ctxBroker.lookup(entityId, CtxModelType.ATTRIBUTE,CtxAttributeTypes.CAUI_MODEL).get();
+					if (LOG.isDebugEnabled())LOG.debug(" retrieving modelAttrIDList for cisID "+ modelAttrIDList);
 
-				LOG.info(" retrieving modelAttrIDList for cisID "+ modelAttrIDList);
+					if(modelAttrIDList.size()>0){
+						for(CtxIdentifier attrID : modelAttrIDList){
+						
+							if (LOG.isDebugEnabled())LOG.debug(" retrieving uiModelAttr  "+ attrID);
+							CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
+							
+							//LOG.info(" retrieving attrID  "+ attrID);
+							//CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
+							//getIdMananager.getThisNetworkNode().getBareJid()
+							
+						//	final INetworkNode cssNodeId = this.commsMgr.getIdManager().getThisNetworkNode();
+						//	final String cssOwnerStr = cssNodeId.getBareJid();
+						//	IIdentity cssOwnerId = this.commsMgr.getIdManager().fromJid(cssOwnerStr);
+							
+						//	RequestorCis requestor = new RequestorCis(cssOwnerId, cisId);
+						//	CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(requestor, attrID).get();
+							
 
-				if(modelAttrIDList.size()>0){
-					for(CtxIdentifier attrID : modelAttrIDList){
+							if(uiModelAttr.getBinaryValue() != null){
+								UserIntentModelData newUIModelData;
+								try {
+									newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
+									userModelList.add(newUIModelData);
+								} catch (Exception e) {
+									LOG.error("Exception while deserializing CAUI model for attrID:"+uiModelAttr.getId()+"."+ e.getLocalizedMessage());
+									e.printStackTrace();
+								}
 
-						LOG.info(" retrieving attrID  "+ attrID);
-						CtxAttribute uiModelAttr = (CtxAttribute) this.ctxBroker.retrieve(attrID).get();	
-						LOG.info(" retrieving uiModelAttr  "+ uiModelAttr);
-
-						if(uiModelAttr.getBinaryValue() != null){
-							UserIntentModelData newUIModelData = (UserIntentModelData) SerialisationHelper.deserialise(uiModelAttr.getBinaryValue(), this.getClass().getClassLoader());
-
-							userModelList.add(newUIModelData);
+							}
 						}
 					}
 
-				}
-			}
-		} catch (Exception e) {
-			LOG.error("Exception while retrieving individual CAUI models "+e.getLocalizedMessage());
-			e.printStackTrace();
-		} 
 
+				} catch (Exception e) {
+					LOG.error("Exception while retrieving CAUI model from : "+entityId +" "+e.getLocalizedMessage());
+					e.printStackTrace();
+				}
+
+			}
+		}
+		if (LOG.isDebugEnabled())LOG.debug(" Retrieved CAUI Models:   "+ userModelList);
 		return userModelList;
 	}
-
 
 }

@@ -78,13 +78,9 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 
 			// Search all matching permissions
 			List<PrivacyPermission> privacyPermissions = findPrivacyPermissions(session, requestor, dataIds, actions, false);
-			LOG.info("Get: "+(null == privacyPermissions ? "0" : privacyPermissions.size())+" permissions retrieved");
+			LOG.debug("Get: {} permissions retrieved", (null == privacyPermissions ? "0" : privacyPermissions.size()));
 			if (null == privacyPermissions) {
 				return null;
-			}
-			int i = 1;
-			for(PrivacyPermission perm : privacyPermissions) {
-				LOG.info((i++)+": "+perm);
 			}
 
 			// Keep the most relevants for these actions
@@ -93,13 +89,13 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 				for(DataIdentifier dataId : dataIds) {
 					PrivacyPermission permission = selectRelevantPermission(dataId, privacyPermissions);
 					if (null != permission) {
-						LOG.info("Get: on of the retrieved and selected permission. "+permission);
+						LOG.trace("Get: on of the retrieved and selected permission. {}", permission);
 						permissions.add(permission.createResponseItem());
 					}
 				}
 			}
 			else {
-				LOG.info("Get: don't check actions and keep them all");
+				LOG.trace("Get: don't check actions and keep them all");
 				permissions.addAll(PrivacyPermission.createResponseItems(privacyPermissions));
 			}
 			// Robustness
@@ -145,12 +141,12 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 			// -- Update this privacy permission
 			// - Privacy Permission doesn't exist: create a new one
 			if (null == privacyPermission) {
-				LOG.info("Update: no permission retrieved, create a new one");
+				LOG.trace("Update: no permission retrieved, create a new one");
 				privacyPermission = new PrivacyPermission(requestor, dataId, actions, decision);
 			}
 			// - Privacy permission already exists: update it
 			else {
-				LOG.info("Update: permission retrieved, update it. "+privacyPermission);
+				LOG.trace("Update: permission retrieved, update it. Before: {}", privacyPermission);
 				privacyPermission.setRequestor(requestor);
 				privacyPermission.setDataId(dataId);
 				privacyPermission.setActionsToData(actions);
@@ -158,7 +154,6 @@ public class PrivacyDataManagerInternal extends PrivacyDataManagerInternalUtilit
 			}
 			// - Update
 			session.saveOrUpdate(privacyPermission);
-			LOG.info("Update: updated permission is "+privacyPermission);
 			t.commit();
 			result = true;
 		} catch (Exception e) {

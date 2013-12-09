@@ -23,23 +23,29 @@
 
 			<section class="form_style_main">
 
-				<h4 class="form_title">Create new Privacy Policy Negotiation Preference</h4>
+				<h4 class="form_title">Create new Privacy Policy Negotiation
+					Preference</h4>
 				<div class="hr grid_12 clearfix"></div>
-				
-						<h5>Privacy Preference Details</h5>				
-					<h:panelGrid columns="2" cellpadding="5">
-						
 
-						<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
-						<h:outputText id="requestorId"
-							value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
-						<h:outputLabel for="specificRequestor" value="For: "></h:outputLabel>
-						<h:outputText id="specificRequestor" value="#{PPNcreateBean.displaySpecificRequestor}" />
-						<h:outputLabel for="resourceType" value="Resource: " />
-						<h:outputText id="resourceType" value="#{PPNcreateBean.preferenceDetails.resource.dataType}" />
+				<h5>Privacy Preference Details</h5>
+				<h:panelGrid columns="2" cellpadding="5">
 
-					</h:panelGrid>
-				
+
+					<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
+					<h:outputText id="requestorId"
+						value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}"></h:outputText>
+					<h:outputLabel for="specificRequestor" value="For: "></h:outputLabel>
+					<h:outputText id="specificRequestor"
+						value="#{PPNcreateBean.displaySpecificRequestor}" />
+					<h:outputLabel for="actionDisplayed" value="Action: "></h:outputLabel>
+					<h:outputText id="actionDisplayed"
+						value="#{PPNcreateBean.preferenceDetails.action.actionConstant}"></h:outputText>
+					<h:outputLabel for="resourceType" value="Resource: " />
+					<h:outputText id="resourceType"
+						value="#{PPNcreateBean.preferenceDetails.resource.dataType}" />
+
+				</h:panelGrid>
+
 				<p:contextMenu for="treeSingle">
 					<p:menuitem value="View" update="messages"
 						actionListener="#{PPNcreateBean.displaySelectedSingle}"
@@ -116,12 +122,12 @@
 			<h:panelGrid columns="2" cellpadding="5">
 
 				<h:outputLabel for="privacyCondition" value="Privacy Condition:" />
-				<h:selectOneMenu id="privacyCondition"
+				<p:selectOneMenu id="privacyCondition"
 					value="#{PPNcreateBean.selectedPrivacyCondition}">
 					<f:selectItems value="#{PPNcreateBean.privacyConditions}" />
 					<p:ajax update="privacyConditionValue"
 						listener="#{PPNcreateBean.handlePrivacyTypeChange}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 
 				<h:outputLabel for="operator" value="Operator: " />
 				<p:selectOneMenu id="operator"
@@ -154,10 +160,10 @@
 			widgetVar="addOutdlg" resizable="false" dynamic="true">
 			<h:panelGrid columns="2" cellpadding="5">
 				<h:outputLabel for="decision" value="Select your action:" />
-				<h:selectOneMenu id="decision"
+				<p:selectOneMenu id="decision"
 					value="#{PPNcreateBean.selectedDecision}">
 					<f:selectItems value="#{PPNcreateBean.decisions}" />
-				</h:selectOneMenu>
+				</p:selectOneMenu>
 				<f:facet name="footer">
 					<p:commandButton id="AddOutcomeButton" value="Add"
 						oncomplete="#{p:widgetVar('addOutcomeDialog')}.hide()"
@@ -174,26 +180,37 @@
 
 			<h:panelGrid columns="2" cellpadding="5">
 				<h:outputLabel for="requestorId2" value="Requestor JID" />
-				<p:inputText id="requestorId2"
-					value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}"
-					label="Requestor">
-				</p:inputText>
-				
-				
+				<p:selectOneMenu id="requestorId2" process="@this"
+					value="#{PPNcreateBean.preferenceDetails.requestor.requestorId}">
+					<f:selectItems value="#{RequestorsController.cssAdvertisements}"
+						var="cssAdvertisement" itemLabel="#{cssAdvertisement.name}"
+						itemValue="#{cssAdvertisement.id}" />
+					<p:ajax update="requestorCis,requestorService" />
+				</p:selectOneMenu>
+				<h:outputLabel for="action" value="Action: " />
+				<p:selectOneMenu id="action"
+					value="#{PPNcreateBean.preferenceDetails.action.actionConstant}">
+					<f:selectItem itemLabel="Read" itemValue="READ" />
+					<f:selectItem itemLabel="Write" itemValue="WRITE" />
+					<f:selectItem itemLabel="Create" itemValue="CREATE" />
+					<f:selectItem itemLabel="Delete" itemValue="DELETE" />
+				</p:selectOneMenu>
+
 				<h:outputLabel for="dataScheme" value="Resource Scheme:" />
-				<h:selectOneMenu id="dataScheme"
+				<p:selectOneMenu id="dataScheme" process="@this"  required="true"
 					value="#{PPNcreateBean.preferenceDetails.resource.scheme}">
 					<f:selectItems value="#{PPNcreateBean.schemeList}" />
-					<p:ajax update="resource"
+					<p:ajax update="resourceDataType1"
 						listener="#{PPNcreateBean.handleSchemeTypeChange}" />
-				</h:selectOneMenu>				
+				</p:selectOneMenu>
 
-				<h:outputLabel for="resource" value="Resource type:" />
-				<p:selectOneMenu id="resource" editable="#{PPNcreateBean.editableResource}"
-					value="#{PPNcreateBean.preferenceDetails.resource.dataType}" label="value">
+				<h:outputLabel for="resourceDataType1" value="Resource type:" />
+				<p:selectOneMenu id="resourceDataType1" immediate="true" required="true"
+					value="#{PPNcreateBean.preferenceDetails.resource.dataType}"
+					label="value">
 					<f:selectItems value="#{PPNcreateBean.resourceTypes}" />
 				</p:selectOneMenu>
-				
+
 
 				<p:outputPanel id="customPanel">
 					<p:selectOneRadio id="customRadio"
@@ -204,29 +221,56 @@
 					</p:selectOneRadio>
 
 					<h:panelGrid columns="3">
+						<h:outputLabel for="requestorCisSelected" value="CIS" />
 						<p:radioButton id="requestorCisSelected" for="customRadio"
 							itemIndex="0" />
-						<h:outputLabel for="requestorCisSelected" value="CIS" />
-						<p:inputText id="requestorCis"
-							value="#{PPNcreateBean.requestorCis}" />
 
+						<p:selectOneMenu id="requestorCis"
+							value="#{PPNcreateBean.requestorCis}">
+							<f:selectItems
+								value="#{RequestorsController.getCisListByOwner(PPNcreateBean.preferenceDetails.requestor.requestorId)}"
+								var="cisAdvertisement" itemLabel="#{cisAdvertisement.name}"
+								itemValue="#{cisAdvertisement.id}" />
+						</p:selectOneMenu>
+
+
+						<h:outputLabel for="requestorServiceSelected" value="Service" />
 						<p:radioButton id="requestorServiceSelected" for="customRadio"
 							itemIndex="1" />
-						<h:outputLabel for="requestorServiceSelected" value="Service" />
-						<p:inputText id="requestorService"
-							value="#{PPNcreateBean.requestorService}" />
+
+						<p:selectOneMenu id="requestorService"
+							value="#{PPNcreateBean.requestorService}">
+							<f:selectItems
+								value="#{RequestorsController.getServiceListByOwner(PPNcreateBean.preferenceDetails.requestor.requestorId)}"
+								var="service" itemLabel="#{service.serviceName}"
+								itemValue="#{RequestorsController.getServiceIDAsString(service.serviceIdentifier)}" />
+						</p:selectOneMenu>
 
 						<p:radioButton id="noneSelected" for="customRadio" itemIndex="2" />
 						<h:outputLabel for="noneSelected" value="None" />
-
 					</h:panelGrid>
 
 				</p:outputPanel>
 				<f:facet name="footer">
 					<p:commandButton id="SavePrefDetails" value="Submit"
-						process="preferenceDetailsDialog" update="mainForm:requestorId,mainForm:specificRequestor, mainForm:resourceType"
+						process="preferenceDetailsDialog"
+						update="mainForm:requestorId,mainForm:specificRequestor, mainForm:resourceType"
 						actionListener="#{PPNcreateBean.savePreferenceDetails}">
 					</p:commandButton>
+
+					<p:confirmDialog id="prefDetailsConfirmationDialog"
+						widgetVar="pdcd" global="true"
+						message="There is already a privacy policy negotiation preference for the details you have entered. Do you want to edit the existing preference or replace it with a new one?"
+						icon="ui-icon-alert">
+						<p:commandButton value="Edit the existing one"
+							styleClass="ui-confirmdialog-yes" icon="ui-icon-check"
+							oncomplete="pdcd.hide();"
+							actionListener="#{PPNcreateBean.loadExistingPreference}"
+							update="treeSingle" />
+						<p:commandButton value="Replace it with a new one"
+							styleClass="ui-confirmdialog-no" icon="ui-icon-close"
+							oncomplete="pdcd.hide();" />
+					</p:confirmDialog>
 				</f:facet>
 			</h:panelGrid>
 

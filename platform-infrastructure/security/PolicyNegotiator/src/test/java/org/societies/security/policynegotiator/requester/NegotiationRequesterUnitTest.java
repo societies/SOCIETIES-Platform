@@ -58,13 +58,17 @@ public class NegotiationRequesterUnitTest {
 	private INegotiationProviderRemote groupMgrMock;
 	private IIdentityManager idMgrMock;
 	private IPersonalisationManager personalizationMgrMock;
-
+	private IEventMgr eventMgrMock;
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
 
+		
+		//Event Manager
+		eventMgrMock = mock(IEventMgr.class);
+		
 		// Signature manager
 		signatureMgrMock = mock(ISignatureMgr.class);
 
@@ -86,6 +90,7 @@ public class NegotiationRequesterUnitTest {
 		classUnderTest.setSignatureMgr(signatureMgrMock);
 		classUnderTest.setSecureStorage(secureStorageMock);
 		classUnderTest.setPersonalizationMgr(personalizationMgrMock);
+		classUnderTest.setEventMgr(eventMgrMock);
 		classUnderTest.init();
 	}
 
@@ -114,9 +119,11 @@ public class NegotiationRequesterUnitTest {
 		classUnderTest.setPrivacyPolicyNegotiationIncluded(true);
 		assertTrue(classUnderTest.isPrivacyPolicyNegotiationIncluded());
 
+		/*
 		IEventMgr eventMgr = mock(IEventMgr.class);
 		classUnderTest.setEventMgr(eventMgr);
 		assertSame(eventMgr, classUnderTest.getEventMgr());
+		*/
 	}
 	
 	/**

@@ -95,6 +95,9 @@ var SocietiesUtility = {
 
 			console.log("Register Feedback plugin ");
             cordova.addPlugin("SocietiesFeedback", SocietiesFeedback);
+            
+            console.log("Register Trust plugin ");
+            cordova.addPlugin("jTrustPlugin", jTrustPlugin);
 		});
 		
 		//handle the Android Back button 

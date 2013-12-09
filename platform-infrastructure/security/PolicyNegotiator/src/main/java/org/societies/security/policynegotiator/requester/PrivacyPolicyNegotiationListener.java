@@ -24,9 +24,8 @@
  */
 package org.societies.security.policynegotiator.requester;
 
-import java.net.URI;
-import java.util.List;
 
+import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.identity.Requestor;
@@ -53,15 +52,11 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	private static Logger LOG = LoggerFactory.getLogger(PrivacyPolicyNegotiationListener.class);
 	private static Logger PERF_LOG = LoggerFactory.getLogger("PerformanceMessage");
 	
-	INegotiationCallback finalCallback;
-	String slaKey;
-	List<URI> fileUris;
-	int id;
+	private String[] eventTypes;
+	private IEventMgr eventMgr;
 	
-	String[] eventTypes;
-	IEventMgr eventMgr;
-	
-	//private long timestamp;
+	private HashMap<Integer,PrivacyPolicyNegotiationInfo> negotiationMap;
+
 	
 	/**
 	 * 
@@ -71,19 +66,30 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 	 * @param slaKey The key to gather SLA from secure storage using
 	 * {@link org.societies.api.internal.security.storage.ISecureStorage#getDocument(String)}
 	 */
-	public PrivacyPolicyNegotiationListener(INegotiationCallback finalCallback, String slaKey,
-			List<URI> fileUris, IEventMgr eventMgr, String[] eventTypes, int id) {
+	public PrivacyPolicyNegotiationListener(IEventMgr eventMgr) {
 		
-		this.finalCallback = finalCallback;
-		this.slaKey = slaKey;
-		this.fileUris = fileUris;
-		this.id = id;
-		
-		this.eventTypes = eventTypes;
+		LOG.debug("Privacy Policy Negotation Listener");
 		this.eventMgr = eventMgr;
+		this.negotiationMap = new HashMap<Integer,PrivacyPolicyNegotiationInfo>();
+
+		this.eventTypes = new String[] {
+				EventTypes.FAILED_NEGOTIATION_EVENT,
+				EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT};
 		
-		//this.timestamp = System.nanoTime();
+		this.eventMgr.subscribeInternalEvent(this, eventTypes, null);
+			
 	}
+	
+	public void addNegotiationInfo(PrivacyPolicyNegotiationInfo info){
+		LOG.debug("Adding Negotiation Info: {}", info.getId());
+		this.negotiationMap.put(info.getId(), info);
+	}
+	
+	public void unsubscribeEvents(){
+		LOG.debug("Listener unsubscribing!");
+		this.eventMgr.unSubscribeInternalEvent(this, eventTypes, null);
+	}
+	
 	
 	@Override
 	public void handleInternalEvent(InternalEvent event) {
@@ -93,35 +99,37 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 		LOG.info("Internal event received: {}", type);
 		LOG.debug("*** event name : " + event.geteventName());
 		LOG.debug("*** event source : " + event.geteventSource());
-
+		
 		if (type.equals(EventTypes.PRIVACY_POLICY_NEGOTIATION_EVENT)) {
 			
 			PPNegotiationEvent payload = (PPNegotiationEvent) event.geteventInfo();
+			Integer negotiationId = new Integer(payload.getDetails().getNegotiationID());
 			
-			if (isEventForThisNegotiation(payload)) {
+			if (negotiationMap.containsKey(negotiationId)) {
 				
 				NegotiationStatus status = payload.getNegotiationStatus();
 				LOG.debug("negotiation status : " + status);
 
 				if (status == NegotiationStatus.SUCCESSFUL) {
 					logPerformance(true);
-					notifySuccess();
+					notifySuccess(negotiationId);
 				}
 				else if (status == NegotiationStatus.FAILED) {
 					logPerformance(false);
-					notifyFailure();
+					notifyFailure(negotiationId);
 				}
 			}
 		}
 		else if (type.equals(EventTypes.FAILED_NEGOTIATION_EVENT)) {
 			
 			FailedNegotiationEvent payload = (FailedNegotiationEvent) event.geteventInfo();
+			Integer negotiationId = new Integer(payload.getDetails().getNegotiationID());
 			
-			if (isEventForThisNegotiation(payload)) {
+			if (negotiationMap.containsKey(negotiationId)) {
 
 				Requestor requestor = payload.getDetails().getRequestor();
 				LOG.debug("negotiation requestor : " + requestor);
-				notifyFailure();
+				notifyFailure(negotiationId);
 			}
 		}
 		
@@ -132,36 +140,14 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 		LOG.warn("External event received unexpectedly: {}", event.geteventType());    
 	}
 	
-	private boolean isEventForThisNegotiation(Object payload) {
 
-		int id;
+	private void notifySuccess(Integer negotiationId) {
 		
-		if (payload instanceof PPNegotiationEvent) {
-			PPNegotiationEvent p = (PPNegotiationEvent) payload;
-			id = p.getDetails().getNegotiationID();
-		}
-		else if (payload instanceof FailedNegotiationEvent) {
-			FailedNegotiationEvent p = (FailedNegotiationEvent) payload;
-			id = p.getDetails().getNegotiationID();
-		}
-		else {
-			LOG.warn("PPN event payload is of unexpected type: {}", payload.getClass().getName());
-			return false;
-		}
-		
-		LOG.debug("Event is for negotiation {}. This listener is waiting " +
-				"for negotiation {}", id, this.id);
-		
-		return id == this.id;
-	}
-	
-	private void notifySuccess() {
-		
-		eventMgr.unSubscribeInternalEvent(this, eventTypes, null);
-
+		PrivacyPolicyNegotiationInfo negotiationInfo = negotiationMap.remove(negotiationId);
+		INegotiationCallback finalCallback = negotiationInfo.getFinalCallback();
 		if (finalCallback != null) {
 			LOG.debug("invoking final callback");
-			finalCallback.onNegotiationComplete(slaKey, fileUris);
+			finalCallback.onNegotiationComplete(negotiationInfo.getSlaKey(), negotiationInfo.getFileUris());
 			LOG.info("negotiation finished, final callback invoked");
 		}
 		else {
@@ -169,12 +155,10 @@ public class PrivacyPolicyNegotiationListener extends EventListener {
 		}
 	}
 	
-	private void notifyFailure() {
+	private void notifyFailure(Integer negotiationId) {
 		LOG.warn("Privacy policy negotiation failed");
-		
-		eventMgr.unSubscribeInternalEvent(this, eventTypes, null);
-
-		finalCallback.onNegotiationError("");
+		PrivacyPolicyNegotiationInfo negotiationInfo = negotiationMap.remove(negotiationId);
+		negotiationInfo.getFinalCallback().onNegotiationError("");
 	}
 	
 	private void logPerformance(boolean success) {

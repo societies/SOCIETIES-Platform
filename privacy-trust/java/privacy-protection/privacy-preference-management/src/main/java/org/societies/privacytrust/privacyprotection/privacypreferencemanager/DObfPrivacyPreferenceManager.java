@@ -39,6 +39,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PreferenceEvaluator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.DObfPreferenceCreator;
 
 /**
  * @author Eliza
@@ -68,13 +69,19 @@ public class DObfPrivacyPreferenceManager {
 	
 	public double evaluateDObfPreference(DObfPreferenceDetailsBean details) {
 		DObfPreferenceTreeModel model = this.prefCache.getDObfPreference(details);
-		if (null != model ){
+		if (model!=null){
 			IPrivacyOutcome outcome = evaluatePreference(model.getRootPreference());
-			if (null != outcome && outcome instanceof DObfOutcome) {
+			if (outcome instanceof DObfOutcome){
 				return ((DObfOutcome) outcome).getObfuscationLevel();
+			}else{
+				return -1;
 			}
+		}else{
+			return -1;
 		}
-		return 1;
+		
+		
+		
 	}
 	
 	private IPrivacyOutcome evaluatePreference(IPrivacyPreference privPref){
@@ -105,4 +112,5 @@ public class DObfPrivacyPreferenceManager {
 		
 		throw new PrivacyException("DObfPreferenceDetailsBean parameter did not match DObfPrivacyPreferenceTreeModel.getDetails()");		
 	}
+
 }

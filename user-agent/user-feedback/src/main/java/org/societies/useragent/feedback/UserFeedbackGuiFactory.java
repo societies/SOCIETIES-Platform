@@ -131,11 +131,11 @@ public class UserFeedbackGuiFactory {
         Boolean result = null;
 
         //show GUIs on local device
-        log.debug("Returning implicit feedback to UACommsServer");
+        if(log.isDebugEnabled()) log.debug("Returning implicit feedback to UACommsServer");
         String proposalText = content.getProposalText();
         int timeout = content.getTimeout();
         if (type == ImpProposalType.TIMED_ABORT) {
-            log.debug("Timed Abort GUI");
+            if(log.isDebugEnabled()) log.debug("Timed Abort GUI");
             TimedGUI gui = new TimedGUI();
             result = gui.displayGUI(proposalText, timeout);
         }

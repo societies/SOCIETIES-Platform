@@ -53,6 +53,8 @@ public class ServiceMgmtEvent implements Serializable{
 	private String serviceName;
 
 	private String problem;
+
+	private String interfaceName;
 	
 	
 	/**
@@ -115,6 +117,20 @@ public class ServiceMgmtEvent implements Serializable{
 	public void setBundleSymbolName(String bundleSymbolName) {
 		this.bundleSymbolName = bundleSymbolName;
 	}
+	
+	/**
+	 * @return the bundleSymbolName
+	 */
+	public String getInterfaceName() {
+		return interfaceName;
+	}
+	/**
+	 * @param bundleSymbolName the bundleSymbolName to set
+	 */
+	public void setInterfaceName(String interfaceName) {
+		this.interfaceName = interfaceName;
+	}
+
 
 	public void setServiceType(ServiceType serviceType){
 		this.serviceType = serviceType;

@@ -70,7 +70,9 @@ public class PreferenceStorer {
 		try {
 			attrPreference = (CtxAttribute) ctxBroker.retrieve(id).get();
 			if (attrPreference == null){
-				this.logging.debug("Cannot delete preference. Doesn't exist");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Cannot delete preference. Doesn't exist");
+				}
 				return false;
 			}
 				ctxBroker.remove(id);
@@ -137,7 +139,9 @@ public class PreferenceStorer {
 			oos.flush(); 
 			oos.close(); 
 			bos.close();
+			if (logging.isDebugEnabled()){
 			this.logging.debug("Trying to store preference of size: "+bos.size());
+			}
 			return bos.toByteArray();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -154,11 +158,15 @@ public class PreferenceStorer {
 			Future<List<CtxIdentifier>> futureCtxIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxModelTypes.PREFERENCE); 
 			List<CtxIdentifier> ctxIDs = futureCtxIDs.get();
 			if (ctxIDs.size()==0){
-				this.logging.debug("Preference Entity doesn't exist");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Preference Entity doesn't exist");
+				}
 				Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveCssOperator();
 				CtxEntity person = (CtxEntity) futurePerson.get();
 				if (person==null){
-					this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");
+					}
 					return null;
 				}
 				
@@ -175,22 +183,30 @@ public class PreferenceStorer {
 				CtxEntity preferenceEntity = (ctxBroker.createEntity(CtxModelTypes.PREFERENCE)).get();
 				assoc.addChildEntity(preferenceEntity.getId());
 				ctxBroker.update(assoc).get();
-				this.logging.debug("Created Preference Entity");
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Created Preference Entity");
+				}
 				CtxAttribute attr = (ctxBroker.createAttribute(preferenceEntity.getId(), key)).get();
 				attr.setBinaryValue(SerialisationHelper.serialise(iptm));
 				ctxBroker.update(attr).get();
-				this.logging.debug("Created attribute: "+attr.getType());
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Created attribute: "+attr.getType());
+				}
 				return attr.getId();
 				
 			}else{
 				if (ctxIDs.size()>1){
-					this.logging.debug("There's more than one entity of type Preference for userId: "+userId.getIdentifier()+"\nStoring preference under the first in the list");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("There's more than one entity of type Preference for userId: "+userId.getIdentifier()+"\nStoring preference under the first in the list");
+					}
 				}
 				CtxIdentifier preferenceEntityID = ctxIDs.get(0);
 				CtxAttribute attr = (ctxBroker.createAttribute((CtxEntityIdentifier) preferenceEntityID, key)).get();
 				attr.setBinaryValue(SerialisationHelper.serialise(iptm));
 				ctxBroker.update(attr).get();
-				this.logging.debug("Created attribute: "+attr.getType());
+				if (logging.isDebugEnabled()){
+					this.logging.debug("Created attribute: "+attr.getType());
+				}
 				return attr.getId();
 			}
 		}catch(CtxException ctxE){
@@ -218,7 +234,8 @@ public class PreferenceStorer {
 			Future<List<CtxIdentifier>> futureCtxIDs = broker.lookup(userId, CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE); 
 			List<CtxIdentifier> ctxIDs = futureCtxIDs.get();
 			if (ctxIDs.size()==0){
-				this.logging.debug("Entity Preference doesn't exist in DB. ");
+				if (logging.isDebugEnabled()){
+				this.logging.debug("Entity Preference doesn't exist in DB. ");}
 				//Preference Entity doesn't exist for this dpi so we're going to check if an association exists of type hasPreferences
 
 				Future<List<CtxIdentifier>> futureAssocCtxIDs =broker.lookup(userId, CtxModelType.ASSOCIATION, CtxModelTypes.HAS_PREFERENCES); 
@@ -226,14 +243,15 @@ public class PreferenceStorer {
 
 				CtxAssociation assoc = null;
 				if (assocCtxIDs.size()==0){
-					this.logging.debug(CtxModelTypes.HAS_PREFERENCES+" association doesn't exist in DB.");
+					if (logging.isDebugEnabled()){
+					this.logging.debug(CtxModelTypes.HAS_PREFERENCES+" association doesn't exist in DB.");}
 					//Has_Preferences association doesn't exist for this dpi, so we're going to check if the Person Entity exists and create the association
 					CtxEntity person = broker.retrieveOperator(userId);
 					Future<List<CtxIdentifier>> futurePersonCtxIDs = broker.lookup(CtxModelType.ENTITY, "PERSON");
 					List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();
 					
 					if (personCtxIDs.size()==0){
-						this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");
+						if (logging.isDebugEnabled()){this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");}
 						return null;
 					}
 					
@@ -301,9 +319,13 @@ public class PreferenceStorer {
 					attr.setBinaryValue(SerialisationHelper.serialise(registry));
 					
 					ctxBroker.update(attr).get();					
-					this.logging.debug("Successfully updated preference registry for CISID: "+CISId.getIdentifier());
+					if (logging.isDebugEnabled()){
+						this.logging.debug("Successfully updated preference registry for CISID: "+CISId.getIdentifier());
+					}
 				}else{
-					this.logging.debug("PreferenceRegistry not found in DB for CISID:. Creating new registry");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("PreferenceRegistry not found in DB for CISID:. Creating new registry");
+					}
 					
 					Future<CtxEntityIdentifier> futureCommunityCtxId = ctxBroker.retrieveCommunityEntityId(CISId);
 					
@@ -313,11 +335,15 @@ public class PreferenceStorer {
 					
 					attr.setBinaryValue(SerialisationHelper.serialise(registry));
 					ctxBroker.update(attr).get();
-					this.logging.debug("Successfully stored new preference registry");
+					if (logging.isDebugEnabled()){
+						this.logging.debug("Successfully stored new preference registry");
+					}
 				}
 			
 		} catch (CtxException e) {
-			this.logging.debug("Exception while storing PreferenceRegistry to DB for CISID:"+CISId.getIdentifier());
+			if (logging.isDebugEnabled()){
+				this.logging.debug("Exception while storing PreferenceRegistry to DB for CISID:"+CISId.getIdentifier());
+			}
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

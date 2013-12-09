@@ -62,12 +62,12 @@ public class CAUITaskManager implements ICAUITaskManager{
 	UserIntentModelData activeUserIntentModel = new UserIntentModelData();
 
 	public ICtxBroker getCtxBroker() {
-		LOG.debug(this.getClass().getName()+": Return ctxBroker");
+		//LOG.debug(this.getClass().getName()+": Return ctxBroker");
 		return ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker ctxBroker) {
-		LOG.debug(this.getClass().getName()+": Got ctxBroker");
+		//LOG.debug(this.getClass().getName()+": Got ctxBroker");
 		this.ctxBroker = ctxBroker;
 	}
 
@@ -100,6 +100,23 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public IUserIntentAction createAction(ServiceResourceIdentifier serviceID, String serviceType, String par, String val) {
 
+		
+		if (serviceID == null) {
+			throw new NullPointerException("serviceID can't be null");
+		}
+		
+		if (serviceType == null) {
+			throw new NullPointerException("serviceType can't be null");
+		}
+		
+		if (par == null) {
+			throw new NullPointerException("action parameter can't be null");
+		}
+		
+		if (val == null) {
+			throw new NullPointerException("action value can't be null");
+		}
+		   
 		IUserIntentAction action = new UserIntentAction (serviceID, serviceType, par,val, UIModelObjectNumberGenerator.getNextValue());
 
 		UserIntentModelData model = retrieveModel();
@@ -108,6 +125,8 @@ public class CAUITaskManager implements ICAUITaskManager{
 		model.setActionModel(actionsMap);
 		updateModel(model);
 		//this.activeModel.setActionModel(this.actionModel);
+	
+		//System.out.println("creating Action:"+ action.getActionID() );
 		return action;
 	}
 
@@ -132,7 +151,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 			}
 		}
 		if(!actionsMap.keySet().contains(sourceAction)){
-			LOG.debug("Doesn't exists in model, ACTION:"+sourceAction.getActionID());
+			if (LOG.isDebugEnabled())LOG.debug("Doesn't exists in model, ACTION:"+sourceAction.getActionID());
 		}
 		model.setActionModel(actionsMap);
 		updateModel(model);
@@ -222,7 +241,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 	@Override
 	public UserIntentAction retrieveCurrentIntentAction(IIdentity arg0,
 			IIdentity arg1, ServiceResourceIdentifier arg2, String arg3) {
-		
+
 		return null;
 	}
 
@@ -257,15 +276,15 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 	@Override
 	public boolean taskBelongsToModel(IUserIntentTask arg0) {
-		
+
 		return false;
 	}
 
 
 	@Override
 	public boolean actionBelongsToModel(IUserIntentAction arg0) {
-		
-		
+
+
 		return false;
 	}
 
@@ -297,14 +316,14 @@ public class CAUITaskManager implements ICAUITaskManager{
 
 		Map<IUserIntentAction, Double> results = new HashMap<IUserIntentAction, Double>();
 		UserIntentModelData model = retrieveModel();
-		LOG.debug("model "+ model);
-		
+		//LOG.debug("model "+ model);
+
 		HashMap<IUserIntentAction, HashMap<IUserIntentAction,Double>> actionsMap = model.getActionModel();
-		LOG.debug("actionsMap "+ actionsMap);
-		LOG.debug("currentAction "+ currentAction);
+		//LOG.debug("actionsMap "+ actionsMap);
+		//LOG.debug("currentAction "+ currentAction);
 		if(actionsMap.keySet().contains(currentAction)){
 			results = actionsMap.get(currentAction);
-			
+
 		}		 
 		return results;
 	}
@@ -325,7 +344,7 @@ public class CAUITaskManager implements ICAUITaskManager{
 		if(model!=null){
 			LOG.debug("updating active model : "+model.getActionModel() );	
 		}
-		
+
 	}
 
 	@Override
@@ -362,87 +381,136 @@ public class CAUITaskManager implements ICAUITaskManager{
 	/*
 	 * find best matching from the actions contained in list  actionList given the situation context map
 	 */
-	private List<IUserIntentAction> findBestMatchingAction(List<IUserIntentAction> actionList, Map<String, Serializable> situationConext ){
+	public List<IUserIntentAction> findBestMatchingAction(List<IUserIntentAction> actionList, Map<String, Serializable> situationConext ){
 
 		List<IUserIntentAction> bestActionList = new ArrayList<IUserIntentAction>();
 		HashMap<IUserIntentAction, Integer> actionsScoreMap = new HashMap<IUserIntentAction, Integer>();
-
+		
+		//System.out.println("findBestMatchingAction situationConext "+situationConext);
+		
 		String currentLocationValue = "null";
-		String currentStatusValue = "null";
+		String currentDayOfWeekValue = "null";
+		Integer currentHourOfDayValue = 0;
 
 		if( situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC) != null){
-			currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);	
+			if(situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC) instanceof String){
+				currentLocationValue = (String) situationConext.get(CtxAttributeTypes.LOCATION_SYMBOLIC);	
+			}
 		}
 
-		if( situationConext.get(CtxAttributeTypes.STATUS) != null){
-			currentStatusValue = (String) situationConext.get(CtxAttributeTypes.STATUS);	
+		if( situationConext.get(CtxAttributeTypes.DAY_OF_WEEK) != null){
+			if(situationConext.get(CtxAttributeTypes.DAY_OF_WEEK) instanceof String){
+				currentDayOfWeekValue = (String) situationConext.get(CtxAttributeTypes.DAY_OF_WEEK);	
+			}
 		}  
 
-		//Integer currentTempValue = (Integer) situationConext.get(CtxAttributeTypes.TEMPERATURE);
+		if( situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) != null){
+			//System.out.println("situationConext.get(CtxAttributeTypes.HOUR_OF_DAY)");
+			if(situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) instanceof Integer){
+				
+				currentHourOfDayValue = (Integer) situationConext.get(CtxAttributeTypes.HOUR_OF_DAY);
+				//System.out.println("situationConext.get(CtxAttributeTypes.HOUR_OF_DAY) currentHourOfDayValue "+currentHourOfDayValue);
+			}
+		}  
+
+
+		//System.out.println("currentDayOfWeekValue: "+currentDayOfWeekValue);
+		//System.out.println("currentLocationValue: "+currentLocationValue);
+		//System.out.println("currentHourOfDayValue: "+currentHourOfDayValue );
+		//if(currentHourOfDayValue instanceof Integer )System.out.println("currentHourOfDayValue is integer"); 
 
 		for(IUserIntentAction action : actionList ){
 
 			HashMap<String,Serializable> actionCtx = action.getActionContext();
 
-			//System.out.println("String action :"+ action+" actionCtx:"+actionCtx);
+			//LOG.debug("1 String action :"+ action+" actionCtx:"+actionCtx);
 
 			for(String ctxType : actionCtx.keySet()){
 				int actionMatchScore = 0;	
-				Serializable ctxValue = "null";
-				if(actionCtx.get(ctxType) != null) 	ctxValue = actionCtx.get(ctxType);
+				Serializable ctxValue ;
 
-				if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC) && ctxValue instanceof String){
-					String actionLocation = (String) ctxValue;
-					//System.out.println(" --currentLocationValue :"+ currentLocationValue);			
-					//System.out.println("******** Action location value :"+ actionLocation);
-					if(currentLocationValue.equals(actionLocation)) {
-						//System.out.println("match... increase score +1 "+actionMatchScore);
-						actionMatchScore = actionMatchScore +1;
-					}
+				if(actionCtx.get(ctxType) != null) 	{
 
-				}  /*else if(ctxType.equals(CtxAttributeTypes.TEMPERATURE) && ctxValue instanceof Double ){
-					Integer actionTemperature= (Integer) ctxValue;
-					LOG.info("Double context temperature value :"+ actionTemperature);
-					if(currentTempValue.equals(actionTemperature)) actionMatchScore = actionMatchScore +1;
-				}*/ else if(ctxType.equals(CtxAttributeTypes.STATUS) && ctxValue instanceof String ){
-					String actionStatus = (String) ctxValue;
-					//System.out.println(" --currentStatusValue :"+ currentStatusValue);
-					//System.out.println("********** Action status value :"+ actionStatus);
-					if(currentStatusValue.equals(actionStatus)) {
-						//System.out.println("match... increase score +1 "+actionMatchScore);
-						actionMatchScore = actionMatchScore +1;
+					ctxValue = actionCtx.get(ctxType);
+
+					//LOG.debug("2 String ctxType type :"+ ctxType+" ctxValue:"+ctxValue);
+
+					if(ctxType.equals(CtxAttributeTypes.LOCATION_SYMBOLIC) && ctxValue instanceof String){
+						String actionLocation = (String) ctxValue;
+						//LOG.debug("3 actionLocation :"+ actionLocation);
+						//System.out.println("3 actionLocation :"+ actionLocation);
+						if(currentLocationValue.equalsIgnoreCase(actionLocation)){
+							actionMatchScore = actionMatchScore +1;
+							//LOG.debug("loc matches :"+ actionMatchScore);
+							//System.out.println("loc matches :"+ actionMatchScore);
+						}
+
+					}  else if(ctxType.equals(CtxAttributeTypes.HOUR_OF_DAY) && ctxValue instanceof Integer ){
+
+						//LOG.debug("hod matches ctxValue :"+ ctxValue);
+						Integer actionHod = (Integer) ctxValue;
+						//LOG.debug("hod matches currentHourOfDayValue :"+ currentHourOfDayValue);
+						//LOG.debug("hod matches actionHod :"+ actionHod);
+						
+						if(currentHourOfDayValue.equals(actionHod)) {
+							actionMatchScore = actionMatchScore +1;
+							//LOG.debug("hod matches :"+ actionMatchScore);
+							//System.out.println("hod matches :"+ actionMatchScore);
+						}
+
+
+					}  else if(ctxType.equals(CtxAttributeTypes.DAY_OF_WEEK) && ctxValue instanceof String ){
+						String actionDow = (String) ctxValue;
+					//	LOG.debug("5 actionDow :"+ actionDow);
+						//System.out.println("5 actionDow :"+ actionDow);
+						if(currentDayOfWeekValue.equalsIgnoreCase(actionDow)) {
+							actionMatchScore = actionMatchScore +1;
+						//	LOG.debug("dow matches :"+ actionMatchScore);
+						//	System.out.println("dow matches :"+ actionMatchScore);
+						}
+
+					} else {
+						if (LOG.isDebugEnabled())LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
 					}
-				} else {
-					LOG.debug("findBestMatchingAction: context type:"+ctxType +" does not match");
+					//System.out.println("String type :"+ ctxType+" ctxValue:"+ctxValue);
 				}
-				//System.out.println("String type :"+ ctxType+" ctxValue:"+ctxValue);
+
 
 				if(actionsScoreMap.get(action) == null){
 					actionsScoreMap.put(action, actionMatchScore);
 				} else {
 					Integer oldScore =	actionsScoreMap.get(action);
 					actionsScoreMap.put(action, oldScore+actionMatchScore);
-				}
-			}	
+				}  
+				//LOG.debug("actionsScoreMap temp: " +actionsScoreMap);
+				//System.out.println("actionsScoreMap temp: " +actionsScoreMap);
+			}// end of for loop	
+
 		}
 		//System.out.println("actionsScoreMap  " +actionsScoreMap);
-		LOG.debug("actionsScoreMap  " +actionsScoreMap);
-		
+		//LOG.debug("actionsScoreMap  " +actionsScoreMap);
+
 		if(!actionsScoreMap.values().isEmpty()){
-			
+
 			// check if no context matches, return empty set
 			boolean allValuesZero = true;
 			for(Integer value : actionsScoreMap.values()){
 				if (value != 0)  allValuesZero = false;
 			}
 			if(allValuesZero) return bestActionList;
-			
+
 			int maxValueInMap=(Collections.max(actionsScoreMap.values()));  // This will return max value in the Hashmap
 			for(IUserIntentAction action  : actionsScoreMap.keySet()){
 				if(actionsScoreMap.get(action).equals(maxValueInMap)) {
+
+					if(maxValueInMap == 3 )action.setConfidenceLevel(100);
+					if(maxValueInMap == 2 )action.setConfidenceLevel(66);
+					if(maxValueInMap == 1 )action.setConfidenceLevel(52);
+
 					bestActionList.add(action);
 				}
 			}
+
 		} else {
 			for(IUserIntentAction action  : actionsScoreMap.keySet()){
 				bestActionList.add(action);	
@@ -450,7 +518,11 @@ public class CAUITaskManager implements ICAUITaskManager{
 		}
 
 
-		LOG.debug("best action "+bestActionList);
+		if (LOG.isDebugEnabled())LOG.debug("best action list: "+bestActionList );
+		for(IUserIntentAction action  : bestActionList){
+			if (LOG.isDebugEnabled())LOG.debug("action conf level "+action.getConfidenceLevel() );
+		}
+
 		return bestActionList;
 	}
 }

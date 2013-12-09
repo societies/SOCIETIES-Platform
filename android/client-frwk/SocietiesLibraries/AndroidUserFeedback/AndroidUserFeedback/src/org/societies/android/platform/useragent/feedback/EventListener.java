@@ -32,6 +32,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.*;
 import android.util.Log;
+import android.widget.Toast;
 import org.societies.android.api.comms.IMethodCallback;
 import org.societies.android.api.events.IAndroidSocietiesEvents;
 import org.societies.android.api.events.IPlatformEventsCallback;
@@ -56,6 +57,9 @@ import java.util.Set;
 public class EventListener extends Service {
 
     private static final String LOG_TAG = EventListener.class.getName();
+
+    private AndroidNotifier notifier;
+
 
     //TRACKING CONNECTION TO EVENTS MANAGER
     private boolean boundToEventMgrService = false;
@@ -83,6 +87,12 @@ public class EventListener extends Service {
         }
     }
 
+
+    public EventListener() {
+
+    }
+
+
     //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>UserFeedback SERVICE LIFECYCLE METHODS>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     @Override
     public IBinder onBind(Intent intent) {
@@ -92,6 +102,13 @@ public class EventListener extends Service {
     @Override
     public void onCreate() {
         Log.d(this.getClass().getName(), "UserFeedback Service creating...");
+
+
+        notifier = new AndroidNotifier(this.getApplicationContext(),
+                Notification.DEFAULT_SOUND,
+                new int[]{Notification.FLAG_AUTO_CANCEL}
+        );
+
         // START BACKGROUND THREAD FOR SERVICE
         HandlerThread thread = new HandlerThread("UserFeedbackStartArguments", android.os.Process.THREAD_PRIORITY_BACKGROUND);
         thread.start();
@@ -102,6 +119,7 @@ public class EventListener extends Service {
 
         // Timed abort processor needs a context to run in
         TimedAbortProcessor.getInstance().setContext(this);
+    
     }
 
     @Override
@@ -156,72 +174,78 @@ public class EventListener extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(LOG_TAG, "Received action: " + intent.getAction());
+            try {
+                Log.d(LOG_TAG, "Received action: " + intent.getAction());
+                Log.d(LOG_TAG, "onReceive");
 
-            //EVENT MANAGER INTENTS
-            if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
-                Log.d(LOG_TAG, "Subscribed to event: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-            } else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
-                Log.d(LOG_TAG, "Subscribed to multiple events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-            } else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
-                Log.d(LOG_TAG, "Un-subscribed to events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
-            }
-            //PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent
-            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
-                UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+                //EVENT MANAGER INTENTS
+                if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENT)) {
+                    Log.d(LOG_TAG, "Subscribed to event: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+                } else if (intent.getAction().equals(IAndroidSocietiesEvents.SUBSCRIBE_TO_EVENTS)) {
+                    Log.d(LOG_TAG, "Subscribed to multiple events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+                } else if (intent.getAction().equals(IAndroidSocietiesEvents.UNSUBSCRIBE_FROM_EVENTS)) {
+                    Log.d(LOG_TAG, "Un-subscribed to events: " + intent.getBooleanExtra(IAndroidSocietiesEvents.INTENT_RETURN_VALUE_KEY, false));
+                }
+                //PRIVACY NEGOTIATION EVENT - payload is UserFeedbackPrivacyNegotiatioEvent
+                else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_PRIVACY_NEGOTIATION_REQUEST_INTENT)) {
+                    UserFeedbackPrivacyNegotiationEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
-                String id = String.valueOf(eventPayload.getRequestId());
+                    String id = String.valueOf(eventPayload.getRequestId());
 
-                synchronized (processedIncomingEvents) {
+                    synchronized (processedIncomingEvents) {
 
-                    if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate PPN event received: id=" + id);
-                        return;
+                        if (processedIncomingEvents.contains(id)) {
+                            Log.w(LOG_TAG, "Ignoring duplicate PPN event received: id=" + id);
+                            return;
+                        }
+
+                        processedIncomingEvents.add(id);
                     }
 
-                    processedIncomingEvents.add(id);
+                    Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
+                    displayPrivacyNegotiationNotification(EventListener.this.getApplicationContext(), eventPayload);
                 }
+                //ACCESS CONTROL EVENT - payload is UserFeedbackAccessControlEvent
+                else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT)) {
+                    UserFeedbackAccessControlEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
-                Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
-                displayPrivacyNegotiationNotification(EventListener.this.getApplicationContext(), eventPayload);
-            }
-            //ACCESS CONTROL EVENT - payload is UserFeedbackAccessControlEvent
-            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_ACCESS_CONTROL_REQUEST_INTENT)) {
-                UserFeedbackAccessControlEvent eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+                    String id = String.valueOf(eventPayload.getRequestId());
 
-                String id = String.valueOf(eventPayload.getRequestId());
+                    synchronized (processedIncomingEvents) {
 
-                synchronized (processedIncomingEvents) {
+                        if (processedIncomingEvents.contains(id)) {
+                            Log.w(LOG_TAG, "Ignoring duplicate AC event received: id=" + id);
+                            return;
+                        }
 
-                    if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate AC event received: id=" + id);
-                        return;
+                        processedIncomingEvents.add(id);
                     }
 
-                    processedIncomingEvents.add(id);
+                    Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
+                    displayAccessControlNotification(EventListener.this.getApplicationContext(), eventPayload);
                 }
+                //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
+                else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
+                    UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
 
-                Log.d(LOG_TAG, "Privacy Negotiation event received: id=" + id);
-                displayAccessControlNotification(EventListener.this.getApplicationContext(), eventPayload);
-            }
-            //PERMISSION REQUEST EVENT - payload is UserFeedbackBean
-            else if (intent.getAction().equals(IAndroidSocietiesEvents.UF_REQUEST_INTENT)) {
-                UserFeedbackBean eventPayload = intent.getParcelableExtra(IAndroidSocietiesEvents.GENERIC_INTENT_PAYLOAD_KEY);
+                    String id = eventPayload.getRequestId();
 
-                String id = eventPayload.getRequestId();
+                    synchronized (processedIncomingEvents) {
 
-                synchronized (processedIncomingEvents) {
+                        if (processedIncomingEvents.contains(id)) {
+                            Log.w(LOG_TAG, "Ignoring duplicate UF event received: id=" + id);
+                            return;
+                        }
 
-                    if (processedIncomingEvents.contains(id)) {
-                        Log.w(LOG_TAG, "Ignoring duplicate UF event received: id=" + id);
-                        return;
+                        processedIncomingEvents.add(id);
                     }
 
-                    processedIncomingEvents.add(id);
+                    Log.d(LOG_TAG, "General Permission request event received: id=" + id);
+                    displayUserFeedbackNotification(eventPayload);
                 }
-
-                Log.d(LOG_TAG, "General Permission request event received: id=" + id);
-                displayUserFeedbackNotification(EventListener.this.getApplicationContext(), eventPayload);
+            } catch (Exception ex) {
+                Log.e(LOG_TAG, "Error receiving pubsub event", ex);
+                Toast.makeText(context, ex.getMessage(), Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -326,24 +350,40 @@ public class EventListener extends Service {
 
     }
 
-    private static void displayUserFeedbackNotification(Context context, UserFeedbackBean ufBean) {
-
+    private void displayUserFeedbackNotification(UserFeedbackBean ufBean) {
+    	Log.d(LOG_TAG, "displayUserFeedbackNotification");
         //DETERMINE WHICH ACTIVITY TO LAUNCH
         Class activityClass;
         if (ufBean.getMethod() == FeedbackMethodType.GET_EXPLICIT_FB) {
 
             // select type of explicit feedback
-            if (ufBean.getType() == 0)
+            if (ufBean.getType() == 0){
                 activityClass = RadioPopup.class;
-            else if (ufBean.getType() == 1)
+            	Log.d(LOG_TAG, "RadioPopup");
+            }
+            else if (ufBean.getType() == 1){
                 activityClass = CheckboxPopup.class;
-            else
+                Log.d(LOG_TAG, "CheckboxPopup");
+            }
+            else{
                 activityClass = AcknackPopup.class;
+            	Log.d(LOG_TAG, "AcknackPopup");
+            }
 
         } else if (ufBean.getMethod() == FeedbackMethodType.GET_IMPLICIT_FB) {
             // only one type of implicit feedback
 
             activityClass = TimedAbortPopup.class;
+            Log.d(LOG_TAG, "TimedAbortPopup");
+            
+            if(TimedAbortProcessor.getInstance()==null)
+            {
+            	Log.d(LOG_TAG,"TimedAbort Thread is null!");
+            }
+            else
+            {
+            	Log.d(LOG_TAG, "Our thread has an instance");
+            }
 
             // Add to the background watcher
             TimedAbortProcessor.getInstance().addTimedAbort(ufBean);
@@ -352,17 +392,17 @@ public class EventListener extends Service {
             // only one left is "SHOW_NOTIFICATION"
 
             activityClass = SimpleNotificationPopup.class;
+            Log.d(LOG_TAG, "SimpleNotificationPopup");
         }
 
         //CREATE INTENT FOR LAUNCHING ACTIVITY
-        Intent intent = new Intent(context, activityClass);
+        Log.d(LOG_TAG, "CREATE INTENT FOR LAUNCHING ACTIVITY");
+        Intent intent = new Intent(this.getApplicationContext(), activityClass);
         intent.putExtra(UserFeedbackActivityIntentExtra.USERFEEDBACK_NODES, (Parcelable) ufBean);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
         //CREATE ANDROID NOTIFICATION
-        int notifierFlags[] = new int[1];
-        notifierFlags[0] = Notification.FLAG_AUTO_CANCEL;
-        AndroidNotifier notifier = new AndroidNotifier(context, Notification.DEFAULT_SOUND, notifierFlags);
+        Log.d(LOG_TAG, "CREATE ANDROID NOTIFICATION");
         notifier.notifyMessage(ufBean.getProposalText(),
                 "Input required",
                 activityClass,

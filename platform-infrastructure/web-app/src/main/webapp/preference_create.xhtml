@@ -1,0 +1,274 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Privacy Preferences</title>
+	</ui:define>
+
+	<ui:define name="body">
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_12">
+			<div class="breadcrumbs">
+				<a href="index.xhtml">Home</a> / <a href="personalisation.xhtml">Personalisation
+					Settings</a> / <a href="preferences.xhtml">User Preference Settings</a>
+				/ <a href="preference_create.xhtml">Create New User Preference</a>
+			</div>
+
+			<section class="form_style_main">
+
+				<h4 class="form_title">Create new User Preference</h4>
+				<div class="hr grid_12 clearfix"></div>
+
+				<h5>User Preference Details</h5>
+				<h:panelGrid id="prefDetailsPanel" columns="2" cellpadding="5">
+
+					<h:outputLabel for="serviceType" value="Service Type:"></h:outputLabel>
+					<h:outputText id="serviceType"
+						value="#{PreferenceCreateBean.preferenceDetails.serviceType}"></h:outputText>
+					<h:outputLabel for="serviceID" value="Service ID:"></h:outputLabel>
+					<h:outputText id="serviceID"
+						value="#{PreferenceCreateBean.preferenceDetails.serviceID}"></h:outputText>
+					<h:outputLabel for="preferenceName" value="Preference Name:"></h:outputLabel>
+					<h:outputText id="preferenceName"
+						value="#{PreferenceCreateBean.preferenceDetails.preferenceName}"></h:outputText>
+
+
+				</h:panelGrid>
+
+				<p:contextMenu for="treeSingle">
+					<p:menuitem value="View" update="messages"
+						actionListener="#{PreferenceCreateBean.displaySelectedSingle}"
+						icon="ui-icon-search" />
+					<p:menuitem value="Delete" update="treeSingle"
+						actionListener="#{PreferenceCreateBean.deleteNode}"
+						icon="ui-icon-close" />
+					<p:menuitem value="Add Condition"
+						actionListener="#{PreferenceCreateBean.startAddConditionProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Add Outcome"
+						actionListener="#{PreferenceCreateBean.startAddOutcomeProcess}"
+						icon="ui-icon-plus" />
+					<p:menuitem value="Edit" update="treeSingle"
+						actionListener="#{PreferenceCreateBean.editNode}"
+						icon="ui-icon-pencil" />
+
+				</p:contextMenu>
+
+				<h:panelGrid columns="1" cellpadding="5">
+					<p:tree id="treeSingle" value="#{PreferenceCreateBean.root}"
+						var="node" selectionMode="single"
+						selection="#{PreferenceCreateBean.selectedNode}" cache="false"
+						dynamic="true" expanded="true">
+
+						<p:treeNode>
+							<h:outputText
+								value="#{PreferenceCreateBean.formatNodeForDisplay(node)}" />
+						</p:treeNode>
+					</p:tree>
+				</h:panelGrid>
+			</section>
+
+			<p:toolbar>
+				<p:toolbarGroup align="left">
+					<p:commandButton type="button" value="Save" icon="ui-icon-disk"
+						onclick="cd.show();" />
+
+
+					<p:confirmDialog id="confirmationDialog" widgetVar="cd"
+						global="true"
+						message="Are you sure you want to save this preference permanently?"
+						icon="ui-icon-alert">
+						<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes"
+							icon="ui-icon-check" oncomplete="cd.hide();"
+							actionListener="#{PreferenceCreateBean.savePreference}" />
+						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
+							icon="ui-icon-close" oncomplete="cd.hide();" />
+					</p:confirmDialog>
+				</p:toolbarGroup>
+			</p:toolbar>
+
+		</section>
+
+		<div class="hr grid_12 clearfix"></div>
+
+
+		<p:dialog id="addConditionDialog" header="Add Condition"
+			widgetVar="addConddlg" resizable="false" dynamic="true">
+
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="ctxId" value="Condition:" />
+				<p:selectOneMenu id="ctxId"
+					value="#{PreferenceCreateBean.selectedCtxID}">
+					<f:selectItems value="#{PreferenceCreateBean.ctxIds}" />
+				</p:selectOneMenu>
+
+				<h:outputLabel for="operator" value="Operator: " />
+				<p:selectOneMenu id="operator"
+					value="#{PreferenceCreateBean.selectedCtxOperator}">
+					<f:selectItems value="#{PreferenceCreateBean.operators}" />
+				</p:selectOneMenu>
+				<h:outputLabel for="ctxValue" value="Value:" />
+				<p:inputText id="ctxValue" value="#{PreferenceCreateBean.ctxValue}"
+					label="value">
+				</p:inputText>
+
+				<f:facet name="footer">
+					<p:commandButton id="AddConditionButton" value="Add"
+						oncomplete="#{p:widgetVar('addConditionDialog')}.hide()"
+						update="treeSingle" ajax="true"
+						actionListener="#{PreferenceCreateBean.addCondition}" />
+				</f:facet>
+
+			</h:panelGrid>
+
+		</p:dialog>
+
+
+
+		<p:dialog id="addOutcomeDialog1" header="Add Outcome"
+			widgetVar="addOutdlg1" resizable="false" dynamic="true">
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="action"
+					value="Enter a value for #{PreferenceCreateBean.preferenceDetails.preferenceName}" />
+				<p:selectOneMenu id="action"
+					value="#{PreferenceCreateBean.selectedAction}">
+					<f:selectItems value="#{PreferenceCreateBean.existingActionValues}" />
+				</p:selectOneMenu>
+				<h:outputText value="Proactive: " />
+				<p:selectBooleanButton value="#{PreferenceCreateBean.proactive}"
+					onLabel="Yes" offLabel="No" onIcon="ui-icon-check"
+					offIcon="ui-icon-close">
+				</p:selectBooleanButton>
+
+			</h:panelGrid>
+
+			<f:facet name="footer">
+				<p:commandButton id="AddOutcomeButton" value="Add"
+					oncomplete="#{p:widgetVar('addOutcomeDialog1')}.hide()"
+					update="treeSingle" ajax="true"
+					actionListener="#{PreferenceCreateBean.addOutcome}" />
+			</f:facet>
+		</p:dialog>
+
+		<p:dialog id="addOutcomeDialog2" header="Add Outcome"
+			widgetVar="addOutdlg2" resizable="false" dynamic="true">
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="action2"
+					value="Enter a value for #{PreferenceCreateBean.preferenceDetails.preferenceName}" />
+				<h:inputText id="action2"
+					value="#{PreferenceCreateBean.selectedAction}">
+					
+				</h:inputText>
+				<h:outputText value="Proactive: " />
+				<p:selectBooleanButton value="#{PreferenceCreateBean.proactive}"
+					onLabel="Yes" offLabel="No" onIcon="ui-icon-check"
+					offIcon="ui-icon-close">
+				</p:selectBooleanButton>
+
+			</h:panelGrid>
+
+			<f:facet name="footer">
+				<p:commandButton id="AddOutcomeButton2" value="Add"
+					oncomplete="#{p:widgetVar('addOutcomeDialog2')}.hide()"
+					update="treeSingle" ajax="true"
+					actionListener="#{PreferenceCreateBean.addOutcome}" />
+			</f:facet>
+		</p:dialog>
+
+		<p:dialog id="preferenceDetailsDialog"
+			header="Enter the user preference details" widgetVar="prefDetailsDlg"
+			resizable="true" modal="true" closable="false" visible="true"
+			dynamic="true">
+
+			<h:panelGrid columns="2" cellpadding="5">
+
+				<h:outputLabel for="serviceIDDlg" value="Service ID:"></h:outputLabel>
+				<p:selectOneMenu id="serviceIDDlg" process="@this"
+					value="#{PreferenceCreateBean.serviceIDStr}">
+					<f:selectItems value="#{RequestorsController.localServices}"
+						var="localServices" itemLabel="#{localServices.serviceName}"
+						itemValue="#{RequestorsController.getServiceIDAsString(localServices.serviceIdentifier)}" />	
+				</p:selectOneMenu>
+				
+					
+				<h:outputLabel for="preferenceNameDlg" value="Preference Name:"></h:outputLabel>
+				<h:inputText id="preferenceNameDlg"
+					value="#{PreferenceCreateBean.preferenceDetails.preferenceName}"></h:inputText>
+
+				<f:facet name="footer">
+					<p:commandButton id="SavePrefDetails" value="Submit"
+						process="preferenceDetailsDialog"
+						update="mainForm:prefDetailsPanel"
+						actionListener="#{PreferenceCreateBean.savePreferenceDetails}">
+					</p:commandButton>
+
+				</f:facet>
+			</h:panelGrid>
+
+		</p:dialog>
+
+		<p:dialog id="outcomeDialog" header="Enter a default outcome"
+			widgetVar="outcomeDlg" resizable="false" modal="true" dynamic="true"
+			closable="false">
+			<h:panelGrid columns="2" cellpadding="5">
+				<h:outputLabel for="action1" value="Action: " />
+				<h:outputLabel id="action1"
+					value="#{PreferenceCreateBean.preferenceDetails.preferenceName}" />
+					
+				<h:outputLabel for="actionValue" value="Value: " />
+				<h:inputText id="actionValue"
+					value="#{PreferenceCreateBean.defaultNodeValue}" />
+				<h:outputText for="proactive" value="Proactive: " />
+				<p:selectBooleanButton id="proactive" value="#{PreferenceCreateBean.proactive}"
+					onLabel="Yes" offLabel="No" onIcon="ui-icon-check"
+					offIcon="ui-icon-close">
+				</p:selectBooleanButton>
+			</h:panelGrid>
+			<f:facet name="footer">
+				<p:commandButton id="defaultNodeButton" value="Submit"
+					process="outcomeDialog" update="mainForm:treeSingle"
+					actionListener="#{PreferenceCreateBean.setDefaultNode}">
+				</p:commandButton>
+			</f:facet>
+
+		</p:dialog>
+
+		<p:dialog id="messageSuccessDialog" header="Success"
+			widgetVar="msgSuccessDlg" dynamic="true" showHeader="true">
+
+			<p:panel>
+				<h:outputText value="The preference has been successfully stored."
+					style="word-wrap: break-word; width: 300px;" dynamic="true" />
+			</p:panel>
+		</p:dialog>
+
+		<p:dialog id="messageFailureDialog" header="Failure"
+			widgetVar="msgFailureDlg" dynamic="true" showHeader="true">
+
+			<p:panel>
+				<h:outputText value="An error occurred while saving the preference."
+					style="word-wrap: break-word; width: 300px;" dynamic="true" />
+			</p:panel>
+		</p:dialog>
+		
+		<p:dialog id="messageFailureDialog1" header="Failure"
+			widgetVar="msgFailureDlg1" dynamic="true" showHeader="true">
+
+			<p:panel style="word-wrap: break-word; width: 300px;">
+				Please add an outcome under this node: <br/> #{PreferenceCreateBean.erroneousNode} <br/>Error: Condition cannot be leaf of the tree. 
+					
+			</p:panel>
+		</p:dialog>
+	</ui:define>
+
+</ui:composition>
+</html>

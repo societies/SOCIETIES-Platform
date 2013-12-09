@@ -27,27 +27,30 @@
 					<h:outputText value="#{loginController.username}" />
 				</h4>
 
+				<!-- PPN TABLE STARTS HERE -->
 				<p:dataTable id="ppnDetails" var="ppnPreferenceDetail"
-					value="#{PrivacyPrefsController.ppnPreferenceDetails}">
+					value="#{PrivacyPrefsController.ppnPreferenceDetails}" style="width:500px;">
 					<f:facet name="header" style="background-color:yellow;">
                  Privacy Policy Negotiation Preferences
                  </f:facet>
 
-					<p:column headerText="Requestor ID">
-            #{ppnPreferenceDetail.requestor.requestorId}
-        </p:column>
-
-					<p:column headerText="Requestor CIS or Service ID">
+					<p:column headerText="Requestor" width="50"
+						style="white-space: normal;">
+					#{ppnPreferenceDetail.requestor.requestorId}
             #{PrivacyPrefsController.toStringRequestor(ppnPreferenceDetail.requestor)}
         </p:column>
 
-					<p:column headerText="Resource Type">
-            #{ppnPreferenceDetail.resource.scheme}
-        </p:column>
 
-					<p:column headerText="Data Type">
-          #{PrivacyPrefsController.toStringDataType(ppnPreferenceDetail.resource.dataType)}
+					<p:column headerText="Action">
+        		#{ppnPreferenceDetail.action.actionConstant}
         </p:column>
+        
+        
+					<p:column headerText="Resource" width="50">
+						<span>#{ppnPreferenceDetail.resource.scheme}</span>
+						<span class="tooltip">#{PrivacyPrefsController.toStringDataType(ppnPreferenceDetail.resource.dataType)}</span>
+					</p:column>
+
 
 					<p:column style="width: 4%">
 						<p:commandButton icon="ui-icon-wrench"
@@ -70,31 +73,31 @@
 					</p:toolbarGroup>
 				</p:toolbar>
 
+
+				<!-- ACCESS CONTROL TABLE STARTS HERE -->
 				<p:dataTable id="accCtrlDetails" var="accCtrlPreference"
 					value="#{PrivacyPrefsController.accCtrlPreferenceDetails}">
 					<f:facet name="header" style="background-color:yellow;">
                  Access Control Privacy Preferences
                  </f:facet>
 
-					<p:column headerText="Requestor ID">
-            #{accCtrlPreference.requestor.requestorId}
-        </p:column>
-
-					<p:column headerText="Requestor CIS or Service ID">
+					<p:column headerText="Requestor" width="50"
+						style="white-space: normal;">
+					#{accCtrlPreference.requestor.requestorId}
             #{PrivacyPrefsController.toStringRequestor(accCtrlPreference.requestor)}
         </p:column>
 
 					<p:column headerText="Resource Type">
             #{accCtrlPreference.resource.scheme}
         </p:column>
-
-		<p:column headerText="Data Type">
-        <span class="tooltip">#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}<em><span></span>#{accCtrlPreference.resource.dataIdUri}</em></span>
+					<p:column headerText="Action">
+        		#{accCtrlPreference.action.actionConstant}
         </p:column>
-
-					<!-- Removed temporarly to take a screenshot <p:column headerText="Resource ID">
-        #{accCtrlPreference.resource.dataIdUri}
-        </p:column> -->
+					<p:column headerText="Resource" width="50">
+						<span class="tooltip">#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}</span>
+						<span><em>#{accCtrlPreference.resource.dataIdUri}</em></span>
+					</p:column>
+					<!-- 				 <p:column headerText="Resource ID">        #{accCtrlPreference.resource.dataIdUri}        </p:column>         -->
 					<p:column style="width: 4%">
 						<p:commandButton icon="ui-icon-wrench"
 							action="#{PrivacyPrefsController.storeAccCtrlDetailToUtils}"
@@ -116,7 +119,9 @@
 					</p:toolbarGroup>
 				</p:toolbar>
 
-				<p:dataTable id="idsDetails" var="idsPreference"
+
+				<!-- IDS TABLE STARTS HERE -->
+				<!-- 				<p:dataTable id="idsDetails" var="idsPreference"
 					value="#{PrivacyPrefsController.idsPreferenceDetails}">
 					<f:facet name="header" style="background-color:yellow;">
                  Identity Selection Privacy Preferences
@@ -133,9 +138,10 @@
 					<p:column headerText="for Identity">
         #{idsPreference.affectedIdentity}
         </p:column>
-				</p:dataTable>
+				</p:dataTable> -->
 
 
+				<!-- DOBF TABLE STARTS HERE -->
 
 				<p:dataTable id="dobfDetails" var="dobfPreference"
 					value="#{PrivacyPrefsController.dObfPreferenceDetails}">
@@ -143,26 +149,41 @@
                  Data Obfuscation Privacy Preferences
                  </f:facet>
 
-					<p:column headerText="Requestor ID">
-            #{dobfPreference.requestor.requestorId}
-        </p:column>
 
-					<p:column headerText="Requestor CIS or Service ID">
-            #{PrivacyPrefsController.toStringRequestor(dobfPreference.requestor)}
-        </p:column>
+					<p:column headerText="Requestor" width="50"
+						style="white-space: normal;">
+						#{dobfPreference.requestor.requestorId}
+            			#{PrivacyPrefsController.toStringRequestor(dobfPreference.requestor)}
+        			</p:column>
 					<p:column headerText="Resource Type">
-            #{dobfPreference.resource.scheme}
-        </p:column>
+            			#{dobfPreference.resource.scheme}
+        			</p:column>
 
-					<p:column headerText="Data Type">
-          #{PrivacyPrefsController.toStringDataType(dobfPreference.resource.dataType)}
-        </p:column>
+					<p:column headerText="Resource" width="50">
+						<span class="tooltip">#{PrivacyPrefsController.toStringDataType(dobfPreference.resource.dataType)}</span>
+						<span><em>#{dobfPreference.resource.dataIdUri}</em></span>
 
-					<p:column headerText="Resource ID">
-        #{dobfPreference.resource.dataIdUri}
-        </p:column>
+					</p:column>
+
+					<p:column style="width: 4%">
+						<p:commandButton icon="ui-icon-wrench"
+							action="#{PrivacyPrefsController.storeDObfDetailToUtils}"
+							title="View-Edit-Delete" ajax="false">
+							<f:setPropertyActionListener value="#{dobfPreference}"
+								target="#{PrivacyPrefsController.selectedDObfDetail}" />
+
+							<f:param name="dobfDetailUUID"
+								value="#{PrivacyPrefsController.dobfUUID}" />
+						</p:commandButton>
+					</p:column>
 				</p:dataTable>
-
+				<p:toolbar>
+					<p:toolbarGroup align="left">
+						<p:button value="Create New Data Obfuscation preference"
+							href="privacy_dobf_create.xhtml">
+						</p:button>
+					</p:toolbarGroup>
+				</p:toolbar>
 
 			</section>
 		</section>

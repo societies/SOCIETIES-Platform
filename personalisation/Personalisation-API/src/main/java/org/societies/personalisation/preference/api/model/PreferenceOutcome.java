@@ -46,15 +46,18 @@ public class PreferenceOutcome extends Action implements IPreferenceOutcome, Ser
 
 	public PreferenceOutcome(){
 		super();
+		this.qop = new QualityofPreference();
 	}
 
 	public PreferenceOutcome(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value){
 		super(serviceID, serviceType, parameterName, value);
+		this.qop = new QualityofPreference();
 		this.confidenceLevel = 51;
 	}
 
 	public PreferenceOutcome(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value, boolean implementable, boolean contextDependent, boolean proactive){
 		super(serviceID, serviceType, parameterName, value, implementable, contextDependent, proactive);
+		this.qop = new QualityofPreference();
 		this.confidenceLevel = 51;
 	}
 

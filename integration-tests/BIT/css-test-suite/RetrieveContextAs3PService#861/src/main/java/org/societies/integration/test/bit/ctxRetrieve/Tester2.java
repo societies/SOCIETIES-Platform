@@ -110,7 +110,11 @@ public class Tester2 {
 	
 	@Test
 	public void testRetrieve(){
-			List<CtxAttribute> attrs = this.helloWorld.retrieveCtxAttribute(CtxAttributeTypes.NAME);
+		List<String> atts = new ArrayList<String>();
+		atts.add(CtxAttributeTypes.NAME_FIRST);
+		atts.add(CtxAttributeTypes.NAME_LAST);
+		atts.add(CtxAttributeTypes.LOCATION_SYMBOLIC);
+			List<CtxAttribute> attrs = this.helloWorld.retrieveCtxAttribute(atts);
 			
 			//this.helloWorld.displayUserLocation();
 	

@@ -28,14 +28,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
+import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
 import org.societies.api.internal.privacytrust.trust.ITrustBroker;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.AccessControlPreferenceDetailsBean;
@@ -46,6 +52,7 @@ import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestItemUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.RequestorUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResponseItemUtils;
@@ -65,6 +72,7 @@ import org.societies.privacytrust.privacyprotection.api.model.privacypreference.
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.evaluation.PrivateContextCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.management.PrivatePreferenceCache;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.AccessControlPreferenceCreator;
+import org.societies.privacytrust.privacyprotection.privacypreferencemanager.merging.DObfPreferenceCreator;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.PrivacyPreferenceConditionMonitor;
 import org.societies.privacytrust.privacyprotection.privacypreferencemanager.monitoring.accessCtrl.AccCtrlMonitor;
 
@@ -102,9 +110,9 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	private IEventMgr eventMgr;
 	private AccessControlPreferenceCreator accCtrlPreferenceCreator;
 	private AccCtrlMonitor accCtrlMonitor;
+	private DObfPreferenceCreator dobfPreferenceCreator;
 
 	public PrivacyPreferenceManager(){
-
 
 	}
 
@@ -124,8 +132,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 		this.privacyPCM = new PrivacyPreferenceConditionMonitor(ctxBroker, this, this.privacyDataManagerInternal, commsMgr);
 		contextCache = new PrivateContextCache(ctxBroker);
 		this.accCtrlPreferenceCreator = new AccessControlPreferenceCreator(this);
-
-		
+		this.dobfPreferenceCreator = new DObfPreferenceCreator(this);
 		accCtrlMonitor = new AccCtrlMonitor(this);
 	}
 
@@ -133,7 +140,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	public AccessControlPreferenceManager getAccessControlPreferenceManager(){
 		if (this.accCtrlMgr==null){
-			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm);
+			accCtrlMgr = new AccessControlPreferenceManager(prefCache, contextCache, userFeedback, trustBroker, ctxBroker, getAgreementMgr(), idm, dobfPreferenceCreator, privacyDataManagerInternal);
 		}
 		return accCtrlMgr;
 	}
@@ -162,29 +169,90 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 
+
 	@Override
-	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
-		// TODO Auto-generated method stub
+	public List<ResponseItem> checkPermission(RequestorBean requestor,
+			List<DataIdentifier> dataIds, Action action)
+					throws PrivacyException {
+
 		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
-		return accCtrlMgr.checkPermission(requestor, dataIds, actions);
+		if (dataIds.size()==1){
+			List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+			
+			permissions.add(this.checkPermission(requestor, dataIds.get(0), action));
+			return permissions;
+		}else{
+			List<ResponseItem> checkPermission = accCtrlMgr.checkPermission(requestor, dataIds, action);
+			for (ResponseItem item : checkPermission){
+				this.logging.info("checkPermission for requestor: "+org.societies.api.identity.util.RequestorUtils.toString(requestor)+" on : "+item.getRequestItem().getResource().getDataType()+" for action: "+item.getRequestItem().getActions().get(0)+". Returning Decision: "+item.getDecision());
+			}
+			return checkPermission;
+		}
+	}
+
+	@Override
+	public ResponseItem checkPermission(RequestorBean requestor,
+			DataIdentifier dataIds, Action action)
+					throws PrivacyException {
+		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
+		ResponseItem item = accCtrlMgr.checkPermission(requestor, dataIds, action);
+		
+		this.logging.info("checkPermission for requestor: "+org.societies.api.identity.util.RequestorUtils.toString(requestor)+" on : "+item.getRequestItem().getResource().getDataType()+" for action: "+item.getRequestItem().getActions().get(0)+". Returning Decision: "+item.getDecision());
+
+		return item;
 	}
 
 	@Override
 	@Deprecated
-	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId,
-			List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
+	public List<ResponseItem> checkPermission(RequestorBean requestor, List<DataIdentifier> dataIds, List<Action> actions) throws PrivacyException {
 		// TODO Auto-generated method stub
 		AccessControlPreferenceManager  accCtrlMgr = getAccessControlPreferenceManager();
-		List<Action> actionBeanList = new ArrayList<Action>();
-		for (org.societies.api.privacytrust.privacy.model.privacypolicy.Action action: actions){
-			actionBeanList.add(ActionUtils.toActionBean(action));
+		List<ResponseItem> permissions = new ArrayList<ResponseItem>();
+		for (Action action: actions){
+			permissions.addAll(accCtrlMgr.checkPermission(requestor, dataIds, action));
 		}
 
-		return ResponseItemUtils.toResponseItems(accCtrlMgr.checkPermission(RequestorUtils.toRequestorBean(requestor), dataId, actionBeanList));
+		for (ResponseItem item : permissions){
+
+			try{
+				this.logging.info("checkPermission for requestor: "+org.societies.api.identity.util.RequestorUtils.toString(requestor)+" on : "+item.getRequestItem().getResource().getDataType()+" for action: "+item.getRequestItem().getActions().get(0)+". Returning Decision: "+item.getDecision());
+			}catch(NullPointerException npe){
+				this.logging.error("NPE probably on actions list", npe);
+			}
+		}
+		return permissions;
+	}
+
+	
+	
+	@Override
+	@Deprecated
+	public List<org.societies.api.privacytrust.privacy.model.privacypolicy.ResponseItem> checkPermission(Requestor requestor, DataIdentifier dataId,
+			List<org.societies.api.privacytrust.privacy.model.privacypolicy.Action> actions) throws PrivacyException {
+
+
+		List<DataIdentifier> dataIds = new ArrayList<DataIdentifier>();
+		dataIds.add(dataId);
+		List<ResponseItem> permissions = checkPermission(RequestorUtils.toRequestorBean(requestor), dataIds, ActionUtils.toActionBeans(actions));
+		return ResponseItemUtils.toResponseItems(permissions);
 	}
 	@Override
 	public boolean deleteAccCtrlPreference(
 			AccessControlPreferenceDetailsBean details) {
+		try {
+			DataIdentifier id = ResourceUtils.getDataIdentifier(details.getResource());
+			if (id!=null){
+				List<Action> actions = new ArrayList<Action>();
+				actions.add(details.getAction());
+				this.privacyDataManagerInternal.deletePermissions(details.getRequestor(), id, actions);
+			}
+		} catch (MalformedCtxIdentifierException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return this.getAccessControlPreferenceManager().deleteAccCtrlPreference(details);
 	}
 
@@ -209,7 +277,29 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 
 	@Override
 	public ResponseItem evaluateAccCtrlPreference(
-			AccessControlPreferenceDetailsBean details, List<Condition> conditions) {
+			AccessControlPreferenceDetailsBean details) {
+		List<Condition> conditions = new ArrayList<Condition>();
+		try {
+			AgreementEnvelope agreementEnv = this.agreementMgr.getAgreement(RequestorUtils.toRequestor(details.getRequestor(), this.idm));
+			if (agreementEnv!=null){
+				IAgreement agreement = agreementEnv.getAgreement();
+
+				for (ResponseItem item: agreement.getRequestedItems()){
+					if (item.getRequestItem().getResource().getDataType().equals(details.getResource().getDataType())){
+						conditions  = item.getRequestItem().getConditions();
+
+						//JOptionPane.showMessageDialog(null, "Found conditions in agreement");
+					}
+				}
+
+			}
+		} catch (InvalidFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (PrivacyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		try {
 			return this.getAccessControlPreferenceManager().evaluateAccCtrlPreference(details, conditions);
 		} catch (PrivacyException e) {
@@ -420,7 +510,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	}
 
 
-	
+
 
 	/**
 	 * @return the commsMgr
@@ -493,6 +583,7 @@ public class PrivacyPreferenceManager implements IPrivacyPreferenceManager{
 	public AccessControlPreferenceCreator getAccCtrlPreferenceCreator() {
 		return accCtrlPreferenceCreator;
 	}
+
 
 
 

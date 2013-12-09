@@ -1,5 +1,6 @@
 package org.societies.webapp.wrappers;
 
+import org.societies.api.internal.privacytrust.privacy.model.dataobfuscation.ObfuscatorInfo;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
 
@@ -9,10 +10,9 @@ import java.util.List;
 public class RequestItemWrapper extends RequestItem {
     private List<Action> originalActions;
     private List<String> selectedActionNames;
-    private RequestItem prototype;
+    private ObfuscatorInfo obfuscatorInfo;
 
     public RequestItemWrapper(RequestItem prototype) {
-        this.prototype = prototype;
         this.originalActions = new ArrayList<Action>(prototype.getActions());
         this.actions = prototype.getActions();
         this.conditions = prototype.getConditions();
@@ -33,11 +33,42 @@ public class RequestItemWrapper extends RequestItem {
         this.selectedActionNames = selectedActionNames;
     }
 
+    public List<Action> getSelectedActions() {
+        List<Action> selectedActions = new ArrayList<Action>();
+
+        for (Action action : this.originalActions) {
+            for (String name : selectedActionNames) {
+                if (action.getActionConstant().name().equals(name)) {
+                    selectedActions.add(action);
+                    break;
+                }
+            }
+        }
+
+        return selectedActions;
+    }
+
     public List<Action> getOriginalActions() {
         return originalActions;
     }
 
-    public RequestItem getRequestItem() {
-        return prototype;
+    public ObfuscatorInfo getObfuscatorInfo() {
+        return obfuscatorInfo;
     }
+
+    public void setObfuscatorInfo(ObfuscatorInfo obfuscatorInfo) {
+        this.obfuscatorInfo = obfuscatorInfo;
+    }
+
+    public RequestItem getRequestItem() {
+        RequestItem item = new RequestItem();
+
+        item.setActions(this.getActions());
+        item.setConditions(this.getConditions());
+        item.setResource(this.getResource());
+        item.setOptional(this.isOptional());
+
+        return item;
+    }
+
 }

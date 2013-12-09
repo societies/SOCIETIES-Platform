@@ -90,25 +90,35 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName) {
-		LOG.debug("Request - getOutcome with values: "+ownerId.getBareJid()+", "+serviceId.getServiceInstanceIdentifier()+", "+preferenceName);
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Request - getOutcome with values: "+ownerId.getBareJid()+", "+serviceId.getServiceInstanceIdentifier()+", "+preferenceName);
+		}
 		//no updates received - just return current outcome
 		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
 
 		if(activated){
 			if(runnerMappings.containsKey(ownerId.getBareJid())){
-				LOG.debug("DIANNE already exists for this ownerId: "+ownerId.getBareJid());
+				if (LOG.isDebugEnabled()){
+					LOG.debug("DIANNE already exists for this ownerId: "+ownerId.getBareJid());
+				}
 				NetworkRunner runner = runnerMappings.get(ownerId.getBareJid());
 				IDIANNEOutcome outcome = runner.getPrefOutcome(serviceId, preferenceName);
 				if(outcome!=null){
 					results.add(outcome);
 				}else{
-					LOG.debug("No outcomes to return from DIANNE");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("No outcomes to return from DIANNE");
+					}
 				}
 			}else{
-				LOG.debug("No DIANNE exists for this ownerId: "+ownerId.getBareJid()+"...cannot return result");
+				if (LOG.isDebugEnabled()){
+					LOG.debug("No DIANNE exists for this ownerId: "+ownerId.getBareJid()+"...cannot return result");
+				}
 			}
 		}else{
-			LOG.debug("DIANNE learning is not enabled - ignoring input and returning empty results list");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("DIANNE learning is not enabled - ignoring input and returning empty results list");
+			}
 		}
 
 		return new AsyncResult<List<IDIANNEOutcome>>(results);
@@ -116,7 +126,9 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 
 	@Override
 	public Future<List<IDIANNEOutcome>> getOutcome(IIdentity ownerId, CtxAttribute attribute) {
-		LOG.debug("Context update - getOutcome with values: "+ownerId.getBareJid()+", "+attribute.getType()+"="+attribute.getStringValue());	
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Context update - getOutcome with values: "+ownerId.getBareJid()+", "+attribute.getType()+"="+attribute.getStringValue());	
+		}
 		List<IDIANNEOutcome> results = new ArrayList<IDIANNEOutcome>();
 
 		if(activated){
@@ -124,10 +136,14 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 			if(attribute.getType() != null && attribute.getStringValue()!=null){
 				// Context update received!!!
 				if(runnerMappings.containsKey(ownerId.getBareJid())){
-					LOG.debug("DIANNE already exists for this ownerId: "+ownerId.getBareJid());
+					if (LOG.isDebugEnabled()){
+						LOG.debug("DIANNE already exists for this ownerId: "+ownerId.getBareJid());
+					}
 					runnerMappings.get(ownerId.getBareJid()).contextUpdate(attribute);
 				}else{
-					LOG.debug("DIANNE does not exist for this ownerId: "+ownerId.getBareJid()+"...creating");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("DIANNE does not exist for this ownerId: "+ownerId.getBareJid()+"...creating");
+					}
 					Network newD_net = new Network();
 					NetworkRunner newRunner = new NetworkRunner(ownerId, newD_net, this);
 					d_nets.put(ownerId, newD_net);
@@ -139,7 +155,9 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 				int loopCount = 0;
 				while(outcomes == null && loopCount < 10){
 					try {
-						LOG.debug("waiting for output response..."+loopCount);
+						if (LOG.isDebugEnabled()){
+							LOG.debug("waiting for output response..."+loopCount);
+						}
 						Thread.sleep(500);
 						loopCount++;
 					} catch (InterruptedException e) {
@@ -150,14 +168,20 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 					results = outcomes;
 					outcomes = null;
 				}else{
-					LOG.debug("Wait cycle exited - DIANNE did not return any new outcomes for this context update");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("Wait cycle exited - DIANNE did not return any new outcomes for this context update");
+					}
 				}
 
 			}else{
-				LOG.debug("Not performing context update - context update contained null element: "+attribute.getType()+"="+attribute.getStringValue());
+				if (LOG.isDebugEnabled()){
+					LOG.debug("Not performing context update - context update contained null element: "+attribute.getType()+"="+attribute.getStringValue());
+				}
 			}
 		}else{
-			LOG.debug("DIANNE learning is not enabled - ignoring input and returning empty results list");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("DIANNE learning is not enabled - ignoring input and returning empty results list");
+			}
 		}
 
 		return new AsyncResult<List<IDIANNEOutcome>>(results);
@@ -181,7 +205,9 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 				newRunner.actionUpdate(action);
 			}	
 		}else{
-			LOG.debug("DIANNE learning is not enabled - ignoring input and returning empty results list");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("DIANNE learning is not enabled - ignoring input and returning empty results list");
+			}
 		}
 		
 		//No new outcomes will be provided after action updates - return empty list
@@ -220,16 +246,25 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 	 * @see org.societies.personalisation.DIANNE.api.DianneNetwork.IDIANNE#registerContext()
 	 */
 	public void registerContext(){
-		LOG.debug("DIANNE is registering for default context updates: symLoc, status and temperature");
+		if (LOG.isDebugEnabled()){
+			LOG.debug("DIANNE is registering for default context updates: symLoc, status and temperature");
+		}
 		for(int i=0; i<defaultContext.length; i++){
 			try {
 				String nextType = defaultContext[i];
-				List<CtxIdentifier> attrIDs = ctxBroker.lookup(CtxModelType.ATTRIBUTE, nextType).get();
-				if(attrIDs.size() > 0){
-					LOG.debug("Registering for context update: "+defaultContext[i]);
-					persoMgr.registerForContextUpdate(cssID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attrIDs.get(0));
+				IndividualCtxEntity individualCtxEntity = this.ctxBroker.retrieveIndividualEntity(cssID).get();
+				
+				Set<CtxAttribute> attributes = individualCtxEntity.getAttributes(nextType);
+				
+				if(attributes.iterator().hasNext()){
+					if (LOG.isDebugEnabled()){
+						LOG.debug("Registering for context update: "+defaultContext[i]);
+					}
+					persoMgr.registerForContextUpdate(cssID, PersonalisationTypes.DIANNE, (CtxAttributeIdentifier)attributes.iterator().next().getId());
 				}else{
-					LOG.debug("Ctx Attribute: "+defaultContext[i]+" does not yet exist - could not register for context updates");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("Ctx Attribute: "+defaultContext[i]+" does not yet exist - could not register for context updates");
+					}
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -256,7 +291,8 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 		persistThread.start();
 		
 		//TEMPORARY FIX FOR #751 -
-		this.disableDIANNELearning(cssID);
+		//this.disableDIANNELearning(cssID);
+	
 	}
 
 	private void retrieveNetworks(){

@@ -27,6 +27,7 @@ package org.societies.api.internal.context.model;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.internal.css.CSSManagerEnums;
+import org.societies.api.privacytrust.privacy.util.privacypolicy.PrivacyPolicyUtils;
 
 /**
  * This class defines common {@link CtxAttribute context attribute} types in
@@ -45,6 +46,7 @@ org.societies.api.context.model.CtxAttributeTypes {
 	public static final String CAUI_MODEL = "caui_model";
 
 	/**
+	 * String used in {@link PrivacyPolicyUtils} (external API). If you change this value, please, change it also in {@link PrivacyPolicyUtils}.
 	 * @since 0.0.8
 	 */
 	public static final String CACI_MODEL = "caci_model";

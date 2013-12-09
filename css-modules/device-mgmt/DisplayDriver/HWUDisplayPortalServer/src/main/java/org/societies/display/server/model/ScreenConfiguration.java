@@ -77,8 +77,8 @@ public class ScreenConfiguration {
 
         }catch(Exception e)
         {
-            logging.debug("ScreenConfiguration Error - Unable to read file");
-            logging.debug(e.toString());
+            if(logging.isDebugEnabled()) logging.debug("ScreenConfiguration Error - Unable to read file");
+            if(logging.isDebugEnabled()) logging.debug(e.toString());
         }
 
     }
@@ -93,7 +93,7 @@ public class ScreenConfiguration {
     }
 	
 	public void addScreen(Screen screen){
-        logging.debug("Screen added: " + screen.getScreenId());
+        if(logging.isDebugEnabled()) logging.debug("Screen added: " + screen.getScreenId());
 		this.screens.add(screen);
 	}
 	public Screen getScreenBasedOnLocation(String location){

@@ -24,7 +24,7 @@
  */
 package org.societies.api.internal.privacytrust.privacy.model.dataobfuscation;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscation.ObfuscationLevelType;
@@ -40,10 +40,10 @@ public class ActivityObfuscatorInfo extends ObfuscatorInfo {
 		persistable = false;
 		obfuscationLevelType = ObfuscationLevelType.DISCRETE;
 		nbOfObfuscationLevelStep = 1;
-		obfuscableDataType = CtxAttributeTypes.ACTION;
-		obfuscationExamples = new HashMap<Double, String>();
+		obfuscableDataType = CtxAttributeTypes.ACTIVITIES;
+		obfuscationExamples = new TreeMap<Double, String>();
 		obfuscationExamples.put(0.0, "\"Emma has joined HWU Group\" will not change");
-//		obfuscationExamples.put(0.5, "\"Bad mood\" will become \"Absent\"");
-//		obfuscationExamples.put(1.0, "\"Bad mood\" will become \"Not there\"");
+		//		obfuscationExamples.put(0.5, "\"Bad mood\" will become \"Absent\"");
+		//		obfuscationExamples.put(1.0, "\"Bad mood\" will become \"Not there\"");
 	}
 }

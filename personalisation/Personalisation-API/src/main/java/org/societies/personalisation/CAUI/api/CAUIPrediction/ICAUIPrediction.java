@@ -36,6 +36,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.personalisation.model.IAction;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
+import org.societies.api.internal.personalisation.model.FeedbackEvent;
+
 /**
  * @since 0.0.1
  * @author nikosk(ICCS)
@@ -93,7 +95,7 @@ public interface ICAUIPrediction {
 	 * Receives the performed action 
 	 * 
 	 */
-	public void receivePredictionFeedback(IAction action);
+	public void receivePredictionFeedback(FeedbackEvent feedbackEvent);
 	
 	/**
 	 * This method return a map describing the transitions among performed user actions and possible future actions

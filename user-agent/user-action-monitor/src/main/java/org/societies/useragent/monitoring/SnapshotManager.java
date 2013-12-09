@@ -58,8 +58,11 @@ public class SnapshotManager implements CtxChangeEventListener{
 	 */
 	String[] defaultDef = {
 			CtxAttributeTypes.LOCATION_SYMBOLIC, 
-			CtxAttributeTypes.STATUS, 
-			CtxAttributeTypes.TEMPERATURE
+			//CtxAttributeTypes.STATUS, 
+			//CtxAttributeTypes.TEMPERATURE
+		    CtxAttributeTypes.TIME_OF_DAY,
+		    CtxAttributeTypes.DAY_OF_WEEK,
+		    CtxAttributeTypes.HOUR_OF_DAY
 	};
 	/*
 	 * End of definition
@@ -79,12 +82,18 @@ public class SnapshotManager implements CtxChangeEventListener{
 	}
 
 	public Snapshot getSnapshot(CtxAttributeIdentifier primary){
-		LOG.debug("Getting context snapshot for primary attribute ID: "+primary);
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Getting context snapshot for primary attribute ID: "+primary);
+		}
 		Snapshot snapshot = snpshtRegistry.getSnapshot(primary);
 		if(snapshot == null){//no existing snapshot mapping to this primary -> create with default snapshot
-			LOG.debug("No snapshot is mapped to this primary attribute ID: "+primary+"...returning default snapshot");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("No snapshot is mapped to this primary attribute ID: "+primary+"...returning default snapshot");
+			}
 			snapshot = defaultSnpsht;
-			LOG.debug("Adding new mapping for primary attribute ID with default snapshot to SnapshotRegistry");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("Adding new mapping for primary attribute ID with default snapshot to SnapshotRegistry");
+			}
 			snpshtRegistry.addMapping(primary, snapshot);
 			storeReg();
 		}
@@ -101,7 +110,9 @@ public class SnapshotManager implements CtxChangeEventListener{
 	}
 
 	private void initialiseDefaultSnpsht(){
-		LOG.debug("Initialising default snapshot");
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Initialising default snapshot");
+		}
 		for(int i = 0; i<defaultDef.length; i++){
 			String attrType = defaultDef[i];
 			//retrieve attribute ID from context
@@ -109,12 +120,16 @@ public class SnapshotManager implements CtxChangeEventListener{
 				Future<List<CtxIdentifier>> futureAttributes = ctxBroker.lookup(CtxModelType.ATTRIBUTE, attrType);
 				List<CtxIdentifier> attributes = futureAttributes.get();
 				if(attributes.size() > 0){
-					LOG.debug("Found "+attrType+" attribute in context - adding to snapshot");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("Found "+attrType+" attribute in context - adding to snapshot");
+					}
 					defaultSnpsht.setTypeID(attrType, (CtxAttributeIdentifier) attributes.get(0));
 				}else{
 					//register for attribute creation event
 					defaultSnpsht.addType(attrType);
-					LOG.debug("Couldn't find "+attrType+" attribute in context - registering for creation event");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("Couldn't find "+attrType+" attribute in context - registering for creation event");
+					}
 					CtxEntityIdentifier personID = ctxBroker.retrieveIndividualEntity(myCssID).get().getId();
 					ctxBroker.registerForChanges(this, personID, attrType);
 				}
@@ -131,19 +146,25 @@ public class SnapshotManager implements CtxChangeEventListener{
 	}
 
 	private SnapshotsRegistry retrieveSnpshtsRegistry(){
-		LOG.debug("Retrieving SnapshotRegistry from context");
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Retrieving SnapshotRegistry from context");
+		}
 		SnapshotsRegistry retrievedReg = null;
 		try {
 			Future<List<CtxIdentifier>> futureAttributes = ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.SNAPSHOT_REG);
 			List<CtxIdentifier> attributes = futureAttributes.get();
 			if(attributes.size() > 0){  //existing registry attribute found
-				LOG.debug("Found SnapshotRegistry in context");
+				if (LOG.isDebugEnabled()){
+					LOG.debug("Found SnapshotRegistry in context");
+				}
 				CtxIdentifier attrID = attributes.get(0);
 				Future<CtxModelObject> futureAttribute = ctxBroker.retrieve(attrID);
 				CtxAttribute attr = (CtxAttribute)futureAttribute.get();
 				retrievedReg = (SnapshotsRegistry)SerialisationHelper.deserialise(attr.getBinaryValue(), this.getClass().getClassLoader());
 			}else{  //create new mappings attribute and populate
-				LOG.debug("SnapshotRegistry does not yet exist in context - creating");
+				if (LOG.isDebugEnabled()){
+					LOG.debug("SnapshotRegistry does not yet exist in context - creating");
+				}
 				retrievedReg = new SnapshotsRegistry();
 				IndividualCtxEntity personEntity = ctxBroker.retrieveIndividualEntity(myCssID).get(); //get PERSON entity to store mappings for
 				Future<CtxAttribute> futureAttribute = ctxBroker.createAttribute((CtxEntityIdentifier)personEntity.getId(), CtxAttributeTypes.SNAPSHOT_REG);
@@ -168,7 +189,9 @@ public class SnapshotManager implements CtxChangeEventListener{
 
 	@Override
 	public void onCreation(CtxChangeEvent event) {
-		LOG.debug("Recieved Ctx Attribute Creation event for attribute: "+event.getId().getType());
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Recieved Ctx Attribute Creation event for attribute: "+event.getId().getType());
+		}
 		CtxAttributeIdentifier attrID = (CtxAttributeIdentifier)event.getId();
 		String type = attrID.getType();
 		//check default snapshot

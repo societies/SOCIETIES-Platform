@@ -29,6 +29,7 @@ import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.societies.api.cis.management.ICisManager;
@@ -175,6 +176,7 @@ public class CommunityPreferenceManagementTest {
 
 
 	@Test
+	@Ignore
 	public void test(){
 		List<IPreferenceTreeModel> allCommunityPreferences = this.communityPrefMgr.getAllCommunityPreferences(cisID);
 		Assert.assertNotNull(allCommunityPreferences);

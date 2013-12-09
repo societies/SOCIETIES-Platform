@@ -313,6 +313,19 @@ button.ui-button-icons-only {
     padding-right: 2.1em;
 }
 
+/* Special case: button inside a panel header */
+.ui-panel-titlebar .ui-button {
+    height: 20px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding: 1px 1px;
+}
+
+/* Special case: checkbox inside a panel header */
+.ui-panel-titlebar .ui-chkbox {
+    margin-right: 5px;
+}
+
 /* no icon support for input elements, provide padding by default */
 input.ui-button {
     padding: .4em 1em;
@@ -1270,7 +1283,6 @@ body .ui-tooltip {
     border: 1px solid #313639;
     background: #f26a36 url("#{resource['primefaces-societies-theme:images/ui-bg_glass_75_f26a36_1x400.png']}") 50% 50% repeat-x;
     font-weight: normal;
-    color: #ffffff;
 }
 
 .ui-state-hover a,
@@ -2206,4 +2218,20 @@ ul.side a{
 
 ul.side a:hover{
 	background: #fafafa url(../images/societies_GUI_v1.png) -600px -180px no-repeat;
+}
+
+
+/**
+* Datatable
+**/
+.ui-datatable .ui-column-filter {
+	width: 80% !important;
+	}
+	
+.ui-datepicker {
+	background: white;
+}
+	
+.calendarInput input {
+	width: 70px;
 }

@@ -57,7 +57,6 @@ public class PrivacyAgreementManagerCommClientCallback {
 	public void receiveResult(Stanza stanza, PrivacyAgreementManagerBeanResult bean) {
 		// -- Get agreement
 		if (bean.getMethod().equals(MethodType.GET_PRIVACY_AGREEMENT)) {
-			LOG.info("$$$$ agreement response received");
 			IPrivacyAgreementManagerListener listener = privacyAgreementManagerlisteners.get(stanza.getId());
 			privacyAgreementManagerlisteners.remove(stanza.getId());
 			if (bean.isAck()) {
@@ -79,6 +78,5 @@ public class PrivacyAgreementManagerCommClientCallback {
 
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
-		LOG.info("[DependencyInjection] CommManager injected");
 	}
 }

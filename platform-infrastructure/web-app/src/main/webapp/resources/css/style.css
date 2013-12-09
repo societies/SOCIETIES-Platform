@@ -1187,7 +1187,7 @@ select option {
 /****** Radio button style ******/
 label {
     margin-right: 10px;
-    float: left;
+    /*float: left;*/
     clear: both;
     /*width: 250px;*/
     /* Seriously? */
@@ -1584,6 +1584,10 @@ ul.social-network li {
     margin:0;
     padding: 0;
     border: 0;
+}
+
+.ep_dialogfix {
+	margin-top: 20px;
 }
 
 /* THE END */

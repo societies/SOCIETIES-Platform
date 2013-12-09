@@ -32,8 +32,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.societies.api.internal.privacytrust.trust.model.ExtTrustRelationship;
@@ -49,6 +50,7 @@ import org.societies.api.privacytrust.trust.model.TrustedEntityType;
 import org.societies.api.schema.privacytrust.trust.broker.TrustQueryBean;
 import org.societies.api.schema.privacytrust.trust.model.ExtTrustRelationshipBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceBean;
+import org.societies.api.schema.privacytrust.trust.model.TrustEvidenceTypeBean;
 import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
 
 /**
@@ -58,6 +60,9 @@ import org.societies.api.schema.privacytrust.trust.model.TrustRelationshipBean;
  * @since 1.2
  */
 public final class TrustCommsClientTranslator {
+	
+	/** A constant denoting an empty binary array. */
+	public static final byte[] NULL_BINARY_ARRAY = new byte[] { Byte.MIN_VALUE };
 	
 	private static TrustCommsClientTranslator instance = new TrustCommsClientTranslator();
 	
@@ -153,8 +158,9 @@ public final class TrustCommsClientTranslator {
 	public TrustEvidenceBean fromTrustEvidence(TrustEvidence evidence) 
 			throws IOException {
 		
-		if (evidence == null)
+		if (evidence == null) {
 			throw new NullPointerException("evidence can't be null");
+		}
 		
 		final TrustEvidenceBean evidenceBean = new TrustEvidenceBean();
 		// (required) subjectId
@@ -171,6 +177,9 @@ public final class TrustCommsClientTranslator {
 		// (optional) info
 		if (evidence.getInfo() != null) {
 			evidenceBean.setInfo(this.serialise(evidence.getInfo()));
+		} else {
+			// Non-null value required for translation to Android Parcelable
+			evidenceBean.setInfo(NULL_BINARY_ARRAY);
 		}
 		// (optional) sourceId
 		if (evidence.getSourceId() != null) {
@@ -208,7 +217,8 @@ public final class TrustCommsClientTranslator {
 		final Date timestamp = evidenceBean.getTimestamp();
 		// (optional) info
 		final Serializable info;
-		if (evidenceBean.getInfo() != null) {
+		if (evidenceBean.getInfo() != null 
+				&& !Arrays.equals(NULL_BINARY_ARRAY, evidenceBean.getInfo())) {
 			info = this.deserialise(evidenceBean.getInfo(), this.getClass().getClassLoader());
 		} else {
 			info = null;
@@ -252,9 +262,20 @@ public final class TrustCommsClientTranslator {
 		// (required) timestamp
 		relationshipBean.setTimestamp(baseRelationshipBean.getTimestamp());
 		// (required) evidence
-		for (final TrustEvidence evidence : relationship.getTrustEvidence()) {
-			relationshipBean.getTrustEvidence().add(
-					this.fromTrustEvidence(evidence));
+		if (!relationship.getTrustEvidence().isEmpty()) {
+			for (final TrustEvidence evidence : relationship.getTrustEvidence()) {
+				relationshipBean.getTrustEvidence().add(
+						this.fromTrustEvidence(evidence));
+			}
+		} else {
+			// Create non-empty evidence set required for translation to Android Parcelable
+			final TrustEvidenceBean nullEvidence = new TrustEvidenceBean();
+			nullEvidence.setSubjectId(relationshipBean.getTrustorId());
+			nullEvidence.setObjectId(relationshipBean.getTrusteeId());
+			nullEvidence.setType(TrustEvidenceTypeBean.NULL);
+			nullEvidence.setTimestamp(new Date());
+			nullEvidence.setInfo(NULL_BINARY_ARRAY);
+			relationshipBean.getTrustEvidence().add(nullEvidence);
 		}
 		
 		return relationshipBean;
@@ -281,9 +302,11 @@ public final class TrustCommsClientTranslator {
 		// (required) timestamp
 		final Date timestamp = baseRelationship.getTimestamp();
 		// (required) evidence
-		final Set<TrustEvidence> trustEvidence = new HashSet<TrustEvidence>();
+		final Set<TrustEvidence> trustEvidence = new LinkedHashSet<TrustEvidence>();
 		for (final TrustEvidenceBean evidenceBean : relationshipBean.getTrustEvidence()) {
-			trustEvidence.add(this.fromTrustEvidenceBean(evidenceBean));
+			if (TrustEvidenceTypeBean.NULL != evidenceBean.getType()) {
+				trustEvidence.add(this.fromTrustEvidenceBean(evidenceBean));
+			}
 		}
 		
 		return new ExtTrustRelationship(trustorId, trusteeId, trustValueType,

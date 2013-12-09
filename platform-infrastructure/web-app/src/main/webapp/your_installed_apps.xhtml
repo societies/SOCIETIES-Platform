@@ -29,6 +29,12 @@
         </section>
         <p:panel id="title_header" styleClass="form_title">
 			<h4 class="form_title"><h:outputText value="#{servicesController.header}"/></h4>
+			<p:commandButton 
+					onclick="blockUI.show()" oncomplete="blockUI.hide()"
+					rendered="#{servicesController.didSearch}" 
+					action="#{servicesController.selectNode}" process="@this"
+					update=":mainForm:services_list,:mainForm:title_header,:mainForm:serMessages"
+					icon="ui-icon-arrowrefresh-1-w" />
 		</p:panel>
         
         <!-- Left -->
@@ -47,6 +53,15 @@
     			</p:column>
  	    		<p:column colspan="1" style="border:3px solid black">
  	    		<p>
+ 	    			<p:commandButton value="Go"
+		    		onclick="blockUI.show()" oncomplete="blockUI.hide()"
+		    		rendered="#{service.started and servicesController.myNode and !service.device and service.mine and service.endpoint != null}"
+		    		action="#{servicesController.launchService}" process="@this" update=":mainForm:serMessages"
+		    		styleClass="services-button" style="width:75px" icon="ui-icon-extlink" >
+						<f:setPropertyActionListener target="#{servicesController.serviceId}" value="#{service.id}" />
+					</p:commandButton>
+				</p>
+				<p>	
 		    		<p:commandButton value="Start"
 		    		onclick="blockUI.show()" oncomplete="blockUI.hide()"
 		    		rendered="#{!service.started and servicesController.myNode and !service.device and service.mine}"
@@ -136,7 +151,7 @@
                     <h3>App Search</h3>
                 </header>
                 <p:inputText id="searchBox" value="#{servicesController.searchBy}" styleClass="websearch-input grid_3" style="text-align: right"/>
-                <p>  
+                <p>
        			<h:outputLabel for="searchMenu" value="Search by: " />  
         		<p:selectOneMenu id="searchMenu" value="#{servicesController.searchOption}" effect="fade" styleClass="grid_2">  
            			 <f:selectItems value="#{servicesController.searchOptions}" var="option" itemLabel="#{option}" itemValue="#{option}"/>  

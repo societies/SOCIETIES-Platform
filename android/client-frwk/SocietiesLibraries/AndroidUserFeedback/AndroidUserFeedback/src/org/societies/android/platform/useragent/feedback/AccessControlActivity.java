@@ -49,9 +49,10 @@ import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.AccessControlResponseItem;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
-import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 
 import java.util.List;
 
@@ -93,7 +94,7 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
 
         //GENERATE RESOURCE SPINNER
-        final List<ResponseItem> responses = accessControlEvent.getResponseItems();
+        final List<AccessControlResponseItem> responses = accessControlEvent.getResponseItems();
         String[] resourceItems = new String[responses.size()];
         for (int i = 0; i < responses.size(); i++) {
             resourceItems[i] = responses.get(i).getRequestItem().getResource().getDataType();
@@ -118,6 +119,9 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         btnAccept.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+            	for (AccessControlResponseItem item: accessControlEvent.getResponseItems()){
+            		item.setDecision(Decision.PERMIT);
+            	}
                 publishEvent();
                 finish();
             }
@@ -127,6 +131,10 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         btnCancel.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+            	for (AccessControlResponseItem item: accessControlEvent.getResponseItems()){
+            		item.setDecision(Decision.DENY);
+            	}
+            	publishEvent();
                 finish(); //BASICALLY, IGNORE REQUEST
             }
         });
@@ -150,9 +158,9 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         }
     }
 
-    private void populateResponseGuiTable(List<ResponseItem> responses) {
+    private void populateResponseGuiTable(List<AccessControlResponseItem> responses) {
         for (int response_idx = 0; response_idx < responses.size(); response_idx++) {
-            ResponseItem response = responses.get(response_idx);
+            AccessControlResponseItem response = responses.get(response_idx);
             RequestItem request = response.getRequestItem();
             List<Condition> conditions = request.getConditions();
 
@@ -184,7 +192,7 @@ public class AccessControlActivity extends Activity implements OnItemSelectedLis
         }
     }
 
-    private View createGuiControlFromCondition(final List<ResponseItem> responses, Condition condition, String contentDescription) {
+    private View createGuiControlFromCondition(final List<AccessControlResponseItem> responses, Condition condition, String contentDescription) {
         //DATA TYPE - CHECKBOX/TEXTBOX
         if (condition.getConditionConstant().value().startsWith("data")) {
             final EditText textbox = new EditText(this);

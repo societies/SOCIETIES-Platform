@@ -327,6 +327,7 @@ public class TestCommunitiesHandler {
 	private void storeUserPreference(){
 		IPreference preferenceLeaf = new PreferenceTreeNode(new PreferenceOutcome(serviceID, "", parameterName, "100"));
 		IPreference preferenceCondition = new PreferenceTreeNode(new ContextPreferenceCondition(null, OperatorConstants.EQUALS, "home", CtxAttributeTypes.LOCATION_SYMBOLIC));
+		preferenceCondition.add(preferenceLeaf);
 		this.upcm.getPreferenceManager().storePreference(userId, preferenceDetails, preferenceCondition);
 	}
 }

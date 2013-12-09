@@ -79,13 +79,21 @@ public class HistoryRetriever {
 			CtxHistoryAttribute printAction = dataset_it.next();
 			try {
 				Action next_action = (Action) SerialisationHelper.deserialise(printAction.getBinaryValue(), this.getClass().getClassLoader());
-				LOG.debug("------------------------------------------");
-				LOG.debug("Action: "+next_action.getparameterName()+" => "+next_action.getvalue());
+				if (LOG.isDebugEnabled()){
+					LOG.debug("------------------------------------------");
+				}
+				if (LOG.isDebugEnabled()){
+					LOG.debug("Action: "+next_action.getparameterName()+" => "+next_action.getvalue());
+				}
 				List<CtxHistoryAttribute> printContext = history.get(printAction);
 				for(CtxHistoryAttribute nextParam : printContext){
-					LOG.debug(nextParam.getType()+" = "+nextParam.getStringValue());
+					if (LOG.isDebugEnabled()){
+						LOG.debug(nextParam.getType()+" = "+nextParam.getStringValue());
+					}
 				}
-				LOG.debug("------------------------------------------");
+				if (LOG.isDebugEnabled()){
+					LOG.debug("------------------------------------------");
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {

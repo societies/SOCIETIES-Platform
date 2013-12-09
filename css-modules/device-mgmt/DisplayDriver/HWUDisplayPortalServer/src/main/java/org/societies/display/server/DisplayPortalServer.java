@@ -30,6 +30,7 @@ import javax.swing.UIManager;
 
 
 
+
 import org.hibernate.SessionFactory;
 //import org.societies.display.server.dao.impl.MockScreenDAO;
 import org.slf4j.Logger;
@@ -99,7 +100,7 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		this.screenconfig = new ScreenConfiguration();
 		//SET THE SCREENS BY RETRIEVING FROM DB
 		setScreens();
-		this.LOG.debug("SCREENS : "  + screens.toString());
+		if(LOG.isDebugEnabled()) LOG.debug("SCREENS : "  + screens.toString());
 
 
 		//DO NOT NEED TO GET SCREENS FROM USER NOW
@@ -110,7 +111,7 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 	@Override
 	public void setScreens()
 	{
-		this.LOG.debug("SETTING SCREENS");
+		if(LOG.isDebugEnabled()) LOG.debug("SETTING SCREENS");
 		this.screens=screenDAO.getAllScreens();
 		//REMOVE ALL SCREENS FROM SCREEN CONFIG
 		screenconfig.removeAllScreens();
@@ -120,40 +121,51 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		{
 			screenconfig.addScreen(screen);
 		}
-		this.LOG.debug(this.toString() + " " + screens.toString());
+		if(LOG.isDebugEnabled()) LOG.debug(this.toString() + " " + screens.toString());
 	}
 
 
 
+	@Override
+	public boolean checkInUse(String location)
+	{
+		if (this.currentlyUsedScreens.containsKey(location))
+		{
+			return true;
+		}
+		return false;
+	}
 
 
 
 	@Override
 	public String requestAccess(String identity, String location) {
 		try{
-			this.LOG.debug("Request from: "+identity+" to use screen in location: "+location);
+			if(LOG.isDebugEnabled()) LOG.debug("Request from: "+identity+" to use screen in location: "+location);
 			if (this.currentlyUsedScreens.containsKey(location)){
 				return "REFUSED";
 			}else{
 				Screen screen = this.screenconfig.getScreenBasedOnLocation(location);
 				if (screen==null){
-					this.LOG.debug("There is no screen at location: "+location+"\n. Available locations are: \n"+this.screenconfig.toString());
+					LOG.debug("There is no screen at location: "+location+"\n. Available locations are: \n"+this.screenconfig.toString());
 					return "REFUSED";
 				}
 
 				String ipAddress = screen.getIpAddress();
 
 				if (ipAddress==null){
-					this.LOG.debug("IP address for screen: "+screen.getScreenId()+" is null");
+					if(LOG.isDebugEnabled()) LOG.debug("IP address for screen: "+screen.getScreenId()+" is null");
 					return "REFUSED";
 				}
 
+				//ON RETURN IP ADDRESS, ADD THE MAPPING OF THE SCREEN
+				this.currentlyUsedScreens.put(location, identity);
 				return ipAddress;
 			}
 		}
 		catch (Exception e){
 			e.printStackTrace();
-			this.LOG.debug("Unknown Exception occured: "+e.getMessage());
+			if(LOG.isDebugEnabled()) LOG.debug("Unknown Exception occured: "+e.getMessage());
 		}
 
 		return "REFUSED";
@@ -170,6 +182,16 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 			}
 		}
 
+	}
+	
+	//Release resource call from webapp
+	@Override
+	public void releaseResource(String location)
+	{
+		if(LOG.isDebugEnabled()) LOG.debug("CURRENTLY USED SCREENS: " + this.currentlyUsedScreens.keys().toString());
+		if(LOG.isDebugEnabled()) LOG.debug("RELEASING RESOURCE : " + location);
+		this.currentlyUsedScreens.remove(location);
+		if(LOG.isDebugEnabled()) LOG.debug("USE SCREENS ARE NOW: " + this.currentlyUsedScreens.keys().toString());
 	}
 
 	@Override
@@ -193,9 +215,9 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 			}
 
 			if (this.myServiceId==null){
-				this.LOG.debug("ServiceID could not be retrieved");
+				if(LOG.isDebugEnabled()) LOG.debug("ServiceID could not be retrieved");
 			}else{
-				this.LOG.debug("Returning serviceID :"+this.myServiceId);
+				if(LOG.isDebugEnabled()) LOG.debug("Returning serviceID :"+this.myServiceId);
 			}	
 		}
 		return this.myServiceId;

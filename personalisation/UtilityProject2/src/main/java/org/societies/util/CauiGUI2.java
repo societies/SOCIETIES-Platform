@@ -24,8 +24,7 @@ import javax.swing.JTextArea;
 import javax.swing.JButton;
 import javax.swing.JTextField;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.joda.time.DateTime;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.CtxException;
 import org.societies.api.context.model.CtxAttribute;
@@ -33,6 +32,7 @@ import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxAssociation;
+import org.societies.api.context.model.CtxAttributeValueType;
 import org.societies.api.context.model.CtxEntityIdentifier;
 import org.societies.api.context.model.CtxHistoryAttribute;
 import org.societies.api.context.model.CtxIdentifier;
@@ -58,6 +58,10 @@ import org.societies.personalisation.CAUI.api.model.*;
 
 public class CauiGUI2  extends JFrame  implements ActionListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private ICtxBroker ctxBroker;
 	private ICommManager commManager;
 	private IIdentityManager idMgr;
@@ -80,6 +84,8 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 	JTextArea textAreaUIModel;
 
 	public CauiGUI2() {
+		
+		
 		//JFrame f = new JFrame();
 
 		ctxBroker = this.getCtxBroker();
@@ -90,9 +96,28 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		System.out.println("services:caciDiscovery: " + caciDiscovery);
 		System.out.println("services:cauiDiscovery: " + cauiDiscovery);
 		System.out.println("services:ctxBroker: " + ctxBroker);
-			
-		getContentPane().setLayout(null);
+		System.out.println("services:uam "+ uam);
+		
+		
 
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+	
+		} catch (ClassNotFoundException e4) {
+			// TODO Auto-generated catch block
+			e4.printStackTrace();
+		} catch (InstantiationException e4) {
+			// TODO Auto-generated catch block
+			e4.printStackTrace();
+		} catch (IllegalAccessException e4) {
+			// TODO Auto-generated catch block
+			e4.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e4) {
+			// TODO Auto-generated catch block
+			e4.printStackTrace();
+		}
+		
+		getContentPane().setLayout(null);
 		//history
 		JPanel panelHistory = new JPanel();
 		panelHistory.setBounds(10, 11, 560, 152);
@@ -251,12 +276,16 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		textField_1.setBounds(114, 11, 86, 20);
 		panel_2.add(textField_1);
 		textField_1.setColumns(10);
-
-		JButton btnPerformAction = new JButton("monitor action");
+		
+		System.out.println("monitor action button starting 1");
+		JButton btnPerformAction = new JButton("monitoraction");
 		btnPerformAction.addActionListener(new ActionListener() {
-
+			
+			
 			public void actionPerformed(ActionEvent e) {
+			
 				System.out.println("monitor action button clicked");
+				setSymbolicLocation();
 				ServiceResourceIdentifier serviceId1 = new ServiceResourceIdentifier();
 				try {
 					serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
@@ -297,7 +326,40 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 	public void setHistoryData(){
 
 	}
-
+	public void setSymbolicLocation(){
+		
+		IIdentity localID = getOwnerId();
+		try {
+			
+			List<CtxIdentifier> locList = this.ctxBroker.lookup(localID, CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC).get();
+			if(!locList.isEmpty()){
+				CtxAttribute loc = (CtxAttribute) this.ctxBroker.retrieve(locList.get(0)).get();
+				DateTime now = new DateTime();
+				if(now.getSecondOfMinute() > 30){
+					loc.setStringValue("home");
+				} else {
+					loc.setStringValue("out");	
+				}
+				
+				this.ctxBroker.update(loc);
+			}
+			
+		
+		
+		
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CtxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+	}
 
 	public static void main( String args[] ) 
 	{
@@ -370,6 +432,9 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		return cauiPrediction;
 	}
 
+	public IUserActionMonitor getUam() {
+		return uam;
+	}
 
 	public void setUam(IUserActionMonitor uam){
 		this.uam = uam;
@@ -432,10 +497,17 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 				Date time = ctxHocAttr.getLastUpdated();
 				IAction action = (IAction)SerialisationHelper.deserialise(ctxHocAttr.getBinaryValue(), this.getClass().getClassLoader());
 				List<CtxHistoryAttribute> escortingAttrList = mapHocData.get(ctxHocAttr);
-				//		System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: {" +escortingAttrList.get(0).getStringValue()+" "+escortingAttrList.get(1).getStringValue()+" "+escortingAttrList.get(2).getStringValue()+"}");
-				System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: { ctx1, ctx2, ctx3 }");
+				
+			
+				CtxHistoryAttribute attr1 = escortingAttrList.get(0);
+				CtxHistoryAttribute attr2 = escortingAttrList.get(1);
+				CtxHistoryAttribute attr3 = escortingAttrList.get(2);
+				CtxHistoryAttribute attr4 = escortingAttrList.get(3);
+				String escortingHistory = getValueFromAttr(attr1)+" "+getValueFromAttr(attr2)+" "+getValueFromAttr(attr3)+" "+getValueFromAttr(attr4);
+				System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: {" +escortingHistory+"}");
+				//System.out.println(i+" primary Attr: {"+action.getparameterName() +" "+action.getvalue()+"} escorting: { ctx1, ctx2, ctx3 }");
 				i++;
-				data = data + time+" "+action.getparameterName()+" "+action.getvalue()+" ctx1,ctx2 "+newline;
+				data = data + time+" "+action.getparameterName()+" "+action.getvalue()+" "+escortingHistory+" "+newline;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -447,6 +519,27 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 		return data;
 	}
 
+	
+	private String getValueFromAttr(CtxHistoryAttribute attr){
+		
+		String result = "";
+		System.out.println("getValueFromAttr   attr.getId() " +attr.getId());
+		if(attr.getValueType().equals(CtxAttributeValueType.STRING)){
+			result = attr.getStringValue();
+			System.out.println("getValueFromAttr  attr.getStringValue() " +result);
+			return result;
+		} else if (attr.getValueType().equals(CtxAttributeValueType.INTEGER)){
+			Integer intResult = attr.getIntegerValue();
+			result = String.valueOf(intResult);
+			System.out.println("getValueFromAttr  attr.getIntegerValue() " +result);
+			return result;
+		}	
+		
+		return result;
+		
+	}
+	
+	
 	private IIdentity getOwnerId(){
 
 		IIdentity cssOwnerId = null;

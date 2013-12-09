@@ -152,7 +152,11 @@
 			<artifactId>community-context-prediction</artifactId>
 			<version>${version.cm}</version>
 		</dependency>
-		
+			<dependency>
+			<groupId>org.societies.context-management</groupId>
+			<artifactId>time-context-monitor</artifactId>
+			<version>${version.cm}</version>
+		</dependency>
 		
 		
 		<!-- added by eboylan 		-->
@@ -197,8 +201,13 @@
 						<Embed-Dependency>*;scope=compile|runtime,</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
 
-						<Import-Package>org.hibernate.proxy;resolution:=optional,
-						    *;resolution:=optional</Import-Package>
+						<Import-Package>
+							org.hibernate.proxy;resolution:=optional,
+							org.aopalliance.aop,
+							org.springframework.aop,
+							org.springframework.aop.framework,
+							*;resolution:=optional
+						</Import-Package>
 						
 						<Export-Package />
 						

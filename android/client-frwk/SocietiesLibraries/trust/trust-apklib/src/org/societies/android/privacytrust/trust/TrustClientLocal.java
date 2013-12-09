@@ -24,6 +24,8 @@
  */
 package org.societies.android.privacytrust.trust;
 
+import java.lang.ref.WeakReference;
+
 import org.societies.android.api.internal.privacytrust.trust.IInternalTrustClient;
 
 import android.app.Service;
@@ -40,7 +42,7 @@ public class TrustClientLocal extends Service {
 	
     private static final String TAG = TrustClientLocal.class.getName();
     
-    private IBinder binder = null;
+    private TrustClientLocalBinder binder = null;
     
     /*
      * @see android.app.Service#onCreate()
@@ -50,6 +52,7 @@ public class TrustClientLocal extends Service {
     	
     	Log.d(TAG, "onCreate");
 		this.binder = new TrustClientLocalBinder();
+		this.binder.addOuterClassreference(new TrustClientBase(TrustClientLocal.this, true));
 	}
 
     /*
@@ -72,11 +75,18 @@ public class TrustClientLocal extends Service {
 	}
 
 	/** The Binder object for local service invocation. */
-	public class TrustClientLocalBinder extends Binder {
+	public static class TrustClientLocalBinder extends Binder {
+		
+		private WeakReference<TrustClientBase> outerClassReference = null;
 		
 		public IInternalTrustClient getService() {
 
-			return new TrustClientBase(TrustClientLocal.this, true);
+			return this.outerClassReference.get();
+		}
+		
+		public void addOuterClassreference(TrustClientBase instance) {
+			
+			this.outerClassReference = new WeakReference<TrustClientBase>(instance);
 		}
 	}
 }

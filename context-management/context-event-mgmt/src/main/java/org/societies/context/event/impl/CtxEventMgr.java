@@ -24,6 +24,7 @@
  */
 package org.societies.context.event.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -48,7 +49,9 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxIdentifierFactory;
 import org.societies.api.context.model.MalformedCtxIdentifierException;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IdentityType;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.CSSEventConstants;
 import org.societies.api.osgi.event.EMSException;
@@ -80,6 +83,9 @@ public class CtxEventMgr implements ICtxEventMgr {
 	private static final List<String> EVENT_SCHEMA_CLASSES = 
 			Collections.unmodifiableList(Arrays.asList(
 					"org.societies.api.schema.context.contextmanagement.CtxChangeEventBean"));
+	
+	private static final String MODIFIED_LOCATION_SYMBOLIC =
+			CtxChangeEventTopic.MODIFIED + "/locationSymbolic";
 			
 	/** The Event Mgr service. */
 	@Autowired(required=true)
@@ -375,6 +381,7 @@ public class CtxEventMgr implements ICtxEventMgr {
 	public void createTopics(final IIdentity ownerId, final String[] topics)
 			throws CtxException {
 
+		final List<String> newTopics = new ArrayList<String>(Arrays.asList(topics));
 		final List<String> existingTopics;
 		try {
 			existingTopics = this.pubsubClient.discoItems(ownerId, null);
@@ -382,8 +389,11 @@ public class CtxEventMgr implements ICtxEventMgr {
 			throw new CtxEventMgrException("Failed to discover topics for IIdentity "
 					+ ownerId + ": " + e.getLocalizedMessage(), e);
 		}
-		for (int i = 0; i < topics.length; ++i) {
-			final String topic = topics[i];
+		// Special treatment for user LOCATION_SYMBOLIC modification events
+		if (IdentityType.CIS != ownerId.getType()) {
+			newTopics.add(MODIFIED_LOCATION_SYMBOLIC);
+		}
+		for (final String topic : newTopics) {
 			if (existingTopics == null || !existingTopics.contains(topic)) {
 				if (LOG.isInfoEnabled())
 					LOG.info("Creating pubsub node '" + topic + "' for IIdentity " + ownerId);
@@ -454,12 +464,12 @@ public class CtxEventMgr implements ICtxEventMgr {
 		
 		private final CtxChangeEvent event;
 		
-		private final String[] topics;
+		private final List<String> topics;
 		
 		private RemoteChangeEventDispatcher(CtxChangeEvent event, String[] topics) {
 			
 			this.event = event;
-			this.topics = topics;
+			this.topics = new ArrayList<String>(Arrays.asList(topics));
 		}
 		
 		/*
@@ -470,7 +480,7 @@ public class CtxEventMgr implements ICtxEventMgr {
 
 			if (LOG.isDebugEnabled()) 
 				LOG.debug("Posting remote context change event '" + this.event 
-						+ "' to topics '" + Arrays.toString(this.topics) + "'");
+						+ "' to topics '" + this.topics + "'");
 			final IIdentity pubsubId;
 			final String itemId;
 			final CtxChangeEventBean eventBean;
@@ -482,27 +492,34 @@ public class CtxEventMgr implements ICtxEventMgr {
 				eventBean.setId(itemId);
 			} catch (Exception e) {
 				LOG.error("Could not post remote context change event '" 
-						+ this.event + "' to topics '" + Arrays.toString(this.topics) + "': "
+						+ this.event + "' to topics '" + this.topics + "': "
 						+ e.getLocalizedMessage(), e);
 				return;
 			}
+			
+			// Special treatment for user LOCATION_SYMBOLIC modification events
+			if (IdentityType.CIS != pubsubId.getType()
+					&& CtxAttributeTypes.LOCATION_SYMBOLIC.equals(this.event.getId().getType())
+					&& this.topics.contains(CtxChangeEventTopic.MODIFIED)) {
+				this.topics.add(MODIFIED_LOCATION_SYMBOLIC);
+			}
 
-			for (int i = 0; i < this.topics.length; ++i) {
+			for (final String topic : this.topics) {
 
 				if (LOG.isDebugEnabled()) 
 					LOG.debug("Posting remote context change event to topic '" 
-							+ this.topics[i] + "'" + " with itemId '" + itemId + "'");
+							+ topic + "'" + " with itemId '" + itemId + "'");
 				try {
 					if (pubsubClient == null) {
 						LOG.error("Could not post remote context change event to topic '"
-								+ topics[i] + "': PubsubClient service is not available");
+								+ topic + "': PubsubClient service is not available");
 						return;
 					}
-					pubsubClient.publisherPublish(pubsubId, topics[i],
+					pubsubClient.publisherPublish(pubsubId, topic,
 							itemId, eventBean);
 				} catch (Exception e) { 
 					LOG.error("Could not post remote context change event to topic '" 
-							+ topics[i] + "'" + " with itemId '" + itemId + "': "
+							+ topic + "'" + " with itemId '" + itemId + "': "
 							+ e.getLocalizedMessage(), e);
 				}
 			}

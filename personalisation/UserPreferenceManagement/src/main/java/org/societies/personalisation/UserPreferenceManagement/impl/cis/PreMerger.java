@@ -97,13 +97,15 @@ public class PreMerger {
 			
 			
 			IPreference currentNode = depthFirstEnumeration.nextElement();
-			//this.logging.debug("Iterating "+i+" processing: "+currentNode.getUserObject().toString());
+			//if(this.logging.isDebugEnabled()){this.logging.debug("Iterating "+i+" processing: "+currentNode.getUserObject().toString());}
 			i++;
 			if (currentNode.getUserObject()!=null){
 				if (currentNode.getUserObject() instanceof ContextPreferenceCondition){
 					
 					ContextPreferenceCondition condition = (ContextPreferenceCondition) currentNode.getCondition();
-					this.logging.debug("nextElement => ContextPreferenceCondition: "+condition.getname());
+					if(this.logging.isDebugEnabled()){
+						this.logging.debug("nextElement => ContextPreferenceCondition: "+condition.getname());
+					}
 					CtxAttributeIdentifier ctxIdentifier = condition.getCtxIdentifier();
 					String type = "";
 					if (ctxIdentifier==null){
@@ -113,7 +115,9 @@ public class PreMerger {
 								return null;
 							}
 							toBeRemoved.add(currentNode);
-							this.logging.debug("removed");
+							if(this.logging.isDebugEnabled()){
+								this.logging.debug("removed");
+							}
 						}else{
 							try {
 								List<CtxIdentifier> list = this.broker.lookup(individualCtxEntity.getId(), CtxModelType.ATTRIBUTE, ctxType).get();
@@ -144,7 +148,9 @@ public class PreMerger {
 						try {
 							
 							List<CtxIdentifier> list = this.broker.lookup(individualCtxEntity.getId(), CtxModelType.ATTRIBUTE, ctxType).get();
-							this.logging.debug("retrieved: "+list.size()+" "+ctxType+" attributes");
+							if(this.logging.isDebugEnabled()){
+								this.logging.debug("retrieved: "+list.size()+" "+ctxType+" attributes");
+							}
 							if (list.size()==0){
 								
 								toBeRemoved.add(currentNode);
@@ -165,7 +171,9 @@ public class PreMerger {
 							e.printStackTrace();
 							toBeRemoved.add(currentNode);
 						}
-						this.logging.debug("ctxId not null");
+						if(this.logging.isDebugEnabled()){
+							this.logging.debug("ctxId not null");
+						}
 					}
 				}
 			}
@@ -186,7 +194,9 @@ public class PreMerger {
 			PreferenceTreeNode currentNode = (PreferenceTreeNode) depthFirstEnumeration.nextElement();
 			if (currentNode.getChildCount()==0){
 				leaves.add(currentNode);
-				this.logging.debug("adding leaf "+currentNode.toTreeString());
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("adding leaf "+currentNode.toTreeString());
+				}
 			}
 		}
 		

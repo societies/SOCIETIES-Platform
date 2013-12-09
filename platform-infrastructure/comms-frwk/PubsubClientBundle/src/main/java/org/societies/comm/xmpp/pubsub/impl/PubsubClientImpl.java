@@ -29,6 +29,7 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.simple.basic.URIConverter;
+import org.societies.simple.converters.DateConverter;
 import org.societies.simple.converters.XMLGregorianCalendarConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -82,6 +83,8 @@ public class PubsubClientImpl implements PubsubClient, ICommCallback {
         Registry registry = new Registry();
         try {
             registry.bind(com.sun.org.apache.xerces.internal.jaxp.datatype.XMLGregorianCalendarImpl.class, XMLGregorianCalendarConverter.class);
+            registry.bind(java.util.Date.class, DateConverter.class);
+            registry.bind(java.sql.Timestamp.class, DateConverter.class);
             registry.bind(java.net.URI.class, URIConverter.class);
         } catch (Exception e) {
             LOG.error(e.getMessage(), e);

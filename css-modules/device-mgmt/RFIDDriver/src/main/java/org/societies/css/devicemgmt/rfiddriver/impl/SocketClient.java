@@ -98,13 +98,13 @@ public class SocketClient extends Thread{
 			out = new PrintWriter(echoSocket.getOutputStream(), true);
 			in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
 		} catch (UnknownHostException e) {
-			this.logging.debug("Don't know about host: "+rfidAddress);
+			if(logging.isDebugEnabled()) logging.debug("Don't know about host: "+rfidAddress);
 			return;
 			//System.exit(1);
 		} catch (IOException e) {
 			System.err.println("Couldn't get I/O for "
 					+ "the connection to: "+rfidAddress);
-			this.logging.debug("Couldn't get I/O for "
+			if(logging.isDebugEnabled()) logging.debug("Couldn't get I/O for "
 					+ "the connection to: "+rfidAddress);
 			//return;
 			
@@ -115,7 +115,7 @@ public class SocketClient extends Thread{
 				in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));			
 			} catch (UnknownHostException e1) {
 				// TODO Auto-generated catch block
-				this.logging.debug("Don't know about host: localhost");
+				if(logging.isDebugEnabled()) logging.debug("Don't know about host: localhost");
 				e1.printStackTrace();
 				return;
 			}
@@ -123,12 +123,12 @@ public class SocketClient extends Thread{
 			catch (IOException ioe) {
 				// TODO Auto-generated catch block
 				ioe.printStackTrace();
-				this.logging.debug("Couldn't get I/O for the connection to localhost");
+				if(logging.isDebugEnabled()) logging.debug("Couldn't get I/O for the connection to localhost");
 				return;
 			}
 		}
 
-		this.logging.debug("Ready to receive data from RFID Reader");
+		if(logging.isDebugEnabled()) logging.debug("Ready to receive data from RFID Reader");
 		//BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
 		String userInput = "GI";
 
@@ -164,7 +164,7 @@ public class SocketClient extends Thread{
 					InternalEvent event = new InternalEvent(EventTypes.RFID_UPDATE_EVENT, DeviceMgmtEventConstants.RFID_READER_EVENT, deviceId, payload);
 					try {
 						this.eventMgr.publishInternalEvent(event);
-						this.logging.debug("Published internal event: "+wakeUpUnit+"-"+tag);
+						if(logging.isDebugEnabled()) logging.debug("Published internal event: "+wakeUpUnit+"-"+tag);
 					} catch (EMSException e) {
 						e.printStackTrace();
 					}

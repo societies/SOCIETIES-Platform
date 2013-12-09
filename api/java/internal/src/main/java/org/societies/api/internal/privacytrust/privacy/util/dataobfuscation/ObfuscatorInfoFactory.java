@@ -86,11 +86,17 @@ public class ObfuscatorInfoFactory {
 		mappingDataType2ObfuscatorInfo.clear();
 
 		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.NAME, new NameObfuscatorInfo());
+		mappingDataType2ObfuscatorInfo.put("NAME", new NameObfuscatorInfo());
 		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.LOCATION_COORDINATES, new LocationCoordinatesObfuscatorInfo());
+		mappingDataType2ObfuscatorInfo.put("LOCATION_COORDINATES", new LocationCoordinatesObfuscatorInfo());
 		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.STATUS, new StatusObfuscatorInfo());
+		mappingDataType2ObfuscatorInfo.put("STATUS", new StatusObfuscatorInfo());
 		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.TEMPERATURE, new TemperatureObfuscatorInfo());
+		mappingDataType2ObfuscatorInfo.put("TEMPERATURE", new TemperatureObfuscatorInfo());
 		PostalLocationObfuscatorInfo postalLocationObfuscatorInfo = new PostalLocationObfuscatorInfo();
-		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_HOME_CITY, postalLocationObfuscatorInfo);
-		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_WORK_CITY, postalLocationObfuscatorInfo);
+		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_HOME, postalLocationObfuscatorInfo);
+		mappingDataType2ObfuscatorInfo.put("ADDRESS_HOME", postalLocationObfuscatorInfo);
+		mappingDataType2ObfuscatorInfo.put(CtxAttributeTypes.ADDRESS_WORK, postalLocationObfuscatorInfo);
+		mappingDataType2ObfuscatorInfo.put("ADDRESS_WORK", postalLocationObfuscatorInfo);
 	}
 }

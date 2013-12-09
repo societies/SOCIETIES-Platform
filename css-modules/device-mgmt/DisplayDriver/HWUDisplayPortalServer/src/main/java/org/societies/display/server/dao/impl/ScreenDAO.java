@@ -58,7 +58,7 @@ public class ScreenDAO implements IScreenDAO{
         } catch (HibernateException e){
             transaction.rollback();
             e.printStackTrace();
-            log.debug(e.toString());
+            if(log.isDebugEnabled()) log.debug(e.toString());
         } finally{
             session.close();
         }

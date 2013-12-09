@@ -39,7 +39,6 @@ import org.societies.android.platform.useragent.feedback.guis.NotificationHistor
 import org.societies.android.platform.useragent.feedback.model.NotificationHistoryItem;
 import org.societies.api.identity.INetworkNode;
 import org.societies.api.identity.InvalidFormatException;
-import org.societies.api.internal.schema.useragent.feedback.HistoryRequestType;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
@@ -128,9 +127,6 @@ public class EventHistory extends Service {
                 INetworkNode cloudNode = clientCommunicationMgr.getIdManager().getCloudNode();
 
                 UserFeedbackHistoryRequest bean = new UserFeedbackHistoryRequest();
-                bean.setRequestType(HistoryRequestType.OUTSTANDING);
-                bean.setHowMany(howMany);
-//                bean.setSinceWhen(new Date()); // will be ignored, but must not be null
 
                 Stanza stanza = new Stanza(cloudNode);
                 String id = UUID.randomUUID().toString();
@@ -184,22 +180,22 @@ public class EventHistory extends Service {
             // wrap the beans in NotificationHistoryItem objects
             for (UserFeedbackBean bean : request.getUserFeedbackBean()) {
                 NotificationHistoryItem item = new NotificationHistoryItem(bean.getRequestId(),
-//                        bean.getRequestDate(),
-                        new Date(),
+                        bean.getRequestDate(),
+//                        new Date(),
                         bean);
                 historyItems.add(item);
             }
             for (UserFeedbackPrivacyNegotiationEvent bean : request.getUserFeedbackPrivacyNegotiationEvent()) {
                 NotificationHistoryItem item = new NotificationHistoryItem(bean.getRequestId(),
-//                        bean.getRequestDate(),
-                        new Date(),
+                        bean.getRequestDate(),
+//                        new Date(),
                         bean);
                 historyItems.add(item);
             }
             for (UserFeedbackAccessControlEvent bean : request.getUserFeedbackAccessControlEvent()) {
                 NotificationHistoryItem item = new NotificationHistoryItem(bean.getRequestId(),
-//                        bean.getRequestDate(),
-                        new Date(),
+                        bean.getRequestDate(),
+//                        new Date(),
                         bean);
                 historyItems.add(item);
             }

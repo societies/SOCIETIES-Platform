@@ -79,7 +79,8 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 		}
 		serRegMap.put(listener, bc.registerService(
 				EventHandler.class.getName(), listener, properties));
-		logger.debug("Registered for event: " + eventTypes[0]);
+		logger.debug("{} Registered for event: {}",listener,eventTypes);
+		logger.debug("We now have {} registered listeners.",serRegMap.size());
 	}
 
 	public void unSubscribeInternalEvent(EventListener listener, String[] eventTypes,
@@ -88,22 +89,36 @@ public class EventMgmtImpl implements IEventMgr, BundleContextAware {
 		if (serRegMap.containsKey(listener)) {
 			(serRegMap.get(listener)).unregister();
 			serRegMap.remove(listener);
-			logger.debug("Unregistered for event: " + eventTypes[0]);
+			logger.debug("{} Unregistered for event: {}",listener,eventTypes);
+			logger.debug("We now have {} registered listeners.",serRegMap.size());
 		} else {
-			logger.debug("Listener object does not exists to unregister: " + eventTypes[0]);
+			logger.debug("Listener object {} does not exists to unregister: {}",listener,eventTypes);
 		}
 	}
 
-	public void publishInternalEvent(InternalEvent event) throws EMSException {
+	public void publishInternalEvent(final InternalEvent event) throws EMSException {
 		if (getEventAdmin() != null) {
-			Dictionary<String, Object> properties = new Hashtable<String, Object>();
+			final Dictionary<String, Object> properties = new Hashtable<String, Object>();
 			properties.put(CSSEventConstants.EVENT_TARGET,CSSEventConstants.INTERNAL_EVENT);
 			properties.put(CSSEventConstants.EVENT_NAME, event.geteventName());
 			properties.put(CSSEventConstants.EVENT_SOURCE,event.geteventSource());
 			properties.put(CSSEventConstants.EVENT_INFO, event.geteventInfo());
-			getEventAdmin().postEvent(
-					new Event(event.geteventType(), properties));
-			logger.debug("Posted event: " + event.geteventType());
+			if (this.eventAdmin!=null){
+				new Thread() {
+
+					@Override
+					public void run() {
+
+						getEventAdmin().postEvent(
+								new Event(event.geteventType(), properties));
+						logger.debug("Posted event: {} with name {}",event.geteventType(),event.geteventName());
+
+					}
+				}.start();
+			}else{
+				this.logger.error("EventAdmin service is null");
+			}
+
 		} else {
 			throw new EMSException(
 					"Could not get OSG Event Admin Service, therefore event was not posted");

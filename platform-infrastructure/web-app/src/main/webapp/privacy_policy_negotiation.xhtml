@@ -1,124 +1,130 @@
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                xmlns:f="http://java.sun.com/jsf/core"
-                template="templates/main_template.xhtml">
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
 
-    <ui:define name="html_head">
-        <title>SOCIEITES :: View Privacy Policy</title>
-    </ui:define>
+	<ui:define name="html_head">
+		<title>SOCIEITES :: View Privacy Policy</title>
+	</ui:define>
 
-    <ui:define name="body">
+	<ui:define name="body">
 
-        <h2>Privacy Policy Negotiation Request</h2>
+		<h2>Privacy Policy Negotiation Request</h2>
 
-        <p:panel>
-            <f:facet name="header">
-                Negotiation with: <p:outputLabel value="#{ppNegotiation.responsePolicy.requestor.requestorId}"/>
-            </f:facet>
+		<p:panel>
+			<f:facet name="header">
+                Negotiation with: <p:outputLabel
+					value="#{ppNegotiation.responsePolicy.requestor.requestorId}" />
+			</f:facet>
 
-            <p:accordionPanel id="accordionPanel"
-                              multiple="true"
-                              value="#{ppNegotiation.responsePolicy.responseItems}"
-                              var="responseItem">
-                <p:tab title="#{responseItem.requestItem.resource.dataType}">
-                    <p:tabView id="tabView">
-
-                        <p:tab title="General">
-                            <!-- GENERAL TAB -->
-                            <h:panelGrid columns="2" cellpadding="10">
-                                <p:outputLabel for="dataType">Data type:</p:outputLabel>
-                                <p:inputText id="dataType" value="#{responseItem.requestItem.resource.dataType}"
-                                             readonly="true"/>
-
-                                <p:outputLabel for="decision">Permission:</p:outputLabel>
-                                <p:selectOneMenu id="decision" value="#{responseItem.decision}">
-                                    <f:selectItems value="#{ppNegotiation.decisionOptions}"
-                                                   var="dec"/>
-                                </p:selectOneMenu>
-                            </h:panelGrid>
-                            <!-- END GENERAL TAB -->
-                        </p:tab>
+			<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">
+			Loading<br />
+				<p:graphicImage value="/images/ajax-loader.gif" />
+			</p:blockUI>
 
 
-                        <p:tab title="Actions">
-                            <!-- ACTIONS TAB -->
-                            <p:selectManyCheckbox layout="pageDirection" id="actionsCheckboxes"
-                                                  value="#{responseItem.requestItem.selectedActionNames}">
-                                <f:selectItems value="#{responseItem.requestItem.actions}"
-                                               var="action"
-                                               itemValue="#{action.actionConstant.name()}"
-                                               itemLabel="#{action.actionConstant.name()}"
-                                               itemDisabled="#{action.actionConstant.name() eq 'READ'}"/>
-
-                                <p:ajax process="actionsCheckboxes" update="actionsCheckboxesMsgs"/>
-                            </p:selectManyCheckbox>
-                            <p:message for="actionsCheckboxes" id="actionsCheckboxesMsgs"/>
-                            <!-- END ACTIONS TAB -->
-                        </p:tab>
+			<p:dataGrid id="dataGrid" columns="1"
+				emptyMessage="This privacy negotiation has no items   0.o"
+				value="#{ppNegotiation.currentNegotiationEvent.responsePolicy.responseItems}"
+				var="responseItem">
 
 
-                        <p:tab title="Conditions">
-                            <!-- CONDITIONS TAB -->
 
-                            <p:dataTable id="conditionsTable"
-                                         var="condition" value="#{responseItem.requestItem.conditions}"
-                                         paginator="false" rows="20">
+				<p:panel>
+					<f:facet name="header">
+						<p:selectBooleanCheckbox id="checkbox"
+							value="#{responseItem.permitted}" />
 
-                                <p:column headerText="Condition" style="width:50%">
-                                    #{condition.conditionConstant}
-                                </p:column>
+						<p:outputLabel
+							value="#{responseItem.requestItem.resource.dataType}"
+							for="checkbox" style="margin-top: 5px;" />
+						<p:commandButton value="Details >" style="float:right;"
+							onclick="document.getElementById('#{p:component('optionsPanel')}').visible = true; return false;"
+							process="@none" update="@none" />
+					</f:facet>
 
-                                <p:column headerText="Value" style="width:25%">
-                                    <p:selectOneMenu
-                                            label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
-                                            id="conditionValue"
-                                            value="#{condition.value}"
-                                            required="#{!condition.optional}"
-                                            validatorMessage="This value is required">
-                                        <f:selectItem itemLabel="(none)"
-                                                      itemValue=""
-                                                      noSelectionOption="true"
-                                                      rendered="#{condition.optional}"/>
-                                        <f:selectItems
-                                                value="#{ppNegotiation.getAvailableConditionValues(condition.conditionConstant)}"/>
-                                        <p:ajax update="conditionValMsg" event="change"/>
-                                    </p:selectOneMenu>
+					<p:panel visible="true" id="optionsPanel">
+						<!--Purpose-->
+						<p:outputLabel value="Purpose: {still to be added}" />
 
-                                </p:column>
+						<!--Actions-->
+						<p:panelGrid columns="4">
+							<p:selectOneMenu id="actionScopeMenu">
+								<f:selectItem itemLabel="Everyone" />
+								<f:selectItem itemLabel="Only this app" />
+							</p:selectOneMenu>
 
-                                <p:column headerText="Required" style="width:25%">
-                                    <p:outputLabel style="color:#f00;font-weight:bold;"
-                                                   rendered="#{!condition.optional}">*</p:outputLabel>
-                                    <p:message id="conditionValMsg" for="conditionValue" display="icon"/>
-                                </p:column>
+							<p:outputLabel value="will be able to" />
 
-                            </p:dataTable>
+							<p:selectManyCheckbox id="actionsCheckboxes"
+								value="#{responseItem.requestItem.selectedActionNames}"
+								style="margin: 0;">
+								<f:selectItems value="#{responseItem.requestItem.actions}"
+									var="action" itemValue="#{action.actionConstant.name()}"
+									itemLabel="#{action.actionConstant.name()}"
+									itemDisabled="#{action.actionConstant.name() eq 'READ'}" />
+							</p:selectManyCheckbox>
 
-                            <!-- END CONDITIONS TAB -->
-                        </p:tab>
+							<p:outputLabel
+								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" />
+						</p:panelGrid>
 
-                    </p:tabView>
-                </p:tab>
-            </p:accordionPanel>
+						<!--Conditions-->
+						<p:dataGrid id="conditionsTable"
+							value="#{responseItem.requestItem.conditions}" var="condition"
+							columns="1">
+							<f:facet name="header">
+                                Conditions
+                            </f:facet>
 
-            <f:facet name="footer">
-                <p:messages id="validationMessages"/>
+							<p:outputLabel for="conditionValue"
+								value="#{condition.conditionConstant.name()}" />
 
-                <p:commandButton id="completePpnButton"
-                                 value="Complete Negotiation"
-                                 action="#{ppNegotiation.completeNegotiationAction}"
-                                 update="@form"/>
+							<p:selectOneMenu
+								label="#{responseItem.requestItem.resource.dataType} condition #{condition.conditionConstant}"
+								id="conditionValue" value="#{condition.value}"
+								required="#{!condition.optional}"
+								validatorMessage="This value is required">
+								<f:selectItem itemLabel="(none)" itemValue=""
+									noSelectionOption="true" rendered="#{condition.optional}" />
+								<f:selectItems
+									value="#{ppNegotiation.getAvailableConditionValues(condition.conditionConstant)}" />
+							</p:selectOneMenu>
 
-                <p:commandButton id="abortPpnButton"
-                                 value="Cancel Negotiation"
-                                 action="#{ppNegotiation.cancelNegotiationAction}"
-                                 process="@this"
-                                 update="@form"/>
-            </f:facet>
-        </p:panel>
+						</p:dataGrid>
 
-    </ui:define>
+						<p:commandButton outcome="productDetail"
+							icon="ui-icon-circle-plus" title="Add condition"
+							actionListener="#{ppNegotiation.addNewCondition(responseItem.requestItem)}"
+							process="addConditionName,@this" update="optionsPanel" />
+						<p:selectOneMenu id="addConditionName"
+							value="#{ppNegotiation.newConditionToAdd}">
+							<f:selectItems
+								value="#{ppNegotiation.getAvailableConditionConstants(responseItem.requestItem)}"
+								var="newCondition" itemLabel="#{newCondition.name()}" />
+						</p:selectOneMenu>
+					</p:panel>
+				</p:panel>
+
+			</p:dataGrid>
+
+
+			<f:facet name="footer">
+				<p:messages id="validationMessages" />
+
+				<p:commandButton id="completePpnButton" value="Complete Negotiation"
+					onclick="blockUI.show()"
+					action="#{ppNegotiation.completeNegotiationAction}" update="@form" />
+
+
+				<p:commandButton id="abortPpnButton" value="Cancel Negotiation"
+					action="#{ppNegotiation.cancelNegotiationAction}" process="@this"
+					onclick="blockUI.show()" update="@form" />
+			</f:facet>
+		</p:panel>
+
+	</ui:define>
 </ui:composition>
 </html>

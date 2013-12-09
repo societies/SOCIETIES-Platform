@@ -96,9 +96,13 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 
 	public void initialiseRFIDClient() {
+		if(logging.isDebugEnabled()) logging.debug("Init RFID CLIENT");
 		this.registerForRfidWebEvents();
+		if(logging.isDebugEnabled()) logging.debug("REGISTERED FOR WEB EVENTS");
 		this.registerWithContextSourceManager();
+		if(logging.isDebugEnabled()) logging.debug("REGISTERED WITH CONTEXT SOURCE MANAGER");
 		try {
+			if(logging.isDebugEnabled()) logging.debug("CHECKING FOR INFO IN DB");
 			//first try to see if there is information in the DB.
 			List<CtxIdentifier> entities = this.ctxBroker.lookup(userIdentity, CtxModelType.ENTITY, RFID_INFO).get();
 
@@ -169,7 +173,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 				if (haveAllInfo){
 					this.rfidServerRemote.registerRFIDTag(rfidServer,rfidTag, userIdentity.getBareJid(), null, password);
-					this.logging.debug("sent registerRFIDTag message");
+					if(logging.isDebugEnabled()) logging.debug("sent registerRFIDTag message");
 				}			
 
 			}
@@ -190,6 +194,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 	}
 
 	private void registerForRfidWebEvents(){
+		if(logging.isDebugEnabled()) logging.debug("REGISTERED FOR WEB EVENTS");
 		this.getEvMgr().subscribeInternalEvent(this, new String[]{RFID_EVENT_TYPE}, null);
 	}
 
@@ -290,7 +295,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 					this.information.put(type, ctxAttribute);
 				}
 			}else{
-				this.logging.error("Entity: "+RFID_INFO+" could not be retrieved/created");
+				if(logging.isDebugEnabled()) logging.error("Entity: "+RFID_INFO+" could not be retrieved/created");
 			}
 
 		} catch (InterruptedException e) {
@@ -314,7 +319,7 @@ public class RfidClient extends EventListener implements IRfidClient {
 		}
 		if (this.myCtxSourceId==null){
 			this.updateContext(RFID_REGISTRATION_ERROR, "RFID location received from RFID server but an error occured while registering as a context source with Context Source Manager");
-			this.logging.debug("RFID_REGISTRATION_ERROR: Context Source Manager error ");
+			if(logging.isDebugEnabled()) logging.debug("RFID_REGISTRATION_ERROR: Context Source Manager error ");
 			return ;
 		}
 		try {
@@ -336,10 +341,11 @@ public class RfidClient extends EventListener implements IRfidClient {
 
 
 
-
+	@Override
 	public void handleInternalEvent(InternalEvent event) {
-		this.logging.debug("Received event - type: "+event.geteventType()+" event source "+event.geteventSource()+" event name: "+event.geteventName());
+		if(logging.isDebugEnabled()) logging.debug("Received event - type: "+event.geteventType()+" event source "+event.geteventSource()+" event name: "+event.geteventName());
 		if (event.geteventType().equals(RFID_EVENT_TYPE) && (event.geteventName().equalsIgnoreCase("registerRequest"))){
+			if(logging.isDebugEnabled()) logging.debug("GOT A REGISTER REQUEST!");
 			Hashtable<String, String> hash = (Hashtable<String, String>) event.geteventInfo();
 			if (hash!=null){
 				//IF REGISTERING, REMOVE ANY CONTEXT WHICH EXISTS?
@@ -347,15 +353,15 @@ public class RfidClient extends EventListener implements IRfidClient {
 				//	String action = hash.get("action");
 				String rfidTag = hash.get("rfidTag");
 				this.updateContext(RFID_TAG, rfidTag);
-				this.logging.debug("Stored RFID_TAG");
+				if(logging.isDebugEnabled()) logging.debug("Stored RFID_TAG");
 				String password = hash.get("password");
 				this.updateContext(RFID_PASSWORD, password);
-				this.logging.debug("Stored RFID_PASSWORD");
+				if(logging.isDebugEnabled()) logging.debug("Stored RFID_PASSWORD");
 				String serverJid = hash.get("serverJid");
 				this.updateContext(RFID_SERVER, serverJid);
-				this.logging.debug("Stored RFID_SERVER");
+				if(logging.isDebugEnabled()) logging.debug("Stored RFID_SERVER");
 				this.rfidServerRemote.registerRFIDTag(serverJid, rfidTag, this.userIdentity.getJid(), "", password);
-				this.logging.debug("Requested RFID tag registration");
+				if(logging.isDebugEnabled()) logging.debug("Requested RFID tag registration");
 
 			}
 		}
@@ -366,15 +372,15 @@ public class RfidClient extends EventListener implements IRfidClient {
 				String action = hash.get("action");
 				String rfidTag = hash.get("rfidTag");
 				//this.updateContext(RFID_TAG, null);
-				this.logging.debug("Removed RFID_TAG");
+				if(logging.isDebugEnabled()) logging.debug("Removed RFID_TAG");
 				String password = hash.get("password");
 				//	this.updateContext(RFID_PASSWORD, null);
-				this.logging.debug("Removed RFID_PASSWORD");
+				if(logging.isDebugEnabled()) logging.debug("Removed RFID_PASSWORD");
 				String serverJid = hash.get("serverJid");
 				//	this.updateContext(RFID_SERVER, null);
-				this.logging.debug("Removed RFID_SERVER");
+				if(logging.isDebugEnabled()) logging.debug("Removed RFID_SERVER");
 				this.rfidServerRemote.unregisterRFIDTag(serverJid, rfidTag, this.userIdentity.getJid(), "", password);
-				this.logging.debug("Requested RFID tag unregistration");
+				if(logging.isDebugEnabled()) logging.debug("Requested RFID tag unregistration");
 
 				//this.rfidServerRemote.unregisterRFIDTag(serverJid, rfidTag, this.userIdentity.getJid(), "", password);
 
@@ -397,31 +403,31 @@ public class RfidClient extends EventListener implements IRfidClient {
 			this.updateContext(RFID_REGISTERED, "true");
 
 			rfidtag = this.information.get(RFID_TAG).getStringValue();
-			this.logging.debug("Successfully registered tag: "+rfidtag);
+			if(logging.isDebugEnabled()) logging.debug("Successfully registered tag: "+rfidtag);
 
 			break;
 		case 1 :
 			this.updateContext(RFID_REGISTERED, "false");
 			this.updateContext(RFID_REGISTRATION_ERROR, "The password for registering your RFID tag number was incorrect. Please enter your password again.");
-			this.logging.debug("RFID_REGISTRATION_ERROR: Incorrect password");
+			if(logging.isDebugEnabled()) logging.debug("RFID_REGISTRATION_ERROR: Incorrect password");
 
 			break;
 		case 2 :
 			this.updateContext(RFID_REGISTERED, "false");
 			this.updateContext(RFID_REGISTRATION_ERROR, "The RFID tag number was not recognised. Please enter a valid RFID tag number. ");
-			this.logging.debug("RFID_REGISTRATION_ERROR: Unrecognised rfid tag number");
+			if(logging.isDebugEnabled()) logging.debug("RFID_REGISTRATION_ERROR: Unrecognised rfid tag number");
 
 			break;
 		case 3 :
 			//	this.updateContext(RFID_REGISTERED, "false");
 			rfidtag = this.information.get(RFID_TAG).getStringValue();
-			this.logging.debug("Successfully unregistered tag: "+rfidtag);
+			if(logging.isDebugEnabled()) logging.debug("Successfully unregistered tag: "+rfidtag);
 
 			break;
 		default: 
 			this.updateContext(RFID_REGISTERED, "false");
 			this.updateContext(RFID_REGISTRATION_ERROR, "An unknown error occured");
-			this.logging.debug("RFID_REGISTRATION_ERROR: Unknown error");
+			if(logging.isDebugEnabled()) logging.debug("RFID_REGISTRATION_ERROR: Unknown error");
 			break;
 		}
 

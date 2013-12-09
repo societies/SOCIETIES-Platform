@@ -7,7 +7,6 @@ import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.integration.test.IntegrationTestCase;
-import org.societies.useragent.api.feedback.IUserFeedbackHistoryRepository;
 
 @SuppressWarnings({"MethodMayBeStatic", "UnusedDeclaration"})
 public class UFTestInit extends IntegrationTestCase {
@@ -17,7 +16,6 @@ public class UFTestInit extends IntegrationTestCase {
     private static PubsubClient pubsub;
     private static ICommManager commsMgr;
     private static IUserFeedback userFeedback;
-    private static IUserFeedbackHistoryRepository userFeedbackHistoryRepository;
 
     public UFTestInit() {
         super(2077,
@@ -56,11 +54,4 @@ public class UFTestInit extends IntegrationTestCase {
         UFTestInit.userFeedback = userFeedback;
     }
 
-    public void setUserFeedbackHistoryRepository(IUserFeedbackHistoryRepository userFeedbackHistoryRepository) {
-        UFTestInit.userFeedbackHistoryRepository = userFeedbackHistoryRepository;
-    }
-
-    public static IUserFeedbackHistoryRepository getUserFeedbackHistoryRepository() {
-        return userFeedbackHistoryRepository;
-    }
 }

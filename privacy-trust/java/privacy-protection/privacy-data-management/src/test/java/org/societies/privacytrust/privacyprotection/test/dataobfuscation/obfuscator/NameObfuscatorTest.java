@@ -64,7 +64,7 @@ public class NameObfuscatorTest {
 
 
 	private Object[] parametersForObfuscateData() {
-		return new Object[] { 0, 1.0/4.0, 2.0/4.0, 3.0/4.0, 1 };
+		return new Object[] { 0.0, 1.0/5.0, 2.0/5.0, 3.0/5.0, 4.0/5.0, 1.0 };
 	}
 
 	@Test
@@ -87,19 +87,19 @@ public class NameObfuscatorTest {
 			Name expected = NameUtils.create("", "");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
-		else if ((double)1/(double)4 == obfuscationLevel) {
+		else if ((double)1/(double)5 == obfuscationLevel) {
 			Name expected = NameUtils.create("O.", "M.");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
-		else if ((double)2/(double)4 == obfuscationLevel) {
+		else if ((double)2/(double)5 == obfuscationLevel) {
 			Name expected = NameUtils.create("Olivier", "M.");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
-		else if ((double)3/(double)4 == obfuscationLevel) {
+		else if ((double)3/(double)5 == obfuscationLevel) {
 			Name expected = NameUtils.create("O.", "Maridat");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}
-		else if (1 == obfuscationLevel) {
+		else if (1 == obfuscationLevel || (double)4/(double)5 == obfuscationLevel) {
 			Name expected = NameUtils.create("Olivier", "Maridat");
 			assertTrue("Data not well obfuscated (expected: "+NameUtils.toString(expected)+" but was "+NameUtils.toString(actual)+")", NameUtils.equals(actual, expected));
 		}

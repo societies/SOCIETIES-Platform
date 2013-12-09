@@ -26,6 +26,7 @@
 	<xs:simpleType name="displayPortalServerMethodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="requestAccess" />
+			<xs:enumeration value="checkScreenUse" />
 			<xs:enumeration value="releaseResource"/>
 			<xs:enumeration value="getScreenLocations"/>
 			<xs:enumeration value="getServerServiceId"/>
@@ -36,6 +37,14 @@
 	    <xs:complexType>
 		    <xs:sequence>
 			    <xs:element name="ipAddress" type="xs:string" minOccurs="1"></xs:element>
+		    </xs:sequence>
+	    </xs:complexType>
+	</xs:element>
+	
+		<xs:element name="displayPortalServerScreenUseBean">
+	    <xs:complexType>
+		    <xs:sequence>
+			    <xs:element name="inUse" type="xs:boolean" minOccurs="1"></xs:element>
 		    </xs:sequence>
 	    </xs:complexType>
 	</xs:element>

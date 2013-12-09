@@ -132,28 +132,45 @@ public class NetworkRunner implements Runnable{
 	}
 
 	private void updateNetwork(){
-		LOG.debug("Running next cycle "+cycleNum);
-		LOG.debug(cycleNum+": getting buffers");
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Running next cycle "+cycleNum);
+		
+			if (LOG.isDebugEnabled()){
+				LOG.debug(cycleNum+": getting buffers");
+			}
+		}
 		ArrayList[] snapshot = buffer.getSnapshot();
-		LOG.debug(cycleNum+": updating context layer");
+		if (LOG.isDebugEnabled()){
+			LOG.debug(cycleNum+": updating context layer");
+		}
 		updateContextLayer(snapshot[0]);  //set network to reflect context updates, feed forward new context updates
-		LOG.debug(cycleNum+": updating outcome layer");
+		if (LOG.isDebugEnabled()){
+			LOG.debug(cycleNum+": updating outcome layer");
+		}
 		updateOutcomeLayer(snapshot[1]);  //set network to reflect outcome updates
-		LOG.debug(cycleNum+": updating network output");
+		if (LOG.isDebugEnabled()){
+			LOG.debug(cycleNum+": updating network output");
+		}
 		updateNetworkOutput();  //update synapses and outcomes
-		LOG.debug(cycleNum+": checking for new outputs");
+		if (LOG.isDebugEnabled()){
+			LOG.debug(cycleNum+": checking for new outputs");
+		}
 		if(getOutcomes){
-			LOG.debug(cycleNum+": returning new outputs");
+			if (LOG.isDebugEnabled()){
+				LOG.debug(cycleNum+": returning new outputs");
+			}
 			callback.handleOutcomes(retrieveNewOutcomes()); //get new outcomes - if any
 			getOutcomes = false;
 		}
-		LOG.debug(cycleNum+": COMPLETE");
+		if (LOG.isDebugEnabled()){
+			LOG.debug(cycleNum+": COMPLETE");
+		}
 		//network.printNetwork();
 		
 		try {
 			Thread.sleep(nur);
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			LOG.error("Error", e);
 		}
 		cycleNum++;
 	}
@@ -266,26 +283,34 @@ public class NetworkRunner implements Runnable{
 			OutcomeGroup outcomeGroup = network.getOutcomeGroup(serviceId, groupName);
 			if(outcomeGroup != null) //group exists
 			{
-				LOG.debug("Group "+groupName+" already exists");
+				if (LOG.isDebugEnabled()){
+					LOG.debug("Group "+groupName+" already exists");
+				}
 
 				//search for node
 				OutcomeNode outcomeNode = (OutcomeNode)outcomeGroup.getNode(nodeName);
 				if(outcomeNode != null)  //node exists in group
 				{
-					LOG.debug("Node "+nodeName+" already exists");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("Node "+nodeName+" already exists");
+					}
 					//activate node in group (deactivates all others)
 					activateOutcomeUpdate(outcomeGroup, outcomeNode);
 
 				}else{  //no such node exists in group
 
-					LOG.debug("Node "+nodeName+" doesn't exist, creating new");
+					if (LOG.isDebugEnabled()){
+						LOG.debug("Node "+nodeName+" doesn't exist, creating new");
+					}
 					//create node, add it to group and activate
 					createNewOutcomeNode(outcomeGroup, nodeName);
 				}
 
 			}else{ //no such group exists
 
-				LOG.debug("Group "+groupName+" under serviceId "+serviceId.getServiceInstanceIdentifier()+" doesn't exist, creating new with node "+nodeName);
+				if (LOG.isDebugEnabled()){
+					LOG.debug("Group "+groupName+" under serviceId "+serviceId.getServiceInstanceIdentifier()+" doesn't exist, creating new with node "+nodeName);
+				}
 				//create group including new node and activate
 				createNewOutcomeGroup(serviceId, serviceType, groupName, nodeName);
 			}
@@ -318,7 +343,9 @@ public class NetworkRunner implements Runnable{
 		createNewOutcomeNode(newOutcomeGroup, nodeName);
 		//add new group to list
 		network.addOutcomeGroup(newOutcomeGroup);
-		LOG.debug("Number of outcome groups after adding new = "+network.getOutcomeGroups().size());
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Number of outcome groups after adding new = "+network.getOutcomeGroups().size());
+		}
 	}
 
 	private void connectOutcomes(ContextNode node){
@@ -388,11 +415,15 @@ public class NetworkRunner implements Runnable{
 		updateSynapses();
 		//calculate new winners and communicate
 		Iterator<OutcomeGroup> outcomeGroups_it = network.getOutcomeGroups().iterator();
-		LOG.debug("Updating "+network.getOutcomeGroups().size()+" outcome groups");
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Updating "+network.getOutcomeGroups().size()+" outcome groups");
+		}
 		while(outcomeGroups_it.hasNext())
 		{
 			OutcomeGroup nextGroup = (OutcomeGroup)outcomeGroups_it.next();
-			LOG.debug("Updating: "+nextGroup.getServiceId().getServiceInstanceIdentifier()+nextGroup.getGroupName());
+			if (LOG.isDebugEnabled()){
+				LOG.debug("Updating: "+nextGroup.getServiceId().getServiceInstanceIdentifier()+nextGroup.getGroupName());
+			}
 			nextGroup.updateGroupOutput();
 		}
 	}

@@ -52,6 +52,7 @@
 		<property name="userFeedback" ref="userFeedbackRef" />
 		<property name="eventMgr" ref="eventManagerRef" />
 		<property name="serviceDir" value="${local.service.directory}" />
+		<!--  <property name="virgoDeployer" ref="virgoDeployerRef" /> -->
 	</bean>
 	
 	<bean id="serviceManagement" class="org.societies.platform.servicelifecycle.servicecontrol.ServiceMgmt" >

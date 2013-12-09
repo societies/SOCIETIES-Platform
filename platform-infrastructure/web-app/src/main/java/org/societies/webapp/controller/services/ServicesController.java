@@ -37,6 +37,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 @ManagedBean(name = "servicesController")
@@ -48,18 +49,6 @@ public class ServicesController extends BasePageController {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	@ManagedProperty(value= "#{eventManager}")
-    private IEventMgr eventManager; 
-    
-    
-    public IEventMgr getEventManager() {
-		return eventManager;
-	}
-
-	public void setEventManager(IEventMgr eventManager) {
-		this.eventManager = eventManager;
-	}
-
     @ManagedProperty(value= "#{cssManager}")
     private ICSSInternalManager cssManager; 
     
@@ -83,6 +72,18 @@ public class ServicesController extends BasePageController {
         this.userService = userService;
     }
     
+	@ManagedProperty(value = "#{serviceEventListener}")
+	private ServiceEventListener serviceEventListener;
+	
+	
+	public ServiceEventListener getServiceEventListener() {
+		return serviceEventListener;
+	}
+
+	public void setServiceEventListener(ServiceEventListener serviceEventListener) {
+		this.serviceEventListener = serviceEventListener;
+	}
+	
     @ManagedProperty(value = "#{cisManager}")
 	private ICisManager cisManager;
     
@@ -135,8 +136,6 @@ public class ServicesController extends BasePageController {
 	private IIdentity selectedNode;
 	
 	public void setSelectedNode(String selectedJid){
-		if(log.isDebugEnabled())
-			log.debug("Selected Node is {}",selectedJid);
 		
 		try{
 			if("mynode".equals(selectedJid)){
@@ -272,7 +271,6 @@ public class ServicesController extends BasePageController {
 		return searchOptions;
 	}
 
-	private ServiceMgmtListener serviceEventListener;
 	private ConcurrentLinkedQueue<QueuedMessage> messageQueue;
 
 	private boolean didSearch;
@@ -297,7 +295,7 @@ public class ServicesController extends BasePageController {
     	log.debug("destroyEventListener");
     	if (this.serviceEventListener!=null){
     		
-    		this.serviceEventListener.unsubscribe();
+    		this.serviceEventListener.unregisterController(this);
     		
     	}
     	
@@ -308,8 +306,6 @@ public class ServicesController extends BasePageController {
     	log.debug("PostConstruct:initController");
     	this.thirdClients = new HashMap<String,String>();
     	this.messageQueue = new ConcurrentLinkedQueue<QueuedMessage>();
-    	if(serviceEventListener == null)
-    		serviceEventListener = new ServiceMgmtListener(this, eventManager);
     	setSelectedNode("mynode");
     	selectNode();
     	searchOptions = new ArrayList<String>();
@@ -318,6 +314,7 @@ public class ServicesController extends BasePageController {
     	searchOptions.add("Category");
     	searchOptions.add("Creator");
     	setVisibleServices("");
+    	this.serviceEventListener.registerController(this);
     	
     }
         
@@ -494,6 +491,7 @@ public class ServicesController extends BasePageController {
     	if(log.isDebugEnabled())
     		log.debug("Selecting one node to view the services:" + selectedNode.getIdentifier());
     	
+    	setDidSearch(false);
     	
     	List<Service> serviceList;
     	try{
@@ -520,7 +518,6 @@ public class ServicesController extends BasePageController {
     		
     	}
     	
-    	didSearch=false;
     	
     }
     
@@ -528,6 +525,22 @@ public class ServicesController extends BasePageController {
     	return "mynode".equals(getSelectedNode());
     }
 
+    public void launchService(){
+    	log.debug("Launching 3P Service...");
+    	ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+    	StringBuilder urlBuilder = new StringBuilder();
+    	urlBuilder.append("http://").append(context.getRequestServerName()).append(':').append(context.getRequestServerPort()).append(selectedService.getServiceEndpoint());
+    	try{
+			sendMessage("Launching App...","A problem occured while trying to launch app!",FacesMessage.SEVERITY_INFO);
+    		log.debug("Trying to launch service at URL: {}",urlBuilder.toString());
+    		context.redirect(urlBuilder.toString());
+    	} catch(Exception ex){
+    		log.error("");
+    		ex.printStackTrace();
+			sendMessage("Problem Redirecting to App","A problem occured while trying to launch app!",FacesMessage.SEVERITY_ERROR);
+
+    	}
+    }
     public void searchService(){
     	log.debug("Searching for services, the option is {} and the key is {}",getSearchOption(),getSearchBy());
     	
@@ -577,7 +590,7 @@ public class ServicesController extends BasePageController {
 		    		currentServices.put(servWrapped.getId(), servWrapped);		    		
 		    	}
 		    	
-		    	didSearch = true;
+		    	setDidSearch(true);
 			}
 		} catch (Exception e) {
 			log.error("There was an exception trying to search for services: ", e.getMessage());

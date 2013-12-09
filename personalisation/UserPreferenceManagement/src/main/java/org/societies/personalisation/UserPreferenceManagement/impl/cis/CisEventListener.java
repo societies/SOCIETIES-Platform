@@ -88,7 +88,7 @@ public class CisEventListener extends EventListener{
 		this.userPrefMgr = pcm.getPreferenceManager();
 		this.pcm = pcm;
 		this.tempTable = new Hashtable<String, PreferenceDetails>();
-		pcm.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.CIS_SUBS, EventTypes.SERVICE_LIFECYCLE_EVENT, EventTypes.CIS_UNSUBS}, null);
+		//pcm.getEventMgr().subscribeInternalEvent(this, new String[]{EventTypes.CIS_SUBS, EventTypes.SERVICE_LIFECYCLE_EVENT, EventTypes.CIS_UNSUBS}, null);
 		
 	}
 
@@ -116,7 +116,9 @@ public class CisEventListener extends EventListener{
 						List<PreferenceDetails> detailsToDownload = new ArrayList<PreferenceDetails>();
 						for (String str: list){
 							if (this.tempTable.containsKey(str)){
-								this.logging.debug("Downloading community preference: "+str+" from: "+cisId);
+								if (logging.isDebugEnabled()){
+									this.logging.debug("Downloading community preference: "+str+" from: "+cisId);
+								}
 								PreferenceDetails preferenceDetails = this.tempTable.get(str);
 								detailsToDownload.add(preferenceDetails);
 								

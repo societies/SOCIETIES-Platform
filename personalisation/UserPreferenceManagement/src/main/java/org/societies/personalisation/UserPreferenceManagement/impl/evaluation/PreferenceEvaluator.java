@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.IOutcome;
+import org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor;
 import org.societies.personalisation.preference.api.model.ContextPreferenceCondition;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceCondition;
@@ -44,28 +45,30 @@ import org.societies.personalisation.preference.api.model.OperatorConstants;
 
 
 public class PreferenceEvaluator {
-	
+
 	private PrivateContextCache contextCache;
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
-	
-	public PreferenceEvaluator(PrivateContextCache cache){
-		
+	private UserPreferenceConditionMonitor monitor;
+
+	public PreferenceEvaluator(PrivateContextCache cache, UserPreferenceConditionMonitor monitor){
+
 		this.contextCache = cache;
+		this.monitor = monitor;
 	}
-	
-	public Hashtable<IPreferenceOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn){
+
+	public Hashtable<IPreferenceOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn, String uuid){
 		Hashtable<IPreferenceOutcome,List<CtxIdentifier>> temp = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
 		IPreference p = this.evaluatePreferenceInternal(ptn);
 		if (p!=null){
 			ArrayList<CtxIdentifier> ctxIds = new ArrayList<CtxIdentifier>();
-			
+
 			Object[] objs = p.getUserObjectPath();
 			for (Object obj : objs){
 				if (obj instanceof IPreferenceCondition){
 					ctxIds.add( ((IPreferenceCondition) obj).getCtxIdentifier());
 				}
 			}
-			
+
 			/*IPreference[] prefs = (IPreference[]) p.getUserObjectPath();
 			for (int i = 0; i<prefs.length; i++){
 				if (null!=prefs[i].getUserObject()){
@@ -75,7 +78,38 @@ public class PreferenceEvaluator {
 					}
 				}
 			}*/
-			
+
+			this.monitor.addEvaluationResult(uuid, p);
+			temp.put(p.getOutcome(), ctxIds);
+			return temp;
+		}else{
+			return new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
+		}
+	}
+	
+	public Hashtable<IPreferenceOutcome,List<CtxIdentifier>> evaluatePreference(IPreference ptn){
+		Hashtable<IPreferenceOutcome,List<CtxIdentifier>> temp = new Hashtable<IPreferenceOutcome,List<CtxIdentifier>>();
+		IPreference p = this.evaluatePreferenceInternal(ptn);
+		if (p!=null){
+			ArrayList<CtxIdentifier> ctxIds = new ArrayList<CtxIdentifier>();
+
+			Object[] objs = p.getUserObjectPath();
+			for (Object obj : objs){
+				if (obj instanceof IPreferenceCondition){
+					ctxIds.add( ((IPreferenceCondition) obj).getCtxIdentifier());
+				}
+			}
+
+			/*IPreference[] prefs = (IPreference[]) p.getUserObjectPath();
+			for (int i = 0; i<prefs.length; i++){
+				if (null!=prefs[i].getUserObject()){
+					if (prefs[i].isBranch()){
+						IPreferenceCondition condition = prefs[i].getCondition();
+						ctxIds.add(condition.getCtxIdentifier());
+					}
+				}
+			}*/
+
 			
 			temp.put(p.getOutcome(), ctxIds);
 			return temp;
@@ -84,15 +118,21 @@ public class PreferenceEvaluator {
 		}
 	}
 	private IPreference evaluatePreferenceInternal(IPreference ptn){
-		logging.debug("evaluating preference");
+		if(this.logging.isDebugEnabled()){
+			logging.debug("evaluating preference");
+		}
 		//a non-context aware preference
 		if (ptn.isLeaf()){
-			logging.debug("preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
+			if(this.logging.isDebugEnabled()){
+				logging.debug("preference is not context-dependent. returning IAction object"+ptn.getOutcome().toString());
+			}
 			return ptn;
 		}
 		//if the root object is null then the tree is split so we have to evaluate more than one tree
 		if (ptn.getUserObject()==null){
-			logging.debug("preference tree is split. we might have a conflict");
+			if(this.logging.isDebugEnabled()){
+				logging.debug("preference tree is split. we might have a conflict");
+			}
 			Enumeration<IPreference> e = ptn.children();
 			ArrayList<IPreference> prefList = new ArrayList<IPreference>(); 
 			while (e.hasMoreElements()){
@@ -101,36 +141,46 @@ public class PreferenceEvaluator {
 				if (outcomePreference!=null){
 					prefList.add(outcomePreference);
 				}
-				
+
 			}
 			//if only one IOutcome is applicable with the current context return that
 			if (prefList.size()==1){
-				logging.debug("PrefEvaluator> Returning: "+ prefList.get(0).toString());
+				if(this.logging.isDebugEnabled()){
+					logging.debug("PrefEvaluator> Returning: "+ prefList.get(0).toString());
+				}
 				return prefList.get(0);
 			}
 			//if no IOutcome is applicable, return a null object
 			else if (prefList.size()==0){
-				logging.debug("PrefEvaluator> No preference applicable");
+				if(this.logging.isDebugEnabled()){
+					logging.debug("PrefEvaluator> No preference applicable");
+				}
 				return null;
 			}
 			//if more than one IOutcome objs is applicable, use conflict resolution and return the most applicable
 			else{
 				ConflictResolver cr = new ConflictResolver();
 				IPreference io = cr.resolveConflicts(prefList);
-				logging.debug("PrefEvaluator> Returning: "+io.toString());
+				if(this.logging.isDebugEnabled()){
+					logging.debug("PrefEvaluator> Returning: "+io.toString());
+				}
 				return io;
 			}
 		}
 		//if the root node is not empty
 		else{
-			logging.debug("preference tree is not split. no conflicts here");
+			if(this.logging.isDebugEnabled()){
+				logging.debug("preference tree is not split. no conflicts here");
+			}
 			//and it's a condition
 			if (ptn.isBranch()){
 				//evaluate the condition
 				IPreferenceCondition con = ptn.getCondition();
 				try {
 					if (evaluatesToTrue(con)){
-						logging.debug(con.toString()+" is true - descending tree levels");
+						if(this.logging.isDebugEnabled()){
+							logging.debug(con.toString()+" is true - descending tree levels");
+						}
 						//traverse the tree in preorder traversal to evaluate all the conditions under this branch and find an Action 
 						Enumeration<IPreference> e = ptn.children();
 						while (e.hasMoreElements()){
@@ -141,7 +191,9 @@ public class PreferenceEvaluator {
 							}
 						}		
 					}else{
-						logging.debug(con.toString()+" is false - returning");
+						if(this.logging.isDebugEnabled()){
+							logging.debug(con.toString()+" is false - returning");
+						}
 					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -149,24 +201,28 @@ public class PreferenceEvaluator {
 				}
 			}//and it's not a condition but an Outcome (i.e. not a branch but a leaf)
 			else{
-				logging.debug("PrefEvaluator> Returning: "+ptn.getOutcome());
+				if(this.logging.isDebugEnabled()){
+					logging.debug("PrefEvaluator> Returning: "+ptn.getOutcome());
+				}
 				return ptn;
 			}
 		}
-		
-		
+
+
 		return null;
 	}
 
-	
-	
-	
+
+
+
 	public boolean evaluatesToTrue(IPreferenceCondition cond){
 		if (cond instanceof ContextPreferenceCondition){
 			String currentContextValue = this.getValueFromContext(cond.getCtxIdentifier());
 			OperatorConstants operator = cond.getoperator();
-			
-			logging.debug("evaluating cond: "+cond.toString()+" against current value: "+currentContextValue);
+
+			if(this.logging.isDebugEnabled()){
+				logging.debug("evaluating cond: "+cond.toString()+" against current value: "+currentContextValue);
+			}
 			if (operator.equals(OperatorConstants.EQUALS)){
 				//JOptionPane.showMessageDialog(null, "Comparing: "+cond.getvalue()+" with current context value: "+currentContextValue);
 				return currentContextValue.equalsIgnoreCase(cond.getvalue());
@@ -174,12 +230,14 @@ public class PreferenceEvaluator {
 			else
 				return this.evaluateInt(parseString(cond.getvalue()), parseString(currentContextValue), operator);
 		}else{
-			this.logging.error("Catastrophic failure. Request to evaluate a node that is not a conditional node");
+			if (logging.isErrorEnabled()){
+				this.logging.error("Catastrophic failure. Request to evaluate a node that is not a conditional node");
+			}
 			return false;
 		}
-		
+
 	}
-	
+
 	public boolean evaluateInt(int valueInPreference, int valueInContext, OperatorConstants operator){
 		boolean result = false;
 		switch (operator){
@@ -195,39 +253,47 @@ public class PreferenceEvaluator {
 		case LESS_THAN:
 			result = valueInContext < valueInPreference;
 			break;
-		default: logging.debug("Invalid Operator");
+		default: if(this.logging.isDebugEnabled()){
+			logging.debug("Invalid Operator");
+			}
 		}
-		
+
 		return result;
 	}
-	
+
 	public String getValueFromContext(CtxIdentifier id){
 		if (id==null){
-			this.logging.debug("can't get context value from null id");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("can't get context value from null id");
+			}
 		}
 		if (this.contextCache==null){
-			this.logging.debug("ContextCache is null. PrefEvaluator not initialised properly");
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("ContextCache is null. PrefEvaluator not initialised properly");
+			}
 		}
 		return this.contextCache.getContextValue(id);
-		
+
 	}
-	
+
 	public int parseString(String str){
 		try{
 			return Integer.parseInt(str);
 		}catch (NumberFormatException nbe){
-			logging.debug("Could not parse String to int");
+			if(this.logging.isDebugEnabled()){
+				logging.debug("Could not parse String to int");
+			}
 			return 0;
 		}
-		
+
 	}
 
-	
-/*	public static void main(String[] args){
+
+	/*	public static void main(String[] args){
 		ICtxBroker sbroker = new StubCtxBroker();
-		
+
 		try {
-			
+
 			ICtxEntity entity = sbroker.createEntity("Person");
 			if (entity==null){
 				System.out.println("entity is null");
@@ -239,7 +305,7 @@ public class PreferenceEvaluator {
 			//ICtxAttribute symlocAttr = new StubCtxAttribute(symlocAttrID, entityID);
 			symlocAttr.setStringValue("home");
 			sbroker.update(symlocAttr);
-			
+
 			IPreference condition1 = new PreferenceTreeNode(
 					new ContextPreferenceCondition(symlocAttr.getCtxIdentifier(), OperatorConstants.EQUALS, "home", CtxAttributeTypes.SYMBOLIC_LOCATION));
 			IPreference condition2 = new PreferenceTreeNode(
@@ -248,17 +314,17 @@ public class PreferenceEvaluator {
 			//define outcomes
 			IPreference outcome1 = new PreferenceTreeNode(new PreferenceOutcome("volume", "100"));
 			IPreference outcome2 = new PreferenceTreeNode(new PreferenceOutcome("volume", "0"));
-			
-		
+
+
 			//build tree
 			IPreference preference = new PreferenceTreeNode();
 			preference.add(condition1); //branch 1
 			condition1.add(outcome1);
 			preference.add(condition2); //branch 2
 			condition2.add(outcome2);
-			
+
 			PrivateContextCache cc = new PrivateContextCache(sbroker);
-		
+
 			PreferenceEvaluator ev = new PreferenceEvaluator(cc);
 			Hashtable<IOutcome,List<CtxIdentifier>> result = ev.evaluatePreference(preference);
 			if (result!=null && (!result.isEmpty())){

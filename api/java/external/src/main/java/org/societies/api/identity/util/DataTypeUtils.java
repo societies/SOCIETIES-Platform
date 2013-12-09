@@ -271,19 +271,42 @@ public class DataTypeUtils {
 		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_STREET_NAME);
 		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_CITY);
 		postAddressHomeChildren.add(CtxAttributeTypes.ADDRESS_HOME_COUNTRY);
-		addChildren("ADDRESS_HOME", postAddressHomeChildren);
+		addChildren(CtxAttributeTypes.ADDRESS_HOME, postAddressHomeChildren);
 
 		Set<String> postAddressWorkChildren = new HashSet<String>();
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NUMBER);
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_STREET_NAME);
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_CITY);
 		postAddressWorkChildren.add(CtxAttributeTypes.ADDRESS_WORK_COUNTRY);
-		addChildren("ADDRESS_WORK", postAddressWorkChildren);
+		addChildren(CtxAttributeTypes.ADDRESS_WORK, postAddressWorkChildren);
 
 		Set<String> nameChildren = new HashSet<String>();
 		nameChildren.add(CtxAttributeTypes.NAME_FIRST);
 		nameChildren.add(CtxAttributeTypes.NAME_LAST);
 		addChildren(CtxAttributeTypes.NAME, nameChildren);
+		
+		Set<String> profileChildren = new HashSet<String>();
+		profileChildren.add(CtxAttributeTypes.ABOUT);
+		profileChildren.add(CtxAttributeTypes.EMAIL);
+		profileChildren.add(CtxAttributeTypes.AGE);
+		profileChildren.add(CtxAttributeTypes.BIRTHDAY);
+		profileChildren.add(CtxAttributeTypes.SEX);
+		profileChildren.add(CtxAttributeTypes.WEIGHT);
+		profileChildren.add(CtxAttributeTypes.LOCATION_COORDINATES);
+		profileChildren.add(CtxAttributeTypes.PHONES);
+		addChildren(CtxAttributeTypes.PROFILE, profileChildren);
+		
+		Set<String> extendedProfileChildren = new HashSet<String>();
+		extendedProfileChildren.add(CtxAttributeTypes.FAVOURITE_QUOTES);
+		extendedProfileChildren.add(CtxAttributeTypes.BOOKS);
+		extendedProfileChildren.add(CtxAttributeTypes.INTERESTS);
+		extendedProfileChildren.add(CtxAttributeTypes.LANGUAGES);
+		extendedProfileChildren.add(CtxAttributeTypes.MOVIES);
+		extendedProfileChildren.add(CtxAttributeTypes.MUSIC);
+		extendedProfileChildren.add(CtxAttributeTypes.POLITICAL_VIEWS);
+		extendedProfileChildren.add(CtxAttributeTypes.RELIGIOUS_VIEWS);
+		extendedProfileChildren.add(CtxAttributeTypes.SKILLS);
+		addChildren(CtxAttributeTypes.EXTENDED_PROFILE, profileChildren);
 
 		Set<String> legumeChildren = new HashSet<String>();
 		legumeChildren.add("middle");
@@ -314,11 +337,14 @@ public class DataTypeUtils {
 		addDataTypeDescription(CtxAttributeTypes.AGE, "Age of this entity");
 		addDataTypeDescription(CtxAttributeTypes.BOOKS, "Favorite books", "Favorite books of this entity");
 		addDataTypeDescription(CtxAttributeTypes.LOCATION_SYMBOLIC, "Symbolic location", "Symbolic location");
+		addDataTypeDescription(CtxAttributeTypes.NAME, "Full name", "Full name");
 		addDataTypeDescription(CtxAttributeTypes.NAME_FIRST, "First name", "First name");
 		addDataTypeDescription(CtxAttributeTypes.NAME_LAST, "Last name", "Last name");
+		addDataTypeDescription(CtxAttributeTypes.PROFILE, "Profile", "Profile of this entity");
+		addDataTypeDescription(CtxAttributeTypes.EXTENDED_PROFILE, "More profile information", "More profile information");
 		addDataTypeDescription(CtxAttributeTypes.ADDRESS_HOME_CITY, "City home address", "City of this entity's home address");
-		addDataTypeDescription("ADDRESS_HOME", "Home address", "Address of this entity's home");
-		addDataTypeDescription("ADDRESS_WORK", "Work address", "Address of this entity's work");
+		addDataTypeDescription(CtxAttributeTypes.ADDRESS_HOME, "Home address", "Address of this entity's home");
+		addDataTypeDescription(CtxAttributeTypes.ADDRESS_WORK, "Work address", "Address of this entity's work");
 		return true;
 	}
 

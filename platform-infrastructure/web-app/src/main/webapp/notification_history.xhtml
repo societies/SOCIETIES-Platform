@@ -15,7 +15,7 @@
 <ui:define name="body">
 
 <p:dataGrid var="notification" value="#{notifications.allNotificationsQueue}"
-            columns="1" emptyMessage="No notifications :(" id="notificationHistoryGrid">
+            columns="1" emptyMessage="No notifications" id="notificationHistoryGrid">
 
 <p:panel id="ppnPanel_unread" styleClass="unread-notification"
          header="Negotiation with #{notification.title}"

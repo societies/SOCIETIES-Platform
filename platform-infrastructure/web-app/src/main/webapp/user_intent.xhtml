@@ -12,115 +12,142 @@
 
 	<ui:define name="body">
 
-		<p:panel>
-			<f:facet name="header">
+
+		<!--	<p:panel> -->
+		<f:facet name="header">
                 Context Aware User Intent Model
             </f:facet>
 
+		<p:tabView id="tabView" dynamic="true" activeIndex="0">
+
+			<p:tab title="User Model">
+
+				<h:panelGrid raws="3">
+					<p:dataTable id="userTable" var="CAUIAction"
+						value="#{cauiController.userActionsList}" scrollable="true" scrollWidth="800" scrollHeight="150">
 
 
-
-
-
-			<p:tabView id="tabView" dynamic="true" activeIndex="0">
-
-				<p:tab title="User Model">
-					<h:panelGrid raws="3">
-
-						<p:dataTable id="userTable" var="CAUIAction"
-							value="#{cauiController.userActionsList}">
-							<p:column headerText="Source User Action">
-								<h:outputText value="#{CAUIAction.sourceAction}" />
-							</p:column>
-							<p:column
-								headerText="Target User Action : transition probability">
-								<h:outputText value="#{CAUIAction.targetAction}" />
-							</p:column>
-						</p:dataTable>
-
-						<p:commandButton value="Learn new user model"
-							actionListener="#{cauiController.learnUserModel()}"
-							update="userTable" />
-						<p:commandButton value="Refresh user model"
-							actionListener="#{cauiController.refreshUserModels()}"
-							update="userTable" />
-					</h:panelGrid>
-
-				</p:tab>
-
-
-
-
-				<p:tab title="Community Model">
-					<h:panelGrid raws="5">
-						<p:dataTable id="communityTable" var="CAUIAction"
-							value="#{cauiController.communityActionsList}">
-							<p:column headerText="Source User Action">
-								<h:outputText value="#{CAUIAction.sourceAction}" />
-							</p:column>
-							<p:column
-								headerText="Target User Action : transition probability">
-								<h:outputText value="#{CAUIAction.targetAction}" />
-							</p:column>
-						</p:dataTable>
-						<h:outputText value="Select local CIS id" />
-						<h:selectOneMenu value="#{cauiController.cisId}">
-							<f:selectItems value="#{cauiController.retrieveCisIdList()}" />
-						</h:selectOneMenu>
-
-						<p:commandButton value="Learn new community model"
-							action="#{cauiController.learnCommunityModel}">
-						</p:commandButton>
-
-
-
-						<p:commandButton value="Refresh community model"
-							actionListener="#{cauiController.refreshCommunityModels()}"
-							update="communityTable" />
-					</h:panelGrid>
-				</p:tab>
-
-
-				<p:tab title="Prediction Log">
-
-					<p:dataTable id="predictionLogTable" var="CAUIActionLog"
-						value="#{cauiController.predictionLogList}">
-
-						<p:column headerText="Performed User Action">
-							<h:outputText value="#{CAUIActionLog.performedAction}" />
+						<p:column headerText="Source User Action">
+							<h:outputText value="#{CAUIAction.sourceAction}" />
 						</p:column>
-						<p:column headerText="Predicted User Action ">
-							<h:outputText value="#{CAUIActionLog.predictedAction}" />
+						<p:column headerText="Target User Action : transition probability">
+							<h:outputText value="#{CAUIAction.targetAction}" />
 						</p:column>
 					</p:dataTable>
-					<p:commandButton value="Refresh Prediction Log"
-						actionListener="#{cauiController.refreshPredictionLog}"
-						update="predictionLogTable" />
-				</p:tab>
 
-				<p:tab title="Options">
-					<h:panelGrid raws="3">
-						<h:outputText value="Enable prediction based on User model: " />
-						<p:selectBooleanCheckbox
-							value="#{cauiController.enableUserPrediction}">
-						</p:selectBooleanCheckbox>
+					<p:commandButton value="Learn new user model"
+						actionListener="#{cauiController.learnUserModel()}"
+						update="userTable" />
+					<p:commandButton value="Refresh user model"
+						actionListener="#{cauiController.refreshUserModels()}"
+						update="userTable" />
+				</h:panelGrid>
 
-						<h:outputText value="Enable prediction based on Community model: " />
-						<p:selectBooleanCheckbox
-							value="#{cauiController.enableCommunityPrediction}">
-						</p:selectBooleanCheckbox>
+			</p:tab>
 
-						<p:commandButton value="Submit"
-							actionListener="#{cauiController.updateComUsrPred}" />
+			<p:tab title="Action's context">
 
-					</h:panelGrid>
+				<p:dataTable id="contextTable2" var="CAUIAction"
+					value="#{cauiController.userActionsList}" scrollable="true" scrollWidth="800" scrollHeight="150">
+					<p:column headerText="User Action">
+						<h:outputText value="#{CAUIAction.sourceAction}" />
+					</p:column>
+					<p:column headerText="Prevailing Escorting Context Values">
+						<h:outputText value="#{CAUIAction.ctxAction}" />
+					</p:column>
+			
+			
+				</p:dataTable>
+			
+				<p:commandButton
+						value="refresh"
+						action="#{cauiController.refreshContextAction()}">
+					</p:commandButton>
+			
+			</p:tab>
 
-				</p:tab>
-			</p:tabView>
+
+			<p:tab title="Community Model">
+				<h:panelGrid raws="5">
+					<p:dataTable id="communityTable" var="CAUIAction"
+						value="#{cauiController.communityActionsList}" scrollable="true" scrollWidth="800" scrollHeight="150">
+						<p:column headerText="Source User Action">
+							<h:outputText value="#{CAUIAction.sourceAction}" />
+						</p:column>
+						<p:column headerText="Target User Action : transition probability">
+							<h:outputText value="#{CAUIAction.targetAction}" escape="false" />
+						</p:column>
+					</p:dataTable>
+					<h:outputText value="Select CIS id" />
+					<h:selectOneMenu value="#{cauiController.cisId}">
+
+					
+					
+						<f:selectItems value="#{cauiController.retrieveCisIdList()}" />
+					</h:selectOneMenu>
+
+					<p:commandButton
+						value="Learn new community model (only for CIS id that user owns)"
+						action="#{cauiController.learnCommunityModel}">
+					</p:commandButton>
 
 
 
-		</p:panel>
+					<p:commandButton
+						value="Retrieve community model (for CIS id that user owns or belongs)"
+						actionListener="#{cauiController.refreshCommunityModels()}"
+						update="communityTable" />
+				</h:panelGrid>
+			</p:tab>
+
+
+			<p:tab title="User Action Log">
+
+				<p:dataTable id="predictionLogTable" var="CAUIActionLog"
+					value="#{cauiController.predictionLogList}" scrollable="true" scrollWidth="800" scrollHeight="150">
+
+					<p:column headerText="Time">
+						<h:outputText value="#{CAUIActionLog.time}" />
+					</p:column>
+
+					<p:column headerText="Performed User Action">
+						<h:outputText value="#{CAUIActionLog.performedAction}" />
+					</p:column>
+										
+					 <p:column headerText="Situation">
+						<h:outputText value="#{CAUIActionLog.ctxAction}" />
+					</p:column>
+					
+					
+				</p:dataTable>
+				<p:commandButton value="Retrieve History of Actions"
+					actionListener="#{cauiController.refreshPredictionLog}"
+					update="predictionLogTable" />
+					
+			</p:tab>
+
+			<p:tab title="Options">
+				<h:panelGrid raws="3">
+					<h:outputText value="Enable prediction based on User model: " />
+					<p:selectBooleanCheckbox
+						value="#{cauiController.enableUserPrediction}">
+					</p:selectBooleanCheckbox>
+
+					<h:outputText value="Enable prediction based on Community model: " />
+					<p:selectBooleanCheckbox
+						value="#{cauiController.enableCommunityPrediction}">
+					</p:selectBooleanCheckbox>
+
+					<p:commandButton value="Submit"
+						actionListener="#{cauiController.updateComUsrPred}" />
+
+				</h:panelGrid>
+
+			</p:tab>
+		</p:tabView>
+
+
+		<!-- </p:panel> -->
 
 	</ui:define>
 </ui:composition>

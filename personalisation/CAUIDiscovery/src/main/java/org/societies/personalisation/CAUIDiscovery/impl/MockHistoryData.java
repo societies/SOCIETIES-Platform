@@ -17,7 +17,7 @@ public class MockHistoryData {
 	
 	Date timestamp;
 	
-	String contextValue = "";
+	//String contextValue = "";
 
 	String serviceType = "";
 		
@@ -67,14 +67,20 @@ public class MockHistoryData {
 	}
 
 	public String getContextValue(String type) {
+		
 		if(contextMap.containsKey(type)){
 			Serializable valueSerial = contextMap.get(type);
 			if (valueSerial instanceof String) {
 				String value = (String) valueSerial;	
-				contextValue = value;
+				//contextValue = value;
+				return value;
+			} else if (valueSerial instanceof Integer){
+				
+				String value = String.valueOf(valueSerial);
+				 return value;
 			}
 		}
-		return contextValue;
+		return null;
 	}
 
 	public void setSymLoc() {

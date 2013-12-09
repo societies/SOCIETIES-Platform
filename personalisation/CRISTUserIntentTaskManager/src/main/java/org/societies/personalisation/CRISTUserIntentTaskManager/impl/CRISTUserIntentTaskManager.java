@@ -88,7 +88,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	private IInternalPersonalisationManager persoMgr;
 
 	public CRISTUserIntentTaskManager() {
-		LOG.info("Hello! I'm the CRIST User Intent Manager!");
+	//	LOG.info("Hello! I'm the CRIST User Intent Manager!");
 	}
 	
 	public IInternalPersonalisationManager getPersoMgr() {
@@ -356,7 +356,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		} catch (CtxException e) {
 			e.printStackTrace();
 		}
-		LOG.info("registerContextUpdate failed: " + ctxAttributeTypeString);
+		if (LOG.isDebugEnabled())LOG.debug("registerContextUpdate failed: " + ctxAttributeTypeString);
 		return null;
 
 	}
@@ -477,7 +477,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			if (this.intentModel == null) {
 				// create intent model
 				if (cristDiscovery == null) {
-					LOG.info("The CRIST Discovery is NULL. ");
+					if (LOG.isDebugEnabled())LOG.debug("The CRIST Discovery is NULL. ");
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
@@ -536,7 +536,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			return getNextActions(entityID, userAction, currentUserSituation);
 		}
 		else {
-			LOG.info("currentUserSituation is null.");
+			if (LOG.isDebugEnabled())LOG.debug("currentUserSituation is null.");
 		}
 
 		// When currentUserSituation == null
@@ -588,7 +588,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 					|| historyList.size() % UPDATE_TRIGGER_THRESHOLD == 0) {
 				// update intent model
 				if (cristDiscovery == null) {
-					LOG.info("The CRIST Discovery is NULL. ");
+					if (LOG.isDebugEnabled())LOG.debug("The CRIST Discovery is NULL. ");
 					return new ArrayList<CRISTUserAction>();
 				}
 				// this.cristDiscovery.enableCRISTUIDiscovery(true);
@@ -641,7 +641,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 			return getNextActions(entityID, userAction, currentUserSituation);
 		} else {
-			LOG.info("currentUserSituation is null.");
+			if (LOG.isDebugEnabled())LOG.debug("currentUserSituation is null.");
 		}
 
 		// When currentUserSituation == null
@@ -674,7 +674,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		if (currentUserAction == null) {
 			currentUserAction = retrieveCurrentUserAction();
 			if (currentUserAction == null) {
-				LOG.info("currentUserAction is null, and no history action.");
+				if (LOG.isDebugEnabled())LOG.debug("currentUserAction is null, and no history action.");
 				return null;
 			}
 			currentUserActionMap.put(entityID, currentUserAction);
@@ -686,7 +686,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 		if (this.intentModel == null) {
 			// create intent model
 			if (cristDiscovery == null) {
-				LOG.info("The CRIST Discovery is NULL. ");
+				if (LOG.isDebugEnabled())LOG.debug("The CRIST Discovery is NULL. ");
 				return new CRISTUserAction();
 			}
 			// this.cristDiscovery.enableCRISTUIDiscovery(true);
@@ -775,7 +775,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 
 		// null paras are handled in predictUserIntent method
 		if (currentAction == null || currentSituation == null) {
-			LOG.info("action or situation is null.");
+			if (LOG.isDebugEnabled())LOG.debug("action or situation is null.");
 			return new ArrayList<CRISTUserAction>();
 		}
 
@@ -1088,7 +1088,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	}
 	
 	public void displayHistoryList() {
-		System.out.println("This is the historyList: ");
+		if (LOG.isDebugEnabled())LOG.debug("This is the historyList: ");
 		for (int i = 0; i < historyList.size(); i++) {
 			System.out.println(historyList.get(i).toString());
 		}
@@ -1097,12 +1097,12 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 	public void displayIntentModel() {
 		//System.out.println("This is the intentModel.toString(): " + intentModel.toString()); //nearly the same as below
 		System.out.println(getCRISTUIModel(intentModel.toString()).toString());
-		System.out.println("This is the intentModel: ");
+		if (LOG.isDebugEnabled())LOG.debug("This is the intentModel: ");
 		Set<String> modelKeys = intentModel.keySet();
 		Object[] keyArray = modelKeys.toArray();
 		if (keyArray.length == 0)
 		{
-			System.out.println("intentModel is not null, but its length is zero.");
+			if (LOG.isDebugEnabled())LOG.debug("intentModel is not null, but its length is zero.");
 		}
 		for (int i = 0; i < keyArray.length; i++) {
 			System.out.println(keyArray[i].toString() + "=" + intentModel.get(keyArray[i]));
@@ -1128,7 +1128,7 @@ public class CRISTUserIntentTaskManager implements ICRISTUserIntentTaskManager {
 			}
 			// what if no ctxEntity of this cisId in the contextDB
 			else {
-				System.out.println("ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY): " + ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY)); //null
+				if (LOG.isDebugEnabled())LOG.debug("ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY): " + ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY)); //null
 				communityCtxEntityId = ctxBroker.createEntity(cisId, CtxEntityTypes.COMMUNITY).get().getId();
 			}
 			

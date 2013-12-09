@@ -70,7 +70,7 @@ public class SA_SI extends Thread{
 		this.historyOwner = historyOwner;
 		this.serviceId = serviceId;
 		this.parameterName = parameterName;
-		
+
 		historyRetriever = new HistoryRetriever(ctxBroker);
 		preProcessor = new PreProcessor();
 		postProcessor = new PostProcessor(); 
@@ -121,7 +121,9 @@ public class SA_SI extends Thread{
 				output.add(nextOutput);
 			}
 		}else{
-			LOG.debug("No History found for history owner: "+historyOwner.toString());
+			if (LOG.isDebugEnabled()){
+				LOG.debug("No History found for history owner: "+historyOwner.toString());
+			}
 		}
 		//send DPI based output to requestor
 		LOG.info("RETURNING C45 OUTPUT TO: "+requestor.getClass().getName());
@@ -129,7 +131,9 @@ public class SA_SI extends Thread{
 			printOutput(output);
 			requestor.handleC45Output(output);
 		}catch(Exception e){
-			LOG.debug("The C45 requestor service is not available to handle response");
+			if (LOG.isDebugEnabled()){
+				LOG.debug("The C45 requestor service is not available to handle response");
+			}
 		}
 	}
 
@@ -150,7 +154,9 @@ public class SA_SI extends Thread{
 			outputString = executeAlgorithm(instances);
 		} catch (Exception e) {
 			e.printStackTrace();
-			LOG.debug("No rules could be learned from the current history set\nException: "+e.toString());
+			if (LOG.isDebugEnabled()){
+				LOG.debug("No rules could be learned from the current history set\nException: "+e.toString());
+			}
 			return null;
 		}
 
@@ -174,7 +180,7 @@ public class SA_SI extends Thread{
 
 		return id3.toString();
 	}
-	
+
 	private void printOutput(List<IC45Output> output){
 		for(IC45Output nextOutput: output){
 			LOG.info("Data owner: "+nextOutput.getOwner().getIdentifier());

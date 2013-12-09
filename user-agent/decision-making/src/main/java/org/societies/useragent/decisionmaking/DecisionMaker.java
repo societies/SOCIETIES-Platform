@@ -47,8 +47,13 @@ import org.societies.useragent.conflict.ConfidenceTradeoffRule;
 import org.societies.useragent.conflict.ConflictResolutionManager;
 import org.societies.useragent.conflict.IntentPriorRule;
 import org.societies.api.identity.IIdentity;
-import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.services.ServiceUtils;
 import org.societies.api.internal.personalisation.model.*;
+import org.societies.api.internal.servicelifecycle.IServiceControl;
+import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.IServiceRegistry;
+import org.societies.api.internal.servicelifecycle.serviceRegistry.exception.ServiceRetrieveException;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
@@ -56,7 +61,7 @@ import org.societies.api.osgi.event.InternalEvent;
 
 
 public class DecisionMaker extends AbstractDecisionMaker implements
-		BundleContextAware {
+BundleContextAware {
 
 	private BundleContext myContext;
 
@@ -104,13 +109,12 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 		this.myContext = myContext;
 	}
 
-	
 
 	public DecisionMaker() {
 		ConflictResolutionManager man = new ConflictResolutionManager();
 		man.addRule(new ConfidenceTradeoffRule());
-		man.addRule(new IntentPriorRule());
-		this.manager = man;
+		//	man.addRule(new IntentPriorRule());
+		super.setManager(man);
 		logging.debug("Intialized DM");
 	}
 
@@ -118,7 +122,8 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 	protected ConflictType detectConflict(IOutcome intent, IOutcome prefernce) {
 		// TODO Auto-generated method stub
 		try {
-			if (intent.getServiceID().equals(prefernce.getServiceID())) {
+			if (ServiceUtils.
+					compare(intent.getServiceID(), prefernce.getServiceID())) {
 				if (intent.getparameterName().equals(
 						prefernce.getparameterName())) {
 					if (!intent.getvalue().equalsIgnoreCase(
@@ -135,62 +140,126 @@ public class DecisionMaker extends AbstractDecisionMaker implements
 
 	}
 
+
 	@Override
 	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences) {
+		makeDecision(intents,preferences,"");
+	}
+
+
+	@Override
+	public void makeDecision(List<IOutcome> intents, List<IOutcome> preferences, String uuid) {
 		logging.debug("make decision with\t" + preferences.size()
 				+ " preferences" + "\t" + intents.size() + " intents");
 		this.refreshServiceLookup();
 		logging.debug("refresh the list of services and doing decision making...");
-		super.makeDecision(intents, preferences);
+		super.makeDecision(intents, preferences,uuid);
 		logging.debug("decision making has been finished");
 	}
 
 	@Override
-	protected void implementIAction(IAction action) {
-		// TODO Auto-generated method stub
-		// @temporal solution depends on the 3rd party-services
-		logging.debug("****************************************");
-		logging.debug("implement the Action for Service ID:\t"
-				+ action.getServiceID());
-		logging.debug("Service Type:\t" + action.getServiceType());
-		logging.debug("Parameter Name of IAction:\t"
-				+ action.getparameterName());
-		logging.debug("Parameter Value of IAction:\t" + action.getvalue());
-		logging.debug("****************************************");
-		logging.debug("implementing IAction DM");
-		boolean found = false;
-		if (this.temporal != null) {
-			for (IActionConsumer consumer : this.temporal) {
-				this.logging.debug("comparing: "
-						+ consumer.getServiceIdentifier()
+	protected void implementIAction(IAction action, String uuid) {
+
+		try{
+			// TODO Auto-generated method stub
+			// @temporal solution depends on the 3rd party-services
+			if (logging.isDebugEnabled()){
+				logging.debug("****************************************");
+				logging.debug("implement the Action for Service ID:\t"
+						+ action.getServiceID());
+				logging.debug("Service Type:\t" + action.getServiceType());
+				logging.debug("Parameter Name of IAction:\t"
+						+ action.getparameterName());
+				logging.debug("Parameter Value of IAction:\t" + action.getvalue());
+				logging.debug("****************************************");
+				logging.debug("implementing IAction DM");
+			}
+			boolean found = false;
+			if (this.temporal != null) {
+				for (IActionConsumer consumer : this.temporal) {
+					if (this.logging.isDebugEnabled()){
+						this.logging.debug("comparing: "
+								+ consumer.getServiceIdentifier()
 								.getServiceInstanceIdentifier() + " with: "
-						+ action.getServiceID().getServiceInstanceIdentifier());
-				if (ServiceModelUtils.compare(consumer.getServiceIdentifier(),
-						action.getServiceID())) {
-					String cImp = "Service:" + consumer.getServiceIdentifier()
-							+ " Action:" + action;
-					if (getUserFeedback(cImp, action)) {
-						FeedbackEvent fedb = new FeedbackEvent(entityID,
-						action, true, FeedbackTypes.IMPLEMENTED);
-						InternalEvent event = new InternalEvent(
-								EventTypes.UI_EVENT, "feedback",
-								"org/societies/useragent/decisionmaker", fedb);
-						try {
-							pesoMgr.publishInternalEvent(event);
-						} catch (EMSException e) {
-							e.printStackTrace();
-						}
-						consumer.setIAction(this.entityID, action);
-						logging.debug("Service has been matched. IAction has been sent to the service");
-					} else {	
-						logging.debug("Service has been matched. But user refuses to act");
+								+ action.getServiceID().getServiceInstanceIdentifier());
 					}
-					found = true;
+					if (ServiceUtils.compare(consumer.getServiceIdentifier(),
+							action.getServiceID())) {
+
+						String cImp = "Do you want to implement the Service:" + consumer.getServiceIdentifier()
+								+ "\n with the Parameter:" + action;
+						if (getUserFeedback(cImp, action,uuid)) {
+							boolean service_decision=consumer.setIAction(super.getEntityID(), action);
+
+							InternalEvent event = null;
+							if (service_decision){
+
+								this.logging.info("Service "+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID())+" was personalised proactively. Action: "+action.getparameterName()+" - value: "+action.getvalue());
+
+								FeedbackEvent fedb = new FeedbackEvent(super.getEntityID(),
+										action, true, FeedbackTypes.IMPLEMENTED);
+								fedb.setUuid(uuid);
+								event = new InternalEvent(
+										EventTypes.UI_EVENT, "feedback",
+										"org/societies/useragent/decisionmaker", fedb);
+							}else{
+								this.logging.info("Service "+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID())+" was NOT personalised. (Action: "+action.getparameterName()+" - value: "+action.getvalue()+" was not implemented by service.");
+								FeedbackEvent fedb = new FeedbackEvent(
+										super.getEntityID(), action, true,
+										FeedbackTypes.SERVICE_DECISION);
+								fedb.setUuid(uuid);
+								event = new InternalEvent(
+										EventTypes.UI_EVENT,
+										"feedback","org/societies/useragent/decisionmaker",fedb);
+							}
+							try {
+								this.getEventMgr().publishInternalEvent(event);
+							} catch (EMSException e) {
+								e.printStackTrace();
+							}
+						} else {	
+
+							logging.info("User aborted proactively personalising the service: "+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID())+" with action: "+action.getparameterName()+" - value: "+action.getvalue());
+
+
+						}
+						found = true;
+					}
 				}
 			}
-		}
-		if (!found) {
-			logging.debug("No services have been founded to implement the IAction");
+			if (!found) {
+				FeedbackEvent fedb = new FeedbackEvent(super.getEntityID(),
+						action, true, FeedbackTypes.SERVICE_UNREACHABLE);
+				fedb.setUuid(uuid);
+				InternalEvent event = new InternalEvent(EventTypes.UI_EVENT,
+						"feedback", "org/societies/useragent/decisionmaker",
+						fedb);
+				logging.info("Service Unreachable. Could not implement action: "+action.getparameterName()+" with value: "+action.getvalue()+" for service: "+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID()));
+				try {
+					this.getEventMgr().publishInternalEvent(event);
+				} catch (EMSException e) {
+					e.printStackTrace();
+				}
+				logging.debug("No services have been founded to implement the IAction");
+			}
+
+		}catch(Exception e2){
+			FeedbackEvent fedb = new FeedbackEvent(super.getEntityID(),
+					action, true, FeedbackTypes.SYSTEM_ERROR);
+			fedb.setUuid(uuid);
+			InternalEvent event = new InternalEvent(EventTypes.UI_EVENT,
+					"feedback", "org/societies/useragent/decisionmaker",
+					fedb);
+			try {
+				this.getEventMgr().publishInternalEvent(event);
+			} catch (EMSException e) {
+				e.printStackTrace();
+			}
+			if (logging.isDebugEnabled()){
+				logging.debug("System fails");
+			}
+			logging.info("System Error. Could not implement action: "+action.getparameterName()+" with value: "+action.getvalue()+" for service: "+ServiceModelUtils.serviceResourceIdentifierToString(action.getServiceID()));
+
 		}
 
 	}

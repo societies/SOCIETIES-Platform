@@ -1,10 +1,18 @@
 package org.societies.webapp.controller.userfeedback;
 
+import org.societies.api.comm.xmpp.datatypes.Stanza;
+import org.societies.api.comm.xmpp.datatypes.XMPPInfo;
+import org.societies.api.comm.xmpp.exceptions.CommunicationException;
+import org.societies.api.comm.xmpp.exceptions.XMPPError;
+import org.societies.api.comm.xmpp.interfaces.ICommCallback;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.pubsub.PubsubClient;
 import org.societies.api.comm.xmpp.pubsub.Subscriber;
+import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.Requestor;
 import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBean;
+import org.societies.api.internal.schema.useragent.feedback.UserFeedbackHistoryRequest;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.feedback.IUserFeedbackResponseEventListener;
 import org.societies.api.internal.useragent.model.ExpProposalContent;
@@ -25,10 +33,7 @@ import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.SessionScoped;
 import java.math.BigInteger;
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -50,7 +55,7 @@ public class UserFeedbackTestController extends BasePageController {
                         EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE,
                         this);
 
-                log.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " events");
+                if(log.isDebugEnabled()) log.debug("Subscribed to " + EventTypes.UF_PRIVACY_NEGOTIATION_RESPONSE + " events");
             } catch (Exception e) {
                 addGlobalMessage("Error subscribing to pubsub notifications",
                         e.getMessage(),
@@ -88,14 +93,17 @@ public class UserFeedbackTestController extends BasePageController {
     private static final String[] FEATURES = new String[]{
             "2 LEGS", "4 LEGS", "SWIMS", "JUMPS", "LONG NECK", "REALLY HEAVY", "WILL EAT YOU"
     };
-    private static final String[] CLASSIFICATIONS = new String[]{
-            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
-    };
+    //    private static final String[] CLASSIFICATIONS = new String[]{
+//            "KINGDOM", "PHYLYM", "CLASS", "ORDER", "FAMILY", "GENUS", "SPECIES"
+//    };
     private static final String[] ANIMALS = new String[]{
             "CAT", "OTTER", "MOUSE", "DOG", "HORSE", "BADGER", "OSTRICH", "SEAL", "HEDGEHOG", "LION", "TIGER", "GIRAFFE", "HEFFALUMP"
     };
 
     private static final Random random = new Random();
+
+    @ManagedProperty(value = "#{commMngrRef}")
+    private ICommManager commManager;
 
     @ManagedProperty(value = "#{pubsubClient}")
     private PubsubClient pubsubClient;
@@ -165,14 +173,21 @@ public class UserFeedbackTestController extends BasePageController {
         this.userFeedback = userFeedback;
     }
 
+    public ICommManager getCommManager() {
+        return commManager;
+    }
+
+    public void setCommManager(ICommManager commManager) {
+        this.commManager = commManager;
+    }
+
     public void sendPpnEvent() throws ExecutionException, InterruptedException {
         RequestorBean requestorBean = new RequestorBean();
         requestorBean.setRequestorId("req" + ++req_counter);
 
         SecureRandom random = new SecureRandom();
-        String guid = new BigInteger(130, random).toString(32);
 
-        ResponsePolicy responsePolicy = buildResponsePolicy(guid, requestorBean);
+        ResponsePolicy responsePolicy = buildResponsePolicy(requestorBean);
 
         NegotiationDetailsBean negotiationDetails = new NegotiationDetailsBean();
         negotiationDetails.setRequestor(requestorBean);
@@ -283,14 +298,17 @@ public class UserFeedbackTestController extends BasePageController {
 
         Requestor requestor = new Requestor(userService.getIdentity());
 
-        List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "data item #1"));
-        responseItems.add(buildResponseItem("http://paddy.rules/", "data item #2"));
-        responseItems.add(buildResponseItem("http://something.something.something/", "data item #3"));
+        List<AccessControlResponseItem> responseItems = new ArrayList<AccessControlResponseItem>();
+        responseItems.add(buildAccessResponseItem("http://this.is.a.win/", CtxAttributeTypes.NAME));
+        responseItems.add(buildAccessResponseItem("http://paddy.rules/", CtxAttributeTypes.LOCATION_COORDINATES));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.STATUS));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.TEMPERATURE));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_HOME_CITY));
+        responseItems.add(buildAccessResponseItem("http://something.something.something/", CtxAttributeTypes.ADDRESS_WORK_CITY));
 
-        userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<ResponseItem>>() {
+        userFeedback.getAccessControlFBAsync(requestor, responseItems, new IUserFeedbackResponseEventListener<List<AccessControlResponseItem>>() {
             @Override
-            public void responseReceived(List<ResponseItem> result) {
+            public void responseReceived(List<AccessControlResponseItem> result) {
                 log.info("AccessControl: Response received");
                 addGlobalMessage("AccessControl Response received",
                         (result != null && result.size() > 0) ? result.get(0).getDecision().toString() : "null",
@@ -304,14 +322,68 @@ public class UserFeedbackTestController extends BasePageController {
         userFeedback.clear();
     }
 
+    public void requestAndroidHistoryBean() {
 
-    private static ResponsePolicy buildResponsePolicy(String guid, RequestorBean requestorBean) {
+        Stanza stanza = new Stanza(UUID.randomUUID().toString(),
+                commManager.getIdManager().getThisNetworkNode(),
+                commManager.getIdManager().getThisNetworkNode());
 
+        UserFeedbackHistoryRequest request = new UserFeedbackHistoryRequest();
 
+        try {
+            commManager.sendIQGet(stanza, request, new ICommCallback() {
+                @Override
+                public List<String> getXMLNamespaces() {
+                    return Arrays.asList("http://societies.org/api/schema/useragent/feedback",
+                            "http://societies.org/api/internal/schema/useragent/feedback");
+                }
+
+                @Override
+                public List<String> getJavaPackages() {
+                    return Arrays.asList("org.societies.api.schema.useragent.feedback",
+                            "org.societies.api.internal.schema.useragent.feedback");
+                }
+
+                @Override
+                public void receiveResult(Stanza stanza, Object payload) {
+                    log.info("receiveResult stanza={}, payload={}",
+                            new Object[]{stanza, payload});
+                }
+
+                @Override
+                public void receiveError(Stanza stanza, XMPPError error) {
+                    log.error("receiveError stanza={}, error={}",
+                            new Object[]{stanza, error});
+                }
+
+                @Override
+                public void receiveInfo(Stanza stanza, String node, XMPPInfo info) {
+                    log.info("receiveInfo stanza={}, info={}",
+                            new Object[]{stanza, info});
+                }
+
+                @Override
+                public void receiveItems(Stanza stanza, String node, List<String> items) {
+                    log.info("receiveItems stanza={}, items={}",
+                            new Object[]{stanza, items});
+                }
+
+                @Override
+                public void receiveMessage(Stanza stanza, Object payload) {
+                    log.info("receiveMessage stanza={}, payload={}",
+                            new Object[]{stanza, payload});
+                }
+            });
+        } catch (CommunicationException e) {
+            log.error("Error sending testing IQ", e);
+        }
+    }
+
+    private static ResponsePolicy buildResponsePolicy(RequestorBean requestorBean) {
         List<ResponseItem> responseItems = new ArrayList<ResponseItem>();
-        responseItems.add(buildResponseItem("http://this.is.a.win/", "Location"));
-        responseItems.add(buildResponseItem("http://paddy.rules/", "Status"));
-        responseItems.add(buildResponseItem("http://something.something.something/", "Hair colour"));
+        responseItems.add(buildPrivacyResponseItem("http://this.is.a.win/", "Location"));
+        responseItems.add(buildPrivacyResponseItem("http://paddy.rules/", "Status"));
+        responseItems.add(buildPrivacyResponseItem("http://something.something.something/", "Hair colour"));
 
         ResponsePolicy responsePolicy = new ResponsePolicy();
         responsePolicy.setRequestor(requestorBean);
@@ -320,36 +392,25 @@ public class UserFeedbackTestController extends BasePageController {
         return responsePolicy;
     }
 
-    private static ResponseItem buildResponseItem(String uri, String dataType) {
-        Action action1 = new Action();
-        action1.setActionConstant(ActionConstants.CREATE);
-        action1.setOptional(true);
-        Action action2 = new Action();
-        action2.setActionConstant(ActionConstants.DELETE);
-        action2.setOptional(false);
+    private static ResponseItem buildPrivacyResponseItem(String uri, String dataType) {
         Action action3 = new Action();
         action3.setActionConstant(ActionConstants.READ);
         action3.setOptional(false);
+        Action action1 = new Action();
+        action1.setActionConstant(ActionConstants.CREATE);
+        action1.setOptional(true);
         Action action4 = new Action();
         action4.setActionConstant(ActionConstants.WRITE);
         action4.setOptional(true);
 
         Condition condition1 = new Condition();
         condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
-        condition1.setValue("1");
+        condition1.setValue("12");
         condition1.setOptional(false);
         Condition condition2 = new Condition();
         condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
-        condition2.setValue("2");
+        condition2.setValue("true");
         condition2.setOptional(true);
-        Condition condition3 = new Condition();
-        condition3.setConditionConstant(ConditionConstants.RIGHT_TO_OPTOUT);
-        condition3.setValue("3");
-        condition3.setOptional(false);
-        Condition condition4 = new Condition();
-        condition4.setConditionConstant(ConditionConstants.STORE_IN_SECURE_STORAGE);
-        condition4.setValue("4");
-        condition4.setOptional(true);
 
         Resource resource = new Resource();
         resource.setDataIdUri(uri);
@@ -357,14 +418,11 @@ public class UserFeedbackTestController extends BasePageController {
 
         RequestItem requestItem = new RequestItem();
         requestItem.getActions().add(action1);
-        requestItem.getActions().add(action2);
         requestItem.getActions().add(action3);
         requestItem.getActions().add(action4);
 
         requestItem.getConditions().add(condition1);
         requestItem.getConditions().add(condition2);
-        requestItem.getConditions().add(condition3);
-        requestItem.getConditions().add(condition4);
 
         requestItem.setOptional(false);
         requestItem.setResource(resource);
@@ -372,6 +430,49 @@ public class UserFeedbackTestController extends BasePageController {
         ResponseItem responseItem = new ResponseItem();
         responseItem.setDecision(Decision.INDETERMINATE);
         responseItem.setRequestItem(requestItem);
+
+        return responseItem;
+    }
+
+    private static AccessControlResponseItem buildAccessResponseItem(String uri, String dataType) {
+        Action action3 = new Action();
+        action3.setActionConstant(ActionConstants.READ);
+        action3.setOptional(false);
+        Action action1 = new Action();
+        action1.setActionConstant(ActionConstants.CREATE);
+        action1.setOptional(true);
+        Action action4 = new Action();
+        action4.setActionConstant(ActionConstants.WRITE);
+        action4.setOptional(true);
+
+        Condition condition1 = new Condition();
+        condition1.setConditionConstant(ConditionConstants.DATA_RETENTION_IN_HOURS);
+        condition1.setValue("12");
+        condition1.setOptional(false);
+        Condition condition2 = new Condition();
+        condition2.setConditionConstant(ConditionConstants.RIGHT_TO_ACCESS_HELD_DATA);
+        condition2.setValue("true");
+        condition2.setOptional(true);
+
+        Resource resource = new Resource();
+        resource.setDataIdUri(uri);
+        resource.setDataType(dataType);
+
+        RequestItem requestItem = new RequestItem();
+        requestItem.getActions().add(action1);
+        requestItem.getActions().add(action3);
+        requestItem.getActions().add(action4);
+
+        requestItem.getConditions().add(condition1);
+        requestItem.getConditions().add(condition2);
+
+        requestItem.setOptional(false);
+        requestItem.setResource(resource);
+
+        AccessControlResponseItem responseItem = new AccessControlResponseItem();
+        responseItem.setDecision(Decision.INDETERMINATE);
+        responseItem.setRequestItem(requestItem);
+
         return responseItem;
     }
 

@@ -80,11 +80,15 @@ public class Network implements Serializable
 		OutcomeGroup requestedGroup = null;
 
 		Iterator <OutcomeGroup>list_it = this.getOutcomeGroups().iterator();
-		LOG.debug("Number of outcome groups = "+this.getOutcomeGroups().size());
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Number of outcome groups = "+this.getOutcomeGroups().size());
+		}
 		while(list_it.hasNext())
 		{
 			OutcomeGroup group = (OutcomeGroup)list_it.next();
-			LOG.debug("Checking if "+group.getServiceId().getServiceInstanceIdentifier()+" equals "+serviceId.getServiceInstanceIdentifier());
+			if (LOG.isDebugEnabled()){
+				LOG.debug("Checking if "+group.getServiceId().getServiceInstanceIdentifier()+" equals "+serviceId.getServiceInstanceIdentifier());
+			}
 			if(group.getServiceId().getServiceInstanceIdentifier().equals(serviceId.getServiceInstanceIdentifier())){
 				if(group.getGroupName().equals(groupName))
 				{
@@ -101,7 +105,9 @@ public class Network implements Serializable
 	}
 	
 	public void addOutcomeGroup(OutcomeGroup newOutcomeGroup){
-		LOG.debug("Adding new outcome group: "+newOutcomeGroup.getServiceId().getServiceInstanceIdentifier()+"->"+newOutcomeGroup.getGroupName());
+		if (LOG.isDebugEnabled()){
+			LOG.debug("Adding new outcome group: "+newOutcomeGroup.getServiceId().getServiceInstanceIdentifier()+"->"+newOutcomeGroup.getGroupName());
+		}
 		outcomeGroups.add(newOutcomeGroup);
 	}
 	

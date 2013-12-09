@@ -103,7 +103,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		StackParser stackParser = new StackParser(stack);
 		String invoker = stackParser.getInvokerOfInvoker();
 		//LOG.debug("Context / Comms: {}", stackParser.getInvoker());  // Costly call, use for debugging only!
-		LOG.debug("Invoked by {}", invoker);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Invoked by {}", invoker);
+		}
 		
 		return invoker;
 	}
@@ -113,18 +115,24 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
 		StackParser stackParser = new StackParser(stack);
 		List<String> classes = stackParser.getAllClasses();
-		LOG.debug("Invoked by {}", classes);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Invoked by {}", classes);
+		}
 		
 		return classes;
 	}
 
 	// Getters and setters for beans
 	public PrivacyLog getPrivacyLog() {
-		LOG.debug("getPrivacyLog()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("getPrivacyLog()");
+		}
 		return privacyLog;
 	}
 	public void setPrivacyLog(PrivacyLog privacyLog) {
-		LOG.debug("setPrivacyLog()");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("setPrivacyLog()");
+		}
 		this.privacyLog = privacyLog;
 	}
 	public CommsFwTestBean getTestBean() {
@@ -143,8 +151,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	// implementation: channelId = XMPP
 	@Override
 	public boolean logCommsFw(IIdentity sender, IIdentity receiver, Object payload) {
-		
-		LOG.debug("logCommsFw({}, {}, ...)", sender, receiver);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("logCommsFw({}, {}, ...)", sender, receiver);
+		}
 
 		String dataType;
 		String invokerClass = getInvokerClass();
@@ -176,8 +185,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner) {
-		
-		LOG.debug("logContext({}, ...)", requestor);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("logContext()");
+		}
 		
 		String invokerClass = getInvokerClass();
 		List<String> invokerClasses = getInvokerClasses();
@@ -189,7 +199,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public void logContext(Requestor requestor, IIdentity owner, int dataSize) {
 		
-		LOG.debug("logContext({}, {}, ...)", requestor, dataSize);
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("logContext({})", dataSize);
+		}
 
 		String invokerClass = getInvokerClass();
 		List<String> invokerClasses = getInvokerClasses();
@@ -228,7 +240,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public boolean log(DataTransmissionLogEntry entry) {
 		
-		LOG.debug("log(DataTransmissionLogEntry)");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("log(DataTransmissionLogEntry)");
+		}
 
 		privacyLog.append(entry);
 
@@ -238,7 +252,9 @@ public class PrivacyLogAppender implements IPrivacyLogAppender {
 	@Override
 	public void log(DataAccessLogEntry entry) {
 
-		LOG.debug("log(DataAccessLogEntry)");
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("log(DataAccessLogEntry)");
+		}
 
 		privacyLog.append(entry);
 	}

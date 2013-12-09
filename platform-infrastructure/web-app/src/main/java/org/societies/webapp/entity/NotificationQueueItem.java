@@ -45,7 +45,11 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     public static NotificationQueueItem forNotification(String itemId, String title) {
+    	if(log.isDebugEnabled()) log.debug("GETTING NEW NOTIF");
+    	try{
         return new NotificationQueueItem(itemId, TYPE_NOTIFICATION, title, null);
+    	}catch(Exception e){log.error("ERROR>", e);}
+    	return null;
     }
 
     private final Date arrivalDate;
@@ -61,7 +65,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     private boolean complete;
 
     private NotificationQueueItem(String itemId, UserFeedbackPrivacyNegotiationEvent payload) {
-        this.arrivalDate = new Date();
+        this.arrivalDate = payload.getRequestDate();
         this.itemId = itemId;
         this.ufPPN = payload;
         this.ufAccessControl = null;
@@ -73,7 +77,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     }
 
     private NotificationQueueItem(String itemId, UserFeedbackAccessControlEvent payload) {
-        this.arrivalDate = new Date();
+        this.arrivalDate = payload.getRequestDate();
         this.itemId = itemId;
         this.ufPPN = null;
         this.ufAccessControl = payload;
@@ -119,6 +123,16 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     public String getTitle() {
         return title;
     }
+    
+    public UserFeedbackAccessControlEvent getAccessControlEvent()
+    {
+    	return ufAccessControl;
+    }
+    
+    public UserFeedbackPrivacyNegotiationEvent getPrivacyNeoEvent()
+    {
+    	return ufPPN;
+    }
 
     public String getInfoLink() {
         if (ufPPN != null)
@@ -159,7 +173,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
     public void setResults(String[] results) {
         this.results = results;
     }
-
+    
     public String getFriendlyTimeLeft() {
         if (timeoutTime == null)
             return "forever";

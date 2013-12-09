@@ -66,8 +66,14 @@ public class TestUserActionMonitor extends TestCase{
 	CtxIdentifier mockPersonId;
 	CtxEntityIdentifier mockEntityId;
 	CtxIdentifier mockSymLocId;
-	CtxIdentifier mockStatusId;
-	CtxIdentifier mockTempId;
+	//CtxIdentifier mockStatusId;
+	//CtxIdentifier mockTempId;
+	
+	CtxIdentifier mockTodId;
+	CtxIdentifier mockHodId;
+	CtxIdentifier mockDowId;
+	
+	
 	CtxIdentifier mockSnpshtRegistryId;
 	CtxModelObject mockSnpshtRegistryObject;
 	CtxAttribute mockSnpshtRegistryAttribute;
@@ -76,14 +82,21 @@ public class TestUserActionMonitor extends TestCase{
 	//arraylists
 	List<CtxIdentifier> mockPersonIds;
 	List<CtxIdentifier> mockSymLocIds;
-	List<CtxIdentifier> mockStatusIds;
-	List<CtxIdentifier> mockTempIds;
+	//List<CtxIdentifier> mockStatusIds;
+	//List<CtxIdentifier> mockTempIds;
+	List<CtxIdentifier> mockTodIds;
+	List<CtxIdentifier> mockHodIds;
+	List<CtxIdentifier> mockDowIds;
 	List<CtxIdentifier> mockSnpshtRegistryIds;
 
 	//futures
 	Future<List<CtxIdentifier>> mockSymLocIdFuture;
-	Future<List<CtxIdentifier>> mockStatusIdFuture;
-	Future<List<CtxIdentifier>> mockTempIdFuture;
+	//Future<List<CtxIdentifier>> mockStatusIdFuture;
+	//Future<List<CtxIdentifier>> mockTempIdFuture;
+	Future<List<CtxIdentifier>> mockTodIdFuture;
+	Future<List<CtxIdentifier>> mockHodIdFuture;
+	Future<List<CtxIdentifier>> mockDowIdFuture;
+	
 	Future<List<CtxIdentifier>> mockSnpshtRegistryIdFuture;
 	Future<CtxModelObject> mockSnpshtRegistryObjectFuture;
 
@@ -102,8 +115,13 @@ public class TestUserActionMonitor extends TestCase{
 		mockPersonId = new CtxEntityIdentifier(stringId, "PERSON", new Long(12345));
 		mockEntityId = new CtxEntityIdentifier(stringId, "testEntity", new Long(12345));
 		mockSymLocId = new CtxAttributeIdentifier(mockEntityId, "symLoc", new Long(12345));
-		mockStatusId = new CtxAttributeIdentifier(mockEntityId, "status", new Long(12345));
-		mockTempId = new CtxAttributeIdentifier(mockEntityId, "temperature", new Long(12345));
+		//mockStatusId = new CtxAttributeIdentifier(mockEntityId, "status", new Long(12345));
+		//mockTempId = new CtxAttributeIdentifier(mockEntityId, "temperature", new Long(12345));
+		
+		mockTodId = new CtxAttributeIdentifier(mockEntityId, CtxAttributeTypes.TIME_OF_DAY, new Long(12345));
+		mockHodId = new CtxAttributeIdentifier(mockEntityId, CtxAttributeTypes.HOUR_OF_DAY, new Long(12345));
+		mockDowId = new CtxAttributeIdentifier(mockEntityId, CtxAttributeTypes.DAY_OF_WEEK, new Long(12345));
+		
 		mockSnpshtRegistryId = new CtxAttributeIdentifier(mockEntityId, "snpshtRegistry", new Long(12345));
 		mockSnpshtRegistryObject = new CtxAttribute((CtxAttributeIdentifier)mockSnpshtRegistryId);
 
@@ -112,8 +130,13 @@ public class TestUserActionMonitor extends TestCase{
 		 */
 		mockPersonIds = new ArrayList<CtxIdentifier>();
 		mockSymLocIds = new ArrayList<CtxIdentifier>();
-		mockStatusIds = new ArrayList<CtxIdentifier>();
-		mockTempIds = new ArrayList<CtxIdentifier>();
+		//mockStatusIds = new ArrayList<CtxIdentifier>();
+		//mockTempIds = new ArrayList<CtxIdentifier>();
+		
+		mockTodIds = new ArrayList<CtxIdentifier>();
+		mockHodIds = new ArrayList<CtxIdentifier>();
+		mockDowIds = new ArrayList<CtxIdentifier>();
+		
 		mockSnpshtRegistryIds = new ArrayList<CtxIdentifier>();
 
 		/*
@@ -128,24 +151,34 @@ public class TestUserActionMonitor extends TestCase{
 				}, mockSymLocIds);
 		this.executeFuture((FutureTask<List<CtxIdentifier>>)mockSymLocIdFuture);
 
-		//mock status
-		mockStatusIdFuture = new FutureTask<List<CtxIdentifier>>(
+		//mock time of day
+		mockTodIdFuture = new FutureTask<List<CtxIdentifier>>(
 				new Runnable(){
 					public void run(){
-						mockStatusIds.add(mockStatusId);
+						mockTodIds.add(mockTodId);
 					}
-				}, mockStatusIds);
-		this.executeFuture((FutureTask<List<CtxIdentifier>>)mockStatusIdFuture);
+				}, mockTodIds);
+		this.executeFuture((FutureTask<List<CtxIdentifier>>)mockTodIdFuture);
 
-		//mock temperature
-		mockTempIdFuture = new FutureTask<List<CtxIdentifier>>(
+		//mock hour of day
+		mockHodIdFuture = new FutureTask<List<CtxIdentifier>>(
 				new Runnable(){
 					public void run(){
-						mockTempIds.add(mockTempId);
+						mockHodIds.add(mockHodId);
 					}
-				}, mockTempIds);
-		this.executeFuture((FutureTask<List<CtxIdentifier>>)mockTempIdFuture);
+				}, mockHodIds);
+		this.executeFuture((FutureTask<List<CtxIdentifier>>)mockHodIdFuture);
 
+		//mock day of week
+		mockDowIdFuture = new FutureTask<List<CtxIdentifier>>(
+				new Runnable(){
+					public void run(){
+						mockDowIds.add(mockDowId);
+					}
+				}, mockDowIds);
+		this.executeFuture((FutureTask<List<CtxIdentifier>>)mockDowIdFuture);
+		
+		
 		//mock snpshtRegistry
 		mockSnpshtRegistryIdFuture = new FutureTask<List<CtxIdentifier>>(
 				new Runnable(){
@@ -179,18 +212,31 @@ public class TestUserActionMonitor extends TestCase{
 		mockPersonId = null;
 		mockEntityId = null;
 		mockSymLocId = null;
-		mockStatusId = null;
-		mockTempId = null;
+		//mockStatusId = null;
+		//mockTempId = null;
+		mockDowId = null;
+		mockTodId = null;
+		mockHodId = null;
+		
 		mockSnpshtRegistryId = null;
 		mockSnpshtRegistryObject = null;
 		mockPersonIds = null;
 		mockSymLocIds = null;
-		mockStatusIds = null;
-		mockTempIds = null;
+		//mockStatusIds = null;
+		//mockTempIds = null;
+		mockDowIds = null;
+		mockTodIds = null;
+		mockHodIds = null;
+		
+		
 		mockSnpshtRegistryIds = null;
 		mockSymLocIdFuture = null;
-		mockStatusIdFuture = null;
-		mockTempIdFuture = null;
+		//mockStatusIdFuture = null;
+		//mockTempIdFuture = null;
+		mockDowIdFuture = null;
+		mockTodIdFuture = null;
+		mockHodIdFuture = null;
+		
 		mockSnpshtRegistryIdFuture = null;
 		mockSnpshtRegistryObjectFuture = null;
 	}
@@ -206,8 +252,12 @@ public class TestUserActionMonitor extends TestCase{
 		 */
 		try {
 			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC)).thenReturn(mockSymLocIdFuture);
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS)).thenReturn(mockStatusIdFuture);
-			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE)).thenReturn(mockTempIdFuture);
+			//when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS)).thenReturn(mockStatusIdFuture);
+			//when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE)).thenReturn(mockTempIdFuture);
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.HOUR_OF_DAY)).thenReturn(mockHodIdFuture);
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TIME_OF_DAY)).thenReturn(mockTodIdFuture);
+			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.DAY_OF_WEEK)).thenReturn(mockDowIdFuture);
+			
 			when(mockCtxBroker.lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.SNAPSHOT_REG)).thenReturn(mockSnpshtRegistryIdFuture);
 			when(mockCtxBroker.retrieve(mockSnpshtRegistryId)).thenReturn(mockSnpshtRegistryObjectFuture);
 		} catch (CtxException e) {
@@ -218,8 +268,12 @@ public class TestUserActionMonitor extends TestCase{
 		snpshtMgr = new SnapshotManager(mockCtxBroker, mockCssID);  //default snapshot created and registry retrieved
 		try {
 			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.LOCATION_SYMBOLIC);
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
-			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE);
+			//verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.STATUS);
+			//verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TEMPERATURE);
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.HOUR_OF_DAY);
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.TIME_OF_DAY);
+			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.DAY_OF_WEEK);
+			
 			verify(mockCtxBroker).lookup(CtxModelType.ATTRIBUTE, CtxAttributeTypes.SNAPSHOT_REG);
 			verify(mockCtxBroker).retrieve(mockSnpshtRegistryId);
 		} catch (CtxException e) {
@@ -231,36 +285,45 @@ public class TestUserActionMonitor extends TestCase{
 		CtxAttributeIdentifier volumePrimary = new CtxAttributeIdentifier(mockEntityId, "volume", new Long(12345)); //serviceId-param attribute
 		List<CtxAttributeIdentifier> retrievedSnpsht = snpshtMgr.getSnapshot(volumePrimary).getIDList();
 		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
-		Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
-		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTodId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockHodId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockDowId));
+		
+		//Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
+		//Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
 
 		//try to retrieve second new snapshot
 		CtxAttributeIdentifier colourPrimary = new CtxAttributeIdentifier(mockEntityId, "colour", new Long(12345)); //serviceId-param attribute
 		retrievedSnpsht = snpshtMgr.getSnapshot(colourPrimary).getIDList();
 		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
-		Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
-		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTodId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockHodId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockDowId));
+		//Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
+		//Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
 		
-
 		//try update existing snapshot
 		CtxIdentifier mockActivityId = new CtxAttributeIdentifier(mockEntityId, "activity", new Long(12345));  //additional context attribute
 		Snapshot newSnapshot = new Snapshot();
 		newSnapshot.setTypeID(CtxAttributeTypes.LOCATION_SYMBOLIC, (CtxAttributeIdentifier)mockSymLocId);
-		newSnapshot.setTypeID(CtxAttributeTypes.TEMPERATURE, (CtxAttributeIdentifier)mockTempId);
+		//newSnapshot.setTypeID(CtxAttributeTypes.TEMPERATURE, (CtxAttributeIdentifier)mockTempId);
+		newSnapshot.setTypeID(CtxAttributeTypes.TIME_OF_DAY, (CtxAttributeIdentifier)mockTodId);
+		
 		newSnapshot.setTypeID("activity", (CtxAttributeIdentifier)mockActivityId);
 		snpshtMgr.updateSnapshot(volumePrimary, newSnapshot);
 
 		//try to retrieve updated existing snapshot
 		retrievedSnpsht = snpshtMgr.getSnapshot(volumePrimary).getIDList();
 		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
-		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTodId));
 		Assert.assertTrue(retrievedSnpsht.contains(mockActivityId));
 
 		//check non-updated existing snapshot
 		retrievedSnpsht = snpshtMgr.getSnapshot(colourPrimary).getIDList();
 		Assert.assertTrue(retrievedSnpsht.contains(mockSymLocId));
-		Assert.assertTrue(retrievedSnpsht.contains(mockStatusId));
-		Assert.assertTrue(retrievedSnpsht.contains(mockTempId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockTodId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockHodId));
+		Assert.assertTrue(retrievedSnpsht.contains(mockDowId));
 	}
 
 	private void executeFuture(FutureTask task){
