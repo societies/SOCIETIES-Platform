@@ -5,14 +5,38 @@
     android:orientation="vertical"
     >
 <Button android:text="@string/installIdentity" android:id="@+id/buttonMainInstallIdentity" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
-<Button android:text="@string/testSigning" android:id="@+id/buttonMainSign" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
-<Button android:text="@string/testXmlSigning" android:id="@+id/buttonMainXmlSign" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
+<Button android:text="@string/viewCommunitySigStatus" android:id="@+id/buttonMainCommunitySigStatus" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
+
+<CheckBox
+    android:id="@+id/checkBoxMainShowTestingOptions"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:checked="false"
+    android:text="@string/showTestingOptions" />
+
+<Button
+    android:id="@+id/buttonMainSign"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/testSigning"
+    android:visibility="invisible" >
+</Button>
+
+<Button
+    android:id="@+id/buttonMainXmlSign"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="@string/testXmlSigning"
+    android:visibility="invisible" >
+</Button>
 
 <TextView
     android:id="@+id/textViewMainSignUrl"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:text="@string/testDefaultUrlLabel" />
+    android:text="@string/testDefaultUrlLabel"
+    android:visibility="invisible" />
+
 <EditText
     android:id="@+id/editTextMainSignUrl"
     android:layout_width="match_parent"
@@ -20,11 +44,27 @@
     android:ems="10"
     android:inputType="textUri"
     android:text="@string/testDefaultUrlValue"
+    android:visibility="invisible"
     >
     <requestFocus />
 </EditText>
 
-<Button android:text="@string/testXmlSigningUrl" android:id="@+id/buttonMainXmlSignUrl" android:layout_height="wrap_content" android:layout_width="match_parent"></Button>
-<Button android:text="@string/testVerification" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/buttonMainVerify"></Button>
+<Button
+    android:text="@string/testXmlSigningUrl"
+    android:id="@+id/buttonMainXmlSignUrl"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:visibility="invisible"
+    >    
+</Button>
+
+<Button
+    android:text="@string/testVerification"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/buttonMainVerify"
+    android:visibility="invisible"
+    >
+</Button>
 
 </LinearLayout>

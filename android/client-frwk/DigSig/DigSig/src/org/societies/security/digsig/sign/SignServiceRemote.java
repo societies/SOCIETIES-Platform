@@ -30,8 +30,10 @@ import java.net.URLEncoder;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
+import java.util.Map;
 
 import org.societies.security.digsig.api.Verify;
+import org.societies.security.digsig.apiinternal.Community;
 import org.societies.security.digsig.apiinternal.RestServer;
 import org.societies.security.digsig.trust.SecureStorage;
 import org.societies.security.digsig.utility.KeyUtil;
@@ -40,6 +42,7 @@ import org.societies.security.digsig.utility.StringUtil;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -161,12 +164,30 @@ public class SignServiceRemote extends Service {
 			bundle.putString(Verify.Params.UPLOAD_URI, uploadUri);
 			bundle.putString(Verify.Params.DOWNLOAD_URI, downloadUri);
 			bundle.putBoolean(Verify.Params.SUCCESS, true);
+			store(resourceName, downloadUri);
 			return bundle;
 		} catch (Exception e) {
 			Log.w(TAG, "generateUris: error", e);
 			bundle.putBoolean(Verify.Params.SUCCESS, false);
 			return bundle;
 		}
+	}
+	
+	private void store(String key, String value) {
+		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString(key, value);
+		editor.commit();
+		Log.d(TAG, "Stored key value pair: " + key + " = " + value);
+	}
+
+	private Map<String, String> restore() {
+		
+		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
+		
+		Map<String, String> all = (Map<String, String>) preferences.getAll();
+		Log.d(TAG, "Restored " + all.size() + " URIs");
+		return all;
 	}
 
 	/**

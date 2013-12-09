@@ -36,6 +36,7 @@ public class PassEntryActivity extends Activity {
 		btnCancel.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				setResult(RESULT_CANCELED);				
+				finish();
 			}
 		});
 	}

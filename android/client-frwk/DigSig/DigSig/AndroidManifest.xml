@@ -1,62 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.societies.security.digsig.sign"
-      android:versionCode="1"
-      android:versionName="1.0">
+    package="org.societies.security.digsig.sign"
+    android:versionCode="1"
+    android:versionName="1.0" >
 
-    <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="18" />
+    <uses-sdk
+        android:minSdkVersion="11"
+        android:targetSdkVersion="18" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" /> 
-    
-    <application android:icon="@drawable/icon" android:label="@string/app_name" android:allowBackup="true" >
-        <activity android:name="MainActivity"
-                  android:label="@string/app_name">
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/icon"
+        android:label="@string/app_name" >
+        <activity
+            android:name="org.societies.security.digsig.sign.MainActivity"
+            android:label="@string/app_name" >
             <intent-filter>
-            	<category android:name="android.intent.category.LAUNCHER"></category>
-                <action android:name="android.intent.action.MAIN"></action>
+                <category android:name="android.intent.category.LAUNCHER" >
+                </category>
+
+                <action android:name="android.intent.action.MAIN" >
+                </action>
             </intent-filter>
         </activity>
-        <activity android:name="ListFilesActivity" android:label="@string/listFilesActivityName">
+        <activity
+            android:name="org.societies.security.digsig.sign.ListFilesActivity"
+            android:label="@string/listFilesActivityName" >
         </activity>
-        
-        <activity android:name="ListIdentitiesActivity" android:label="@string/listIdentitiesActivityName">
+        <activity
+            android:name="org.societies.security.digsig.sign.ListIdentitiesActivity"
+            android:label="@string/listIdentitiesActivityName" >
         </activity>
-        
-        <activity android:name="PassEntryActivity"></activity>
-		
-		<activity android:name="SignActivity">
-		    <intent-filter>
-		    	<category android:name="android.intent.category.DEFAULT"></category>                
-		    	<action android:name="org.societies.security.digsig.action.Sign"></action>
-            </intent-filter>     
-		</activity>
-		
-		<activity android:name="VerifyActivity">
-		    <intent-filter>
-		    	<category android:name="android.intent.category.DEFAULT"></category>                
-		    	<action android:name="org.societies.security.digsig.action.Verify"></action>
-            </intent-filter>     
-		</activity>
-		
-		<activity android:name="InstallIdentityActivity">
-			<intent-filter>                
-				<category android:name="android.intent.category.DEFAULT"></category>
-		    	<action android:name="org.societies.security.digsig.action.InstallIdentity"></action>
+        <activity android:name="org.societies.security.digsig.sign.PassEntryActivity" >
+        </activity>
+        <activity android:name="org.societies.security.digsig.sign.SignActivity" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+
+                <action android:name="org.societies.security.digsig.action.Sign" >
+                </action>
             </intent-filter>
-		</activity>
-		<service android:name=".SignService" android:exported="false"/>
-		<service android:name=".SignServiceRemote" android:exported="true">
-			<intent-filter>                
-		    	<action android:name="org.societies.security.digsig.action.SignServiceRemote"></action>
+        </activity>
+        <activity android:name="org.societies.security.digsig.sign.VerifyActivity" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+
+                <action android:name="org.societies.security.digsig.action.Verify" >
+                </action>
             </intent-filter>
-		</service>
-		<provider android:name="org.societies.security.digsig.sign.contentprovider.DocContentProvider"
-        		  android:authorities="org.societies.security.digsig.provider"
-        		  android:exported="true"
-        		  >
-<!--
-        		  android:permission="org.societies.security.digsig.provider.permission.SIGN"
--->
-		</provider>
-		</application>
+        </activity>
+        <activity android:name="org.societies.security.digsig.sign.InstallIdentityActivity" >
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" >
+                </category>
+
+                <action android:name="org.societies.security.digsig.action.InstallIdentity" >
+                </action>
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="org.societies.security.digsig.sign.SignService"
+            android:exported="false" />
+        <service
+            android:name="org.societies.security.digsig.sign.SignServiceRemote"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="org.societies.security.digsig.action.SignServiceRemote" >
+                </action>
+            </intent-filter>
+        </service>
+
+        <provider
+            android:name="org.societies.security.digsig.sign.contentprovider.DocContentProvider"
+            android:authorities="org.societies.security.digsig.provider"
+            android:exported="true" >
+
+<!--         		  android:permission="org.societies.security.digsig.provider.permission.SIGN" -->
+        </provider>
+
+        <activity
+            android:name="org.societies.security.digsig.community.CommunitySigStatusActivity"
+            android:label="@string/title_activity_community_sig_status" >
+        </activity>
+    </application>
+
 </manifest>
