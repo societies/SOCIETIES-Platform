@@ -177,9 +177,8 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		
 		mBusyDialog = new ProgressDialog(getActionBarThemedContextCompat());
 		mBusyDialog.setMessage(getText(R.string.fetchingStatus));
-		mBusyDialog.setCancelable(false);
 		mBusyDialog.show();
-
+		
 		new GetSigStatusTask(this).execute(downloadUris.get(position));
 		return true;
 	}
