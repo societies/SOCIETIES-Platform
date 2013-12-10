@@ -10,13 +10,6 @@
     tools:context=".CommunitySigStatusActivity$DummySectionFragment" >
 
     <CheckBox
-        android:id="@+id/communitySigStatusSigningStartedCheckBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="@string/collaborativeSigningStarted" />
-
-    <CheckBox
         android:id="@+id/communitySigStatusThresholdReachedCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

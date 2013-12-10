@@ -25,6 +25,7 @@
 package org.societies.security.digsig.utility;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -60,53 +61,50 @@ public class Net {
 		this.uri = uri;
 	}
 	
-	public boolean get(OutputStream os) {
+	public void get(OutputStream os) throws FileNotFoundException, IOException {
 		
 		Log.d(TAG, "download()");
 		
 		long startTime = System.currentTimeMillis();
 		
-		try {
-			uri.toURL().openConnection();
-			InputStream reader = uri.toURL().openStream();
-			byte[] buffer = new byte[153600];
-			int totalBytesRead = 0;
-			int bytesRead = 0;
+		uri.toURL().openConnection();
+		InputStream reader = uri.toURL().openStream();
+		byte[] buffer = new byte[153600];
+		int totalBytesRead = 0;
+		int bytesRead = 0;
 
-			if (os != null) {
-				while ((bytesRead = reader.read(buffer)) > 0)
-				{  
-					os.write(buffer, 0, bytesRead);
-					buffer = new byte[153600];
-					totalBytesRead += bytesRead;
-				}
+		if (os != null) {
+			while ((bytesRead = reader.read(buffer)) > 0)
+			{  
+				os.write(buffer, 0, bytesRead);
+				buffer = new byte[153600];
+				totalBytesRead += bytesRead;
 			}
-
-			long endTime = System.currentTimeMillis();
-
-			Log.i(TAG, "File " + uri + " downloaded. " + String.valueOf(totalBytesRead) +
-					" bytes read (" + String.valueOf(endTime - startTime) + " ms).");
-			reader.close();
-		} catch (IOException e) {
-			Log.w(TAG, "download(): " + uri, e);
-			return false;
 		}
-		return true;
+
+		long endTime = System.currentTimeMillis();
+
+		Log.i(TAG, "File " + uri + " downloaded. " + String.valueOf(totalBytesRead) +
+				" bytes read (" + String.valueOf(endTime - startTime) + " ms).");
+		reader.close();
 	}
 	
 	/**
 	 * Perform HTTP GET without downloading the resource
-	 * @return true for success, false for error
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public boolean get() {
-		return get((OutputStream) null);
+	public void get() throws FileNotFoundException, IOException {
+		get((OutputStream) null);
 	}
 	
 	/**
 	 * Perform HTTP GET
 	 * @return the downloaded resource
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public byte[] getByteArray() {
+	public byte[] getByteArray() throws FileNotFoundException, IOException {
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
@@ -117,8 +115,10 @@ public class Net {
 	/**
 	 * Perform HTTP GET
 	 * @return the downloaded resource
+	 * @throws IOException 
+	 * @throws FileNotFoundException 
 	 */
-	public String getString() {
+	public String getString() throws FileNotFoundException, IOException {
 		byte[] ba = getByteArray();
 		try {
 			String s = new String(ba, "UTF-8");

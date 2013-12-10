@@ -3,6 +3,8 @@ package org.societies.security.digsig.sign;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -200,7 +202,7 @@ public class SignService extends IntentService {
 		}
 	}
 
-	private void download(URI uri, OutputStream os) {
+	private void download(URI uri, OutputStream os) throws FileNotFoundException, IOException {
 		
 		Log.d(TAG, "download(" + uri + ")");
 		

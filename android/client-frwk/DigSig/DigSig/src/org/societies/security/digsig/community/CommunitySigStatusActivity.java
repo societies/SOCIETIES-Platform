@@ -71,8 +71,10 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 
 		clearDownloadUris();
 //		store("title-1", "http://192.168.1.92:8080/rest/xmldocs/foo.xml?sig=5F068B13A9184C4773809426EAB845A99A2258724887CA67475B263283E92B7D680B39865B1622F066FB03283772AB6C69347D1400D8F8CEE5CCC4F5DE80FD5F3B8C3272B5B7DC08EBB3BC45D11F66590DA25742193BCEF20619DCF0D8B33812424153BCFDBCDE081B48867F90BB544F593EEA9BA825C425A4A6D2650E0A17C6&operation=status");
- 		store("title-2", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
-		store("title-3", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
+ 		store("completed", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
+		store("in progress", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
+ 		store("not started yet", "http://192.168.1.92/tmp/societies/non-existing.json?sig=foo");
+ 		store("network error", "http://192.168.1.312/invalid-ip-address.json?sig=foo");
 		
 		restore();
 		Log.d(TAG, documentTitles.size() + " existing documents found");
@@ -183,7 +185,14 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		return true;
 	}
 	
-	protected void updateSigStatus(int numSigners, int minNumSigners, ArrayList<String> signers) {
+	/**
+	 * 
+	 * @param numSigners Value extracted from downloaded document, or negative value for error
+	 * @param minNumSigners Value extracted from downloaded document, or negative value for error
+	 * @param signers List of signers extracted from downloaded document, or null for error
+	 * @param errorMsg Localized error to be displayed to the user, or null for no error
+	 */
+	protected void updateSigStatus(int numSigners, int minNumSigners, ArrayList<String> signers, String errorMsg) {
 		
 		Log.d(TAG, "updateSigStatus: numSigners = " + numSigners);
 		Log.d(TAG, "updateSigStatus: minNumSigners = " + minNumSigners);
@@ -194,6 +203,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		args.putInt(DummySectionFragment.ARG_NUM_SIGNERS, numSigners);
 		args.putInt(DummySectionFragment.ARG_MIN_NUM_SIGNERS, minNumSigners);
 		args.putStringArrayList(DummySectionFragment.ARG_SIGNERS, signers);
+		args.putString(DummySectionFragment.ARG_ERROR_MSG, errorMsg);
 		fragment.setArguments(args);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.container, fragment).commit();
@@ -208,29 +218,44 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		public static final String ARG_SIGNERS = "SIGNERS";
 		public static final String ARG_NUM_SIGNERS = "NUM_SIGNERS";
 		public static final String ARG_MIN_NUM_SIGNERS = "MIN_NUM_SIGNERS";
+		public static final String ARG_ERROR_MSG = "ERROR_MSG";
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			
-			View rootView = inflater.inflate(
-					R.layout.fragment_community_sig_status_dummy, container,
-					false);
-			
+			int resource;
+			View rootView;
+			TextView textView;
+			CheckBox checkBox;
+			String str;
+		
+			// Arguments
 			int numSigners = getArguments().getInt(ARG_NUM_SIGNERS, -1);
 			int minNumSigners = getArguments().getInt(ARG_MIN_NUM_SIGNERS, -1);
 			ArrayList<String> signers = getArguments().getStringArrayList(ARG_SIGNERS);
+			String errorMsg = getArguments().getString(ARG_ERROR_MSG);
 			
 			Log.d(TAG, "onCreateView: numSigners = " + numSigners);
 			Log.d(TAG, "onCreateView: minNumSigners = " + minNumSigners);
 			Log.d(TAG, "onCreateView: signers = " + signers);
+			Log.d(TAG, "onCreateView: localized error = " + errorMsg);
 
-			TextView textView;
-			CheckBox checkBox;
-			String str;
-
-			checkBox = (CheckBox) rootView.findViewById(R.id.communitySigStatusSigningStartedCheckBox);
-			checkBox.setChecked(true);
+			mBusyDialog.cancel();
 			
+			if (errorMsg != null) {
+				
+				resource = R.layout.fragment_community_sig_status_nonexisting;
+				rootView = inflater.inflate(resource, container, false);
+				
+				textView = (TextView) rootView.findViewById(R.id.communitySigStatusError);
+				textView.setText(errorMsg);
+				
+				return rootView;
+			}
+			
+			resource = R.layout.fragment_community_sig_status_existing;
+			rootView = inflater.inflate(resource, container, false);
+
 			checkBox = (CheckBox) rootView.findViewById(R.id.communitySigStatusThresholdReachedCheckBox);
 			checkBox.setChecked(numSigners >= minNumSigners);
 			
@@ -253,8 +278,6 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 				signersStr += s + System.getProperty("line.separator");
 			}
 			textView.setText(signersStr);
-			
-			mBusyDialog.cancel();
 			
 			return rootView;
 		}

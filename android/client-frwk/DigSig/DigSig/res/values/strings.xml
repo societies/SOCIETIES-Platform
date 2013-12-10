@@ -19,7 +19,7 @@
     <string name="unknownApp">Unknown app</string>
     <string name="title_activity_community_sig_status">CommunitySigStatusActivity</string>
     <string name="action_settings">Settings</string>
-    <string name="collaborativeSigningStarted">Collaborative signing started</string>
+    <string name="collaborativeSigningNotStartedYet">Collaborative signing not started yet.</string>
     <string name="signatureThresholdReached">Signature threshold reached</string>
     <string name="signedBy">Signed by</string>
     <string name="parties">parties</string>
@@ -27,5 +27,6 @@
     <string name="required">Required:</string>
     <string name="currentSigners">Current signers:</string>
     <string name="fetchingStatus">Fetching status</string>
+    <string name="errorOccurred">An error occurred</string>
     
 </resources>
