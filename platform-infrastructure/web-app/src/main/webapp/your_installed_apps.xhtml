@@ -7,7 +7,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIETIES</title>
+        <title>Apps - SOCIETIES</title>
     </ui:define>
 
     <ui:define name="body">
@@ -138,48 +138,55 @@
                 <header>
                     <h3>Community Apps</h3>
                 </header>
-			<p:selectOneMenu id="nodeMenu" value="#{servicesController.selectedNode}" effect="fade" styleClass="select grid_3">
-            	<f:selectItem itemLabel="My Installed Apps" itemValue="mynode" />
-            	<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisId}"/>
-            	<p:ajax update=":mainForm:services_list,:mainForm:title_header,:mainForm:serMessages"
-            	 listener="#{servicesController.selectNode}" process="@this"/>
-        		</p:selectOneMenu>
+                <div class="hr dotted clearfix"> </div>
+                <ul class="sidebar">
+				<li>
+					<p:selectOneMenu id="nodeMenu" value="#{servicesController.selectedNode}" effect="fade" styleClass="select">
+		            	<f:selectItem itemLabel="My Installed Apps" itemValue="mynode" />
+		            	<f:selectItems value="#{servicesController.nodeList}" var="node" itemLabel="#{node.name}" itemValue="#{node.cisId}"/>
+		            	<p:ajax update=":mainForm:services_list,:mainForm:title_header,:mainForm:serMessages"
+		            	 listener="#{servicesController.selectNode}" process="@this"/>
+	        		</p:selectOneMenu>
+        		</li>
+        		</ul>
             </section>
-            <p></p>
             <section>
                 <header>
                     <h3>App Search</h3>
                 </header>
-                <p:inputText id="searchBox" value="#{servicesController.searchBy}" styleClass="websearch-input grid_3" style="text-align: right"/>
-                <p>
-       			<h:outputLabel for="searchMenu" value="Search by: " />  
-        		<p:selectOneMenu id="searchMenu" value="#{servicesController.searchOption}" effect="fade" styleClass="grid_2">  
-           			 <f:selectItems value="#{servicesController.searchOptions}" var="option" itemLabel="#{option}" itemValue="#{option}"/>  
-       			 </p:selectOneMenu>  
-       			 </p>
-       			 <p:commandButton value="Search"
-       			 onclick="blockUI.show()" oncomplete="blockUI.hide()" icon="ui-icon-search"
-       			 update=":mainForm:services_list,:mainForm:title_header,:mainForm:serMessages"
-       			 styleClass="grid_3"
-       			 action="#{servicesController.searchService}" process="@this,searchMenu,searchBox"/> 
+                <div class="hr dotted clearfix"> </div>
+                <ul class="sidebar">
+					<li><p:inputText id="searchBox" value="#{servicesController.searchBy}" styleClass="websearch-input" /></li>
+	       			<li>
+	       				<h:outputLabel for="searchMenu" value="Search by: " />
+		        		<p:selectOneMenu id="searchMenu" value="#{servicesController.searchOption}" effect="fade">  
+	           				<f:selectItems value="#{servicesController.searchOptions}" var="option" itemLabel="#{option}" itemValue="#{option}"/>  
+	       			 	</p:selectOneMenu>  
+	       			 </li>
+	       			 <li>
+	       			 	<p:commandButton value="Search"
+			       			 onclick="blockUI.show()" oncomplete="blockUI.hide()" icon="ui-icon-search"
+			       			 update=":mainForm:services_list,:mainForm:title_header,:mainForm:serMessages"
+			       			 styleClass="grid_3"
+			       			 action="#{servicesController.searchService}" process="@this,searchMenu,searchBox"/>
+	       			 </li>
+       			 </ul>
             </section>
-            <p></p>
             <section>
                 <header>
                     <h3>Install App</h3>
                 </header>
-                <div class="hr dotted clearfix"></div>
-                    <p:fileUpload fileUploadListener="#{servicesController.handleFileUpload}"
+                <div class="hr dotted clearfix"> </div>
+                <p:fileUpload fileUploadListener="#{servicesController.handleFileUpload}"
                     mode="advanced" dragDropSupport="true"  
                     allowTypes="/(\.|\/)(jar|war)$/"
                     onstart="blockUI.show()" oncomplete="blockUI.hide()"
                     update=":mainForm:services_list,:mainForm:serMessages" process="@this"/>  
             </section>
-            <div class="hr dotted clearfix"></div>
-            <div class="sidebar_bottom_BG"></div>
+            <div class="hr dotted clearfix"> </div>
+			<div class="sidebar_bottom_BG"></div>
 		</aside>
-		
-        <div class="hr grid_12 clearfix"></div>
+		<div class="hr grid_12 clearfix"> </div>
 	
     </ui:define>
 </ui:composition>

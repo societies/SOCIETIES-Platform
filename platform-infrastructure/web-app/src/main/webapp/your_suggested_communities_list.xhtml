@@ -8,7 +8,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES</title>
+        <title>Suggested Communities - SOCIETIES</title>
     </ui:define>
 
     <ui:define name="body">
@@ -17,15 +17,17 @@
         <div class="hr grid_12 clearfix"></div>
         <section class="grid_12">
             <section>
-                <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+                <div class="breadcrumbs"><a href="index.xhtml">Home</a> / <a href="your_suggested_communities_list.xhtml">Suggested Communities</a></div>
             </section>
             <div class="websearchbar">
                 <div class="websearchtitle">
                     <h4 class="form_title">Suggested Communities</h4>
-                    <p:commandButton value="Refresh" action="#{cismanager.getsuggestedcommunities}"></p:commandButton>
-                    <br/> <br/>
-                    
                 </div>
+                <div class="groupsearch">
+					<div class="websearch-form frame nobtn rsmall">
+						<p:commandButton value="Refresh" action="#{cismanager.getsuggestedcommunities}" styleClass="websearch-btn"></p:commandButton>
+					</div>
+				</div>
             </div>
         </section>
        <!-- Left Column -->
@@ -34,28 +36,27 @@
                 <div class="hr clearfix"></div>
             </section>
             <section class="itemlist">
-                <header>SOCIETIES Suggested Communities</header>
                 <ol class="keyinfolist">
+                <p:outputPanel id="panel">
                 <c:forEach items="#{cismanager.suggestedcommunities}" var="sugcommunity">
-    				    <li class="keyinfo bypostauthor">
-                        <figure class="gravatar">
-                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
-                                                                height="58" width="58"/></a>
-                        </figure>
-                        <div class="keyinfo_content">
-                            <div class="clearfix">
-                                <br/>
-                                <H6>Name:     #{sugcommunity.getCisname()}</H6> 								
-
-                            </div>
-                            <div class="keyinfo_text">
-                            </div>
-                        </div>
-                		<p:commandButton value="Join Community" action="#{cismanager.joincis(sugcommunity)}"/>
-                		<!-- <p:commandButton value="Get Members" action="#{cismanager.getsuggestedlistmembers(sugcommunity)}"/> -->
-                		</li>
-                		</c:forEach>
-                    
+   				    <li class="keyinfo bypostauthor">
+                       <figure class="gravatar">
+                           	<a class="friend_profile.xhtml"><img alt="Community Icon" src="images/launcher_societies.png" height="58" width="58"/></a>
+                           	<p:commandButton value="Join Community" update="panel" action="#{cismanager.joincis(sugcommunity)}" styleClass="keyinfo-reply-link" />
+               				<!-- <p:commandButton value="Get Members" update="panel" action="#{cismanager.getsuggestedlistmembers(sugcommunity)}" styleClass="keyinfo-reply-link" /> -->
+                       </figure>
+                       <div class="keyinfo_content">
+                           <div class="clearfix">
+                               	<time datetime="2013-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Identity: #{sugcommunity.getCisid()}</time>
+								<br/>
+                               	<cite class="author_name"><a href="your_suggested_communities_list.xhtml">#{sugcommunity.getCisname()}</a></cite>
+                           </div>
+                           <div class="keyinfo_text">
+                           </div>
+                       </div>
+               		</li>
+             	</c:forEach>
+                </p:outputPanel>    
                 </ol>
                 <div class="hr clearfix"></div>
             </section>
@@ -67,12 +68,11 @@
             <div class="hr dotted clearfix"></div>
             <section>
                 <header>
-                    <h3>Your Communities...</h3>
+                    <h3>Your Communities</h3>
                 </header>
-       	 		<br/> <br/>
-                <ul>
+                <ul class="sidebar">
                 	<ui:repeat value="#{cismanager.communities}" var="community">
-                		<li> #{community.getCisname()}</li>
+                		<li><a href="your_communities_list.xhtml">#{community.getCisname()}</a></li>
                 	</ui:repeat>
                 </ul>
             </section>
@@ -81,7 +81,6 @@
                     <h3>CIS Activity</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
-       	 		<br/> <br/>
        	 		<ul>
                 	<c:forEach items="#{cismanager.activities}" var="MarshaledActivity">
                 		<li> #{MarshaledActivity.getVerb()}</li>

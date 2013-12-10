@@ -7,7 +7,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES</title>
+        <title>Your Friends - SOCIETIES</title>
     </ui:define>
 
     <ui:define name="body">
@@ -15,43 +15,34 @@
         <div class="hr grid_12 clearfix"></div>
         <section class="grid_12">
             <section>
-                <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+                <div class="breadcrumbs"><a href="index.xhtml">Home</a> / <a href="your_societies_friends_list.xhtml">Your Friends</a></div>
             </section>
             <div class="websearchbar">
                 <div class="websearchtitle">
-                    <h4 class="form_title">Friends</h4>
+                    <h4 class="form_title">Your Friends</h4>
                 </div>
                 <div class="groupsearch">
-                    <form action="" class="websearch-form frame nobtn rsmall">
-                       <!--  <input type="text" name="search" class="websearch-input" placeholder="Search for Friends..."/>  -->
-                        <h:inputText id="findfriend" value="#{suggestedfriends.findfriend}"></h:inputText>
-                        <p:commandButton value="Search for Friend" action="#{suggestedfriends.search(suggestedfriends.findfriend)}"></p:commandButton>
-    					
-                    </form>
+					<div class="websearch-form frame nobtn rsmall">
+                		<h:inputText id="findfriend" value="#{suggestedfriends.findfriend}" styleClass="websearch-small-input" placeholder="E.g. Emma"></h:inputText>
+            			<p:commandButton value="Search" action="#{suggestedfriends.search(suggestedfriends.findfriend)}" styleClass="websearch-small-btn" update="searchResult"></p:commandButton>
+            		</div>
                 </div>
             </div>
         </section>
         <!-- Left Column -->
         <article id="left_col" class="grid_8">
             <section class="itemlist">
-            	<form action="" method="" id="form1">
-                <header>
-                </header>
                 <ol class="keyinfolist">
                 	<ui:repeat value="#{suggestedfriends.friends}" var="friend">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
-                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
-                                                                height="58" width="58"/></a>
+                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png" height="58" width="58"/></a>
                         </figure>
                         <div class="keyinfo_content">
                             <div class="clearfix">
-                                <time datetime="2012-09-30T00:01Z"
-                                      class="keyinfo-meta keyinfometadata">Location, Sep 30, 2012 at 0:01 am
-                                </time>
-                                <br/>
-                                <H6>Name:     #{friend.getName()}</H6> 								
-                                <H6>Identity: #{friend.getId()}</H6>
+                            	<time datetime="2013-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Identity: #{friend.getId()}</time>
+								<br/>
+                                <cite class="author_name"><a href="your_societies_friends_list.xhtml">#{friend.getName()}</a></cite>
                             </div>
                             <div class="keyinfo_text">
                             </div>
@@ -60,7 +51,6 @@
                       </ui:repeat>
                 </ol>
                 <div class="hr clearfix"></div>
-                </form>
             </section>
         </article>
         <!-- Right Column / Sidebar -->
@@ -69,13 +59,14 @@
             <div class="hr dotted clearfix"></div>
             <section>
                 <header>
-                    <h3>Search friends Result...</h3>
+                    <h3>Search Results</h3>
                 </header>
-       	 		<br/> <br/>
-                <ul>
+                <ul class="sidebar">
+                	<p:outputPanel id="searchResult">
                 	<ui:repeat value="#{suggestedfriends.search(suggestedfriends.findfriend)}" var="findfriend">
-                		<li> <strong>Name:</strong> #{findfriend.getName()} <strong>ID:</strong> #{findfriend.getId()}</li>
+                		<li><a href="your_societies_friends_list.xhtml" title="ID: #{findfriend.getId()}">#{findfriend.getName()}</a></li>
                 	</ui:repeat>
+                	</p:outputPanel>
                 </ul>
             </section>
             <section>
@@ -83,7 +74,6 @@
                     <h3>CSS Activity</h3>
                 </header>
                 <div class="hr dotted clearfix"></div>
-       	 		<br/> <br/>
        	 		<ul>
                 	<c:forEach items="#{suggestedfriends.getactivities()}" var="MarshaledActivity">
                 		<li> #{MarshaledActivity.getVerb()}</li>

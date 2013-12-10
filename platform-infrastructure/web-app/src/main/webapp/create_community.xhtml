@@ -8,7 +8,7 @@
 	template="templates/main_template.xhtml">
 
 	<ui:define name="html_head">
-		<title>SOCIEITES</title>
+		<title>Create a community - SOCIETIES</title>
 	</ui:define>
 
 	<ui:define name="body">
@@ -17,8 +17,7 @@
 		<!-- Left Column -->
 		<section id="left_col" class="grid_8">
 			<div class="breadcrumbs">
-				<a href="">Home</a> / <a href="create_community.xhtml">Create
-					community</a>
+				<a href="index.xhtml">Home</a> / <a href="create_community.xhtml">Create a community</a>
 			</div>
 
 			<div id="msgid"></div>
@@ -29,25 +28,32 @@
 
 				<div class="hr dotted clearfix"></div>
 				<ul>
-					<li>Community Name: <h:inputText value="#{cismanager.cisname}" /></li>
-
-					<li>Community type: <h:inputText value="#{cismanager.cistype}" /></li>
-
-					<li>Description: <h:inputText value="#{cismanager.cisdesc}" /></li>
-
-					<li>Privacy Policy: &#160; &#160; &#160; &#160; &#160; &#160;
-						&#160; &#160; <h:selectOneMenu value="#{cismanager.mode}">
+					<li class="clearfix">
+						<label>Community Name</label>
+						<h:inputText value="#{cismanager.cisname}" />
+					</li>
+					<li class="clearfix">
+						<label>Community type</label>
+						<h:inputText value="#{cismanager.cistype}" />
+					</li>
+					<li class="clearfix">
+						<label>Description</label>
+						<h:inputText value="#{cismanager.cisdesc}" />
+					</li>
+					<li class="clearfix">
+						<label>Privacy Policy</label>
+						<div class="select-wrapper">
+						<h:selectOneMenu value="#{cismanager.mode}">
 							<f:selectItem itemValue="0" itemLabel="Private" />
 							<f:selectItem itemValue="1" itemLabel="Members Only" />
 							<f:selectItem itemValue="2" itemLabel="Public" />
 						</h:selectOneMenu>
+						</div>
+						<div class="clear"></div>
 					</li>
-
 					<li class="clearfix">
-
-						<div>
-							<p:commandButton value="Create Community"
-								action="#{cismanager.createcommunity()}" oncomplete="#{p:widgetVar('createDialog')}.show()" />
+						<div id="button">
+							<p:commandButton value="Create Community" action="#{cismanager.createcommunity()}" oncomplete="#{p:widgetVar('createDialog')}.show()" styleClass="sendButton" />
 						</div>
 					</li>
 				</ul>

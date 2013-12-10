@@ -8,7 +8,7 @@
                 template="templates/main_template.xhtml">
 
     <ui:define name="html_head">
-        <title>SOCIEITES</title>
+        <title>Your Communities - SOCIETIES</title>
     </ui:define>
 
     <ui:define name="body">
@@ -17,7 +17,7 @@
         <div class="hr grid_12 clearfix"></div>
         <section class="grid_12">
             <section>
-                <div class="breadcrumbs"><a href="">Home</a> / <a href="">Page</a></div>
+                <div class="breadcrumbs"><a href="index.xhtml">Home</a> / <a href="your_communities_list.xhtml">Your Communities</a></div>
             </section>
             <div class="websearchbar">
                 <div class="websearchtitle">
@@ -29,53 +29,55 @@
         <!-- Left Column -->
         <article id="left_col" class="grid_8">
             <section class="itemlist">
-                <header><H5>Role: Participant</H5>
+                <header>
+                	<h5>Role: Participant</h5>
                 </header>
                 <ol class="keyinfolist">
-                    <c:forEach items="#{cismanager.membercommunities}" var="snsFriend">
+                	<p:outputPanel id="panel">
+                    <c:forEach items="#{cismanager.membercommunities}" var="memberCis">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
-                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
-                                                                height="58" width="58"/></a>
+                            <a class="friend_profile.xhtml"><img alt="Community Icon" src="images/launcher_societies.png" height="58" width="58"/></a>
+                            <p:commandButton value="Leave Community" ajax="false" action="#{cismanager.leavecis(memberCis)}" styleClass="keyinfo-reply-link" />
+                            <!-- <p:commandButton value="Get Members" update="panel" action="#{cismanager.getsuggestedlistmembers(memberCis)}" styleClass="keyinfo-reply-link" /> -->
                         </figure>
                         <div class="keyinfo_content">
                             <div class="clearfix">
-                                <br/>
-                                <H6>Name:     #{snsFriend.getCisname()}</H6> 								
-                                <!-- <H6>Identity: #{snsFriend.getCisid()}</H6> -->
-                                <!-- Doesnt work unless you own the CIS -->
-                            </div>
-                            <div class="keyinfo_text">
-                            </div>
+								<time datetime="2013-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Identity: #{memberCis.getCisid()}</time>
+								<br/>
+                               	<cite class="author_name"><a href="your_communities_list.xhtml">#{memberCis.getCisname()}</a></cite>
+                           </div>
+                           <div class="keyinfo_text">
+                           </div>
                         </div>
-                        <p:commandButton value="Leave Community" action="#{cismanager.leavecis(snsFriend)}"/>
                         </li>
                       </c:forEach>
+                      </p:outputPanel>
                 </ol>
                 <div class="hr clearfix"></div>
             </section>
             <section class="itemlist">
-                <header><H5>Role: Owner</H5></header>
+                <header><h5>Role: Owner</h5></header>
                 <ol class="keyinfolist">
-                    <c:forEach items="#{cismanager.ownedcommunities}" var="otherFriend">
+                	<p:outputPanel id="ownedPanel">
+                    <c:forEach items="#{cismanager.ownedcommunities}" var="ownedCis">
     				    <li class="keyinfo bypostauthor">
                         <figure class="gravatar">
-                            <a class="friend_profile.xhtml"><img alt="" src="images/launcher_societies.png"
-                                                                height="58" width="58"/></a>
+                            <a class="friend_profile.xhtml"><img alt="Community Icon" src="images/launcher_societies.png" height="58" width="58"/></a>
+                            <!-- <p:commandButton value="Get Members" update="ownedPanel" action="#{cismanager.getsuggestedlistmembers(ownedCis)}" styleClass="keyinfo-reply-link" /> -->
                         </figure>
                         <div class="keyinfo_content">
-                            <div class="clearfix">
-                                <br/>
-                                <H6>Name:     #{otherFriend.getCisname()}</H6> 								
-                                <!-- <H6>Identity: #{otherFriend.getCisid()}</H6> -->
-                                <!-- To Stay consistent, this is disabled as you can't view members
-                                of a CIS which you do not own. -->
-                            </div>
-                            <div class="keyinfo_text">
-                            </div>
+                       		<div class="clearfix">
+								<time datetime="2013-09-30T00:01Z" class="keyinfo-meta keyinfometadata">Identity: #{ownedCis.getCisid()}</time>
+								<br/>
+                               	<cite class="author_name"><a href="your_communities_list.xhtml">#{ownedCis.getCisname()}</a></cite>
+                           </div>
+                           <div class="keyinfo_text">
+                           </div>
                         </div>
                         </li>
                       </c:forEach>
+                      </p:outputPanel>
                 </ol>
                 <div class="hr clearfix"></div>
             </section>
@@ -87,12 +89,11 @@
             <div class="hr dotted clearfix"></div>
             <section>
                 <header>
-                    <h3>Owned Communities...</h3>
+                    <h3>Owned Communities</h3>
                 </header>
-       	 		<br/> <br/>
-                <ul>
+                <ul class="sidebar">
                 	<ui:repeat value="#{cismanager.ownedcommunities}" var="friend">
-                		<li> #{friend.getCisname()}</li>
+                		<li><a href="your_communities_list.xhtml">#{friend.getCisname()}</a></li>
                 	</ui:repeat>
                 </ul>
             </section>
