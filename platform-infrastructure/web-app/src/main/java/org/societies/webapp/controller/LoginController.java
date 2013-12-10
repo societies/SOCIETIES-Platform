@@ -102,8 +102,12 @@ public class LoginController extends BasePageController {
         //redirect
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         try {
-			externalContext.redirect("http://societies.local.macs.hw.ac.uk:8080/societies-platform/index.html");
-			log.debug("redirected to http://societies.local.macs.hw.ac.uk:8080/societies-platform/index.html");
+        	String redirectUrl = "http://ict-societies.eu:50000/societies-platform/index.html";
+        	if (userService.getCommMngrRef().getIdManager().getDomainAuthorityNode().getJid().endsWith(".macs.hw.ac.uk")) {
+        		redirectUrl = "http://societies.local.macs.hw.ac.uk:8080/societies-platform/index.html";
+        	}
+			externalContext.redirect(redirectUrl);
+			log.debug("redirected to {}", redirectUrl);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
