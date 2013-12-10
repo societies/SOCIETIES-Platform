@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -37,11 +36,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,7 +188,7 @@ public class XmlDocument extends HttpServlet {
 		int status;
 		InputStream is;
 		try {
-			is = getInputStream(request);
+			is = Common.getInputStream(request);
 		} catch (DaRestException e) {
 			LOG.warn("HTTP PUT, ", e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -248,51 +242,6 @@ public class XmlDocument extends HttpServlet {
 			LOG.info("HTTP DELETE: document {} deleted", path);
 			response.setStatus(HttpServletResponse.SC_OK);
 		}
-	}
-	
-	private InputStream getInputStream(HttpServletRequest request) throws DaRestException {
-
-		if(!ServletFileUpload.isMultipartContent(request)) {
-			try {
-				LOG.debug("Content is not multipart");
-				return request.getInputStream();
-			} catch (IOException e) {
-				throw new DaRestException(e);
-			}
-		} 
-		LOG.debug("Content is multipart");
-
-		// Create a factory for disk-based file items
-		FileItemFactory factory = new DiskFileItemFactory();
-
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-
-		// Parse the request
-		List<FileItem> items;
-		try {
-			items = upload.parseRequest(request);
-		} catch (FileUploadException e) {
-			throw new DaRestException(e);
-		}
-
-		// Process the uploaded items
-		Iterator<FileItem> iter = items.iterator();
-		while (iter.hasNext()) {
-			FileItem item = iter.next();
-
-			if (item.isFormField()) {
-				// Process FormField;
-			} else {
-				// Process Uploaded File
-				try {
-					return item.getInputStream();
-				} catch (IOException e) {
-					throw new DaRestException(e);
-				}
-			}
-		}
-		throw new DaRestException("No payload found in HTTP request");
 	}
 	
 	private int putNewDocument(String path, String cert, String endpoint, int minNumSigners, InputStream is) {

@@ -56,6 +56,12 @@ public class Verify {
 		 * Minimal number of signatures (threshold) for notifying the uploader about future sign events.
 		 */
 		public static final String NUM_SIGNERS_THRESHOLD = "NUM_SIGNERS_THRESHOLD";
+		
+		/**
+		 * Optional human readable name or title of the document that is to be signed.
+		 * Type: {@link String}
+		 */
+		public static final String DOC_TITLE = "DOC_TITLE";
 
 		/**
 		 * The URI to upload initial version of document by using HTTP PUT.
