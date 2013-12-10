@@ -23,6 +23,7 @@
     <string name="signatureThresholdReached">Signature threshold reached</string>
     <string name="signedBy">Signed by</string>
     <string name="parties">parties</string>
+    <string name="unknown">\?</string>
     <string name="required">Required:</string>
     <string name="currentSigners">Current signers:</string>
     

@@ -31,6 +31,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class CommunitySigStatusActivity extends FragmentActivity implements
@@ -224,6 +225,11 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			
 			checkBox = (CheckBox) rootView.findViewById(R.id.communitySigStatusThresholdReachedCheckBox);
 			checkBox.setChecked(numSigners >= minNumSigners);
+			
+			ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.communitySigStatusProgressBar);
+			int progress = Math.round(100 * ((float) numSigners) / minNumSigners);
+			progress = Math.min(progress, 100);
+			progressBar.setProgress(progress);
 
 			textView = (TextView) rootView.findViewById(R.id.communitySigStatusSignedByNPartiesTextView);
 			str = numSigners >= 0 ? String.valueOf(numSigners) : "?";
