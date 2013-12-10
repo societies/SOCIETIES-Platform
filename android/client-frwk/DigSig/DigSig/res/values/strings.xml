@@ -26,5 +26,6 @@
     <string name="unknown">\?</string>
     <string name="required">Required:</string>
     <string name="currentSigners">Current signers:</string>
+    <string name="fetchingStatus">Fetching status</string>
     
 </resources>

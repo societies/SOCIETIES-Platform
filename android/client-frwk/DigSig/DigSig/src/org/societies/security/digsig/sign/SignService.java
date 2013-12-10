@@ -34,6 +34,9 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.util.Log;
 
+/**
+ * Service to be used internally, by this app only.
+ */
 public class SignService extends IntentService {
 
 	private static final String TAG = SignService.class.getSimpleName();

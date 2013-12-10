@@ -15,6 +15,7 @@ import org.societies.security.digsig.sign.R.string;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -47,7 +48,9 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	
 	private List<String> documentTitles = new ArrayList<String>();
 	private List<String> downloadUris = new ArrayList<String>();
-
+	
+	private static ProgressDialog mBusyDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -67,7 +70,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		super.onResume();
 
 		clearDownloadUris();
-		store("title-1", "http://192.168.1.92:8080/rest/xmldocs/foo.xml?sig=5F068B13A9184C4773809426EAB845A99A2258724887CA67475B263283E92B7D680B39865B1622F066FB03283772AB6C69347D1400D8F8CEE5CCC4F5DE80FD5F3B8C3272B5B7DC08EBB3BC45D11F66590DA25742193BCEF20619DCF0D8B33812424153BCFDBCDE081B48867F90BB544F593EEA9BA825C425A4A6D2650E0A17C6&operation=status");
+//		store("title-1", "http://192.168.1.92:8080/rest/xmldocs/foo.xml?sig=5F068B13A9184C4773809426EAB845A99A2258724887CA67475B263283E92B7D680B39865B1622F066FB03283772AB6C69347D1400D8F8CEE5CCC4F5DE80FD5F3B8C3272B5B7DC08EBB3BC45D11F66590DA25742193BCEF20619DCF0D8B33812424153BCFDBCDE081B48867F90BB544F593EEA9BA825C425A4A6D2650E0A17C6&operation=status");
  		store("title-2", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
 		store("title-3", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
 		
@@ -171,6 +174,12 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		// When the given dropdown item is selected, show its contents in the
 		// container view.
 		Log.d(TAG, "position = " + position + ", id = " + id);
+		
+		mBusyDialog = new ProgressDialog(getActionBarThemedContextCompat());
+		mBusyDialog.setMessage(getText(R.string.fetchingStatus));
+		mBusyDialog.setCancelable(false);
+		mBusyDialog.show();
+
 		new GetSigStatusTask(this).execute(downloadUris.get(position));
 		return true;
 	}
@@ -219,7 +228,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			TextView textView;
 			CheckBox checkBox;
 			String str;
-			
+
 			checkBox = (CheckBox) rootView.findViewById(R.id.communitySigStatusSigningStartedCheckBox);
 			checkBox.setChecked(true);
 			
@@ -245,6 +254,8 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 				signersStr += s + System.getProperty("line.separator");
 			}
 			textView.setText(signersStr);
+			
+			mBusyDialog.cancel();
 			
 			return rootView;
 		}
