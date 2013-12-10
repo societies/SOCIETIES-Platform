@@ -27,21 +27,16 @@ package org.societies.domainauthority.rest.server;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
+import java.io.InputStream;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.internal.domainauthority.DaRestException;
 import org.societies.api.internal.domainauthority.LocalPath;
 import org.societies.api.internal.domainauthority.UrlPath;
 import org.societies.api.internal.security.util.FileName;
@@ -156,9 +151,6 @@ public class ServiceClientJar extends HttpServlet {
 	@Override
 	public void doPut(HttpServletRequest request, HttpServletResponse response) {
 		
-		// TODO: handle also non-multipart PUT requests, just as in XmlDocument
-		// TODO: It seems SC_BAD_REQUEST is returned instead of 200 even if everything finishes OK
-		
 		String path = request.getParameter(UrlPath.URL_PARAM_FILE);
 		String serviceId = request.getParameter(UrlPath.URL_PARAM_SERVICE_ID);
 		String cert = request.getParameter(UrlPath.URL_PARAM_CERT);
@@ -174,50 +166,35 @@ public class ServiceClientJar extends HttpServlet {
 		
 		LOG.debug("HTTP PUT: cert fixed to {}", cert);
 
-		// Create a factory for disk-based file items
-		FileItemFactory factory = new DiskFileItemFactory();
-
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-
-		// Parse the request
-		List<FileItem> items;
+		InputStream is;
 		try {
-			items = upload.parseRequest(request);
-		} catch (FileUploadException e) {
+			is = Common.getInputStream(request);
+		} catch (DaRestException e) {
+			LOG.warn("HTTP PUT, ", e);
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 
-		// Process the uploaded items
-		Iterator<FileItem> iter = items.iterator();
-		while (iter.hasNext()) {
-			FileItem item = iter.next();
-
-			if (item.isFormField()) {
-				// Process FormField;
-			} else {
-				// Process Uploaded File
-				//path = path.replaceAll("[/\\\\]", File.separator);
-				path = get3PServicePath(serviceId) + path;
-				LOG.debug("Saving to file {}", path);
-				try {
-					Files.writeFile(item.getInputStream(), path);
-					ServiceClientJarAccess.addResource(path, cert);
-				} catch (IOException e) {
-					LOG.warn("Could not write to file {}", path, e);
-					// Return HTTP status code 500 - Internal Server Error
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					return;
-				} catch (DigsigException e) {
-					LOG.warn("Could not store public key", e);
-					// Return HTTP status code 500 - Internal Server Error
-					response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-					return;
-				}
-			}
+		//path = path.replaceAll("[/\\\\]", File.separator);
+		path = get3PServicePath(serviceId) + path;
+		LOG.debug("Saving to file {}", path);
+		try {
+			Files.writeFile(is, path);
+			ServiceClientJarAccess.addResource(path, cert);
+			LOG.info("File {} stored successfuly.", path);
+			response.setStatus(HttpServletResponse.SC_OK);
+			return;
+		} catch (IOException e) {
+			LOG.warn("Could not write to file {}", path, e);
+			// Return HTTP status code 500 - Internal Server Error
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
+		} catch (DigsigException e) {
+			LOG.warn("Could not store public key", e);
+			// Return HTTP status code 500 - Internal Server Error
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			return;
 		}
-		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 	private String get3PServicePath(String serviceId) {
