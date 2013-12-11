@@ -27,6 +27,6 @@
     <string name="required">Required:</string>
     <string name="currentSigners">Current signers:</string>
     <string name="fetchingStatus">Fetching status</string>
-    <string name="errorOccurred">An error occurred</string>
+    <string name="errorOccurred">Could not get valid data from server</string>
     
 </resources>

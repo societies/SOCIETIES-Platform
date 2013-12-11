@@ -24,6 +24,10 @@
  */
 package org.societies.security.digsig.sign.test;
 
+import java.net.URI;
+import java.net.URL;
+import java.util.Random;
+
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.sign.MainActivity;
 
@@ -32,6 +36,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -50,47 +55,72 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 	private static final String TAG = SignServiceRemoteTest.class.getSimpleName();
 
 	private static final int TIME_TO_WAIT = 3000;
-	
-	private Activity mActivity;
-	
-	/**
-     * Target we publish for clients to send messages to IncomingHandler.
-     */
-    final Messenger mMessenger = new Messenger(new IncomingHandler());
 
-    /**
-     * Handler of incoming messages from clients.
-     */
-    static class IncomingHandler extends Handler {
-    	
-        @Override
-        public void handleMessage(Message msg) {
-            Log.i(TAG, "handleMessage: msg.what = " + msg.what + ", replyTo = " + msg.replyTo);
-            switch (msg.what) {
-                case Verify.Methods.GENERATE_URIS:
-                    break;
-                default:
-                    super.handleMessage(msg);
-            }
-        }
-    }
-    
+	private Activity mActivity;
+
+	/** Messenger for communicating with the service. */
+	private Messenger mService = null;
+
+	/** Flag indicating whether we have called bind on the service. */
+	private boolean mBound = false;
+
+	/**
+	 * Target we publish for clients to send messages to IncomingHandler.
+	 */
+	private final Messenger mMessenger = new Messenger(new IncomingHandler());
+
+	private static class Results {
+		public static boolean methodGenerateUrisCalled = false;
+	}
+
+	/**
+	 * Handler of incoming messages from clients.
+	 */
+	static class IncomingHandler extends Handler {
+
+		@Override
+		public void handleMessage(Message msg) {
+			Log.i(TAG, "handleMessage: msg.what = " + msg.what + ", replyTo = " + msg.replyTo);
+			switch (msg.what) {
+			case Verify.Methods.GENERATE_URIS:
+				Results.methodGenerateUrisCalled = true;
+				assertTrue(msg.getData().getBoolean(Verify.Params.SUCCESS));
+				String uploadUri = msg.getData().getString(Verify.Params.UPLOAD_URI);
+				String downloadUri = msg.getData().getString(Verify.Params.DOWNLOAD_URI);
+				assertNotNull(uploadUri);
+				assertNotNull(downloadUri);
+				try {
+					new URI(uploadUri);
+					new URI(downloadUri);
+					new URL(uploadUri);
+					new URL(downloadUri);
+					Log.i(TAG, "GENERATE_URIS completed successfully");
+				} catch (Exception e) {
+					fail(e.getMessage());
+				}
+				break;
+			default:
+				super.handleMessage(msg);
+			}
+		}
+	}
+
 	public SignServiceRemoteTest() {
 		super(MainActivity.class);
 	}
-	
+
 	@Override
 	protected void setUp() throws Exception {
-		
+
 		Log.i(TAG, "setUp");
-		
+
 		// Required by JUnit
 		super.setUp();
 
 		setActivityInitialTouchMode(false);
 		mActivity = getActivity();
 	}
-	
+
 	public void testPreConditions() {
 		assertNotNull(mActivity);
 	}
@@ -100,59 +130,59 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		Log.i(TAG, "testSignServiceRemote");
 
 		// Bind to the service
-    	Intent intent = new Intent("org.societies.security.digsig.action.SignServiceRemote");
-    	mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
-    	Thread.sleep(TIME_TO_WAIT);
+		Intent intent = new Intent(Verify.ACTION);
+		mActivity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+		Thread.sleep(TIME_TO_WAIT);
+		assertTrue(mBound);
+		assertTrue(Results.methodGenerateUrisCalled);
 	}
-	
-    /** Messenger for communicating with the service. */
-    Messenger mService = null;
 
-    /** Flag indicating whether we have called bind on the service. */
-    boolean mBound;
+	/**
+	 * Class for interacting with the main interface of the service.
+	 */
+	private ServiceConnection mConnection = new ServiceConnection() {
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			// This is called when the connection with the service has been
+			// established, giving us the object we can use to
+			// interact with the service.  We are communicating with the
+			// service using a Messenger, so here we get a client-side
+			// representation of that from the raw IBinder object.
+			
+			Log.i(TAG, "onServiceConnected");
+			
+			mService = new Messenger(service);
+			mBound = true;
+			generateUris();
+		}
 
-    /**
-     * Class for interacting with the main interface of the service.
-     */
-    private ServiceConnection mConnection = new ServiceConnection() {
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the object we can use to
-            // interact with the service.  We are communicating with the
-            // service using a Messenger, so here we get a client-side
-            // representation of that from the raw IBinder object.
-            mService = new Messenger(service);
-            mBound = true;
-            sayHello();
-        	try {
-				Thread.sleep(TIME_TO_WAIT);
-			} catch (InterruptedException e) {
-				Log.e(TAG, "could not sleep", e);
-			}
-        	
-        }
+		public void onServiceDisconnected(ComponentName className) {
+			// This is called when the connection with the service has been
+			// unexpectedly disconnected -- that is, its process crashed.
+			
+			Log.i(TAG, "onServiceDisconnected");
 
-        public void onServiceDisconnected(ComponentName className) {
-            // This is called when the connection with the service has been
-            // unexpectedly disconnected -- that is, its process crashed.
-            mService = null;
-            mBound = false;
-        }
-    };
+			mService = null;
+			mBound = false;
+		}
+	};
 
-    public void sayHello() {
-        if (!mBound) return;
-        // Create and send a message to the service, using a supported 'what' value
-        Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
-        //msg.replyTo = null;
-        try {
-        	Log.i(TAG, "Sending message to service");
-            mService.send(msg);
-        	Log.i(TAG, "Message sent to service 1");
-            Thread.sleep(TIME_TO_WAIT);
-        	Log.i(TAG, "Message sent to service 2");
-        } catch (Exception e) {
-            Log.e(TAG, "sayHello", e);
-        }
-    }
+	private void generateUris() {
+		if (!mBound) return;
+		// Create and send a message to the service, using a supported 'what' value
+		Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
+		Bundle data = new Bundle();
+		data.putString(Verify.Params.DOC_TITLE, "Android JUnit test " + new Random().nextInt());
+		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://192.168.1.92/societies/community-signature/notify");
+		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2);
+		msg.setData(data);
+		msg.replyTo = mMessenger;
+		try {
+			Log.i(TAG, "Sending message to service");
+			mService.send(msg);
+			Log.i(TAG, "Message sent to service");
+		} catch (Exception e) {
+			Log.e(TAG, "generateUris", e);
+		}
+	}
+
 }

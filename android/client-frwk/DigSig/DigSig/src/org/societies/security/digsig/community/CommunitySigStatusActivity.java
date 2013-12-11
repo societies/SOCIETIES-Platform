@@ -7,14 +7,9 @@ import java.util.Map;
 
 import org.societies.security.digsig.apiinternal.Community;
 import org.societies.security.digsig.sign.R;
-import org.societies.security.digsig.sign.R.id;
-import org.societies.security.digsig.sign.R.layout;
-import org.societies.security.digsig.sign.R.menu;
-import org.societies.security.digsig.sign.R.string;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.content.Context;
@@ -22,12 +17,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -62,19 +54,14 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+//		clearDownloadUris();
 	}
 	
 	@Override
 	protected void onResume() {
 
 		super.onResume();
-
-		clearDownloadUris();
-//		store("title-1", "http://192.168.1.92:8080/rest/xmldocs/foo.xml?sig=5F068B13A9184C4773809426EAB845A99A2258724887CA67475B263283E92B7D680B39865B1622F066FB03283772AB6C69347D1400D8F8CEE5CCC4F5DE80FD5F3B8C3272B5B7DC08EBB3BC45D11F66590DA25742193BCEF20619DCF0D8B33812424153BCFDBCDE081B48867F90BB544F593EEA9BA825C425A4A6D2650E0A17C6&operation=status");
- 		store("completed", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
-		store("in progress", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
- 		store("not started yet", "http://192.168.1.92/tmp/societies/non-existing.json?sig=foo");
- 		store("network error", "http://192.168.1.312/invalid-ip-address.json?sig=foo");
 		
 		restore();
 		Log.d(TAG, documentTitles.size() + " existing documents found");
@@ -87,15 +74,6 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 				new ArrayAdapter<String>(getActionBarThemedContextCompat(),
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, documentTitles), this);
-	}
-	
-	// FIXME: remove this testing method
-	private void store(String key, String value) {
-		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString(key, value);
-		editor.commit();
-		Log.d(TAG, "Stored key value pair: " + key + " = " + value);
 	}
 
 	private void clearDownloadUris() {

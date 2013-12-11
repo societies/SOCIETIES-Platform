@@ -30,7 +30,6 @@ import java.net.URLEncoder;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
-import java.util.Map;
 
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.apiinternal.Community;
@@ -112,10 +111,15 @@ public class SignServiceRemote extends Service {
 			case Verify.Methods.GENERATE_URIS:
 				Message reply = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
 				reply.setData(mService.get().generateUris(msg.getData()));
-				try {
-					msg.replyTo.send(reply);
-				} catch (RemoteException e) {
-					Log.i(TAG, "handleMessage: sending return message", e);
+				if (msg.replyTo != null) {
+					try {
+						msg.replyTo.send(reply);
+					} catch (RemoteException e) {
+						Log.i(TAG, "handleMessage: sending return message", e);
+					}
+				}
+				else {
+					Log.w(TAG, "replyTo is null, cannot return the generated URI.");
 				}
 				break;
 			default:
