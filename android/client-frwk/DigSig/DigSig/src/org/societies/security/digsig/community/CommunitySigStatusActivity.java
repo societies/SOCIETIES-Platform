@@ -20,6 +20,7 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -65,6 +66,11 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		
 		restore();
 		Log.d(TAG, documentTitles.size() + " existing documents found");
+		
+		loadActionBar();
+	}
+
+	private void loadActionBar() {
 
 		final ActionBar actionBar = getActionBar();
 
@@ -75,13 +81,18 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, documentTitles), this);
 	}
-
+	
 	private void clearDownloadUris() {
 		
 		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
 		SharedPreferences.Editor editor = preferences.edit();
 		editor.clear();
 		editor.commit();
+
+		documentTitles.clear();
+		downloadUris.clear();
+		loadActionBar();
+		
 		Log.d(TAG, "Download URIs cleared");
 	}
 
@@ -101,15 +112,6 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			downloadUris.add(all.get(key));
 		}
 		Log.d(TAG, "Restored " + downloadUris.size() + " URIs");
-	}
-
-	private String getDownloadUri(String documentTitle) {
-		
-		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
-		
-		String uri = preferences.getString(documentTitle, null);
-		Log.d(TAG, "Restored URI: " + uri);
-		return uri;
 	}
 
 	/**
@@ -147,6 +149,19 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.community_sig_status, menu);
 		return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		
+		Log.d(TAG, "onOptionsItemSelected: " + item.getTitle());
+		
+		if (item.getTitle().equals(getText(R.string.action_clear))) {
+			clearDownloadUris();
+			Log.d(TAG, "The documents list cleared");
+		}
+		
+		return false;
 	}
 
 	@Override

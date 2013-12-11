@@ -26,9 +26,12 @@ package org.societies.security.digsig.sign.test;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
 
 import org.societies.security.digsig.api.Verify;
+import org.societies.security.digsig.apiinternal.Community;
 import org.societies.security.digsig.sign.MainActivity;
 
 import android.app.Activity;
@@ -36,6 +39,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -56,7 +60,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 
 	private static final int TIME_TO_WAIT = 3000;
 
-	private Activity mActivity;
+	private static Activity mActivity;
 
 	/** Messenger for communicating with the service. */
 	private Messenger mService = null;
@@ -71,6 +75,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 
 	private static class Results {
 		public static boolean methodGenerateUrisCalled = false;
+		public static String resourceName;
 	}
 
 	/**
@@ -94,10 +99,11 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 					new URI(downloadUri);
 					new URL(uploadUri);
 					new URL(downloadUri);
-					Log.i(TAG, "GENERATE_URIS completed successfully");
 				} catch (Exception e) {
 					fail(e.getMessage());
 				}
+				assertTrue(preferenceExists(Results.resourceName));
+				Log.i(TAG, "GENERATE_URIS completed successfully");
 				break;
 			default:
 				super.handleMessage(msg);
@@ -171,7 +177,8 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		// Create and send a message to the service, using a supported 'what' value
 		Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
 		Bundle data = new Bundle();
-		data.putString(Verify.Params.DOC_TITLE, "Android JUnit test " + new Random().nextInt());
+		Results.resourceName = "Android JUnit test " + new Random().nextInt();
+		data.putString(Verify.Params.DOC_TITLE, Results.resourceName);
 		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://192.168.1.92/societies/community-signature/notify");
 		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2);
 		msg.setData(data);
@@ -183,6 +190,21 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		} catch (Exception e) {
 			Log.e(TAG, "generateUris", e);
 		}
+	}
+
+	private static boolean preferenceExists(String key) {
+		
+		SharedPreferences preferences = mActivity.getSharedPreferences(
+				Community.Preferences.DOWNLOAD_URIS, Activity.MODE_PRIVATE);
+		Map<String, String> all = (Map<String, String>) preferences.getAll();
+		
+		Iterator<String> iter = all.keySet().iterator();
+		while (iter.hasNext()) {
+			if (key.equals(iter.next())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
