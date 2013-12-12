@@ -34,6 +34,8 @@ public class Community {
 
 	public static final String STATUS_DOWNLOAD_URI_PARAMETER = "&operation=status";
 	
+	public static final String SELECTED_DOCUMENT_INDEX = "SELECTED_DOCUMENT_INDEX";
+	
 	public class Preferences {
 	
 		public static final String DOWNLOAD_URIS = "DOWNLOAD_URIS";

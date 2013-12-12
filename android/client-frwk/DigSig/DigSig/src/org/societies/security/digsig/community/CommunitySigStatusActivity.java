@@ -37,7 +37,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	 * The serialization (saved instance state) Bundle key representing the
 	 * current dropdown position.
 	 */
-	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
+//	private static final String STATE_SELECTED_NAVIGATION_ITEM = "selected_navigation_item";
 	
 	private List<String> documentTitles = new ArrayList<String>();
 	private List<String> downloadUris = new ArrayList<String>();
@@ -55,8 +55,6 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
-//		clearDownloadUris();
 	}
 	
 	@Override
@@ -70,6 +68,14 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		loadActionBar();
 	}
 
+	@Override
+	protected void onPause() {
+		
+		super.onPause();
+		
+		store();
+	}
+	
 	private void loadActionBar() {
 
 		final ActionBar actionBar = getActionBar();
@@ -80,6 +86,11 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 				new ArrayAdapter<String>(getActionBarThemedContextCompat(),
 						android.R.layout.simple_list_item_1,
 						android.R.id.text1, documentTitles), this);
+
+		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+		int previouslySelected = preferences.getInt(Community.SELECTED_DOCUMENT_INDEX, 0);
+		getActionBar().setSelectedNavigationItem(previouslySelected);
+		Log.d(TAG, "Activity state restored. previouslySelected = " + previouslySelected);
 	}
 	
 	private void clearDownloadUris() {
@@ -94,7 +105,30 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		loadActionBar();
 		
 		Log.d(TAG, "Download URIs cleared");
+		
+//		// FIXME: remove this testing code and store(String, String) method
+//		store("completed", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
+//		store("in progress", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
+//		store("not started yet", "http://192.168.1.92/tmp/societies/non-existing.json?sig=foo");
+//		store("network error", "http://192.168.1.312/invalid-ip-address.json?sig=foo");
 	}
+
+	private void store() {
+		SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+		SharedPreferences.Editor editor = preferences.edit();
+		int selected = getActionBar().getSelectedNavigationIndex();
+		editor.putInt(Community.SELECTED_DOCUMENT_INDEX, selected);
+		editor.commit();
+		Log.d(TAG, "Activity state stored. selected = " + selected);
+	}
+
+//	private void store(String key, String value) {
+//		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
+//		SharedPreferences.Editor editor = preferences.edit();
+//		editor.putString(key, value);
+//		editor.commit();
+//		Log.d(TAG, "Stored key value pair: " + key + " = " + value);
+//	}
 
 	private void restore() {
 		
@@ -128,21 +162,27 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		}
 	}
 
-	@Override
-	public void onRestoreInstanceState(Bundle savedInstanceState) {
-		// Restore the previously serialized current dropdown position.
-		if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
-			getActionBar().setSelectedNavigationItem(
-					savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
-		}
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		// Serialize the current dropdown position.
-		outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar()
-				.getSelectedNavigationIndex());
-	}
+//	@Override
+//	public void onRestoreInstanceState(Bundle savedInstanceState) {
+//		
+//		Log.d(TAG, "onRestoreInstanceState");
+//		
+//		// Restore the previously serialized current dropdown position.
+//		if (savedInstanceState.containsKey(STATE_SELECTED_NAVIGATION_ITEM)) {
+//			getActionBar().setSelectedNavigationItem(
+//					savedInstanceState.getInt(STATE_SELECTED_NAVIGATION_ITEM));
+//		}
+//	}
+//
+//	@Override
+//	public void onSaveInstanceState(Bundle outState) {
+//
+//		Log.d(TAG, "onSaveInstanceState");
+//
+//		// Serialize the current dropdown position.
+//		outState.putInt(STATE_SELECTED_NAVIGATION_ITEM, getActionBar()
+//				.getSelectedNavigationIndex());
+//	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -160,7 +200,6 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			clearDownloadUris();
 			Log.d(TAG, "The documents list cleared");
 		}
-		
 		return false;
 	}
 
