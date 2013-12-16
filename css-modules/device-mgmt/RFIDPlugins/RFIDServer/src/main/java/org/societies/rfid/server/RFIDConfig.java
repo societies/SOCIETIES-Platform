@@ -103,28 +103,7 @@ public class RFIDConfig {
             throw new FileNotFoundException("rfid.conf: No such file in resources)");
         }
     }
-	public static void main(String[] args) throws IOException{
-		RFIDConfig config = new RFIDConfig();
-		
-		Properties props = config.getRFIDConfiguration();
-		
-		Enumeration<Object> keys = props.keys();
-		System.out.println(props.size());
-		while (keys.hasMoreElements()){
-			String key = (String) keys.nextElement();
-			System.out.println(key+" : "+props.getProperty(key));
-		}
-		
-		Hashtable<String, String> table = config.getUnitToSymloc();
-		
-		Enumeration<String> units = table.keys();
-		
-		while (units.hasMoreElements()){
-			String unit = units.nextElement();
-			System.out.println(unit+" : "+table.get(unit));
-		}
-	}
-	
+
 	
 	public Hashtable<String, String> getUnitToSymloc(){
 		this.getRFIDConfiguration();

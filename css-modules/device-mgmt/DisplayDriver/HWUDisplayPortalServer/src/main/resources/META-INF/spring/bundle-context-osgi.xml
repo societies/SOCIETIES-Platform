@@ -18,12 +18,12 @@
         </osgi:interfaces>
         </osgi:service>
 
-		<osgi:reference id="dataSource" interface="javax.sql.DataSource"></osgi:reference>
-
 
 
 		<osgi:reference id="commManager" interface="org.societies.api.comm.xmpp.interfaces.ICommManager"></osgi:reference>
 		<osgi:reference id="IServices" interface="org.societies.api.services.IServices"></osgi:reference>
+		<osgi:reference id="ctxBroker" interface="org.societies.api.internal.context.broker.ICtxBroker"></osgi:reference>
+		
 
 
 

@@ -41,11 +41,11 @@ public interface IDisplayPortalServer {
     
     public void releaseResource(String location);
 
-	public String requestAccess(String identity, String location);
+	public String requestAccess(String identity, String screenID);
 	
-	public void releaseResource(String identity, String location);
+	public void releaseResource(String identity, String screenID);
 	
-	public String[] getScreenLocations();
+	public String[] getScreenIDs();
 	
 	public ServiceResourceIdentifier getServerServiceId();
 

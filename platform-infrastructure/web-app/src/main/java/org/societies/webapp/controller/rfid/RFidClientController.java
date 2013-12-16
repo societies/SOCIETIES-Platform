@@ -68,7 +68,7 @@ import javax.faces.context.FacesContext;
 import javax.swing.JOptionPane;
 
 @ManagedBean(name = "rfidClientController")
-@ViewScoped
+@SessionScoped
 public class RFidClientController extends BasePageController{
 
 

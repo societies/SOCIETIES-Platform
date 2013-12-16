@@ -1,0 +1,166 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<p:growl id="screenGrowl" showDetail="true" life="3000" />
+
+	<p:panel>
+
+		<p:dataTable var="screen" id="screenTable"
+			value="#{screenData.screenList}">
+
+
+			<p:column headerText="Screen ID">
+				<h:outputText value="#{screen.screenID}" />
+			</p:column>
+
+			<p:column headerText="IP Address">
+				<h:outputText value="#{screen.ipAddress}" />
+			</p:column>
+
+			<p:column headerText="Location Description">
+				<h:outputText value="#{screen.locationDescription}" />
+			</p:column>
+			
+			<p:column headerText="View" style="width: 4%">
+				<p:commandButton id="selectButton" oncomplete="screenDialog.show();"
+					update="@([id$=viewScreen])" icon="ui-icon-zoomin" title="View">
+					<f:setPropertyActionListener value="#{screen}"
+						target="#{screenData.selectedScreen}" />
+				</p:commandButton>
+			</p:column>
+
+
+		</p:dataTable>
+
+		<p:commandButton value="Add screen" onclick="asDialogue.show()" />
+		
+			<p:dialog id="screenDialog" header="Screen Detail"
+		widgetVar="screenDialog" modal="true" resizable="false" showEffect="fade"
+		hideEffect="explode">
+
+		<h:panelGrid id="viewScreen" columns="2" cellpadding="4"
+			style="margin:0 auto;">
+			
+			<h:outputText value="Screen ID:" />
+			<h:outputText
+				value="#{screenData.selectedScreen.screenID}"
+				style="font-weight:bold" />
+
+			<h:outputText value="IP Address:" />
+			<h:outputText
+				value="#{screenData.selectedScreen.ipAddress}"
+				style="font-weight:bold" />
+
+
+			<h:outputText value="Location:" />
+			<h:outputText value="#{screenData.selectedScreen.locationDescription}"
+				style="font-weight:bold" />
+
+		
+			<p:commandButton value="Delete" update="screenGrowl, screenTable, @([id$=wakeUpPanel])"
+				icon="ui-icon-circle-close" oncomplete="screenDialog.hide();"
+				actionListener="#{screenData.deleteScreen}" />
+
+		</h:panelGrid>
+
+	</p:dialog>
+
+		<p:dialog id="addScreenDialog" header="Add Screen"
+			widgetVar="asDialogue" modal="true" height="200">
+			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+
+				<h:outputText value="Screen ID: " />
+				<p:inputText id="screen-id" value="#{screenData.newScreenID}" />
+
+				<h:outputText value="IP Address: " />
+				<p:inputText id="ip-address" value="#{screenData.newScreenIP}" />
+
+				<h:outputText value="Location Description: " />
+				<p:inputText id="screen-loc"
+					value="#{screenData.newScreenLocationDesc}" />
+
+			</h:panelGrid>
+			<p:commandButton value="Add"
+				update="screenGrowl,screenTable, @([id$=wakeUpPanel])"
+				actionListener="#{screenData.addScreen()}"
+				oncomplete="handleAddScreenRequest(xhr, status, args)" />
+		</p:dialog>
+
+
+		<!--JAVA SCRIPT TO ALERT USER OF INVALID INPUT -->
+		<script type="text/javascript">
+			function handleAddScreenRequest(xhr, status, args) {
+				if (!args.screenAdded) {
+					asDialogue.jq.effect("shake", {
+						times : 5
+					}, 100);
+				} else {
+					asDialogue.hide();
+				}
+			}
+		</script>
+	</p:panel>
+
+	<p:panel>
+
+		<p:dataTable var="loc" id="locTable"
+			value="#{screenData.otherLocations}">
+
+
+			<p:column headerText="Other Locations">
+				<h:outputText value="#{loc}" />
+			</p:column>
+			
+			<p:column headerText="View" style="width: 4%">
+				<p:commandButton oncomplete="otherLocDialog.show();"
+					update="@([id$=viewOtherLoc])" icon="ui-icon-zoomin" title="View">
+					<f:setPropertyActionListener value="#{loc}"
+						target="#{screenData.selectedOtherLoc}" />
+				</p:commandButton>
+			</p:column>
+
+		</p:dataTable>
+
+		<p:commandButton value="Add other location"
+			onclick="addOtherLocDialog.show()" />
+			
+			<p:dialog id="otherLocDialog" header="Location Detail"
+		widgetVar="otherLocDialog" modal="true" resizable="false" showEffect="fade"
+		hideEffect="explode">
+
+		<h:panelGrid id="viewOtherLoc" columns="2" cellpadding="4"
+			style="margin:0 auto;">
+			
+			<h:outputText value="Location:" />
+			<h:outputText
+				value="#{screenData.selectedOtherLoc}"
+				style="font-weight:bold" />
+	
+			<p:commandButton value="Delete" update="locTable, @([id$=wakeUpPanel])"
+				icon="ui-icon-circle-close" oncomplete="otherLocDialog.hide();"
+				actionListener="#{screenData.deleteOtherLoc}" />
+
+		</h:panelGrid>
+
+	</p:dialog>
+
+		<p:dialog id="addOtherLocDialog" header="Add Location"
+			widgetVar="addOtherLocDialog" modal="true" height="200">
+			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+
+				<h:outputText value="Location: " />
+				<p:inputText value="#{screenData.newOtherLocation}" />
+
+			</h:panelGrid>
+			<p:commandButton value="Add" update="locTable,@([id$=wakeUpPanel]) "
+				actionListener="#{screenData.addOtherLocation()}"
+				oncomplete="addOtherLocDialog.hide()" />
+		</p:dialog>
+
+	</p:panel>
+</ui:composition>
+</html>

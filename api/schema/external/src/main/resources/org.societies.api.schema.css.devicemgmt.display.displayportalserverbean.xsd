@@ -28,7 +28,7 @@
 			<xs:enumeration value="requestAccess" />
 			<xs:enumeration value="checkScreenUse" />
 			<xs:enumeration value="releaseResource"/>
-			<xs:enumeration value="getScreenLocations"/>
+			<xs:enumeration value="getScreenIds"/>
 			<xs:enumeration value="getServerServiceId"/>
 		</xs:restriction>
 	</xs:simpleType>
@@ -57,7 +57,7 @@
 	    </xs:complexType>
 	</xs:element>
 
-	<xs:element name="displayPortalServerScreenLocationResultBean">
+	<xs:element name="displayPortalServerScreenIDResultBean">
 	    <xs:complexType>
 		    <xs:sequence>
 			    <xs:element name="screenLocations" type="xs:base64Binary"></xs:element>

@@ -7,6 +7,8 @@ import java.util.Hashtable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.css.devicemgmt.rfid.RfidReader;
+import org.societies.api.css.devicemgmt.rfid.RfidWakeupUnit;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.IEventMgr;
@@ -43,8 +45,8 @@ public class RfidWebAppEventListener extends EventListener{
 	public void handleInternalEvent(InternalEvent event) {
 		if(logging.isDebugEnabled()) logging.debug("Received event: "+event.geteventType()+" name: "+event.geteventName());
 		if (event.geteventType().equalsIgnoreCase(RFID_SERVER_EVENT_TYPE)){
-			Hashtable<String, String> payload = (Hashtable<String, String>) event.geteventInfo();
 			if (event.geteventName().equalsIgnoreCase("addNewTag")){
+				Hashtable<String, String> payload = (Hashtable<String, String>) event.geteventInfo();
 				if(logging.isDebugEnabled()) logging.debug("adding new tag");
 				if (payload.containsKey("tag")){
 					if (payload.containsKey("password")){
@@ -55,9 +57,16 @@ public class RfidWebAppEventListener extends EventListener{
 					}
 				}
 			}else if (event.geteventName().equalsIgnoreCase("deleteTag")){
+				Hashtable<String, String> payload = (Hashtable<String, String>) event.geteventInfo();
 				if (payload.containsKey("tag")){
 					this.server.requestDeleteTag(payload.get("tag"));
 				}
+			}else if (event.geteventName().equalsIgnoreCase("addNewWakeupUnit")){
+				RfidWakeupUnit payload = (RfidWakeupUnit) event.geteventInfo();
+				this.server.addRfidWakeupUnit(payload);
+			}else if (event.geteventName().equalsIgnoreCase("deleteWakeupUnit")){
+				RfidWakeupUnit payload = (RfidWakeupUnit) event.geteventInfo();
+				this.server.deleteRfidWakeupUnit(payload);
 			}
 		}
 		

@@ -1,0 +1,67 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>SOCIETIES Display Settings</title>
+	</ui:define>
+
+	<ui:define name="body">
+
+		<p:panel>
+			<f:facet name="header">
+                Display Settings Administration Page
+            </f:facet>
+			<p:accordionPanel id="dataPanel" multiple="true">
+				<!-- USER RFID PANEL -->
+				<p:tab id="clientRFID" title="User Settings">
+					<ui:include src="/includes/displayadmin/rfid_client.xhtml" />
+				</p:tab>
+
+
+				<p:tab id="adminTab" title="Admin Settings">
+					<p:panel id="navigationPanel"
+						visible="#{!displayAdminController.adminLoggedIn}">
+						<p:panelGrid columns="2">
+							<h:outputText value="Password" />
+							<h:inputSecret value="#{displayAdminController.userPassword}" />
+							<h:outputText value="#{displayAdminController.passwordError}" />
+							<p:commandButton value="Login"
+								action="#{displayAdminController.login()}" update="adminTab" />
+						</p:panelGrid>
+					</p:panel>
+					<p:panel id="adminPanel"
+						visible="#{displayAdminController.adminLoggedIn}">
+						<p:accordionPanel multiple="true">
+
+							<!-- RFID SERVER SETTINGS -->
+							<p:tab title="RFID Server Settings">
+								<ui:include src="/includes/displayadmin/rfid_server.xhtml" />
+							</p:tab>
+
+							<!-- WAKEUP UNIT SETTINGS -->
+							<p:tab title="RFID Wakeup Unit Settings">
+								<ui:include src="/includes/displayadmin/rfid_wakeup.xhtml" />
+							</p:tab>
+
+							<!-- DISPLAY SCREEN SETTINGS -->
+							<p:tab title="Display Screen Settings">
+								<ui:include src="/includes/displayadmin/display_screens.xhtml" />
+							</p:tab>
+
+						</p:accordionPanel>
+					</p:panel>
+
+				</p:tab>
+			</p:accordionPanel>
+
+
+		</p:panel>
+
+	</ui:define>
+</ui:composition>
+</html>

@@ -1,3 +1,7 @@
+package org.societies.api.css.devicemgmt.display;
+
+import java.io.Serializable;
+
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
@@ -22,81 +26,50 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.display.server.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 
-/**
- * Describe your class here...
- *
- * @author Eliza
- *
- */
-@Entity
-@Table(name="screen")
-public class Screen {
+public class Screen implements Serializable {
 
-	private String screenId;
-	private String location;
-	private String ipAddress;
+    private String screenID;
+    private String ipAddress;
+    private String locationDescription;
 
     public Screen()
     {
 
     }
 
-	public Screen(String screenId, String location, String ipAddress){
-		this.screenId = screenId;
-		this.location = location;
-		this.ipAddress = ipAddress;
-		
-	}
-
-	/**
-	 * @return the screenID
-	 */
-    @Id
-    @Column(name="screenId")
-	public String getScreenId() {
-		return screenId;
-	}
-
-    public void setScreenId(String screenId)
+    public Screen(String screenID, String ipAddress, String locationDescription)
     {
-        this.screenId=screenId;
-    }
-
-    public void setLocation(String location)
-    {
-        this.location=location;
-    }
-
-    public void setIpAddress(String ipAddress)
-    {
+        this.screenID=screenID;
         this.ipAddress=ipAddress;
+        this.locationDescription=locationDescription;
     }
 
-	/**
-	 * @return the locationID
-	 */
-    @Column(name="locationId")
-	public String getLocation() {
-		return location;
+    public String getLocationDescription() {
+		return locationDescription;
 	}
 
-	/**
-	 * @return the ipAddress
-	 */
-    @Column(name="ipAddress")
-	public String getIpAddress() {
-		return ipAddress;
+	public void setLocationDescription(String locationDescription) {
+		this.locationDescription = locationDescription;
 	}
 
-	
-	public String toString(){
-		return "ScreenID: "+this.screenId+",  location: "+this.location+", IP Address: "+this.ipAddress;
-	}
+	public String getScreenID() {
+        return screenID;
+    }
+
+    public void setScreenID(String screenID) {
+        this.screenID = screenID;
+    }
+
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+
 }

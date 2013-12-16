@@ -1,0 +1,99 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core">
+
+	<p:panel id="wakeUpPanel">
+
+		<p:dataTable id="wakeupUnitTable" var="wakeupUnit"
+			value="#{rfidServerController.rfidWakeupUnits}">
+			<p:column headerText="Wakeup Unit Number">
+				<h:outputText value="#{wakeupUnit.wakeupUnitNumber}" />
+			</p:column>
+
+			<p:column headerText="Corresponding Location">
+				<h:outputText value="#{wakeupUnit.screenID}" />
+			</p:column>
+			
+			<p:column headerText="View" style="width: 4%">
+				<p:commandButton id="selectButton" oncomplete="wakeupDialog.show();"
+					update="@([id$=viewWakeup])" icon="ui-icon-zoomin" title="View">
+					<f:setPropertyActionListener value="#{wakeupUnit}"
+						target="#{rfidServerController.selectedWakeupUnit}" />
+				</p:commandButton>
+			</p:column>
+
+		</p:dataTable>
+		
+					<p:dialog id="wakeupDialog" header="Wakeup Unit Detail"
+		widgetVar="wakeupDialog" modal="true" resizable="false" showEffect="fade"
+		hideEffect="explode">
+
+		<h:panelGrid id="viewWakeup" columns="2" cellpadding="4"
+			style="margin:0 auto;">
+			
+			<h:outputText value="Wakeup Unit Number:" />
+			<h:outputText
+				value="#{rfidServerController.selectedWakeupUnit.wakeupUnitNumber}"
+				style="font-weight:bold" />
+
+			<h:outputText value="Corresponding Location:" />
+			<h:outputText
+				value="#{rfidServerController.selectedWakeupUnit.screenID}"
+				style="font-weight:bold" />
+
+		
+			<p:commandButton value="Delete" update="wakeupUnitTable"
+				icon="ui-icon-circle-close" oncomplete="wakeupDialog.hide();"
+				actionListener="#{rfidServerController.deleteWakeupUnit}" />
+
+		</h:panelGrid>
+
+	</p:dialog>
+
+		<h:panelGrid columns="1" cellpadding="5">
+			<p:commandButton id="addWUButton" value="Add Wakeup Unit"
+				onclick="addNewWakeupDlg.show();" />
+		</h:panelGrid>
+
+		<p:dialog id="addNewWakeupDlg" header="Add Wakeup Unit"
+			widgetVar="addNewWakeupDlg" modal="true">
+			<h:panelGrid id="addNewWUPanel" columns="2" cellpadding="4"
+				style="margin:0 auto;">
+
+				<h:outputText value="Wakeup Unit Number:" />
+				<h:inputText id="newWakeUpNo"
+					value="#{rfidServerController.newRfidWakeupUnit.wakeupUnitNumber}"
+					style="font-weight:bold" />
+
+				<h:outputText value="Corresponding Location:" />
+
+				<p:selectOneMenu
+					value="#{rfidServerController.newRfidWakeupUnit.screenID}"
+					style="width: 150px">
+					<f:selectItems value="#{screenData.getAllLocations()}" />
+				</p:selectOneMenu>
+
+				<p:commandButton value="Add" id="addWakeUpBtn"
+					actionListener="#{rfidServerController.addRfidWakeupUnit}"
+					update="wakeupUnitTable, growl"
+					oncomplete="handleAddWakeupRequest(xhr, status, args)" />
+			</h:panelGrid>
+		</p:dialog>
+
+	</p:panel>
+
+	<!--JAVA SCRIPT TO HIDE DIALOG IF PASSES -->
+	<script type="text/javascript">
+        function handleAddWakeupRequest(xhr, status, args) {
+        if(!args.wakeupAdded) {
+        	addNewWakeupDlg.hide();
+        }
+        
+        }
+    </script>
+
+</ui:composition>
+</html>

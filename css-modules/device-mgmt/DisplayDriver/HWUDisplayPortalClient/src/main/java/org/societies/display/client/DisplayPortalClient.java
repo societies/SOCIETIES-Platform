@@ -68,7 +68,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	private ICommManager commManager;
 	private IIdentityManager idMgr;
 	private IIdentity userIdentity;
-	private List<String> screenLocations;
+	private List<String> screenIDs;
 	private IDisplayPortalServer portalServerRemote;
 	private IIdentity serverIdentity;
 	private ICtxBroker ctxBroker;
@@ -90,7 +90,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	private Integer serviceRuntimeSocketPort;
 
 	public DisplayPortalClient(){
-		this.screenLocations = new ArrayList<String>();
+		this.screenIDs = new ArrayList<String>();
 		this.servRuntimeSocketThread = new ServiceRuntimeSocketServer(this);
 		this.serviceRuntimeSocketPort = this.servRuntimeSocketThread.setListenPort();
 		this.servRuntimeSocketThread.start();
@@ -137,13 +137,13 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 	}
 
 	//METHOD TO RETRIEVE SCREEN LOCATIONS FROM SERVER PORTAL
-	private void retrieveScreenLocations()
+	private void retrieveScreenIDs()
 	{
-		this.screenLocations.clear();
-		String[] locs = this.portalServerRemote.getScreenLocations(serverIdentity);
-		if(LOG.isDebugEnabled()) LOG.debug("Retrieved screen locations from my server");
+		this.screenIDs.clear();
+		String[] locs = this.portalServerRemote.getScreenIds(serverIdentity);
+		if(LOG.isDebugEnabled()) LOG.debug("Retrieved screen ids from my server");
 		for (int i=0; i<locs.length; i++){
-			this.screenLocations.add(locs[i]);
+			this.screenIDs.add(locs[i]);
 			if(LOG.isDebugEnabled()) LOG.debug("Screen location: "+i+": "+locs[i]);
 		}
 	}
@@ -194,11 +194,11 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 		// TODO Auto-generated method stub
 	}
 
-	private boolean matchesLocation(String location){
+	private boolean matchesScreenIDs(String location){
 		if(LOG.isDebugEnabled()) LOG.debug("User location length: "+location.length());
 
-		for (int i=0; i<screenLocations.size(); i++){
-			String scrLoc = screenLocations.get(i);
+		for (int i=0; i<screenIDs.size(); i++){
+			String scrLoc = screenIDs.get(i);
 			if(LOG.isDebugEnabled()) LOG.debug("Screen location length: "+scrLoc.length());	
 			if (scrLoc.trim().equalsIgnoreCase(location.trim())){
 				if(LOG.isDebugEnabled()) LOG.debug(scrLoc+" matches "+location+". Returning true");
@@ -277,26 +277,26 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 		}
 	}
 
-	public void updateUserLocation(String location){
+	public void updateUserLocationByID(String screenID){
 
 		//FOR EVERY UPDATE ON USER LOCATION, GET UPTO DATE SCREEN LOCATIONS
-		retrieveScreenLocations();
+		retrieveScreenIDs();
 		String uuid = UUID.randomUUID().toString();
 		synchronized(userLocation)
 		{
 			userLocation.clear();
-			userLocation.put(uuid, location);
+			userLocation.put(uuid, screenID);
 		}
 
-		if(LOG.isDebugEnabled()) LOG.debug("location of user: "+location);
+		if(LOG.isDebugEnabled()) LOG.debug("location of user: "+screenID);
 		if(LOG.isDebugEnabled()) LOG.debug("Location of screens: ");
-		for (int i=0; i<screenLocations.size(); i++){
-			if(LOG.isDebugEnabled()) LOG.debug("Screen location: "+i+": "+screenLocations.get(i));
+		for (int i=0; i<screenIDs.size(); i++){
+			if(LOG.isDebugEnabled()) LOG.debug("Screen location: "+i+": "+screenIDs.get(i));
 		}
 
-		if (!location.trim().equalsIgnoreCase(currentUsedScreenLocation.trim())){
+		if (!screenID.trim().equalsIgnoreCase(currentUsedScreenLocation.trim())){
 			//if near a screen
-			if (this.matchesLocation(location)){
+			if (this.matchesScreenIDs(screenID)){
 				//check if the user is already using another screen
 				if (this.hasSession){
 					if(LOG.isDebugEnabled()) LOG.debug("Releasing previous screen session from: "+currentUsedScreenIP);
@@ -313,14 +313,14 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 				//REQUEST ACCESS - RETURNS FALSE IF NOT IN USE
 				synchronized(this.waitingRequests)
 				{
-					if(!waitingRequests.contains(location))
+					if(!waitingRequests.contains(screenID))
 					{
 						if(LOG.isDebugEnabled()) LOG.debug("CURRENT LOCATION IS NOT STORED IN WAITING REQUESTS, CHECK ACCESS!");
-						waitingRequests.add(location);
-						if(!this.portalServerRemote.checkAccess(serverIdentity, location))
+						waitingRequests.add(screenID);
+						if(!this.portalServerRemote.checkAccess(serverIdentity, screenID))
 						{
 							if(LOG.isDebugEnabled()) LOG.debug("START NOTIFICATION CONTROL THREAD");
-							new Thread(new NotificationControl(uuid, this, this.userFeedback, location)).start();		
+							new Thread(new NotificationControl(uuid, this, this.userFeedback, screenID)).start();		
 						}
 					}
 					if(LOG.isDebugEnabled()) LOG.debug("CURRENT LOCATION IS IN WAITING REQUESTS, DO NOTHING!");
@@ -359,7 +359,7 @@ public class DisplayPortalClient extends EventListener implements IDisplayDriver
 				}
 			}
 		}else{
-			if(LOG.isDebugEnabled()) LOG.debug("Ignoring same value for symloc> new: "+location+" - current: "+this.currentUsedScreenLocation);
+			if(LOG.isDebugEnabled()) LOG.debug("Ignoring same value for symloc> new: "+screenID+" - current: "+this.currentUsedScreenLocation);
 		}
 	}
 

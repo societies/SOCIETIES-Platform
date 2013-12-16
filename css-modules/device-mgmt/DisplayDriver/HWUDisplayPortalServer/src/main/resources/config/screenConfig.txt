@@ -1,2 +1,0 @@
-screen1,location1,100.00.00.0
-screen2,location2,100.00.00.0

@@ -40,7 +40,7 @@ import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerIPAddressResultBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerMethodType;
-import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenLocationResultBean;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenIDResultBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenUseBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerServiceIDResultBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -128,13 +128,13 @@ public class CommsServer implements IFeatureServer{
 		// TODO Auto-generated method stub
 		if (payload instanceof DisplayPortalServerBean){
 			
-			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS)){
-				if(LOG.isDebugEnabled()) LOG.debug("getQuery: "+DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS);
-				String[] locations = this.displayPortalServer.getScreenLocations();
+			if (((DisplayPortalServerBean) payload).getMethod().equals(DisplayPortalServerMethodType.GET_SCREEN_IDS)){
+				if(LOG.isDebugEnabled()) LOG.debug("getQuery: "+DisplayPortalServerMethodType.GET_SCREEN_IDS);
+				String[] locations = this.displayPortalServer.getScreenIDs();
 				
 				try {
 					byte[] serialisedObj = SerialisationHelper.serialise(locations);
-					DisplayPortalServerScreenLocationResultBean resultBean = new DisplayPortalServerScreenLocationResultBean();
+					DisplayPortalServerScreenIDResultBean resultBean = new DisplayPortalServerScreenIDResultBean();
                     resultBean.setScreenLocations(serialisedObj);
 					if(LOG.isDebugEnabled()) LOG.debug("Returning screen locations");
 					return resultBean;

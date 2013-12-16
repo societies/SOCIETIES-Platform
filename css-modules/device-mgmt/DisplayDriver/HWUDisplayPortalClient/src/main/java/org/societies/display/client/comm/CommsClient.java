@@ -44,7 +44,7 @@ import org.societies.api.identity.IIdentityManager;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerIPAddressResultBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerMethodType;
-import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenLocationResultBean;
+import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenIDResultBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerScreenUseBean;
 import org.societies.api.schema.css.devicemgmt.display.displayportalserverbean.DisplayPortalServerServiceIDResultBean;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
@@ -75,7 +75,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 
 	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerIPAddressResultBean> ipAddressResults;
 	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerServiceIDResultBean> serviceIDResults;
-	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenLocationResultBean> screenLocationsResults;
+	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenIDResultBean> screenIDsResults;
 	private Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenUseBean> screenUseResult;
 	/**
 	 * @return the commManager
@@ -96,7 +96,7 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 	{	
 		this.ipAddressResults = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerIPAddressResultBean>();
 		this.serviceIDResults = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerServiceIDResultBean>();
-		this.screenLocationsResults = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenLocationResultBean>();
+		this.screenIDsResults = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenIDResultBean>();
 		this.screenUseResult = new Hashtable<DisplayPortalServerMethodType, DisplayPortalServerScreenUseBean>();
     }
 
@@ -157,10 +157,10 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 				this.serviceIDResults.notifyAll();
 			}
 				
-		}else if (result instanceof DisplayPortalServerScreenLocationResultBean){
-				this.screenLocationsResults.put(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS, (DisplayPortalServerScreenLocationResultBean) result);
-				synchronized (this.screenLocationsResults) {
-					this.screenLocationsResults.notifyAll();
+		}else if (result instanceof DisplayPortalServerScreenIDResultBean){
+				this.screenIDsResults.put(DisplayPortalServerMethodType.GET_SCREEN_IDS, (DisplayPortalServerScreenIDResultBean) result);
+				synchronized (this.screenIDsResults) {
+					this.screenIDsResults.notifyAll();
 				}
 		}else if (result instanceof DisplayPortalServerIPAddressResultBean){
 				this.ipAddressResults.put(DisplayPortalServerMethodType.REQUEST_ACCESS, (DisplayPortalServerIPAddressResultBean) result);
@@ -272,9 +272,9 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 	}
 
 	@Override
-	public String[] getScreenLocations(IIdentity serverIdentity) {
+	public String[] getScreenIds(IIdentity serverIdentity) {
 		DisplayPortalServerBean bean = new DisplayPortalServerBean();
-		bean.setMethod(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS);
+		bean.setMethod(DisplayPortalServerMethodType.GET_SCREEN_IDS);
 		
 		Stanza stanza = new Stanza(serverIdentity);
 		
@@ -285,20 +285,20 @@ public class CommsClient implements IDisplayPortalServer, ICommCallback{
 			e.printStackTrace();
 		}
 		
-		while(!this.screenLocationsResults.containsKey(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS)){
+		while(!this.screenIDsResults.containsKey(DisplayPortalServerMethodType.GET_SCREEN_IDS)){
 			try {
 				if(logging.isDebugEnabled()) logging.debug("waiting for results");
-				synchronized (this.screenLocationsResults){
-					this.screenLocationsResults.wait();
+				synchronized (this.screenIDsResults){
+					this.screenIDsResults.wait();
 				}
-				DisplayPortalServerScreenLocationResultBean resultBean = this.screenLocationsResults.get(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS);
+				DisplayPortalServerScreenIDResultBean resultBean = this.screenIDsResults.get(DisplayPortalServerMethodType.GET_SCREEN_IDS);
 				
 				byte[] bytearray = resultBean.getScreenLocations();
 				
 				String[] locations;
 				try {
 					locations = (String[]) SerialisationHelper.deserialise(bytearray, this.getClass().getClassLoader());
-					this.screenLocationsResults.remove(DisplayPortalServerMethodType.GET_SCREEN_LOCATIONS);
+					this.screenIDsResults.remove(DisplayPortalServerMethodType.GET_SCREEN_IDS);
 					return locations;
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

@@ -51,4 +51,5 @@
 	</osgi:reference>
 
 	<osgi:reference id="activityFeedManager" interface="org.societies.api.activity.IActivityFeedManager" />
+	
 </beans>

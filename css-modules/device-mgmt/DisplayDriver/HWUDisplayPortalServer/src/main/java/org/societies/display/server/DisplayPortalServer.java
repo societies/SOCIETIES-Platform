@@ -31,13 +31,19 @@ import javax.swing.UIManager;
 
 
 
-import org.hibernate.SessionFactory;
+
+
+
+
+
+import org.societies.api.osgi.event.IEventMgr;
 //import org.societies.display.server.dao.impl.MockScreenDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
+import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
 import org.societies.api.services.IServices;
@@ -45,9 +51,8 @@ import org.societies.api.services.IServices;
 
 
 import org.societies.api.css.devicemgmt.display.IDisplayPortalServer;
-import org.societies.display.server.dao.impl.ScreenDAO;
-import org.societies.display.server.model.Screen;
-import org.societies.display.server.model.ScreenConfiguration;
+import org.societies.display.server.context.ContextRetriever;
+import org.societies.api.css.devicemgmt.display.Screen;
 /**
  * Describe your class here...
  *
@@ -56,48 +61,37 @@ import org.societies.display.server.model.ScreenConfiguration;
  */
 public class DisplayPortalServer implements IDisplayPortalServer{
 
-
-
-	private List<String> screenIPAddresses;
-
 	private static Logger LOG = LoggerFactory.getLogger(DisplayPortalServer.class);
 
 
 	private Hashtable<String, String> currentlyUsedScreens;
 
-	private ScreenConfiguration screenconfig;
-
 	private IServices services;
-
-
 
 	private ServiceResourceIdentifier myServiceId;
 
 	private ICommManager commManager;
 	private IIdentityManager idMgr;
+	private ICtxBroker ctxBroker;
+
+	private ContextRetriever contextRetriever;
+
 
 	private IIdentity serverIdentity;
 
 	private List<Screen> screens;
-	private ScreenDAO screenDAO;
-
-	private SessionFactory sessionFactory;
-
 
 
 	public DisplayPortalServer(){
-		screenIPAddresses = new ArrayList<String>();
 		screens = new ArrayList<Screen>();
-
 	}
 
 	public void initialiseServer(){
 		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
 		//SETUP UP TO GET SCREENS FROM DB
-		screenDAO = new ScreenDAO(sessionFactory);
+		contextRetriever = new ContextRetriever(this.ctxBroker, this.serverIdentity);
 		currentlyUsedScreens = new Hashtable<String, String>();
-		//SET UP A NEW SCREEN CONFIGURATION
-		this.screenconfig = new ScreenConfiguration();
+		
 		//SET THE SCREENS BY RETRIEVING FROM DB
 		setScreens();
 		if(LOG.isDebugEnabled()) LOG.debug("SCREENS : "  + screens.toString());
@@ -112,16 +106,8 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 	public void setScreens()
 	{
 		if(LOG.isDebugEnabled()) LOG.debug("SETTING SCREENS");
-		this.screens=screenDAO.getAllScreens();
-		//REMOVE ALL SCREENS FROM SCREEN CONFIG
-		screenconfig.removeAllScreens();
-		//GET A NEW SCREEN CONFIGURATION (ORGINALLY CALLED FROM SCREENCONFIGFIDALOGUE)
-		//AND ADD THE SCREENS TO THE SCREENCONFIG
-		for(Screen screen : screens)
-		{
-			screenconfig.addScreen(screen);
-		}
-		if(LOG.isDebugEnabled()) LOG.debug(this.toString() + " " + screens.toString());
+		this.contextRetriever.getScreensFromContext();
+		this.screens = this.contextRetriever.getScreens();
 	}
 
 
@@ -136,30 +122,41 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		return false;
 	}
 
+	private Screen getScreenBasedOnID(String screenID){
+		Screen screenToReturn = null;
+		for(Screen screen : this.screens)
+		{
+			if(screen.getScreenID().equals(screenID))
+			{
+				screenToReturn = screen;
+				break;
+			}
+		}
+		return screenToReturn;
+	}
 
 
 	@Override
-	public String requestAccess(String identity, String location) {
+	public String requestAccess(String identity, String screenID) {
 		try{
-			if(LOG.isDebugEnabled()) LOG.debug("Request from: "+identity+" to use screen in location: "+location);
-			if (this.currentlyUsedScreens.containsKey(location)){
+			if(LOG.isDebugEnabled()) LOG.debug("Request from: "+identity+" to use screen: "+screenID);
+			if (this.currentlyUsedScreens.containsKey(screenID)){
 				return "REFUSED";
 			}else{
-				Screen screen = this.screenconfig.getScreenBasedOnLocation(location);
+				Screen screen = getScreenBasedOnID(screenID);
 				if (screen==null){
-					LOG.debug("There is no screen at location: "+location+"\n. Available locations are: \n"+this.screenconfig.toString());
 					return "REFUSED";
 				}
 
 				String ipAddress = screen.getIpAddress();
 
 				if (ipAddress==null){
-					if(LOG.isDebugEnabled()) LOG.debug("IP address for screen: "+screen.getScreenId()+" is null");
+					if(LOG.isDebugEnabled()) LOG.debug("IP address for screen: "+screen.getScreenID()+" is null");
 					return "REFUSED";
 				}
 
 				//ON RETURN IP ADDRESS, ADD THE MAPPING OF THE SCREEN
-				this.currentlyUsedScreens.put(location, identity);
+				this.currentlyUsedScreens.put(screenID, identity);
 				return ipAddress;
 			}
 		}
@@ -174,11 +171,11 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 
 
 	@Override
-	public void releaseResource(String identity, String location) {
-		if (this.currentlyUsedScreens.containsKey(location)){
-			String currentUserId = this.currentlyUsedScreens.get(location);
+	public void releaseResource(String identity, String screenID) {
+		if (this.currentlyUsedScreens.containsKey(screenID)){
+			String currentUserId = this.currentlyUsedScreens.get(screenID);
 			if (identity.startsWith(currentUserId) || (currentUserId.startsWith(identity))){
-				this.currentlyUsedScreens.remove(location);
+				this.currentlyUsedScreens.remove(screenID);
 			}
 		}
 
@@ -192,17 +189,6 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 		if(LOG.isDebugEnabled()) LOG.debug("RELEASING RESOURCE : " + location);
 		this.currentlyUsedScreens.remove(location);
 		if(LOG.isDebugEnabled()) LOG.debug("USE SCREENS ARE NOW: " + this.currentlyUsedScreens.keys().toString());
-	}
-
-	@Override
-	public String[] getScreenLocations() {
-		return this.screenconfig.getLocations();
-	}
-
-	public static void main(String[] args){
-		DisplayPortalServer server = new DisplayPortalServer();
-		server.initialiseServer();
-
 	}
 
 	@Override
@@ -250,28 +236,34 @@ public class DisplayPortalServer implements IDisplayPortalServer{
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 		this.idMgr = commManager.getIdManager();
-		serverIdentity = this.idMgr.getThisNetworkNode();
+		this.serverIdentity = this.idMgr.getThisNetworkNode();
+	}
+	
+	/**
+	 * @return the ctxBroker
+	 */
+	public ICtxBroker getCtxBroker() {
+		return ctxBroker;
 	}
 
 	/**
-	 * @return the sessionFactory
+	 * @param ctxBroker the ctxBroker to set
 	 */
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
+	public void setCtxBroker(ICtxBroker ctxBroker) {
+		this.ctxBroker = ctxBroker;
 	}
-	/**
-	 * @param sessionFactory the services to sessionFactory
-	 */
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
+	
+
+
+	@Override
+	public String[] getScreenIDs() {
+		String[] screenIDs = new String[this.screens.size()];
+		int increment=0;
+		for(Screen screen : this.screens)
+		{
+			screenIDs[increment] = screen.getScreenID();
+		}
+		return screenIDs;
 	}
 
-
-	/* public void setScreenDAO(IScreenDAO screenDAO) {
-        this.screenDAO = screenDAO;
-    }
-
-    public IScreenDAO getScreenDAO() {
-        return screenDAO;
-    }*/
 }

@@ -25,11 +25,15 @@
 
 package org.societies.rfid.server;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Timer;
 
 import javax.swing.UIManager;
@@ -54,6 +58,8 @@ import org.societies.api.css.devicemgmt.model.DeviceMgmtDriverServiceNames;
 import org.societies.api.css.devicemgmt.model.DeviceMgmtEventConstants;
 import org.societies.api.css.devicemgmt.model.DeviceStateVariableConstants;
 import org.societies.api.css.devicemgmt.model.DeviceTypeConstants;
+import org.societies.api.css.devicemgmt.rfid.RfidReader;
+import org.societies.api.css.devicemgmt.rfid.RfidWakeupUnit;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -80,6 +86,11 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 	private Hashtable<String, String> tagtoIdentityTable;
 	
 	private Hashtable<String, String> tagtoSymlocTable; //TAG TO SYMLOC
+	
+	private Hashtable<String, String> tagtoTimeTable; 
+	
+	
+	private ArrayList<RfidWakeupUnit> rfidWakeupUnits;
 
 	private Hashtable<String, String> wUnitToSymlocTable;
 
@@ -146,19 +157,34 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.tagtoIdentityTable = new Hashtable<String, String>();
 		this.tagToPasswordTable = new Hashtable<String, String>();
 		this.tagtoSymlocTable = new Hashtable<String, String>();
+		this.tagtoTimeTable = new Hashtable<String, String>();
+		
+		this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
 		//this.dpiToServiceID = new Hashtable<String, String>();
-		RFIDConfig rfidConfig = new RFIDConfig();
-		this.wUnitToSymlocTable = rfidConfig.getUnitToSymloc();
-		if (this.wUnitToSymlocTable==null){
-			this.wUnitToSymlocTable = new Hashtable<String, String>();
+		this.wUnitToSymlocTable = new Hashtable<String, String>();
 
-		}
-		this.registerRFIDReaders();
 
 		this.ctxRetriever = new ContextRetriever(getCtxBroker(), this.serverIdentity);
 		this.tagtoIdentityTable = ctxRetriever.getTagToIdentity();
 		this.tagToPasswordTable = ctxRetriever.getTagToPassword();
 		this.tagtoSymlocTable = ctxRetriever.getTagToSymloc();
+		this.tagtoTimeTable = ctxRetriever.getTagToTime();
+		this.rfidWakeupUnits = ctxRetriever.getRfidWakeupUnits();
+		
+		//SET UP UNIT TO LOCATION
+		for(RfidWakeupUnit wakeupUnit : rfidWakeupUnits)
+		{
+			this.wUnitToSymlocTable.put(wakeupUnit.getWakeupUnitNumber(), wakeupUnit.getScreenID());
+		}
+		
+		/*RFIDConfig rfidConfig = new RFIDConfig();
+		this.wUnitToSymlocTable = rfidConfig.getUnitToSymloc();
+		if (this.wUnitToSymlocTable==null){
+			this.wUnitToSymlocTable = new Hashtable<String, String>();
+
+		}*/
+		this.registerRFIDReaders();
+		
 		logging.debug("in initialisation - starting eventlistener");
 		this.webAppEventListener = new RfidWebAppEventListener(this);
 	}
@@ -215,6 +241,39 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		}
 
 	}
+	
+
+	public void addRfidWakeupUnit(RfidWakeupUnit rfidWakeupUnit){
+		this.rfidWakeupUnits.add(rfidWakeupUnit);
+		this.wUnitToSymlocTable.put(rfidWakeupUnit.getWakeupUnitNumber(), rfidWakeupUnit.getScreenID());
+		this.ctxRetriever.setRfidWakeupUnits(this.rfidWakeupUnits);
+		this.ctxRetriever.updateRFIDWakeupContext();
+		logging.debug("Wakeup Unit succesfully added!");
+	}
+
+	
+	public void deleteRfidWakeupUnit(RfidWakeupUnit rfidWakeupUnit){
+		logging.debug("Deleting UNIT: " + rfidWakeupUnit.getWakeupUnitNumber() + this.rfidWakeupUnits.size());
+		int index = 0;
+		boolean found = false;
+		for(RfidWakeupUnit unit : this.rfidWakeupUnits){
+			if(unit.getWakeupUnitNumber().equals(rfidWakeupUnit.getWakeupUnitNumber())){
+				found = true;
+				index = this.rfidWakeupUnits.indexOf(unit);
+				break;
+			}
+		}
+		if(found)
+		{
+			this.rfidWakeupUnits.remove(index);
+		}
+		//this.rfidWakeupUnits.remove(rfidWakeupUnit);
+		logging.debug(" " +this.rfidWakeupUnits.size());
+		this.wUnitToSymlocTable.remove(rfidWakeupUnit.getWakeupUnitNumber());
+		this.ctxRetriever.setRfidWakeupUnits(this.rfidWakeupUnits);
+		this.ctxRetriever.updateRFIDWakeupContext();
+	}
+	
 	public RfidServer(){
 		logging.debug("started!");
 		UIManager.put("ClassLoader", ClassLoader.getSystemClassLoader());
@@ -271,8 +330,21 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.tagtoSymlocTable.remove(tag);//remove last entry if exists
 		this.tagtoSymlocTable.put(tag,symloc);
 		this.ctxRetriever.setTagToSymloc(tagtoSymlocTable);
-		this.ctxRetriever.updateContext();
+		
+		//UPDATE TIME TOO
+		updateTagToTime(tag);
+		this.ctxRetriever.updateRFIDTagContext();
 		logging.debug("Tag to Symloc Updated!");
+	}
+	
+	public void updateTagToTime(String tag) {
+		DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		Date date = new Date();
+		String time = dateFormat.format(date).toString();
+		this.tagtoTimeTable.remove(tag);//remove last entry if exists
+		this.tagtoTimeTable.put(tag,time);
+		this.ctxRetriever.setTagToTime(tagtoTimeTable);
+		logging.debug("Tag to Time Updated!");
 	}
 
 
@@ -321,7 +393,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 				this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
 				this.ctxRetriever.setTagToPassword(tagToPasswordTable);
 				this.ctxRetriever.setTagToSymloc(tagtoSymlocTable);//MAYBE DONT NEED?!
-				this.ctxRetriever.updateContext();
+				this.ctxRetriever.updateRFIDTagContext();
 				this.rfidClientRemote.acknowledgeRegistration(dpiAsString, 0);
 				logging.debug("Registration successfull. Sent Acknowledgement 0");
 
@@ -347,7 +419,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.tagToPasswordTable.put(tagNumber, getPassword());
 		this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
 		this.ctxRetriever.setTagToPassword(tagToPasswordTable);
-		this.ctxRetriever.updateContext();
+		this.ctxRetriever.updateRFIDTagContext();
 		//TODO ACK's
 		this.rfidClientRemote.acknowledgeRegistration(dpiAsString, 3);
 		logging.debug("UnRegistration successfull. Sent Acknowledgement 3");
@@ -381,9 +453,11 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 	public void deleteTag(String tag) {
 		this.tagtoIdentityTable.remove(tag);
 		this.tagToPasswordTable.remove(tag);
+		this.tagtoTimeTable.remove(tag);
 		this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
 		this.ctxRetriever.setTagToPassword(tagToPasswordTable);
-		this.ctxRetriever.updateContext();
+		this.ctxRetriever.setTagToTime(tagtoTimeTable);
+		this.ctxRetriever.updateRFIDTagContext();
 		if(logging.isDebugEnabled()) logging.debug("deleted rfidTag: "+tag);
 		this.printInformation();
 	}
@@ -441,7 +515,7 @@ public class RfidServer extends EventListener implements IRfidServer, ServiceTra
 		this.tagtoIdentityTable.remove(tagNumber);
 		this.ctxRetriever.setTagToIdentity(tagtoIdentityTable);
 		this.ctxRetriever.setTagToPassword(tagToPasswordTable);
-		this.ctxRetriever.updateContext();
+		this.ctxRetriever.updateRFIDTagContext();
 		this.printInformation();
 	}
 

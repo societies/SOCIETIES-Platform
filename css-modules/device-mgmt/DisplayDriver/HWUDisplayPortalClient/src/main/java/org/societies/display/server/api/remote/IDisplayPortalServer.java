@@ -42,7 +42,7 @@ public interface IDisplayPortalServer {
 	
 	boolean checkAccess(IIdentity serverIdentity, String location);
 	
-	public String[] getScreenLocations(IIdentity serverIdentity);
+	public String[] getScreenIds(IIdentity serverIdentity);
 	
 	public ServiceResourceIdentifier getServerServiceId(IIdentity serverIdentity);
 }

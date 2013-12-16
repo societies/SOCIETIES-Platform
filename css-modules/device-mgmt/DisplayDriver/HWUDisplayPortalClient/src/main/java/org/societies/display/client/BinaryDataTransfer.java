@@ -54,6 +54,7 @@ public class BinaryDataTransfer {
 		this.address = address;
 
 	}
+	
 	public void sendImage(String userIdentity, String sourceFileName){
 		try {
 			File file = new File(sourceFileName);
@@ -91,13 +92,5 @@ public class BinaryDataTransfer {
 		} 
 	}
 	
-	
-	
-	public static void main(String[] args){
-		String filename = "C:\\Users\\Public\\Pictures\\Sample Pictures\\Chrysanthemum.jpg";
-		BinaryDataTransfer bdt = new BinaryDataTransfer("127.0.0.1");
-		bdt.sendImage("eliza@societies.local",filename);
-
-	}
 
 }

@@ -47,10 +47,12 @@ import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.webapp.controller.BasePageController;
+import org.societies.api.css.devicemgmt.rfid.RfidReader;
+import org.societies.api.css.devicemgmt.rfid.RfidWakeupUnit;
 import org.societies.webapp.service.UserService;
 
 @ManagedBean(name = "rfidServerController")
-@ViewScoped
+@SessionScoped
 public class RFidServerController extends BasePageController {
 
 	private static final String RFID_SERVER_EVENT_TYPE = "org/societies/rfid/server";
@@ -71,16 +73,29 @@ public class RFidServerController extends BasePageController {
 	private RfidBean selectedRfidBean;
 	private RfidBean addRfidBean;
 
+	private RfidWakeupUnit selectedWakeupUnit;
+
+
+	private ArrayList<RfidWakeupUnit> rfidWakeupUnits;
+	private ContextRetriever contextRetriever;
+	
+	private RfidWakeupUnit newRfidWakeupUnit;
+
 	private IIdentityManager idManager;
 
 	private IIdentity serverIdentity;
-	
+
+	private String newWakeUpLocDropDown;
+	private String newWakeUpLocText;
+
 
 	public RFidServerController() {
 		// controller constructor - called every time this page is requested!
 		this.setRfidBeans(new ArrayList<RfidBean>());
 		this.addRfidBean = new RfidBean();
 		this.selectedRfidBean = new RfidBean();
+		this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
+		this.newRfidWakeupUnit = new RfidWakeupUnit();
 	}
 
 	public UserService getUserService() {
@@ -93,7 +108,91 @@ public class RFidServerController extends BasePageController {
 
 	@PostConstruct
 	public void retrieveRFIDRecords(){
+		this.contextRetriever = new ContextRetriever(ctxBroker, serverIdentity);
 		this.getRfidBeans();
+		this.getWakeupUnits();
+
+	}
+
+	public void deleteWakeupWithLoc(String loc) {
+		List<RfidWakeupUnit> matchedUnits = new ArrayList<RfidWakeupUnit>();
+		for(RfidWakeupUnit unit : this.rfidWakeupUnits)
+		{
+			if(loc.equals(unit.getScreenID()))
+			{
+				matchedUnits.add(unit);
+			}
+				}
+		if(matchedUnits.size()>0)
+		{
+			for(RfidWakeupUnit unitToDelete : matchedUnits)
+			{
+				deleteWakeupUnit(unitToDelete);
+				//this.rfidWakeupUnits.remove(unitToDelete);
+			}
+		}
+	}
+	
+	public void deleteWakeupUnit() {
+		deleteWakeupUnit(this.selectedWakeupUnit);
+	}
+	
+	public void deleteWakeupUnit(RfidWakeupUnit wakeupUnit){
+		if(log.isDebugEnabled()) log.debug("Delete wakeup record");
+		InternalEvent event = new InternalEvent(RFID_SERVER_EVENT_TYPE, "deleteWakeupUnit", this.getClass().getName(), wakeupUnit);
+		try {
+			this.eventManager.publishInternalEvent(event);
+			if(log.isDebugEnabled()) log.debug("Published deletion event");
+		} catch (EMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.rfidWakeupUnits.remove(wakeupUnit);
+	}
+
+	
+	public void getWakeupUnits() {
+		this.rfidWakeupUnits=this.contextRetriever.getRfidWakeupUnits();
+
+	}
+
+	public void addRfidWakeupUnit() {
+		this.log.debug("IN ADD WAKEUP");
+		if(null != this.newRfidWakeupUnit.getScreenID() && !this.newRfidWakeupUnit.getScreenID().trim().isEmpty()
+				&& null != this.newRfidWakeupUnit.getWakeupUnitNumber() && !this.newRfidWakeupUnit.getWakeupUnitNumber().trim().isEmpty())
+		{
+			//CHECK TO SEE IF ONE ALREADY EXISTS
+			boolean wakeupFound = false;
+			FacesMessage msg = null;
+			for(RfidWakeupUnit wakeupUnit : this.rfidWakeupUnits)
+			{
+				if(wakeupUnit.getScreenID().equals(this.newRfidWakeupUnit.getScreenID())
+						|| wakeupUnit.getWakeupUnitNumber().equals(this.newRfidWakeupUnit.getWakeupUnitNumber()))
+				{
+					wakeupFound = true;
+					msg = new FacesMessage(FacesMessage.SEVERITY_WARN, "RFID WakeupUnit", "A Wakeup Unit with similar properties already exist!");
+					break;
+				}
+			}
+			
+			if(!wakeupFound)
+			{
+				this.rfidWakeupUnits.add(this.newRfidWakeupUnit);
+				InternalEvent event = new InternalEvent(RFID_SERVER_EVENT_TYPE, "addNewWakeupUnit", this.getClass().getName(), this.newRfidWakeupUnit);
+				try {
+					this.eventManager.publishInternalEvent(event);
+					if(log.isDebugEnabled()) log.debug("Published add new wakeupUnit event");
+				} catch (EMSException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "RFID WakeupUnit", "Wakeup Unit has successfully been added!");
+
+			}
+			this.newRfidWakeupUnit = new RfidWakeupUnit();
+			FacesContext.getCurrentInstance().addMessage(null, msg);
+			RequestContext.getCurrentInstance().addCallbackParam("wakeupAdded", wakeupFound);
+		}		
 
 	}
 
@@ -129,7 +228,7 @@ public class RFidServerController extends BasePageController {
 		}
 		FacesContext.getCurrentInstance().addMessage(null, msg);
 		context.addCallbackParam("tagAdded", tagAdded);
-		
+
 
 	}
 
@@ -197,13 +296,14 @@ public class RFidServerController extends BasePageController {
 
 	public List<RfidBean> getRfidBeans() {
 		this.rfidBeans = new ArrayList<RfidBean>();
-		ContextRetriever contextRetriever = new ContextRetriever(ctxBroker, serverIdentity);
+		this.contextRetriever.getAllFromContext();
 		Hashtable<String,String> tagToIdentity = contextRetriever.getTagToIdentity();
 		Hashtable<String,String> tagToPassword = contextRetriever.getTagToPassword();
 		Hashtable<String,String> tagToSymloc = contextRetriever.getTagToSymloc();
+		Hashtable<String,String> tagToTime = contextRetriever.getTagToTime();
 
 		if(log.isDebugEnabled()) log.debug("GOT BEANS: " + tagToSymloc.toString());
-		
+
 		Enumeration<String> rfidTags = tagToPassword.keys();
 
 		while(rfidTags.hasMoreElements()){
@@ -212,6 +312,7 @@ public class RFidServerController extends BasePageController {
 			bean.setRfidTag(rfidTag);
 			bean.setPassword(tagToPassword.get(rfidTag));
 			bean.setSymLoc(tagToSymloc.get(rfidTag));
+			bean.setTime(tagToTime.get(rfidTag));
 			if (tagToIdentity.containsKey(rfidTag)){
 				bean.setUserIdentity(tagToIdentity.get(rfidTag));
 			}
@@ -234,4 +335,45 @@ public class RFidServerController extends BasePageController {
 		if(log.isDebugEnabled()) log.debug("Set addRfidBean");
 
 	}
+
+	public RfidWakeupUnit getNewRfidWakeupUnit() {
+		return newRfidWakeupUnit;
+	}
+
+	public void setNewRfidWakeupUnit(RfidWakeupUnit newRfidWakeupUnit) {
+		this.newRfidWakeupUnit = newRfidWakeupUnit;
+	}
+
+
+
+	public ArrayList<RfidWakeupUnit> getRfidWakeupUnits() {
+		return rfidWakeupUnits;
+	}
+
+	public String getNewWakeUpLocDropDown() {
+		return newWakeUpLocDropDown;
+	}
+
+	public void setNewWakeUpLocDropDown(String newWakeUpLocDropDown) {
+		this.newWakeUpLocDropDown = newWakeUpLocDropDown;
+	}
+
+	public String getNewWakeUpLocText() {
+		return newWakeUpLocText;
+	}
+
+	public void setNewWakeUpLocText(String newWakeUpLocText) {
+		this.newWakeUpLocText = newWakeUpLocText;
+	}
+	
+	public RfidWakeupUnit getSelectedWakeupUnit() {
+		return selectedWakeupUnit;
+	}
+
+	public void setSelectedWakeupUnit(RfidWakeupUnit selectedWakeupUnit) {
+		this.selectedWakeupUnit = selectedWakeupUnit;
+	}
+
+
+
 }

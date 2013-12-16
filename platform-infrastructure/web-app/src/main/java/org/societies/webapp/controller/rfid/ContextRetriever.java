@@ -26,6 +26,7 @@ package org.societies.webapp.controller.rfid;
 
 import java.io.IOException;
 import java.security.Identity;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -46,6 +47,8 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.IIdentityManager;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.css.devicemgmt.rfid.RfidReader;
+import org.societies.api.css.devicemgmt.rfid.RfidWakeupUnit;
 
 /**
  * @author Eliza
@@ -56,12 +59,16 @@ public class ContextRetriever {
 	private static final String TAG_TO_IDENTITY = "tagToIdentity";
 	private static final String TAG_TO_PASSWORD = "tagToPassword";
 	private static final String TAG_TO_SYMLOC = "tagToSymloc";
+	private static final String TAG_TO_TIME = "tagToTime";
+	private static final String RFID_WAKEUP_UNITS = "rfidWakeupUnits";
 	private static final String RFID_SERVER_ENTITY = "RFID_SERVER_ENTITY";
 	private static final String RFID_INFO = "RFID_INFO";
 	private static final String RFID_LAST_LOCATION = "RFID_LAST_LOCATION";
 	private Hashtable<String, String> tagToPassword;
 	private Hashtable<String, String> tagToIdentity;
 	private Hashtable<String, String> tagToSymloc;
+	private Hashtable<String, String> tagToTime;
+	private ArrayList<RfidWakeupUnit> rfidWakeupUnits;
 	private CtxEntity ctxEntity;
 	private ICtxBroker ctxBroker;
 	private IIdentity serverIdentity;
@@ -75,6 +82,38 @@ public class ContextRetriever {
 		this.tagToIdentity = new Hashtable<String, String>();
 		this.tagToPassword = new Hashtable<String, String>();
 		this.tagToSymloc= new Hashtable<String, String>();
+		this.tagToTime= new Hashtable<String, String>();
+		this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
+		
+		//GET ALL FROM CONTEXT
+		getAllFromContext();
+
+
+	}
+
+	public Hashtable<String, String> getTagToIdentity() {
+		return tagToIdentity;
+	}
+
+
+	public Hashtable<String, String> getTagToPassword() {
+		return tagToPassword;
+	}
+
+	public Hashtable<String, String> getTagToSymloc() {
+		return tagToSymloc;
+	}
+	
+	public Hashtable<String, String> getTagToTime() {
+		return tagToTime;
+	}
+	
+
+	public ArrayList<RfidWakeupUnit> getRfidWakeupUnits() {
+		return rfidWakeupUnits;
+	}
+	
+	public void getAllFromContext() {
 
 		try {
 			List<CtxIdentifier> list = ctxBroker.lookup(serverIdentity, CtxModelType.ENTITY, RFID_SERVER_ENTITY).get();
@@ -110,53 +149,73 @@ public class ContextRetriever {
 						this.tagToSymloc = new Hashtable<String, String>();
 					}
 				}
+				
+				Set<CtxAttribute> tagToTimeAttributes = ctxEntity.getAttributes(TAG_TO_TIME);
+				if (tagToTimeAttributes.size()>0){			
+					byte[] binaryValue = tagToTimeAttributes.iterator().next().getBinaryValue();
+					if (binaryValue!=null){
+						this.tagToTime = (Hashtable<String, String>) SerialisationHelper.deserialise(binaryValue, this.getClass().getClassLoader());
+					}else{
+						this.tagToTime = new Hashtable<String, String>();
+					}
+				}
+				
+				Set<CtxAttribute> rfidWakeupUnitAttributes = ctxEntity.getAttributes(RFID_WAKEUP_UNITS);
+				if (rfidWakeupUnitAttributes.size()>0){			
+					byte[] binaryValue = rfidWakeupUnitAttributes.iterator().next().getBinaryValue();
+					if (binaryValue!=null){
+						this.rfidWakeupUnits = (ArrayList<RfidWakeupUnit>) SerialisationHelper.deserialise(binaryValue, this.getClass().getClassLoader());
+					}else{
+						this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
+					}
+				}
+
 
 
 			}else{
 				this.tagToIdentity = new Hashtable<String, String>();
 				this.tagToPassword = new Hashtable<String, String>();
 				this.tagToSymloc = new Hashtable<String, String>();
+				this.tagToTime= new Hashtable<String, String>();
+				this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
 			}
 		} catch (InterruptedException e) {
 			this.tagToIdentity = new Hashtable<String, String>();
 			this.tagToPassword = new Hashtable<String, String>();
 			this.tagToSymloc = new Hashtable<String, String>();
+			this.tagToTime= new Hashtable<String, String>();
+			this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			this.tagToIdentity = new Hashtable<String, String>();
 			this.tagToPassword = new Hashtable<String, String>();
 			this.tagToSymloc = new Hashtable<String, String>();
+			this.tagToTime= new Hashtable<String, String>();
+			this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
 			e.printStackTrace();
 		} catch (CtxException e) {
 			this.tagToIdentity = new Hashtable<String, String>();
 			this.tagToPassword = new Hashtable<String, String>();
 			this.tagToSymloc = new Hashtable<String, String>();
+			this.tagToTime= new Hashtable<String, String>();
+			this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
 			e.printStackTrace();
 		} catch (IOException e) {
 			this.tagToIdentity = new Hashtable<String, String>();
 			this.tagToPassword = new Hashtable<String, String>();
 			this.tagToSymloc = new Hashtable<String, String>();
+			this.tagToTime= new Hashtable<String, String>();
+			this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			this.tagToIdentity = new Hashtable<String, String>();
 			this.tagToPassword = new Hashtable<String, String>();
 			this.tagToSymloc = new Hashtable<String, String>();
+			this.tagToTime= new Hashtable<String, String>();
+			this.rfidWakeupUnits = new ArrayList<RfidWakeupUnit>();
 			e.printStackTrace();
 		}
-
 	}
 
-	public Hashtable<String, String> getTagToIdentity() {
-		return tagToIdentity;
-	}
-
-
-	public Hashtable<String, String> getTagToPassword() {
-		return tagToPassword;
-	}
-
-	public Hashtable<String, String> getTagToSymloc() {
-		return tagToSymloc;
-	}
 
 }

@@ -39,7 +39,15 @@ public class RfidBean {
 	private String password = "";
 	private String userIdentity = "";
 	private String wakeupUnit = "";
+	private String time = "";
 	private String symLoc = "";
+	
+	public String getTime() {
+		return time;
+	}
+	public void setTime(String time) {
+		this.time = time;
+	}
 	
 	public String getSymLoc() {
 		return symLoc;
