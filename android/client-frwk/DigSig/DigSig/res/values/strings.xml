@@ -21,6 +21,7 @@
     <string name="action_clear">Clear document list</string>
     <string name="collaborativeSigningNotStartedYet">Collaborative signing not started yet.</string>
     <string name="signatureThresholdReached">Signature threshold reached</string>
+    <string name="signatureThresholdNotReached">Signature threshold not reached yet</string>
     <string name="signedBy">Signed by</string>
     <string name="parties">parties</string>
     <string name="unknown">\?</string>

@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.societies.security.digsig.sign.R;
 import org.societies.security.digsig.utility.Net;
 
 import android.os.AsyncTask;
@@ -61,13 +60,11 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 			return net.getString();
 		} catch (FileNotFoundException e) {
 			Log.w(TAG, "doInBackground: file not found", e);
-			activity.updateSigStatus(-1, -1, null,
-					activity.getText(R.string.collaborativeSigningNotStartedYet).toString());
+			activity.updateSigStatus(true, false, -1, -1, null);
 			return null;
 		} catch (Exception e) {
 			Log.w(TAG, "doInBackground", e);
-			activity.updateSigStatus(-1, -1, null,
-					activity.getText(R.string.errorOccurred).toString());
+			activity.updateSigStatus(false, false, -1, -1, null);
 			return null;
 		}
 	}
@@ -93,7 +90,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 		int minNumSigners = getMinNumSigners(json);
 		ArrayList<String> signers = getSigners(json);
 		
-		activity.updateSigStatus(numSigners, minNumSigners, signers, null);
+		activity.updateSigStatus(true, true, numSigners, minNumSigners, signers);
 	}
 	
 	private int getNumSigners(JSONObject json) {

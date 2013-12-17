@@ -10,13 +10,13 @@
     tools:context=".CommunitySigStatusActivity$DummySectionFragment" >
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/not_started"
-        android:gravity="center"
-        android:text="@string/collaborativeSigningNotStartedYet"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        />
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:drawableLeft="@drawable/error"
+	        android:gravity="center"
+	        android:text="@string/errorOccurred"
+	        android:textAlignment="center"
+	        android:textSize="20sp"
+	/>
     
 </LinearLayout>

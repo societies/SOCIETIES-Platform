@@ -9,12 +9,16 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".CommunitySigStatusActivity$DummySectionFragment" >
 
-    <CheckBox
-        android:id="@+id/communitySigStatusThresholdReachedCheckBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="@string/signatureThresholdReached" />
+    <TextView
+        	android:id="@+id/communitySigStatusMainTextView"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:drawableLeft="@drawable/ok"
+	        android:gravity="center"
+	        android:text="@string/signatureThresholdReached"
+	        android:textAlignment="center"
+	        android:textSize="20sp"
+	/>
 
     <ProgressBar
         android:id="@+id/communitySigStatusProgressBar"
@@ -77,7 +81,6 @@
     </LinearLayout>
 
     <TextView
-        android:id="@+id/communitySigStatusCurrentSignersLabelTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/currentSigners" />

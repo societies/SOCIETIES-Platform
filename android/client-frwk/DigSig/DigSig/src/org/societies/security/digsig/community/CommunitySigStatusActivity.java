@@ -24,7 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -224,7 +223,8 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	 * @param signers List of signers extracted from downloaded document, or null for error
 	 * @param errorMsg Localized error to be displayed to the user, or null for no error
 	 */
-	protected void updateSigStatus(int numSigners, int minNumSigners, ArrayList<String> signers, String errorMsg) {
+	protected void updateSigStatus(boolean success, boolean started,
+			int numSigners, int minNumSigners, ArrayList<String> signers) {
 		
 		Log.d(TAG, "updateSigStatus: numSigners = " + numSigners);
 		Log.d(TAG, "updateSigStatus: minNumSigners = " + minNumSigners);
@@ -232,10 +232,11 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 
 		Fragment fragment = new DummySectionFragment();
 		Bundle args = new Bundle();
+		args.putBoolean(DummySectionFragment.ARG_SUCCESS, success);
+		args.putBoolean(DummySectionFragment.ARG_STARTED, started);
 		args.putInt(DummySectionFragment.ARG_NUM_SIGNERS, numSigners);
 		args.putInt(DummySectionFragment.ARG_MIN_NUM_SIGNERS, minNumSigners);
 		args.putStringArrayList(DummySectionFragment.ARG_SIGNERS, signers);
-		args.putString(DummySectionFragment.ARG_ERROR_MSG, errorMsg);
 		fragment.setArguments(args);
 		getSupportFragmentManager().beginTransaction()
 				.replace(R.id.container, fragment).commit();
@@ -247,10 +248,11 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	 */
 	public static class DummySectionFragment extends Fragment {
 
+		public static final String ARG_SUCCESS = "SUCCESS";
+		public static final String ARG_STARTED = "STARTED";
 		public static final String ARG_SIGNERS = "SIGNERS";
 		public static final String ARG_NUM_SIGNERS = "NUM_SIGNERS";
 		public static final String ARG_MIN_NUM_SIGNERS = "MIN_NUM_SIGNERS";
-		public static final String ARG_ERROR_MSG = "ERROR_MSG";
 		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -258,52 +260,65 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			int resource;
 			View rootView;
 			TextView textView;
-			CheckBox checkBox;
 			String str;
 		
 			// Arguments
 			int numSigners = getArguments().getInt(ARG_NUM_SIGNERS, -1);
 			int minNumSigners = getArguments().getInt(ARG_MIN_NUM_SIGNERS, -1);
 			ArrayList<String> signers = getArguments().getStringArrayList(ARG_SIGNERS);
-			String errorMsg = getArguments().getString(ARG_ERROR_MSG);
+			boolean success = getArguments().getBoolean(ARG_SUCCESS);
+			boolean started = getArguments().getBoolean(ARG_STARTED);
 			
+			Log.d(TAG, "onCreateView: success = " + success);
+			Log.d(TAG, "onCreateView: started = " + started);
 			Log.d(TAG, "onCreateView: numSigners = " + numSigners);
 			Log.d(TAG, "onCreateView: minNumSigners = " + minNumSigners);
 			Log.d(TAG, "onCreateView: signers = " + signers);
-			Log.d(TAG, "onCreateView: localized error = " + errorMsg);
 
 			mBusyDialog.cancel();
 			
-			if (errorMsg != null) {
-				
-				resource = R.layout.fragment_community_sig_status_nonexisting;
+			// Inflate the appropriate GUI
+			if (!success) {
+				resource = R.layout.fragment_community_sig_status_error;
 				rootView = inflater.inflate(resource, container, false);
-				
-				textView = (TextView) rootView.findViewById(R.id.communitySigStatusError);
-				textView.setText(errorMsg);
-				
 				return rootView;
 			}
-			
+			else if (!started) {
+				resource = R.layout.fragment_community_sig_status_nonexisting;
+				rootView = inflater.inflate(resource, container, false);
+				return rootView;
+			}
 			resource = R.layout.fragment_community_sig_status_existing;
 			rootView = inflater.inflate(resource, container, false);
 
-			checkBox = (CheckBox) rootView.findViewById(R.id.communitySigStatusThresholdReachedCheckBox);
-			checkBox.setChecked(numSigners >= minNumSigners);
+			// Display appropriate icon and main text
+			textView = (TextView) rootView.findViewById(R.id.communitySigStatusMainTextView);
+			if (numSigners >= minNumSigners) {
+				textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ok, 0, 0, 0);
+				textView.setText(R.string.signatureThresholdReached);
+			}
+			else {
+				textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.construction, 0, 0, 0);
+				textView.setText(R.string.signatureThresholdNotReached);
+			}
 			
+			// Set progress bar progress
 			ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.communitySigStatusProgressBar);
 			int progress = Math.round(100 * ((float) numSigners) / minNumSigners);
 			progress = Math.min(progress, 100);
 			progressBar.setProgress(progress);
 
+			// Display current number of signers
 			textView = (TextView) rootView.findViewById(R.id.communitySigStatusSignedByNPartiesTextView);
 			str = numSigners >= 0 ? String.valueOf(numSigners) : "?";
 			textView.setText(str);
 			
+			// Display minimal required number of signers
 			textView = (TextView) rootView.findViewById(R.id.communitySigStatusRequiredTextView);
 			str = minNumSigners >= 0 ? String.valueOf(minNumSigners) : "?";
 			textView.setText(str);
 
+			// List all current signers
 			textView = (TextView) rootView.findViewById(R.id.communitySigStatusCurrentSignersTextView);
 			String signersStr = "";
 			for (String s : signers) {
