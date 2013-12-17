@@ -26,6 +26,10 @@ import org.societies.orchestration.sca.model.SuggestedCISImpl;
 public class SCAManager extends EventListener implements ISCAManager {
 
 	private static Logger log = LoggerFactory.getLogger(SCAManager.class);
+	
+	private static final String FEEDBACK_YES = "Yes";
+	private static final String FEEDBACK_NO = "No";
+	private static final String[] FEEDBACK_OPTIONS = new String[] {FEEDBACK_YES, FEEDBACK_NO};
 
 	private IEventMgr eventMgr;
 	private ICommManager commManager;
@@ -155,5 +159,6 @@ public class SCAManager extends EventListener implements ISCAManager {
 	public void setCisManager(ICisManager cisManager) {
 		this.cisManager = cisManager;
 	}
+
 
 }
