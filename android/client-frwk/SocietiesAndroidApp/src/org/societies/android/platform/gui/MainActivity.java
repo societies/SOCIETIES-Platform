@@ -29,7 +29,7 @@ package org.societies.android.platform.gui;
 
 
 import org.apache.cordova.DroidGap;
-
+import org.societies.android.platform.updateApp.CheckUpdateTask;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -50,6 +50,12 @@ public class MainActivity extends DroidGap {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //          setContentView(R.layout.main);
+        
+      //TODO: check if it the device is connected to Internet
+        //check if there is an updated version of Societies
+   		CheckUpdateTask checkUpdateTask= new CheckUpdateTask(this);
+   		checkUpdateTask.execute();
+   		
       super.setIntegerProperty("loadUrlTimeoutValue", 60000);
       PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
       super.loadUrl("file:///android_asset/www/index.html");
@@ -85,6 +91,10 @@ public class MainActivity extends DroidGap {
         case R.id.preference:
         	Intent prefIntent = new Intent(this, MasterPreferences.class);
         	this.startActivity(prefIntent);
+            return true;
+        case R.id.update:
+        	CheckUpdateTask checkUpdateTask= new CheckUpdateTask(this,true);
+			checkUpdateTask.execute();
             return true;
         default:
             return super.onOptionsItemSelected(item);

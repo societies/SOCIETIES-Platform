@@ -24,6 +24,7 @@
  */
 package org.societies.personalisation.preference.api.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -31,7 +32,7 @@ import java.util.Date;
  * @version 1.0
  * @created 08-Nov-2011 14:02:57
  */
-public class QualityofPreference implements IQualityofPreference {
+public class QualityofPreference implements IQualityofPreference, Serializable {
 
 	/**
 	 * how many times this outcome has been aborted

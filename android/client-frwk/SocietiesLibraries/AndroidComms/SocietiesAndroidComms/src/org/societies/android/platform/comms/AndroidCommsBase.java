@@ -197,7 +197,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 			
-			createNotification("Error registering namespaces: " + e.getMessage(), COMMS_CANNOT_REGISTER, NOTIFICATION_TITLE);
+			//createNotification("Error registering namespaces: " + e.getMessage(), COMMS_CANNOT_REGISTER, NOTIFICATION_TITLE);
 		} finally {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 		}
@@ -255,14 +255,14 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 			
-			createNotification("Error un-registering namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
+			//createNotification("Error un-registering namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);			
 			intent.setAction(XMPPAgent.UNREGISTER_EXCEPTION);
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 			
-			createNotification("Error un-registering namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
+			//createNotification("Error un-registering namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
 		} finally {
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
@@ -300,7 +300,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 
-			createNotification("Error unregistering all namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
+			//createNotification("Error unregistering all namespaces: " + e.getMessage(), COMMS_CANNOT_UNREGISTER, NOTIFICATION_TITLE);
 		} finally {
 			this.serviceContext.sendBroadcast(intent);
 		}
@@ -341,7 +341,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 
-			createNotification("Error sending message due to lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+			//createNotification("Error sending message due to lost connectivity", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
 			this.lostConnection = true;
 			
 		} catch (Exception e) {
@@ -350,7 +350,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_KEY, e.getMessage());
 			intent.putExtra(XMPPAgent.INTENT_RETURN_EXCEPTION_TRACE_KEY, getStackTraceArray(e));
 
-			createNotification("Error sending message: " + e.getMessage(), COMMS_CANNOT_SEND_MESSAGE, NOTIFICATION_TITLE);
+			//createNotification("Error sending message: " + e.getMessage(), COMMS_CANNOT_SEND_MESSAGE, NOTIFICATION_TITLE);
 		} finally {
 			this.serviceContext.sendBroadcast(intent);
 		}
@@ -389,7 +389,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
-			createNotification("Error invoking remote method", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
+			//createNotification("Error invoking remote method", COMMS_NO_CONNECTIVITY, NOTIFICATION_TITLE);
 			this.lostConnection = true;
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
@@ -403,7 +403,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
-			createNotification("Error invoking remote method due to lost connectivity: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+			//createNotification("Error invoking remote method due to lost connectivity: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 		}
 		return false;
 	}
@@ -1005,7 +1005,7 @@ public class AndroidCommsBase implements XMPPAgent {
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
 					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 					
-					createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+					//createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 				}
 			} catch (NoXMPPConnectionAvailableException e) {
 				Log.e(LOG_TAG, e.getMessage(), e);
@@ -1341,7 +1341,7 @@ public class AndroidCommsBase implements XMPPAgent {
 					intent.putExtra(XMPPAgent.INTENT_RETURN_VALUE_KEY, packet.toXML());
 					intent.putExtra(INTENT_RETURN_CALL_ID_KEY, this.remoteCallId);
 					AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
-					createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+					//createNotification("Error invoking remote method: " + packet.toXML(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 				}
 			} catch (NoXMPPConnectionAvailableException e) {
 				Log.e(LOG_TAG, e.getMessage(), e);
@@ -1399,7 +1399,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
-			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+			//createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 		} catch (Exception e) {
 			Log.e(LOG_TAG, e.getMessage(), e);
 			//Send intent
@@ -1412,7 +1412,7 @@ public class AndroidCommsBase implements XMPPAgent {
 			intent.putExtra(INTENT_RETURN_CALL_ID_KEY, remoteCallId);
 			AndroidCommsBase.this.serviceContext.sendBroadcast(intent);
 			
-			createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
+			//createNotification("Error invoking remote method: " + e.getMessage(), COMMS_CANNOT_SEND_IQ, NOTIFICATION_TITLE);
 		}
 		
 		return null;

@@ -129,7 +129,7 @@ public class PreferenceCreateBean extends BasePageController {
 	private IPreferenceCondition erroneousNode;
 	@PostConstruct
 	public void setup(){
-		
+		this.logging.debug("#CODE2#: Initiating PreferenceCreate controller");
 		root = new DefaultTreeNode();
 		createCtxAttributeTypesList();
 		setOperators(Arrays.asList(OperatorConstants.values()));

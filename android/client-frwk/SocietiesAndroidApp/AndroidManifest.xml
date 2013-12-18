@@ -1,17 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="org.societies.android.platform.gui"
-    android:versionCode="1"
-    android:versionName="1.0">
+    android:versionCode="3"
+    android:versionName="1.0" >
 
-    <uses-sdk
-        android:minSdkVersion="8"/>
+    <uses-sdk android:minSdkVersion="8" />
+
     <supports-screens
-                android:largeScreens="true"
-                android:normalScreens="true"
-                android:smallScreens="true"
-                android:resizeable="true"
-                android:anyDensity="true"
-                />
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:resizeable="true"
+        android:smallScreens="true" />
     <!-- Review these permissions and eliminate unwanted ones -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -24,34 +24,40 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-    <uses-permission android:name="android.permission.WRITE_CONTACTS" />   
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />  
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="org.societies.android.SocialProvider.WRITE"/>
-    <uses-permission android:name="org.societies.android.SocialProvider.READ"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    
-    <!-- Traceview permission-->
+    <uses-permission android:name="org.societies.android.SocialProvider.WRITE" />
+    <uses-permission android:name="org.societies.android.SocialProvider.READ" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+    <!-- Traceview permission -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
+    <uses-permission android:name="android.permission.INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.DELETE_PACKAGES" />
+
     <application
-        android:icon="@drawable/launcher_societies"
-        android:label="@string/app_name"
         android:configChanges="orientation|keyboardHidden"
-        android:debuggable="true"> 
+        android:debuggable="true"
+        android:icon="@drawable/launcher_societies"
+        android:label="@string/app_name" >
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:configChanges="orientation|keyboardHidden"> 
+            android:name="org.societies.android.platform.gui.MainActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MasterPreferences" android:label="@string/app_name" />
-        <activity android:name=".AboutActivity" android:label="@string/app_name" />
+        <activity
+            android:name="org.societies.android.platform.gui.MasterPreferences"
+            android:label="@string/app_name" />
+        <activity
+            android:name="org.societies.android.platform.gui.AboutActivity"
+            android:label="@string/app_name" />
         <activity android:name="org.societies.android.platform.socialdata.BridgeActivity" />
         <activity android:name="org.societies.platfrom.sns.android.socialapp.WebActivity" />
         <activity android:name="org.societies.android.platform.css.friends.AcceptFriendActivity" />
@@ -65,9 +71,9 @@
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.UserFeedbackHistoryList" />
         <activity android:name="org.societies.android.platform.useragent.feedback.guis.NotificationHistoryPopup" />
         <!-- LOCAL SERVICES -->
-		<service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
-		<service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
-		<service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
+        <service android:name="org.societies.android.platform.servicemonitor.ServiceManagementLocal" />
+        <service android:name="org.societies.android.platform.servicemonitor.ServiceUtilitiesRemote" />
+        <service android:name="org.societies.android.platform.servicemonitor.CoreServiceMonitor" />
         <service android:name="org.societies.android.platform.cssmanager.ServiceCSSManagerLocal" />
         <service android:name="org.societies.android.platform.cssmanager.LocalCssDirectoryService" />
         <service android:name="org.societies.android.platform.devicestatus.LocalDeviceStatusService" />
@@ -82,58 +88,69 @@
         <service android:name="org.societies.android.platform.useragent.feedback.EventHistory" />
         <service android:name="org.societies.android.privacytrust.trust.TrustClientLocal" />
         <!-- REMOTE SERVICES -->
-        <service android:name="org.societies.android.platform.cis.CisDirectoryRemote" android:label="Cis Directory Remote" >
-           <intent-filter>
+        <service
+            android:name="org.societies.android.platform.cis.CisDirectoryRemote"
+            android:label="Cis Directory Remote" >
+            <intent-filter>
                 <action android:name="org.societies.android.platform.cis.CisDirectoryRemote" />
-   			</intent-filter>
-   		</service>
-		<service android:name="org.societies.android.platform.cis.CisManagerRemote" 
-		    android:label="Cis Manager Remote" >
-			<intent-filter>
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.societies.android.platform.cis.CisManagerRemote"
+            android:label="Cis Manager Remote" >
+            <intent-filter>
                 <action android:name="org.societies.android.platform.cis.CisManagerRemote" />
-   			</intent-filter>
-   		</service>
-		<service android:name="org.societies.android.platform.cis.CisSubscribedRemote" 
-		    android:label="Cis Subscribed Remote" >
-			<intent-filter>
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.societies.android.platform.cis.CisSubscribedRemote"
+            android:label="Cis Subscribed Remote" >
+            <intent-filter>
                 <action android:name="org.societies.android.platform.cis.CisSubscribedRemote" />
-   			</intent-filter>
-   		</service>
-        <service
-        	android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"
-        	android:label="SocietiesPersonalisation">
-           <intent-filter>
-                <action android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"></action>
-   			</intent-filter>
+            </intent-filter>
         </service>
         <service
-        	android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"
-        	android:label="SocietiesEvents">
-           <intent-filter>
-                <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"></action>
-   			</intent-filter>
+            android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote"
+            android:label="SocietiesPersonalisation" >
+            <intent-filter>
+                <action android:name="org.societies.android.platform.personalisation.impl.PersonalisationManagerAndroidRemote" >
+                </action>
+            </intent-filter>
         </service>
-        <service android:name="org.societies.android.privacytrust.trust.TrustClientRemote" 
+        <service
+            android:name="org.societies.android.platform.events.ServicePlatformEventsRemote"
+            android:label="SocietiesEvents" >
+            <intent-filter>
+                <action android:name="org.societies.android.platform.events.ServicePlatformEventsRemote" >
+                </action>
+            </intent-filter>
+        </service>
+        <service
+            android:name="org.societies.android.privacytrust.trust.TrustClientRemote"
             android:label="Trust Client Remote" >
             <intent-filter>
                 <action android:name="org.societies.android.privacytrust.trust.TrustClientRemote" />
             </intent-filter>
         </service>
-        <service android:name="org.societies.android.platform.context.ServiceContextBrokerRemote" 
+        <service
+            android:name="org.societies.android.platform.context.ServiceContextBrokerRemote"
             android:label="SocietiesContext" >
             <intent-filter>
                 <action android:name="org.societies.android.platform.context.ServiceContextBrokerRemote" />
             </intent-filter>
         </service>
-        
-        <provider 
-            android:authorities="org.societies.android.platform.content.androidcssmanager"
+
+        <provider
             android:name="org.societies.android.platform.content.ProviderImplementation"
+            android:authorities="org.societies.android.platform.content.androidcssmanager"
             android:exported="true"
-            android:label="SocietiesCSSContentProvider">
+            android:label="SocietiesCSSContentProvider" >
         </provider>
-        
-         
+
+        <activity
+            android:name="org.societies.android.platform.gui.VersionActivity"
+            android:label="@string/title_activity_version" >
+        </activity>
     </application>
 
 </manifest>

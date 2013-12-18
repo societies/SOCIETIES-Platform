@@ -48,6 +48,7 @@ import org.societies.android.platform.useragent.feedback.constants.UserFeedbackA
 import org.societies.android.remote.helper.EventsHelper;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestItem;
@@ -86,13 +87,15 @@ public class NegotiationActivity extends Activity implements OnItemSelectedListe
 
         //SET HEADER INFO
         RequestorBean requestor = privacyNegotiationEvent.getNegotiationDetails().getRequestor();
-        String sRequestorType = "community";
+        String sRequestor = requestor.getRequestorId();
         if (requestor instanceof RequestorServiceBean) {
-            sRequestorType = "installed service";
+            sRequestor = sRequestor.concat("\nfor Installed service:"+((RequestorServiceBean) requestor).getRequestorServiceId().getServiceInstanceIdentifier()+"\n");
+        }else if (requestor instanceof RequestorCisBean){
+        	sRequestor = sRequestor.concat("\nfor community:"+((RequestorCisBean) requestor).getCisRequestorId()+"\n");
         }
         TextView lblHeader = (TextView) findViewById(R.id.txtHeader);
         //lblHeader.setText(sHeader + "\r\n has requested access to the following data:");
-        lblHeader.setText("The " + sRequestorType + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
+        lblHeader.setText("The " + sRequestor + " is requesting access to your personal info for the following uses. Please select what you would like to allow:");
 
         //GENERATE RESOURCE SPINNER
         final List<ResponseItem> responses = privacyNegotiationEvent.getResponsePolicy().getResponseItems();

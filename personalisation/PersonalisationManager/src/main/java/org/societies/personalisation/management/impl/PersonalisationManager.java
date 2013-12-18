@@ -65,6 +65,7 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -306,32 +307,32 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 	}
 
 	public IUserPreferenceConditionMonitor getPcm() {
-		System.out.println(this.getClass().getName() + "Return PCM");
+		if (logging.isDebugEnabled()) logging.debug(this.getClass().getName() + "Return PCM");
 		return pcm;
 	}
 
 	public void setPcm(IUserPreferenceConditionMonitor pcm) {
-		System.out.println(this.getClass().getName() + "GOT PCM");
+		if (logging.isDebugEnabled()) logging.debug(this.getClass().getName() + "GOT PCM");
 		this.pcm = pcm;
 	}
 
 	public IDIANNE getDianne() {
-		System.out.println(this.getClass().getName() + "Return DIANNE");
+		if (logging.isDebugEnabled()) logging.debug(this.getClass().getName() + "Return DIANNE");
 		return dianne;
 	}
 
 	public void setDianne(IDIANNE dianne) {
-		System.out.println(this.getClass().getName() + "GOT DIANNE");
+		if (logging.isDebugEnabled()) logging.debug(this.getClass().getName() + "GOT DIANNE");
 		this.dianne = dianne;
 	}
 
 	public ICtxBroker getCtxBroker() {
-		System.out.println(this.getClass().getName() + "Return CtxBroker");
+		if (logging.isDebugEnabled()) logging.debug(this.getClass().getName() + "Return CtxBroker");
 		return this.ctxBroker;
 	}
 
 	public void setCtxBroker(ICtxBroker broker) {
-		System.out.println(this.getClass().getName() + "GOT CtxBroker");
+		if (logging.isDebugEnabled()) logging.debug(this.getClass().getName() + "GOT CtxBroker");
 		this.ctxBroker = broker;
 	}
 
@@ -852,7 +853,29 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 
 							printInfo(intentOutcomes, preferenceOutcomes, info);
-							decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes, uuid);
+							//remove non implementable and non proactive actions:
+							Iterator<IOutcome> intentIterator = intentOutcomes.iterator();
+							while (intentIterator.hasNext()){
+								IOutcome next = intentIterator.next();
+								if ((!next.isImplementable()) || (!next.isProactive())){
+									if (logging.isDebugEnabled()) logging.debug("Removing intent action: "+next.getparameterName()+":"+next.getvalue());
+									intentIterator.remove();
+								}
+							}
+							Iterator<IOutcome> prefIterator = preferenceOutcomes.iterator();
+							while (prefIterator.hasNext()){
+								IOutcome next = prefIterator.next();
+								if ((!next.isImplementable()) || (!next.isProactive())){
+									if (logging.isDebugEnabled()) logging.debug("Removing preference action: "+next.getparameterName()+":"+next.getvalue());
+									prefIterator.remove();
+								}
+							}
+							if (logging.isDebugEnabled()) logging.debug("Removed non implementable and non proactive outcomes:");
+							printInfo(intentOutcomes, preferenceOutcomes, info);
+							if ((intentOutcomes.size()!=0) && (preferenceOutcomes.size()!=0)){
+								if (logging.isDebugEnabled()) logging.debug("Sending to decisionMaker");
+								decisionMaker.makeDecision(intentOutcomes, preferenceOutcomes, uuid);
+							}
 						} else {
 							if (logging.isDebugEnabled()){
 								logging.debug("retrieved attribute but was not instanceof CtxAttribute");
@@ -1084,17 +1107,25 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 			boolean matches = false;
 			IPreferenceOutcome matchedOutcome = null;
 			for (IPreferenceOutcome pOut : pOuts) {
+				if (logging.isDebugEnabled()) logging.debug("Comparing parameter names: (d):"+dOut.getparameterName()+" - (p): "+pOut.getparameterName());
 				if (dOut.getparameterName().equalsIgnoreCase(pOut.getparameterName())) {
 					matches = true;
 					matchedOutcome = pOut;
+					break;
 				} else {
 					matches = false;
 				}
 			}
+			
 			if (!matches) {
+				if (logging.isDebugEnabled()) logging.debug("no conflict (d): "+dOut.getparameterName()+": "+dOut.getvalue());
+
 				result.add(dOut);
 			} else {
-				result.add(this.resolvePreferenceConflicts(dOut, matchedOutcome));
+				if (logging.isDebugEnabled()) logging.debug("found a conflict: "+dOut.getparameterName()+" value A: "+dOut.getvalue()+" value B: "+matchedOutcome.getvalue());
+				IOutcome resolved = this.resolvePreferenceConflicts(dOut, matchedOutcome);
+				if (logging.isDebugEnabled()) logging.debug("Adding resolved: "+resolved.getparameterName()+":"+resolved.getvalue());
+				result.add(resolved);
 			}
 		}
 
@@ -1104,6 +1135,8 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 
 
 			if (out == null) {
+				if (logging.isDebugEnabled()) logging.debug("no conflict (p) : "+pOut.getparameterName()+": "+pOut.getvalue());
+
 				result.add(pOut);
 			}
 		}
@@ -1383,7 +1416,26 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 						actionInformation.put(uuid, info);
 						
 						printInfo(intentNonOverlapping, prefNonOverlapping, info);
-						decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping, uuid);
+						//remove non implementable and non proactive actions:
+						Iterator<IOutcome> intentIterator = intentNonOverlapping.iterator();
+						while (intentIterator.hasNext()){
+							IOutcome next = intentIterator.next();
+							if ((!next.isImplementable()) || (!next.isProactive())){
+								intentIterator.remove();
+							}
+						}
+						Iterator<IOutcome> prefIterator = prefNonOverlapping.iterator();
+						while (prefIterator.hasNext()){
+							IOutcome next = prefIterator.next();
+							if ((!next.isImplementable()) || (!next.isProactive())){
+								prefIterator.remove();
+							}
+						}
+						if (logging.isDebugEnabled()) logging.debug("Removed non implementable and non proactive outcomes:");
+						printInfo(intentNonOverlapping, prefNonOverlapping, info);
+						if ((intentNonOverlapping.size()!=0) && (prefNonOverlapping.size()!=0)){
+							decisionMaker.makeDecision(intentNonOverlapping, prefNonOverlapping, uuid);
+						}
 					} else if (event.geteventType().equalsIgnoreCase(EventTypes.UI_EVENT)){
 						if (event.geteventInfo()!=null){
 							if (event.geteventInfo() instanceof FeedbackEvent){
@@ -1472,7 +1524,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		}
 		
 		this.logging.info(str);
-		
+		if (logging.isDebugEnabled()) logging.debug(str);
 		
 	}
 

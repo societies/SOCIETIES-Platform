@@ -1626,7 +1626,14 @@ ul.social-network li {
 .ep_dialogfix {
 	margin-top: 20px;
 }
-
+.ep_acctabfix{
+	background-color: #E9835B;
+}
 /* THE END */
 
-
+.Label:after{
+	color: red;
+	font-size: 0.9em;
+	content: '*'
+}
+}

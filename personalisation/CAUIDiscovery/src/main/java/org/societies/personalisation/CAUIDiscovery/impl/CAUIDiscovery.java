@@ -24,10 +24,12 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +74,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 	HashMap<String,List<String>> contextActionsMap = new HashMap<String,List<String>>();
 
 	Map<String , ServiceResourceIdentifier> sriMap = new HashMap<String , ServiceResourceIdentifier>();
-
+	Set<IAction> tempActionList = new HashSet<IAction>();
 
 
 	List<String> charList = null;
@@ -156,7 +158,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				//LOG.info("6. Generate UserIntentModelData");
 				ConstructUIModel cmodel = new ConstructUIModel(cauiTaskManager,ctxBroker); 
 				UserIntentModelData modelData = null;
-				modelData = cmodel.constructNewModel(trans2ProbDictionary,contextActionsMap,this.sriMap);
+				modelData = cmodel.constructNewModel(trans2ProbDictionary,contextActionsMap,this.sriMap,mockData );
 
 				CtxAttribute ctxAttr = storeModelCtxDB(modelData);
 				if(!modelData.getActionModel().isEmpty()) printCAUIModel(modelData.getActionModel());
@@ -261,10 +263,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 		//key:ActionName value:[home,free,10]
 		HashMap<String,List<String>> results = new HashMap<String,List<String>>();
+		System.out.println("**** assignContextToAction **** ");
 
 		TransProbCalculator transProb  = new TransProbCalculator();
 		LinkedHashMap<List<String>,ActionDictObject> dic = transProb.getStepDict(dictionaryFull, 1);
-		//System.out.println("dic "+dic);
+		System.out.println("dic "+dic);
+		//System.out.println("_______________________________");
 		String action = "";
 		ActionDictObject dicObj;
 		for(List<String> actList :dic.keySet()){
@@ -272,17 +276,27 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 				action = actList.get(0);
 				dicObj = dic.get(actList);
 				int actionOccurences = dicObj.getTotalOccurences();
+				//System.out.println("_action: "+action);
+				//System.out.println("_dicObj: "+dicObj);
 				List<String> contextList = new ArrayList<String>();
 
 				if(dicObj.getLocationContextMap() != null){
 					HashMap<List<String>,Integer> locMap = dicObj.getLocationContextMap();  
+					//System.out.println("_locMap: "+locMap);
 					for(List<String> locationValues : locMap.keySet()){
 						if(locationValues.size()== 1){
 							String location = locationValues.get(0);
 							int locValueOccurences = locMap.get(locationValues);
-							if(locValueOccurences/actionOccurences >= 0.5){
+							//System.out.println("locValueOccurences: "+locValueOccurences);
+							//System.out.println("locValueOccurences/actionOccurences: "+(float)locValueOccurences/(float)actionOccurences);
+							if((float)locValueOccurences/(float)actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"="+location);
-							} else contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"="); 
+								break;
+							} else {
+								if(contextList.isEmpty()) contextList.add(CtxAttributeTypes.LOCATION_SYMBOLIC+"=n/a"); 
+								//System.out.println("=n/a added");
+							}
+							//System.out.println("_contextList: "+contextList);
 						}
 					}
 				}
@@ -292,9 +306,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						if(dowValues.size()== 1){
 							String dow = dowValues.get(0);
 							int dowValueOccurences = dowMap.get(dowValues);
-							if(dowValueOccurences/actionOccurences >= 0.5){
+							if((float)dowValueOccurences/(float)actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"="+dow);
-							}else contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"=");
+								break;
+							}else {
+								if(contextList.isEmpty())contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"=n/a");
+							}
 						}
 					}
 				}
@@ -305,9 +322,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 						if(hodValues.size()== 1){
 							String hod = hodValues.get(0);
 							int temperatureValueOccurences = hodMap.get(hodValues);
-							if(temperatureValueOccurences/actionOccurences >= 0.5){
+							if((float)temperatureValueOccurences/(float)actionOccurences >= 0.5){
 								contextList.add(CtxAttributeTypes.HOUR_OF_DAY+"="+hod);
-							}else contextList.add(CtxAttributeTypes.DAY_OF_WEEK+"=");
+								break;
+							}else {
+								if(contextList.isEmpty()) contextList.add(CtxAttributeTypes.HOUR_OF_DAY+"=n/a");
+							}
 						}
 					}
 				}
@@ -316,7 +336,7 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 
 			}
 		}
-
+		//System.out.println("_______________________________"+results);
 		if (LOG.isDebugEnabled())LOG.debug(" context and actions map ****************** :  "+results) ;
 		return results;
 	}
@@ -424,7 +444,12 @@ public class CAUIDiscovery implements ICAUIDiscovery{
 					context.put(escortingHocAttr.getType(), value);
 				}
 
-				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, serviceType);
+				//MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, serviceType);
+
+
+				MockHistoryData mockHocData = new MockHistoryData(retrievedAction.getparameterName(), retrievedAction.getvalue(), context,primaryHocAttr.getLastModified(),serviceIdentString, 
+						serviceType,retrievedAction.isImplementable(),retrievedAction.isProactive());
+				//System.out.println("mock hoc is impl ******* "+mockHocData.getIsImplementable() );
 				result.add(mockHocData);
 
 			}  catch (Exception e) {

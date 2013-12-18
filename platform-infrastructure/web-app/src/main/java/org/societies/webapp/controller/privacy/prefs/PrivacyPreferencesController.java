@@ -94,6 +94,7 @@ public class PrivacyPreferencesController extends BasePageController{
     
 	@PostConstruct
 	public void initController(){
+		this.logging.info("#CODE2#: Initialising PrivacyPreference controller");
 		this.retrievePPNPreferences();
 		this.retrieveAccCtrlPreferences();
 		this.retrieveDObfPreferences();

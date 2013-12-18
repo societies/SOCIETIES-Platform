@@ -128,4 +128,7 @@ public interface IUserIntentAction  extends IOutcome, Serializable{
 	 */
 	public void setCommunity(Boolean community);
 
+	public void setImplementable(Boolean implementable);
+
+	public void setProactive(Boolean proactive);
 }

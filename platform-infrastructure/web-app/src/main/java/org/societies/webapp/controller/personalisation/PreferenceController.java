@@ -87,6 +87,7 @@ public class PreferenceController extends BasePageController{
 	@PostConstruct
     private void init(){
     
+		this.logging.info("#CODE2#: Initialising PreferenceController page");
 		preferenceDetails = this.preferenceManager.getPreferenceDetailsForAllPreferences();
 		if (preferenceDetails == null){
 			preferenceDetails = new ArrayList<PreferenceDetails>();
