@@ -89,10 +89,13 @@ public class XmlTest extends XMLTestCase {
 	@Test
 	public void testAddNodeRecursively() throws Exception {
 		
-		InputStream newXml = getSampleXml(true);
-		int numNodes = classUnderTest.addNodeRecursively(newXml, XML_SIGNATURE_XPATH);
+		InputStream newXml;
+		int numNodes;
 		
+		newXml = getSampleXml(true);
+		numNodes = classUnderTest.addNodeRecursively(newXml, XML_SIGNATURE_XPATH, false);
 		assertEquals(3, numNodes, 0.0);
+		assertEquals(3, classUnderTest.getNodes(XML_SIGNATURE_XPATH).getLength(), 0.0);
 
 //		// It seems the test is not working properly.
 //		// Both XML strings differ only in newline breaks but assertXMLEqual fails.
@@ -106,6 +109,16 @@ public class XmlTest extends XMLTestCase {
 //		
 //		assertXMLEqual(xml1, xml2);
 //		assertXMLEqual(getSampleXmlString(true), classUnderTest.toString());
+		
+		newXml = getSampleXml(true);
+		numNodes = classUnderTest.addNodeRecursively(newXml, XML_SIGNATURE_XPATH, false);
+		assertEquals(3, classUnderTest.getNodes(XML_SIGNATURE_XPATH).getLength(), 0.0);
+		assertEquals(0, numNodes, 0.0);
+		
+		newXml = getSampleXml(true);
+		numNodes = classUnderTest.addNodeRecursively(newXml, XML_SIGNATURE_XPATH, true);
+		assertEquals(6, classUnderTest.getNodes(XML_SIGNATURE_XPATH).getLength(), 0.0);
+		assertEquals(3, numNodes, 0.0);
 	}
 
 	@Test

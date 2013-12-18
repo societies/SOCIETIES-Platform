@@ -446,10 +446,11 @@ public class Xml {
 	 * 
 	 * @param newXml source of new nodes
 	 * @param xpath XPath to nodes in newXml to be added
+	 * @param addDuplicates Add also those new nodes that are already present in this document.
 	 * @return Number of new XML nodes inserted
 	 * @throws XmlException
 	 */
-	public int addNodeRecursively(InputStream newXml, String xpath) throws XmlException {
+	public int addNodeRecursively(InputStream newXml, String xpath, boolean addDuplicates) throws XmlException {
 
 		Log.debug("addNodeRecursively(..., {})", xpath);
 		
@@ -463,18 +464,33 @@ public class Xml {
 			NodeList newNodes = getNodes(newXmlDoc, xpath);
 			if (newNodes == null || newNodes.getLength() == 0) {
 				Log.warn("No nodes found with XPath: " + xpath);
+				return 0;
 			}
+			NodeList existingNodes = getNodes(doc, xpath);
 			Node docElement = doc.getDocumentElement();
-			int k;
-			for (k = 0; k < newNodes.getLength(); k++) {
-				Node firstDocImportedNode = doc.importNode(newNodes.item(k), true);
-				docElement.appendChild(firstDocImportedNode);
+			int count = 0;
+			for (int k = 0; k < newNodes.getLength(); k++) {
+				Node n = newNodes.item(k);
+				if (addDuplicates || !contains(existingNodes, n)) {
+					Node firstDocImportedNode = doc.importNode(n, true);
+					docElement.appendChild(firstDocImportedNode);
+					++count;
+				}
 			}
-			return k;
+			return count;
 		} catch (Exception e) {
 			Log.warn("addNodeRecursively", e);
 			throw new XmlException(e);
 		}
+	}
+	
+	public static boolean contains(NodeList list, Node node) {
+		for (int k = 0; k < list.getLength(); k++) {
+			if (node.isEqualNode(list.item(k))) {
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public Document getDocument() {

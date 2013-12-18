@@ -166,7 +166,7 @@ public class XmlDocumentAccess {
 		
 		try {
 			Xml old = new Xml(new ByteArrayInputStream(oldXml));
-			int numInsertedNodes = old.addNodeRecursively(newXml, XmlSignature.XML_SIGNATURE_XPATH);
+			int numInsertedNodes = old.addNodeRecursively(newXml, XmlSignature.XML_SIGNATURE_XPATH, false);
 			LOG.debug("merge: inserted {} new nodes", numInsertedNodes);
 			old.toOutputStream(bos);
 			InputStream is = new ByteArrayInputStream(bos.toByteArray());

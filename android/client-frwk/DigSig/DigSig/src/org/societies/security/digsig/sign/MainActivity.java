@@ -151,7 +151,6 @@ public class MainActivity extends Activity {
 				i.putExtra(Sign.Params.COMMUNITY_SIGNATURE_SERVER_URI, url);
 
 				ArrayList<String> idsToSign = new ArrayList<String>();
-//				idsToSign.add("5709068098338816");
 				idsToSign.add("Board001");
 				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
 
