@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="docServerUrl">http://192.168.1.92:8080</string>
 <!--
-    <string name="docServerUrl">http://research.setcce.si:8081</string>
+    <string name="docServerUrl">http://192.168.1.92:8080</string>
 -->
+    <string name="docServerUrl">http://research.setcce.si:8081</string>
 </resources>
