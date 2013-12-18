@@ -36,6 +36,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+
+	private static final boolean testMode = true;
 	
 	private final static int SIGN = 1;
 	private final static int VERIFY = 2;
@@ -66,6 +68,53 @@ public class MainActivity extends Activity {
 				startActivity(i);
 			}
 		});
+		
+		if (testMode) {
+			initTestingWidgets();
+		}
+	}
+	
+	@Override
+	protected void onResume() {
+		
+		super.onResume();
+
+		if (testMode) {
+			IntentFilter filter = new IntentFilter(Sign.ACTION_FINISHED);
+			receiver = new Receiver();
+			registerReceiver(receiver, filter);
+			Log.d(TAG, "Receiver registered");
+		}
+	}
+	
+	@Override
+	protected void onPause() {
+		
+		super.onPause();
+
+		if (testMode) {
+			if (receiver != null) {
+				unregisterReceiver(receiver);
+				receiver = null;
+				Log.d(TAG, "Receiver unregistered");
+			}
+			
+			if (mBound) {
+				unbindService(mConnection);
+				Log.d(TAG, "Service unbound");
+				mBound = false;
+			}
+		}
+	}
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// Below is the code for testing only.
+	//
+	///////////////////////////////////////////////////////////////////////////
+
+	private void initTestingWidgets() {
 		
 		Button listBtn = (Button) findViewById(R.id.buttonMainXmlSign);
 		listBtn.setOnClickListener(new View.OnClickListener() {		
@@ -99,8 +148,10 @@ public class MainActivity extends Activity {
 
 				Intent i = new Intent(Sign.ACTION);
 				i.putExtra(Sign.Params.DOC_TO_SIGN_URL, url);
+				i.putExtra(Sign.Params.COMMUNITY_SIGNATURE_SERVER_URI, url);
 
 				ArrayList<String> idsToSign = new ArrayList<String>();
+//				idsToSign.add("5709068098338816");
 				idsToSign.add("Board001");
 				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
 
@@ -138,50 +189,27 @@ public class MainActivity extends Activity {
 				startActivityForResult(i, VERIFY);
 			}
 		});
-		
+
 		CheckBox showTestingOptions = (CheckBox) findViewById(R.id.checkBoxMainShowTestingOptions);
+		showTestingOptions.setVisibility(View.VISIBLE);
 		showTestingOptions.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				int visibility = isChecked ? View.VISIBLE : View.INVISIBLE;
-				findViewById(R.id.buttonMainSign).setVisibility(visibility);
-				findViewById(R.id.buttonMainVerify).setVisibility(visibility);
-				findViewById(R.id.buttonMainXmlSign).setVisibility(visibility);
-				findViewById(R.id.buttonMainXmlSignUrl).setVisibility(visibility);
-				findViewById(R.id.textViewMainSignUrl).setVisibility(visibility);
-				findViewById(R.id.editTextMainSignUrl).setVisibility(visibility);
+				showTestButtons(isChecked);
 			}
 		});
+		showTestButtons(showTestingOptions.isChecked());
 	}
 	
-	@Override
-	protected void onResume() {
-		
-		super.onResume();
-
-		IntentFilter filter = new IntentFilter(Sign.ACTION_FINISHED);
-		receiver = new Receiver();
-		registerReceiver(receiver, filter);
-		Log.d(TAG, "Receiver registered");
-	}
-	
-	@Override
-	protected void onPause() {
-		
-		super.onPause();
-		
-		if (receiver != null) {
-			unregisterReceiver(receiver);
-			receiver = null;
-			Log.d(TAG, "Receiver unregistered");
-		}
-		
-		if (mBound) {
-			unbindService(mConnection);
-			Log.d(TAG, "Service unbound");
-			mBound = false;
-		}
+	private void showTestButtons(boolean show) {
+		int visibility = show ? View.VISIBLE : View.INVISIBLE;
+		findViewById(R.id.buttonMainSign).setVisibility(visibility);
+		findViewById(R.id.buttonMainVerify).setVisibility(visibility);
+		findViewById(R.id.buttonMainXmlSign).setVisibility(visibility);
+		findViewById(R.id.buttonMainXmlSignUrl).setVisibility(visibility);
+		findViewById(R.id.textViewMainSignUrl).setVisibility(visibility);
+		findViewById(R.id.editTextMainSignUrl).setVisibility(visibility);
 	}
 
 	private class Receiver extends BroadcastReceiver {
@@ -229,7 +257,8 @@ public class MainActivity extends Activity {
 			signedUrl = data.getStringExtra(Sign.Params.SIGNED_DOC_URL);
 			sessionId = data.getIntExtra(Sign.Params.SESSION_ID, -1);
 			Log.d(TAG, "URL of the signed XML: " + signedUrl);
-		} if (requestCode == VERIFY) {
+		}
+		else if (requestCode == VERIFY) {
 			if (resultCode == RESULT_OK) {
 				// get data
 				ArrayList<SigResult> sigResults = data.getParcelableArrayListExtra(Trust.Params.RESULT);
@@ -266,9 +295,6 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
-
-
-
 
 	/**
 	 * Target we publish for clients to send messages to IncomingHandler.
@@ -368,4 +394,11 @@ public class MainActivity extends Activity {
 			Log.e(TAG, "sayHello", e);
 		}
 	}
+
+
+	///////////////////////////////////////////////////////////////////////////
+	//
+	// End of testing-only code.
+	//
+	///////////////////////////////////////////////////////////////////////////
 }

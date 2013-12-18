@@ -18,12 +18,15 @@ import java.util.UUID;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.xerces.dom.DOMImplementationImpl;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.sign.contentprovider.DocContentProvider;
 import org.societies.security.digsig.trust.SecureStorage;
 import org.societies.security.digsig.utility.Net;
 import org.societies.security.digsig.utility.Storage;
@@ -68,12 +71,14 @@ public class SignService extends IntentService {
 		int identity = intent.getIntExtra(Sign.Params.IDENTITY, -1);
 		List<String> ids = intent.getStringArrayListExtra(Sign.Params.IDS_TO_SIGN);
 		String outputType = intent.getStringExtra(Sign.Params.OUTPUT_TYPE);
+		String serverUri = intent.getStringExtra(Sign.Params.COMMUNITY_SIGNATURE_SERVER_URI);
 
 		Log.i(TAG, "DOC_TO_SIGN = " + (doc != null ? new String(doc) : null));
 		Log.i(TAG, "DOC_TO_SIGN_URL = " + docUrl);
 		Log.i(TAG, "IDENTITY = " + identity);
 		Log.i(TAG, "IDS_TO_SIGN = " + ids);
 		Log.i(TAG, "OUTPUT_TYPE = " + outputType);
+		Log.i(TAG, "COMMUNITY_SIGNATURE_SERVER_URI = " + serverUri);
 
 		try {
 			init();
@@ -154,10 +159,17 @@ public class SignService extends IntentService {
 			Log.d(TAG, "Writing signed doc to internal storage file " + path);
 			new Storage(this).writeToInternalStorage(path, output.toByteArray());
 			Log.d(TAG, "Written signed doc to internal storage file " + path);
+			
+			String serverUri = intent.getStringExtra(Sign.Params.COMMUNITY_SIGNATURE_SERVER_URI);
+			if (serverUri != null) {
+				InputStream signedIs = getContentResolver().openInputStream(DocContentProvider.localPath2Uri(path));
+				bcIntent.putExtra(Sign.Params.UPLOAD_SUCCESS, upload(new URI(serverUri), signedIs));
+			}
+			
 			bcIntent.putExtra(Sign.Params.SUCCESS, true);
 			
 		} catch (Exception e) {  
-			Log.e(TAG, "Failed while signing!", e);
+			Log.e(TAG, "Failed while signing: " + e.getMessage());
 			bcIntent.putExtra(Sign.Params.SUCCESS, false);
 		}
 		int sessionId = intent.getIntExtra(Sign.Params.SESSION_ID, -1);
@@ -208,5 +220,15 @@ public class SignService extends IntentService {
 		
 		Net net = new Net(uri);
 		net.get(os);
+	}
+	
+	private boolean upload(URI uri, InputStream is) throws FileNotFoundException, IOException {
+		
+		Log.d(TAG, "upload(" + uri + ")");
+		Log.d(TAG, "upload: input stream = " + is);
+		
+		Net net = new Net(uri);
+		HttpEntity entity = new InputStreamEntity(is, -1);
+		return net.put(entity);
 	}
 }

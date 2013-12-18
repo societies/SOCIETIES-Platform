@@ -47,8 +47,13 @@ public class DocContentProvider extends ContentProvider {
 
 	private static final String AUTHORITY = "org.societies.security.digsig.provider";
 
-	private static final String BASE_PATH = "docs";
-	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + BASE_PATH);
+	public static String localPath2UriString(String path) {
+		return "content://" + AUTHORITY + "/" + path;
+	}
+
+	public static Uri localPath2Uri(String path) {
+		return Uri.parse(localPath2UriString(path));
+	}
 
 	/* (non-Javadoc)
 	 * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])

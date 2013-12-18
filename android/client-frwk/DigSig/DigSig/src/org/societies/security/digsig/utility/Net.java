@@ -33,6 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -138,10 +139,27 @@ public class Net {
 	 */
 	public boolean put(String contents) {
 		Log.d(TAG, "put()");
-		HttpPut put = new HttpPut(uri);
 		try {
 			StringEntity entity = new StringEntity(contents, "UTF-8");
 			entity.setContentType("text/xml; charset=UTF-8");
+			return put(entity);
+		} catch (Exception e) {
+			Log.w(TAG, e);
+			return false;
+		}
+	}
+	
+	/**
+	 * Perform a HTTP PUT
+	 * 
+	 * @param contents The contents to write.
+	 * 
+	 * @return True for success, false for error
+	 */
+	public boolean put(HttpEntity entity) {
+		Log.d(TAG, "put()");
+		HttpPut put = new HttpPut(uri);
+		try {
 			put.setEntity(entity);
 			HttpClient httpclient = new DefaultHttpClient();
 
@@ -150,10 +168,11 @@ public class Net {
 			Log.d(TAG, "put to " + uri + " finished, success = " + success);
 			return success;
 		} catch (Exception e) {
-			Log.w(TAG, e);
+			Log.w(TAG, "put failed", e);
 			return false;
 		}
 	}
+
 	
 	/**
 	 * Perform a HTTP POST

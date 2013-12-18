@@ -62,6 +62,23 @@ public class Sign {
 		public static final String IDS_TO_SIGN = "IDS_TO_SIGN";
 	
 		/**
+		 * If the document is to be signed by a community, it can be automatically uploaded to the
+		 * REST server that merges signatures from various members of the community.
+		 * <br><br>
+		 * If this parameter is specified, its value should be the document URI on the REST server.
+		 * Usually this is the same as value of {@link #DOC_TO_SIGN_URL}.
+		 * The success of upload operation {@link #UPLOAD_SUCCESS} is independent of {@link #SUCCESS}
+		 * which represents only the success of signing operation.
+		 * <br><br>
+		 * If this parameter is not specified, the signed document will be available only on local
+		 * Android device via the returned content provider URI and has to be manually retrieved
+		 * and uploaded by your app.
+		 * <br><br>
+		 * Type: {@link String}
+		 */
+		public static final String COMMUNITY_SIGNATURE_SERVER_URI = "COMMUNITY_SIGNATURE_SERVER_URI";
+		
+		/**
 		 * The identity to use when signing.
 		 * Type: {@link String}
 		 */
@@ -72,7 +89,16 @@ public class Sign {
 		 * Type: boolean
 		 */
 		public static final String SUCCESS = "SUCCESS";
-		
+
+		/**
+		 * True if the document has been successfully uploaded to the remote REST server.
+		 * The signing operation may finish successfully and {@link #SUCCESS} is true, but
+		 * the upload may still fail. In that case, your app can still get the signed document
+		 * from local content provider and upload it manually.
+		 * Type: boolean
+		 */
+		public static final String UPLOAD_SUCCESS = "UPLOAD_SUCCESS";
+	
 		/**
 		 * Session number. Should be non-negative. A negative value indicates a serious error.
 		 * Type: int

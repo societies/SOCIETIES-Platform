@@ -3,6 +3,7 @@ package org.societies.security.digsig.sign;
 import java.util.Random;
 
 import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.sign.contentprovider.DocContentProvider;
 import org.societies.security.digsig.utility.RandomString;
 
 import android.app.Activity;
@@ -110,15 +111,11 @@ public class SignActivity extends Activity {
 			startService(intent);
 
 			Intent returnIntent = new Intent(getIntent());
-			returnIntent.putExtra(Sign.Params.SIGNED_DOC_URL, localPath2Url(signedDocPath));
+			returnIntent.putExtra(Sign.Params.SIGNED_DOC_URL, DocContentProvider.localPath2UriString(signedDocPath));
 			returnIntent.putExtra(Sign.Params.SESSION_ID, sid);
 			setResult(RESULT_OK, returnIntent);
 			finish();
 		}
-	}
-	
-	private String localPath2Url(String path) {
-		return "content://org.societies.security.digsig.provider/" + path;
 	}
 
 	private void selectIdentity() {
