@@ -141,7 +141,7 @@ public class PreferenceEditBean extends BasePageController {
 	@PostConstruct
 	public void setup(){
 		
-		
+		this.logging.info("#CODE2#: Initiating Preference Edit controller");
 		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 		if (logging.isDebugEnabled()){
 			this.logging.debug("\n\n\n\n\n\n\n\n\n\n");

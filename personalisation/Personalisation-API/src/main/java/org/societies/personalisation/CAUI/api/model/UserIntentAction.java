@@ -49,6 +49,8 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 	// is set to true if this action refers to a community of users
 	public Boolean isCommunity = false;
 	
+	public Boolean isImplementable = true;
+	public Boolean isProactive = true;
 	//private double transProb;
 	private long duration;
 
@@ -123,4 +125,24 @@ public class UserIntentAction extends Action implements IUserIntentAction, Seria
 		this.isCommunity = community;
 	}
 
+	@Override
+	public void setImplementable(Boolean implementable) {
+		this.isImplementable = implementable;
+	}
+	
+	@Override
+	public boolean isImplementable() {
+		return this.isImplementable;
+	}
+	
+	@Override
+	public void setProactive(Boolean proactive) {
+		this.isProactive = proactive;
+	}
+	
+	@Override
+	public boolean isProactive() {
+		return this.isProactive;
+	}
+	
 }

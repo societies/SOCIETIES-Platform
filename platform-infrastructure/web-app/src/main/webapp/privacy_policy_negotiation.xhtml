@@ -26,7 +26,7 @@
 
 
 			<p:dataGrid id="dataGrid" columns="1"
-				emptyMessage="This privacy negotiation has no items   0.o"
+				emptyMessage="This privacy negotiation has no items"
 				value="#{ppNegotiation.currentNegotiationEvent.responsePolicy.responseItems}"
 				var="responseItem">
 
@@ -46,8 +46,6 @@
 					</f:facet>
 
 					<p:panel visible="true" id="optionsPanel">
-						<!--Purpose-->
-						<p:outputLabel value="Purpose: {still to be added}" />
 
 						<!--Actions-->
 						<p:panelGrid columns="4">
@@ -114,12 +112,13 @@
 			<f:facet name="footer">
 				<p:messages id="validationMessages" />
 
-				<p:commandButton id="completePpnButton" value="Complete Negotiation"
+				<p:commandButton id="completePpnButton" value="Accept"
+					rendered="#{not empty ppNegotiation.currentNegotiationEvent.responsePolicy.responseItems}"
 					onclick="blockUI.show()"
 					action="#{ppNegotiation.completeNegotiationAction}" update="@form" />
 
 
-				<p:commandButton id="abortPpnButton" value="Cancel Negotiation"
+				<p:commandButton id="abortPpnButton" value="Cancel"
 					action="#{ppNegotiation.cancelNegotiationAction}" process="@this"
 					onclick="blockUI.show()" update="@form" />
 			</f:facet>

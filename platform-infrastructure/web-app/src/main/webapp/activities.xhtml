@@ -1,0 +1,91 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Activity Feed :: SOCIETIES</title>
+	</ui:define>
+
+	<ui:define name="body">
+		<div class="hr grid_12 clearfix"></div>
+		<!-- Left Column -->
+		<section id="left_col" class="grid_12">
+			<div class="breadcrumbs">
+				<a href="index.xhtml">Home</a> / <a href="activities.xhtml">Activity
+					Feeds</a>
+			</div>
+
+			<section class="form_style_main">
+
+				<h4 class="form_title">CIS Activity Feeds</h4>
+
+
+
+				<p:panelGrid id="allPanel" columns="1">
+
+					<p:inputTextarea rows="2" cols="150" counter="counter"
+						maxlength="300" counterTemplate="{0} characters remaining."
+						autoResize="false"
+						value="#{ActivityFeedController.postActivityText}" />
+					<h:outputText id="counter" />
+
+					<p:selectOneMenu id="selectCIS"
+						value="#{ActivityFeedController.selectedCIS}">
+						<f:selectItems value="#{ActivityFeedController.cisList}" var="cis"
+							itemValue="#{cis.cisId}" itemLabel="#{cis.name}" />
+
+						<p:ajax event="change" onstart="blockUI.show()" oncomplete="blockUI.hide()"
+							update="feedsAccordionPanel" process="selectCIS"
+							listener="#{ActivityFeedController.handleSelectedCISChange}" />
+					</p:selectOneMenu>
+
+					<p:panelGrid columns="2">
+						<p:commandButton id="postButton" value="Post"
+							action="#{ActivityFeedController.postActivity()}"
+							update="feedsAccordionPanel" icon="ui-icon-1-n" />
+
+						<p:commandButton id="refreshButton" value="Refresh"
+							action="#{ActivityFeedController.handleSelectedCISChange}"
+							update="feedsAccordionPanel" icon="ui-icon-arrowrefresh-1-e" />
+					</p:panelGrid>
+
+
+					<p:accordionPanel id="feedsAccordionPanel"
+						value="#{ActivityFeedController.activities}"
+						var="marshalledActivity" multiple="true">
+						<p:tab title="#{marshalledActivity.actor}"
+							titletip="#{ActivityFeedController.getDate(marshalledActivity.published)}"
+							titleStyleClass="ep_acctabfix">
+							<p:panelGrid columns="1">
+								<h:outputText
+									value="On: #{ActivityFeedController.getDate(marshalledActivity.published)} #{marshalledActivity.actor} posted:" />
+
+								<h:outputText value="#{marshalledActivity.verb}" />
+								<h:outputText value="#{marshalledActivity.object}" />
+								<h:outputText value="#{marshalledActivity.target}" />
+							</p:panelGrid>
+						</p:tab>
+
+					</p:accordionPanel>
+				</p:panelGrid>
+
+
+				<p:blockUI widgetVar="blockUI" id="blockUI" block=":mainForm"
+					trigger="postButton, refreshButton">Refreshing...<br />
+					<p:graphicImage value="/images/ajax-loader.gif" />
+				</p:blockUI>
+
+			</section>
+		</section>
+
+		<div class="hr grid_12 clearfix"></div>
+
+	</ui:define>
+
+</ui:composition>
+</html>

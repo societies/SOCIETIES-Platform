@@ -292,6 +292,15 @@ public class CAUIPrediction implements ICAUIPrediction{
 			this.predictionPerformanceLog(endTime-startTime);
 		}
 
+		List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+		
+		for(IUserIntentAction actionResult : clearedResults){
+			if(!actionResult.isImplementable()){
+				if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
+				results.remove(actionResult);
+			}
+		}
+		
 		if (LOG.isInfoEnabled())LOG.info("getPrediction based on action: "+ action+" identity requestor:"+requestor+" results:"+predictedActString);
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
@@ -303,8 +312,7 @@ public class CAUIPrediction implements ICAUIPrediction{
 	@Override
 	public Future<List<IUserIntentAction>> getPrediction(IIdentity requestor, CtxAttribute contextAttribute) {
 
-		//	LOG.debug("getPrediction based on attr update  contextAttribute : "+ contextAttribute.getId().toString()+" identity requestor"+requestor);
-		//	LOG.debug("attr string value "+contextAttribute.getStringValue() );
+		if (LOG.isInfoEnabled())LOG.info("getPrediction based on attr update  contextAttribute : "+ contextAttribute.getId().toString()+" identity requestor"+requestor);
 		List<IUserIntentAction> results = new ArrayList<IUserIntentAction>();
 
 		long startTime = System.currentTimeMillis();
@@ -382,20 +390,49 @@ public class CAUIPrediction implements ICAUIPrediction{
 			if (LOG.isInfoEnabled())LOG.info("situation context :"+ situationContext);
 			if (LOG.isInfoEnabled())LOG.info("action prediction based on ctx update: "+ results);	
 
+			List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+			for(IUserIntentAction actionResult : clearedResults){
+				if(!actionResult.isImplementable()){
+					if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
+					results.remove(actionResult);
+				}
+			}
 
 			return new AsyncResult<List<IUserIntentAction>>(results);
 
+			
+			
 		}else if(enableCACIPrediction == true && caciModelExist == true) {
 
 			if (LOG.isDebugEnabled())LOG.debug("CAUI predictor not able to perform prediction ... CACI model is not supporting context based prediction");
 			//results = this.caciPredictor.getPrediction(requestor, action);
-
+			List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+			
+			for(IUserIntentAction actionResult : clearedResults){
+			
+				if(!actionResult.isImplementable()){
+					if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
+					results.remove(actionResult);
+				}
+			}
+			
 			return new AsyncResult<List<IUserIntentAction>>(results);
 
 		} else if (LOG.isInfoEnabled())LOG.info("neither caci, nor caui are able to perform prediction based on ctx updated");
 
 
-		if (LOG.isInfoEnabled())LOG.info("action prediction based on ctx update :"+ results);		
+		if (LOG.isInfoEnabled())LOG.info("context updated :"+ contextAttribute.getId());
+		if (LOG.isInfoEnabled())LOG.info("situation context :"+ situationContext);
+		if (LOG.isInfoEnabled())LOG.info("action prediction based on ctx update: "+ results);	
+		
+		List<IUserIntentAction> clearedResults = new ArrayList<IUserIntentAction>(results);
+		for(IUserIntentAction actionResult : clearedResults){
+			if(!actionResult.isImplementable()){
+				if (LOG.isDebugEnabled())LOG.debug("action: "+actionResult+" is not implementable and will be removed");
+				results.remove(actionResult);
+			}
+		}
+		
 		return new AsyncResult<List<IUserIntentAction>>(results);
 	}
 

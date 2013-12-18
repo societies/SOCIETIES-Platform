@@ -182,7 +182,7 @@ public class NotificationsController extends BasePageController {
 
 			//synchronized (unansweredPrivacyNegotiationEvents) {
 			//	unansweredPrivacyNegotiationEvents.put(ppn.getRequestId(), ppn);
-		//	}
+			//	}
 
 		}
 
@@ -228,12 +228,12 @@ public class NotificationsController extends BasePageController {
 			addItemToQueue(newItem);
 
 			//synchronized (unansweredAccessControlEvents) {
-		//		unansweredAccessControlEvents.put(bean.getRequestId(), bean);
+			//		unansweredAccessControlEvents.put(bean.getRequestId(), bean);
 
-		//	}
+			//	}
 
 		}
-		
+
 		private void processAccessControlResponse(String node, String itemId, Object item) {
 			if (!(item instanceof UserFeedbackAccessControlEvent)) {
 				log.warn(String.format("Received pubsub event with topic '%s', ID '%s' and class '%s' - Required UserFeedbackAccessControlEvent",
@@ -572,7 +572,7 @@ public class NotificationsController extends BasePageController {
 				feedback.clear();
 			} else {
 				// add one result
-				feedback.add(selectedItem.getResult());
+				feedback.add(selectedItem.getSubmitResult());
 			}
 
 			try {
@@ -734,6 +734,7 @@ public class NotificationsController extends BasePageController {
 			case ExpProposalType.RADIOLIST:
 				// This is a select-one notification
 				newItem = NotificationQueueItem.forSelectOne(bean.getRequestId(), proposalText, options);
+
 				break;
 
 			default:
@@ -790,7 +791,6 @@ public class NotificationsController extends BasePageController {
 							synchronized (unansweredAccessControlEvents) {
 								synchronized (unansweredPrivacyNegotiationEvents) {
 
-
 									unansweredNotificationIDs.add(item.getItemId());
 									unansweredNotifications.add(item);
 									Collections.sort(unansweredNotifications);
@@ -813,7 +813,7 @@ public class NotificationsController extends BasePageController {
 			}
 		}
 	}
-	
+
 	public boolean stopPoll() {
 		synchronized(unansweredNotifications)
 		{
@@ -865,7 +865,7 @@ public class NotificationsController extends BasePageController {
 
 
 	}
-	
+
 
 	public boolean isTimedAbortProcessorEnabled() {
 		return timedAbortProcessor.isEnabled();

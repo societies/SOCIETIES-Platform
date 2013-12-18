@@ -304,6 +304,7 @@ public class ServicesController extends BasePageController {
     @PostConstruct
     public void initController(){
     	log.debug("PostConstruct:initController");
+    	this.log.info("#CODE2#: Initialising Apps controller");
     	this.thirdClients = new HashMap<String,String>();
     	this.messageQueue = new ConcurrentLinkedQueue<QueuedMessage>();
     	setSelectedNode("mynode");

@@ -290,8 +290,13 @@ public class CauiGUI2  extends JFrame  implements ActionListener {
 				try {
 					serviceId1.setIdentifier(new URI("css://nikosk@societies.org/radioService"));
 					serviceId1.setServiceInstanceIdentifier("css://nikosk@societies.org/radioService");
+					IAction action1 = null;
+					if(textField.getText().equals("a")){
+						 action1 = new Action(serviceId1, "serviceType", textField.getText(), textField_1.getText(), false, true, true);
+						 System.out.println("creating NON impl action :"+ action1);		
+						 //Action(ServiceResourceIdentifier serviceID, String serviceType, String parameterName, String value, boolean implementable, boolean contextDependent, boolean proactive){
+					} else action1 = new Action(serviceId1, "serviceType", textField.getText(), textField_1.getText());
 					
-					IAction action1 = new Action(serviceId1, "serviceType", textField.getText(), textField_1.getText());
 					IIdentity cssOwnerId = getOwnerId();
 					
 					System.out.println(" action: "+ action1 );

@@ -166,7 +166,7 @@ public class PPNCreateBean extends BasePageController implements Serializable{
 
 	@PostConstruct
 	public void setup(){
-
+		this.logging.info("#CODE2#: Initialising PPNCreate controller");
 		preferenceDetails.setRequestor(new RequestorBean());
 		preferenceDetails.getRequestor().setRequestorId("");
 		preferenceDetails.setResource(new Resource());

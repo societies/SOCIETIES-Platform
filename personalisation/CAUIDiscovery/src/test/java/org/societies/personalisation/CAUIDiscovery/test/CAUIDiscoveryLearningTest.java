@@ -73,17 +73,17 @@ public class CAUIDiscoveryLearningTest {
 		
 		
 		
-/*		
+		System.out.println("---------- Print dictionary -------------");
 		for(int i=1; i<= dictionary.size(); i++) {
 			System.out.println("Print dictionary, step: "+i+" size:"+dictionary.get(i).size());
 			printDictionary(dictionary.get(i));
 		}
-	*/	
+	
 		
-		
-		HashMap<String,List<String>> ctxActionsMap =  discover.assignContextToAction(dictionary.get(1));
 		System.out.println("4. assignContextToAction");
-		//System.out.println(ctxActionsMap);
+		HashMap<String,List<String>> ctxActionsMap =  discover.assignContextToAction(dictionary.get(1));
+		
+		System.out.println(ctxActionsMap);
 
 
 		System.out.println("5. Calculate trans probabilites");
@@ -101,14 +101,18 @@ public class CAUIDiscoveryLearningTest {
 			System.out.println("6. Generate UserIntentModelData");
 			ConstructUIModel cmodel = new ConstructUIModel(discover.getCauiTaskManager(),null);
 			System.out.println("6. discover.getSriMap()" +discover.getSriMap());
-			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
-
+			//UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap());
+			UserIntentModelData modelData = cmodel.constructNewModel(trans2ProbDictionary,ctxActionsMap,discover.getSriMap(),mockData );
 			System.out.println("*********** model created *******"+ modelData.getActionModel());
+			printCAUIModel(modelData.getActionModel());
+			/*
 			for( IUserIntentAction userAction  : modelData.getActionModel().keySet()){
 					System.out.println(userAction);
+					System.out.println("is implementable: "+userAction.isImplementable());
+					System.out.println("is proactive: "+userAction.isProactive());
 					//System.out.println(userAction.getActionContext());
 			}
-		
+		*/
 		
 			
 		} catch (Exception e) {
@@ -175,37 +179,65 @@ public class CAUIDiscoveryLearningTest {
 		}
 
 		//create actions
-		action1 = new Action(serviceId1, "testService", "volume", "high");
-		IAction action2 = new Action(serviceId2, "testService", "volume", "low");
-		IAction action3 = new Action(serviceId1, "testService", "volume", "mute");
-		IAction actionX = new Action(serviceId1, "testService", "XXXX", "XXXX");
-		IAction action4 = new Action(serviceId2, "testService", "colour", "blue");
-		IAction action5 = new Action(serviceId2, "testService", "colour", "green");
-		IAction actionY = new Action(serviceId1, "testService", "YYYY", "YYYY");
+		action1 = new Action(serviceId1, "testService", "action1", "action1");
+		IAction action2 = new Action(serviceId2, "testService", "action2", "action2");
+		
+		IAction action3 = new Action(serviceId1, "testService", "action3", "action3");
+		IAction actionX = new Action(serviceId1, "testService", "XXXX", "XXXX",false,false,false);
+		IAction action4 = new Action(serviceId2, "testService", "action4", "action4");
+		IAction action5 = new Action(serviceId2, "testService", "action5", "action5");
+		IAction actionY = new Action(serviceId1, "testService", "YYYY", "YYYY",false,false,false);
 		//System.out.println ("action service ID "+actionY.getServiceID().getServiceInstanceIdentifier());
 		for (int i=0; i<4; i++){
 
+			// loc const, day non const, tod increases   
+			
+			// Monday
+			//task1
 			monitorAction(action1,"home","Monday",10);
-			monitorAction(action1,"country","Monday",10);
-			monitorAction(action2,"office","Tuesday",15);
-			monitorAction(action3,"park","Wednesday",2);
-			monitorAction(actionX,"park","Wednesday",2);
-			monitorAction(actionY,"park","Wednesday",2);
-			monitorAction(action4,"park","Wednesday",2);
-			monitorAction(action5,"park","Wednesday",2);
-			monitorAction(actionY,"park","Wednesday",2);
-			monitorAction(actionX,"park","Wednesday",2);
+			monitorAction(action2,"home","Monday",11);
+			monitorAction(action3,"home","Monday",12);
+		
+			monitorAction(actionX,"park","Monday",14);
+			monitorAction(actionY,"gym","Monday",15);
+			//task2			
+			monitorAction(action4,"office","Monday",16);
+			monitorAction(action5,"office","Monday",17);
+			
+			monitorAction(actionY,"market","Monday",18);
+			monitorAction(actionX,"park","Monday",19);
+
+			// Tuesday
+			//task1
 			monitorAction(action1,"home","Tuesday",10);
-			monitorAction(action2,"office","Monday",15);
-			monitorAction(action3,"zoo","Monday",2);
-			monitorAction(actionY,"park","Monday",2);
-			monitorAction(actionY,"park","Monday",2);
-			monitorAction(action1,"home","Monday",10);
-			monitorAction(action2,"office","Monday",15);
-			monitorAction(action3,"park","Monday",2);
-			monitorAction(actionX,"park","Monday",2);
-			monitorAction(action4,"park","Monday",2);
-			monitorAction(action5,"park","Monday",2);
+			monitorAction(action2,"home","Tuesday",11);
+			monitorAction(action3,"home","Tuesday",12);
+			
+			monitorAction(actionY,"outX","Tuesday",12);
+			monitorAction(actionY,"park","Tuesday",12);
+			//task2	
+			monitorAction(action4,"office","Tuesday",16);
+			monitorAction(action5,"office","Tuesday",17);
+			
+			monitorAction(actionX,"market12","Tuesday",19);
+			monitorAction(actionX,"park12","Tuesday",21);
+
+			// Wednesday
+			//task1
+			monitorAction(action1,"home","Wednesday",10);
+			monitorAction(action2,"home","Wednesday",11);
+			monitorAction(action3,"home","Wednesday",12);
+			
+			monitorAction(actionY,"outX","Wednesday",12);
+			monitorAction(actionY,"park","Wednesday",12);
+			//task2	
+			monitorAction(action4,"office","Wednesday",16);
+			monitorAction(action5,"office","Wednesday",17);
+			
+			monitorAction(actionX,"market12","Wednesday",19);
+			monitorAction(actionX,"park12","Wednesday",21);
+			
+			
 		}
 	}
 
@@ -312,6 +344,30 @@ public class CAUIDiscoveryLearningTest {
 		}
 	}
 
+	
+	public void printCAUIModel(Map<IUserIntentAction, HashMap<IUserIntentAction,Double>> map){
+
+		System.out.println("---------------- printing model -------------------------");
+			for( IUserIntentAction sourceAct : map.keySet()){
+				//System.out.println("sourceAct "+ sourceAct +" target "+map.get(sourceAct) );
+				System.out.println("\n sourceAct ::"+ sourceAct /*+" target "+map.get(sourceAct)*/ );
+				HashMap<IUserIntentAction, Double> targetActions = map.get(sourceAct);
+
+				for(IUserIntentAction actionTarget : targetActions.keySet()){
+						
+					System.out.println("--> targetID:"+actionTarget.getActionID() +" conf level: "+targetActions.get(actionTarget)+" ctx:"+actionTarget.getActionContext() );
+
+				}
+
+			}
+	
+			
+			System.out.println("--------------------------------------------");
+	}
+		
+	
+	
+	
 	// dead code
 
 	/*

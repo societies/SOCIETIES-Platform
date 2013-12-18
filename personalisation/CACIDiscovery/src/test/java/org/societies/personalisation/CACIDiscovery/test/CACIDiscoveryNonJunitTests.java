@@ -27,8 +27,8 @@ public class CACIDiscoveryNonJunitTests {
 
 	//private static final String SERVICE_SRI2 = "css://requestor.societies.org/HelloWorld";
 	//private static ServiceResourceIdentifier serviceSri2;
-	
-	
+
+
 	CACIDiscoveryNonJunitTests() throws URISyntaxException{
 
 		serviceSri1 = new ServiceResourceIdentifier();
@@ -39,7 +39,7 @@ public class CACIDiscoveryNonJunitTests {
 		serviceSri2 = new ServiceResourceIdentifier();
 		serviceSri2.setServiceInstanceIdentifier(SERVICE_SRI2);
 		serviceSri2.setIdentifier(new URI(SERVICE_SRI2));
-		*/
+		 */
 		discovery = new CACIDiscovery();
 		cauiTaskManager = discovery.getCauiTaskManager();
 	}
@@ -48,12 +48,12 @@ public class CACIDiscoveryNonJunitTests {
 
 		UserIntentModelData modelA = createCAUIModelA();
 		UserIntentModelData modelB = createCAUIModelB();
-		
+
 		System.out.println("printModel(modelA)");
 		printModel(modelA);
 		System.out.println("printModel(modelB)");
 		printModel(modelB);
-		
+
 		List<UserIntentModelData> uiModelList = new ArrayList<UserIntentModelData>();
 		uiModelList.add(modelA);
 		uiModelList.add(modelB);
@@ -64,9 +64,15 @@ public class CACIDiscoveryNonJunitTests {
 		//System.out.println("1 merged:"+ merged);
 		//System.out.println("2 merged:"+ merged.getActionModel().keySet());
 		//System.out.println("3 merged:"+ merged.getActionModel());
-		
+
 		System.out.println("printModel(merged)");
 		printModel(merged);
+
+
+		System.out.println("context merge");
+
+
+
 	}
 
 
@@ -87,6 +93,12 @@ public class CACIDiscoveryNonJunitTests {
 		context2.put(CtxAttributeTypes.DAY_OF_WEEK, "tuesday");
 
 
+		HashMap<String,Serializable> context3 = new HashMap<String,Serializable>();
+		context3.put(CtxAttributeTypes.LOCATION_SYMBOLIC, "office");
+		context3.put(CtxAttributeTypes.HOUR_OF_DAY, 3);
+		context3.put(CtxAttributeTypes.DAY_OF_WEEK, "tuesday");
+
+
 		UserIntentModelData modelDataA = cauiTaskManager.createModel();
 
 
@@ -100,7 +112,7 @@ public class CACIDiscoveryNonJunitTests {
 
 		//IUserIntentAction userActionSetChannel = new UserIntentAction(serviceSri ,SERVICE_TYPE,"SetChannel","radio1",11L);
 		IUserIntentAction userActionSetChannel = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"C","C");
-		userActionSetChannel.setActionContext(context2);
+		userActionSetChannel.setActionContext(context3);
 
 		//IUserIntentAction userActionOff1 = new UserIntentAction(serviceSri ,SERVICE_TYPE,"A","off",12L);
 		IUserIntentAction userActionOff1 = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"D","D");
@@ -146,16 +158,16 @@ public class CACIDiscoveryNonJunitTests {
 		actB.setActionContext(context1);
 
 		IUserIntentAction actE = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"E","E");
-		
+
 		IUserIntentAction actD = cauiTaskManager.createAction(serviceSri1 ,SERVICE_TYPE,"D","D");
 		actD.setActionContext(context1);
-		
+
 		//On --> setVol 0.5
 		cauiTaskManager.setActionLink(actA, actB, 0.8d);	
 		cauiTaskManager.setActionLink(actA, actE, 0.2d);
 		cauiTaskManager.setActionLink(actE, actD, 1.0d);
 		cauiTaskManager.setActionLink(actB, actE, 1.0d);
-		
+
 		modelData  = cauiTaskManager.retrieveModel();
 		System.out.println("B CAUI modelData ::"+modelData.getActionModel());
 		//printModel(modelData);
@@ -171,15 +183,15 @@ public class CACIDiscoveryNonJunitTests {
 		allActions = model.getActionModel();
 		//System.out.println("------------printModel start ---------------");
 		for(IUserIntentAction action : allActions.keySet()){
-			System.out.println("source:"+action.getparameterName()+"/"+action.getvalue() /*+" ctx:"+ action.getActionContext()*/);
+			System.out.println("source:"+action.getparameterName()+"/"+action.getvalue() +" ctx:"+ action.getActionContext());
 
 			if(allActions.get(action)!=null){
-				
-			
-			HashMap<IUserIntentAction, Double> targetActions = allActions.get(action);
-			for(IUserIntentAction actionTarget : targetActions.keySet()){
-				System.out.println("--> target:"+actionTarget.getparameterName()+"/"+actionTarget.getvalue()+"/"+ targetActions.get(actionTarget)/*+" ctx:"+ actionTarget.getActionContext()*/);	
-			}
+
+
+				HashMap<IUserIntentAction, Double> targetActions = allActions.get(action);
+				for(IUserIntentAction actionTarget : targetActions.keySet()){
+					System.out.println("--> target:"+actionTarget.getparameterName()+"/"+actionTarget.getvalue()+"/"+ targetActions.get(actionTarget)/*+" ctx:"+ actionTarget.getActionContext()*/);	
+				}
 			}
 		}
 		System.out.println("------------printModel end ---------------");

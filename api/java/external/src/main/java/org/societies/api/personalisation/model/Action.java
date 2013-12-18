@@ -64,9 +64,9 @@ public class Action implements IAction, Serializable{
 		this.serviceType = "not_initialised";
 		this.parameterName = "not_initialised";
 		this.value = "not_initialised";
-		this.implementable = false;
-		this.contextDependent = false;
-		this.proactive = false;
+		this.implementable = true;
+		this.contextDependent = true;
+		this.proactive = true;
 	}
 
 	/**

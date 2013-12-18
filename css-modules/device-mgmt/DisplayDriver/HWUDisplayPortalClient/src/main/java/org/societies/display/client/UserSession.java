@@ -46,7 +46,22 @@ public class UserSession {
 	}
 	
 	public void addService(ServiceInfo sInfo){
+		checkIfServiceExists(sInfo);
 		this.services.add(sInfo);
+	}
+	
+	private void checkIfServiceExists(ServiceInfo sInfo){
+		ServiceInfo previousService = null;
+		for(ServiceInfo sI : this.services)
+		{
+			//THERE WILL ONLY BE ONE OTHER SERVICE WITH SAME NAME!
+			if(sI.getServiceName().equals(sInfo.getServiceName()))
+			{
+				previousService = sI;
+				break;
+			}
+		}
+		if(previousService!=null) this.services.remove(previousService);		
 	}
 
 	/**
