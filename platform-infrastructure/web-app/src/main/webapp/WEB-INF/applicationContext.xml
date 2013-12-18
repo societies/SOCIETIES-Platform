@@ -51,4 +51,5 @@
 	</osgi:reference>
 
 	<osgi:reference id="activityFeedManager" interface="org.societies.api.activity.IActivityFeedManager" />
+	<osgi:reference id="communityPreferenceManager" interface="org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager" />
 </beans>

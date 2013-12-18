@@ -1,0 +1,47 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Privacy Preferences - SOCIETIES</title>
+	</ui:define>
+
+	<ui:define name="body">
+
+		<h4 class="form_title">
+			Community Preferences for
+			<h:outputText value="#{loginController.username}" />
+		</h4>
+
+		<p:dataTable id="cisTable" value="#{cisPrefControlller.getAllCIS()}"
+			var="cis">
+			<f:facet name="header" style="background-color:yellow;">
+                 Your CIS's
+                 </f:facet>
+
+			<p:column headerText="CIS" width="50">
+						#{cis.cisname}
+					</p:column>
+
+
+			<p:column style="width: 4%">
+				<p:commandButton icon="ui-icon-wrench"
+					action="#{PrivacyPrefsController.storePPNDetailToUtils}"
+					title="View-Edit-Delete" ajax="false">
+					<f:setPropertyActionListener value="#{ppnPreferenceDetail}"
+						target="#{PrivacyPrefsController.selectedPPNDetail}" />
+
+					<f:param name="ppnDetailUUID"
+						value="#{PrivacyPrefsController.ppnUUID}" />
+				</p:commandButton>
+			</p:column>
+		</p:dataTable>
+
+	</ui:define>
+
+</ui:composition>
+</html>

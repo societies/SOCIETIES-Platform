@@ -29,6 +29,7 @@ import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.RequestScoped;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
 import org.primefaces.context.RequestContext;
@@ -133,7 +134,7 @@ import org.societies.webapp.models.WebAppParticipant;
 
 @Controller
 @ManagedBean(name = "cismanager")
-@RequestScoped
+@SessionScoped
 public class CISController extends BasePageController{
 	
 	
