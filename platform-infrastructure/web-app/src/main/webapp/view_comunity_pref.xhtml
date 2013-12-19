@@ -17,28 +17,16 @@
 			<h:outputText value="#{loginController.username}" />
 		</h4>
 
-		<p:dataTable id="cisTable" value="#{cisPrefControlller.getAllCIS()}"
-			var="cis">
+		<p:dataTable id="cisTable"
+			value="#{cisPrefControlller.getAllCISPref()}" var="cis">
 			<f:facet name="header" style="background-color:yellow;">
                  Your CIS's
                  </f:facet>
 
-			<p:column headerText="CIS" width="50">
-						#{cis.cisname}
-					</p:column>
-
-
-			<p:column style="width: 4%">
-				<p:commandButton icon="ui-icon-wrench"
-					action="#{PrivacyPrefsController.storePPNDetailToUtils}"
-					title="View-Edit-Delete" ajax="false">
-					<f:setPropertyActionListener value="#{ppnPreferenceDetail}"
-						target="#{PrivacyPrefsController.selectedPPNDetail}" />
-
-					<f:param name="ppnDetailUUID"
-						value="#{PrivacyPrefsController.ppnUUID}" />
-				</p:commandButton>
+			<p:column>
+				<h:outputText value="#{cis.preferenceDetails.preferenceName}" />
 			</p:column>
+
 		</p:dataTable>
 
 	</ui:define>
