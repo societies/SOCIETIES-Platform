@@ -78,8 +78,9 @@ public class XmlDocument extends HttpServlet {
 		}
 		String path = request.getPathInfo().replaceFirst("/", "");
 		String signature = request.getParameter(UrlPath.URL_PARAM_SIGNATURE);
+		String operation = request.getParameter(UrlPath.URL_PARAM_OPERATION);
+		LOG.info("HTTP GET: path = {}, operation = {}, signature = " + signature, path, operation);
 		
-		LOG.info("HTTP GET: path = {}, signature = " + signature, path);
 		if (path == null || signature == null) {
 			LOG.warn("HTTP GET: Missing URL parameters");
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -94,7 +95,6 @@ public class XmlDocument extends HttpServlet {
 			return;
 		}
 
-		String operation = request.getParameter(UrlPath.URL_PARAM_OPERATION);
 		
 		if (operation == null ||  "getfile".equals(operation)) {
 			respondWithDocumentContents(path, response);
