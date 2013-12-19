@@ -10,13 +10,14 @@
     tools:context=".CommunitySigStatusActivity$DummySectionFragment" >
 
     <TextView
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:drawableLeft="@drawable/error"
-	        android:gravity="center"
-	        android:text="@string/errorOccurred"
-	        android:textAlignment="center"
-	        android:textSize="20sp"
+       	android:id="@+id/communitySigStatusErrorTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/error"
+        android:gravity="center"
+        android:text="@string/errorNetwork"
+        android:textAlignment="center"
+        android:textSize="20sp"
 	/>
     
 </LinearLayout>

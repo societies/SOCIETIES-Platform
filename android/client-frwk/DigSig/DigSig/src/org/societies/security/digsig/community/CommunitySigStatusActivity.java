@@ -109,7 +109,9 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 //		store("completed", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
 //		store("in progress", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
 //		store("not started yet", "http://192.168.1.92/tmp/societies/non-existing.json?sig=foo");
+//		store("invalid response", "http://192.168.1.92/tmp/societies/invalid.json?sig=foo");
 //		store("network error", "http://192.168.1.312/invalid-ip-address.json?sig=foo");
+//		restore();
 	}
 
 	private void store() {
@@ -223,7 +225,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	 * @param signers List of signers extracted from downloaded document, or null for error
 	 * @param errorMsg Localized error to be displayed to the user, or null for no error
 	 */
-	protected void updateSigStatus(boolean success, boolean started,
+	protected void updateSigStatus(RetrievalStatus status,
 			int numSigners, int minNumSigners, ArrayList<String> signers) {
 		
 		Log.d(TAG, "updateSigStatus: numSigners = " + numSigners);
@@ -232,8 +234,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 
 		Fragment fragment = new DummySectionFragment();
 		Bundle args = new Bundle();
-		args.putBoolean(DummySectionFragment.ARG_SUCCESS, success);
-		args.putBoolean(DummySectionFragment.ARG_STARTED, started);
+		args.putSerializable(DummySectionFragment.ARG_RETRIEVAL_STATUS, status);
 		args.putInt(DummySectionFragment.ARG_NUM_SIGNERS, numSigners);
 		args.putInt(DummySectionFragment.ARG_MIN_NUM_SIGNERS, minNumSigners);
 		args.putStringArrayList(DummySectionFragment.ARG_SIGNERS, signers);
@@ -248,8 +249,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	 */
 	public static class DummySectionFragment extends Fragment {
 
-		public static final String ARG_SUCCESS = "SUCCESS";
-		public static final String ARG_STARTED = "STARTED";
+		public static final String ARG_RETRIEVAL_STATUS = "RETRIEVAL_STATUS";
 		public static final String ARG_SIGNERS = "SIGNERS";
 		public static final String ARG_NUM_SIGNERS = "NUM_SIGNERS";
 		public static final String ARG_MIN_NUM_SIGNERS = "MIN_NUM_SIGNERS";
@@ -266,11 +266,9 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			int numSigners = getArguments().getInt(ARG_NUM_SIGNERS, -1);
 			int minNumSigners = getArguments().getInt(ARG_MIN_NUM_SIGNERS, -1);
 			ArrayList<String> signers = getArguments().getStringArrayList(ARG_SIGNERS);
-			boolean success = getArguments().getBoolean(ARG_SUCCESS);
-			boolean started = getArguments().getBoolean(ARG_STARTED);
+			RetrievalStatus retrievalStatus = (RetrievalStatus) getArguments().getSerializable(ARG_RETRIEVAL_STATUS);
 			
-			Log.d(TAG, "onCreateView: success = " + success);
-			Log.d(TAG, "onCreateView: started = " + started);
+			Log.d(TAG, "onCreateView: retrieval status = " + retrievalStatus);
 			Log.d(TAG, "onCreateView: numSigners = " + numSigners);
 			Log.d(TAG, "onCreateView: minNumSigners = " + minNumSigners);
 			Log.d(TAG, "onCreateView: signers = " + signers);
@@ -278,54 +276,66 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			mBusyDialog.cancel();
 			
 			// Inflate the appropriate GUI
-			if (!success) {
-				resource = R.layout.fragment_community_sig_status_error;
-				rootView = inflater.inflate(resource, container, false);
-				return rootView;
-			}
-			else if (!started) {
+			switch (retrievalStatus) {
+			case SUCCESS_AND_NOT_STARTED:
 				resource = R.layout.fragment_community_sig_status_nonexisting;
 				rootView = inflater.inflate(resource, container, false);
-				return rootView;
-			}
-			resource = R.layout.fragment_community_sig_status_existing;
-			rootView = inflater.inflate(resource, container, false);
+				break;
+			case SUCCESS_AND_STARTED:
+				resource = R.layout.fragment_community_sig_status_existing;
+				rootView = inflater.inflate(resource, container, false);
+				// Display appropriate icon and main text
+				textView = (TextView) rootView.findViewById(R.id.communitySigStatusMainTextView);
+				if (numSigners >= minNumSigners) {
+					textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ok, 0, 0, 0);
+					textView.setText(R.string.signatureThresholdReached);
+				}
+				else {
+					textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.construction, 0, 0, 0);
+					textView.setText(R.string.signatureThresholdNotReached);
+				}
+				
+				// Set progress bar progress
+				ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.communitySigStatusProgressBar);
+				int progress = Math.round(100 * ((float) numSigners) / minNumSigners);
+				progress = Math.min(progress, 100);
+				progressBar.setProgress(progress);
 
-			// Display appropriate icon and main text
-			textView = (TextView) rootView.findViewById(R.id.communitySigStatusMainTextView);
-			if (numSigners >= minNumSigners) {
-				textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ok, 0, 0, 0);
-				textView.setText(R.string.signatureThresholdReached);
-			}
-			else {
-				textView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.construction, 0, 0, 0);
-				textView.setText(R.string.signatureThresholdNotReached);
-			}
-			
-			// Set progress bar progress
-			ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.communitySigStatusProgressBar);
-			int progress = Math.round(100 * ((float) numSigners) / minNumSigners);
-			progress = Math.min(progress, 100);
-			progressBar.setProgress(progress);
+				// Display current number of signers
+				textView = (TextView) rootView.findViewById(R.id.communitySigStatusSignedByNPartiesTextView);
+				str = numSigners >= 0 ? String.valueOf(numSigners) : "?";
+				textView.setText(str);
+				
+				// Display minimal required number of signers
+				textView = (TextView) rootView.findViewById(R.id.communitySigStatusRequiredTextView);
+				str = minNumSigners >= 0 ? String.valueOf(minNumSigners) : "?";
+				textView.setText(str);
 
-			// Display current number of signers
-			textView = (TextView) rootView.findViewById(R.id.communitySigStatusSignedByNPartiesTextView);
-			str = numSigners >= 0 ? String.valueOf(numSigners) : "?";
-			textView.setText(str);
-			
-			// Display minimal required number of signers
-			textView = (TextView) rootView.findViewById(R.id.communitySigStatusRequiredTextView);
-			str = minNumSigners >= 0 ? String.valueOf(minNumSigners) : "?";
-			textView.setText(str);
-
-			// List all current signers
-			textView = (TextView) rootView.findViewById(R.id.communitySigStatusCurrentSignersTextView);
-			String signersStr = "";
-			for (String s : signers) {
-				signersStr += s + System.getProperty("line.separator");
+				// List all current signers
+				textView = (TextView) rootView.findViewById(R.id.communitySigStatusCurrentSignersTextView);
+				String signersStr = "";
+				for (String s : signers) {
+					signersStr += s + System.getProperty("line.separator");
+				}
+				textView.setText(signersStr);
+				break;
+			case ERROR_COULD_NOT_CONNECT_TO_SERVER:
+				resource = R.layout.fragment_community_sig_status_error;
+				rootView = inflater.inflate(resource, container, false);
+				textView = (TextView) rootView.findViewById(R.id.communitySigStatusErrorTextView);
+				textView.setText(R.string.errorNetwork);
+				break;
+			case ERROR_INVALID_RESPONSE:
+				resource = R.layout.fragment_community_sig_status_error;
+				rootView = inflater.inflate(resource, container, false);
+				textView = (TextView) rootView.findViewById(R.id.communitySigStatusErrorTextView);
+				textView.setText(R.string.errorReceivedData);
+				break;
+			default:
+				// Should never happen
+				Log.w(TAG, "Unknown retrieval status: " + retrievalStatus);
+				rootView = null;
 			}
-			textView.setText(signersStr);
-			
 			return rootView;
 		}
 	}

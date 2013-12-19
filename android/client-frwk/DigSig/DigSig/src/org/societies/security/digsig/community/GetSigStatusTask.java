@@ -60,11 +60,11 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 			return net.getString();
 		} catch (FileNotFoundException e) {
 			Log.w(TAG, "doInBackground: file not found", e);
-			activity.updateSigStatus(true, false, -1, -1, null);
+			activity.updateSigStatus(RetrievalStatus.SUCCESS_AND_NOT_STARTED, -1, -1, null);
 			return null;
 		} catch (Exception e) {
 			Log.w(TAG, "doInBackground", e);
-			activity.updateSigStatus(false, false, -1, -1, null);
+			activity.updateSigStatus(RetrievalStatus.ERROR_COULD_NOT_CONNECT_TO_SERVER, -1, -1, null);
 			return null;
 		}
 	}
@@ -75,6 +75,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 		Log.i(TAG, "onPostExecute: result = \"" + result + "\"");
 
 		if (result == null) {
+			// Method activity.updateSigStatus() has been already called from doInBackground()
 			return;
 		}
 		
@@ -83,6 +84,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 			json = new JSONObject(result);
 		} catch (JSONException e) {
 			Log.w(TAG, e);
+			activity.updateSigStatus(RetrievalStatus.ERROR_INVALID_RESPONSE, -1, -1, null);
 			return;
 		}
 		
@@ -90,7 +92,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 		int minNumSigners = getMinNumSigners(json);
 		ArrayList<String> signers = getSigners(json);
 		
-		activity.updateSigStatus(true, true, numSigners, minNumSigners, signers);
+		activity.updateSigStatus(RetrievalStatus.SUCCESS_AND_STARTED, numSigners, minNumSigners, signers);
 	}
 	
 	private int getNumSigners(JSONObject json) {
