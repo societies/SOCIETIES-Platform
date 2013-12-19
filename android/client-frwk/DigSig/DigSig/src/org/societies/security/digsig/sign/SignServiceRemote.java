@@ -31,9 +31,10 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
 
+import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
-import org.societies.security.digsig.apiinternal.Community;
 import org.societies.security.digsig.apiinternal.RestServer;
+import org.societies.security.digsig.community.SharedPreferencesHelper;
 import org.societies.security.digsig.trust.SecureStorage;
 import org.societies.security.digsig.utility.KeyUtil;
 import org.societies.security.digsig.utility.RandomString;
@@ -41,7 +42,6 @@ import org.societies.security.digsig.utility.StringUtil;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -157,7 +157,7 @@ public class SignServiceRemote extends Service {
 		
 		String notificationEndpoint = data.getString(Verify.Params.NOTIFICATION_ENDPOINT);
 		int numSignersThreshold = data.getInt(Verify.Params.NUM_SIGNERS_THRESHOLD, -1);
-		String title = data.getString(Verify.Params.DOC_TITLE);
+		String title = data.getString(Sign.Params.DOC_TITLE);
 		if (title == null) {
 			title = resourceName;
 		}
@@ -172,21 +172,14 @@ public class SignServiceRemote extends Service {
 			bundle.putString(Verify.Params.UPLOAD_URI, uploadUri);
 			bundle.putString(Verify.Params.DOWNLOAD_URI, downloadUri);
 			bundle.putBoolean(Verify.Params.SUCCESS, true);
-			store(title, downloadUri);
+			SharedPreferencesHelper preferences = new SharedPreferencesHelper(this);
+			preferences.store(title, downloadUri);
 			return bundle;
 		} catch (Exception e) {
 			Log.w(TAG, "generateUris: error", e);
 			bundle.putBoolean(Verify.Params.SUCCESS, false);
 			return bundle;
 		}
-	}
-	
-	private void store(String key, String value) {
-		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString(key, value);
-		editor.commit();
-		Log.d(TAG, "Stored key value pair: " + key + " = " + value);
 	}
 
 	/**

@@ -94,10 +94,8 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	
 	private void clearDownloadUris() {
 		
-		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.clear();
-		editor.commit();
+		SharedPreferencesHelper preferences = new SharedPreferencesHelper(this);
+		preferences.clear();
 
 		documentTitles.clear();
 		downloadUris.clear();
@@ -105,12 +103,13 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		
 		Log.d(TAG, "Download URIs cleared");
 		
-//		// FIXME: remove this testing code and store(String, String) method
-//		store("completed", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
-//		store("in progress", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
-//		store("not started yet", "http://192.168.1.92/tmp/societies/non-existing.json?sig=foo");
-//		store("invalid response", "http://192.168.1.92/tmp/societies/invalid.json?sig=foo");
-//		store("network error", "http://192.168.1.312/invalid-ip-address.json?sig=foo");
+//		// FIXME: remove this testing code
+//		SharedPreferencesHelper prefs = new SharedPreferencesHelper(this);
+//		prefs.store("completed", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
+//		prefs.store("in progress", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
+//		prefs.store("not started yet", "http://192.168.1.92/tmp/societies/non-existing.json?sig=foo");
+//		prefs.store("invalid response", "http://192.168.1.92/tmp/societies/invalid.json?sig=foo");
+//		prefs.store("network error", "http://192.168.1.312/invalid-ip-address.json?sig=foo");
 //		restore();
 	}
 
@@ -123,18 +122,10 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		Log.d(TAG, "Activity state stored. selected = " + selected);
 	}
 
-//	private void store(String key, String value) {
-//		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
-//		SharedPreferences.Editor editor = preferences.edit();
-//		editor.putString(key, value);
-//		editor.commit();
-//		Log.d(TAG, "Stored key value pair: " + key + " = " + value);
-//	}
-
 	private void restore() {
 		
-		SharedPreferences preferences = getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, MODE_PRIVATE);
-		Map<String, String> all = (Map<String, String>) preferences.getAll();
+		SharedPreferencesHelper preferences = new SharedPreferencesHelper(this);
+		Map<String, String> all = preferences.getAll();
 		
 		documentTitles.clear();
 		downloadUris.clear();
@@ -214,8 +205,14 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		mBusyDialog.setMessage(getText(R.string.fetchingStatus));
 		mBusyDialog.show();
 		
-		new GetSigStatusTask(this).execute(downloadUris.get(position));
+		String uri = appendGetStatusParameter(downloadUris.get(position));
+		new GetSigStatusTask(this).execute(uri);
 		return true;
+	}
+	
+	private String appendGetStatusParameter(String uri) {
+		String delimiter = uri.contains("?") ? "&" : "?";
+		return uri + delimiter + Community.SERVER_PARAMETER_GET_STATUS;
 	}
 	
 	/**

@@ -26,6 +26,7 @@ import org.apache.xml.security.algorithms.MessageDigestAlgorithm;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.societies.security.digsig.api.Sign;
+import org.societies.security.digsig.community.SharedPreferencesHelper;
 import org.societies.security.digsig.sign.contentprovider.DocContentProvider;
 import org.societies.security.digsig.trust.SecureStorage;
 import org.societies.security.digsig.utility.Net;
@@ -164,6 +165,12 @@ public class SignService extends IntentService {
 			if (serverUri != null) {
 				InputStream signedIs = getContentResolver().openInputStream(DocContentProvider.localPath2Uri(path));
 				bcIntent.putExtra(Sign.Params.UPLOAD_SUCCESS, upload(new URI(serverUri), signedIs));
+				String title = intent.getStringExtra(Sign.Params.DOC_TITLE);
+				if (title == null) {
+					title = path;
+				}
+				SharedPreferencesHelper preferences = new SharedPreferencesHelper(this);
+				preferences.store(title, serverUri);
 			}
 			
 			bcIntent.putExtra(Sign.Params.SUCCESS, true);

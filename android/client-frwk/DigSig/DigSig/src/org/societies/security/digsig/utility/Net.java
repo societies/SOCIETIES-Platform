@@ -25,7 +25,6 @@
 package org.societies.security.digsig.utility;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -62,21 +61,23 @@ public class Net {
 		this.uri = uri;
 	}
 	
-	public void get(OutputStream os) throws FileNotFoundException, IOException {
+	public void get(OutputStream os) throws IOException {
 		
 		Log.d(TAG, "download()");
 		
 		long startTime = System.currentTimeMillis();
 		
 		uri.toURL().openConnection();
+		// TODO: openStream() throws FileNotFoundException not only when server returns 404,
+		// but only when other errors (e.g., 500) are returned.
+		// Prevent FileNotFoundException when errors other thant 404 are returned.
 		InputStream reader = uri.toURL().openStream();
 		byte[] buffer = new byte[153600];
 		int totalBytesRead = 0;
 		int bytesRead = 0;
 
 		if (os != null) {
-			while ((bytesRead = reader.read(buffer)) > 0)
-			{  
+			while ((bytesRead = reader.read(buffer)) > 0) {
 				os.write(buffer, 0, bytesRead);
 				buffer = new byte[153600];
 				totalBytesRead += bytesRead;
@@ -93,9 +94,8 @@ public class Net {
 	/**
 	 * Perform HTTP GET without downloading the resource
 	 * @throws IOException 
-	 * @throws FileNotFoundException 
 	 */
-	public void get() throws FileNotFoundException, IOException {
+	public void get() throws IOException {
 		get((OutputStream) null);
 	}
 	
@@ -103,9 +103,8 @@ public class Net {
 	 * Perform HTTP GET
 	 * @return the downloaded resource
 	 * @throws IOException 
-	 * @throws FileNotFoundException 
 	 */
-	public byte[] getByteArray() throws FileNotFoundException, IOException {
+	public byte[] getByteArray() throws IOException {
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		
@@ -117,9 +116,8 @@ public class Net {
 	 * Perform HTTP GET
 	 * @return the downloaded resource
 	 * @throws IOException 
-	 * @throws FileNotFoundException 
 	 */
-	public String getString() throws FileNotFoundException, IOException {
+	public String getString() throws IOException {
 		byte[] ba = getByteArray();
 		try {
 			String s = new String(ba, "UTF-8");

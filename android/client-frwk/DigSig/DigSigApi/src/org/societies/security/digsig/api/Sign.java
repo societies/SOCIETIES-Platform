@@ -48,6 +48,12 @@ public class Sign {
 		 * Type: {@link String}
 		 */
 		public static final String SIGNED_DOC_URL = "SIGNED_XML";
+		
+		/**
+		 * Optional human readable name or title of the document that is to be signed.
+		 * Type: {@link String}
+		 */
+		public static final String DOC_TITLE = "DOC_TITLE";
 	
 		/**
 		 * Type of the signature in output document

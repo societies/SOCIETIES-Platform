@@ -58,10 +58,10 @@ public class Verify {
 		public static final String NUM_SIGNERS_THRESHOLD = "NUM_SIGNERS_THRESHOLD";
 		
 		/**
-		 * Optional human readable name or title of the document that is to be signed.
-		 * Type: {@link String}
+		 * Please use {@link Sign.Params#DOC_TITLE} instead.
 		 */
-		public static final String DOC_TITLE = "DOC_TITLE";
+		@Deprecated
+		public static final String DOC_TITLE = Sign.Params.DOC_TITLE;
 
 		/**
 		 * The URI to upload initial version of document by using HTTP PUT.

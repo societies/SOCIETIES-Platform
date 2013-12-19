@@ -22,25 +22,55 @@
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.societies.security.digsig.apiinternal;
+package org.societies.security.digsig.community;
+
+import java.util.Map;
+
+import org.societies.security.digsig.apiinternal.Community;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 /**
- * Community signatures
+ * Helper class for {@link SharedPreferences} used to store download URIs for community signatures.
  *
- * @author Mitja Vardjan
+ * @author mitjav
  *
  */
-public class Community {
+public class SharedPreferencesHelper {
 
-	public static final String STATUS_DOWNLOAD_URI_PARAMETER = "&operation=status";
+	private static final String TAG = SharedPreferencesHelper.class.getSimpleName();
+
+	Context context;
+	SharedPreferences preferences;
+
+	public SharedPreferencesHelper(Context context) {
+		this.context = context;
+		preferences = context.getSharedPreferences(Community.Preferences.DOWNLOAD_URIS, Activity.MODE_PRIVATE);
+	}
 	
-	public static final String SELECTED_DOCUMENT_INDEX = "SELECTED_DOCUMENT_INDEX";
-	
-	public static final String SERVER_PARAMETER_GET_STATUS = "operation=status";
-	
-	public class Preferences {
-	
-		public static final String DOWNLOAD_URIS = "DOWNLOAD_URIS";
+	public void store(String key, String value) {
+		
+		if (!preferences.getAll().containsValue(value)) {
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString(key, value);
+			editor.commit();
+			Log.d(TAG, "Stored key value pair: " + key + " = " + value);
+		}
+		else {
+			Log.d(TAG, "Value " + value + " already exists");
+		}
 	}
 
+	public Map<String, String> getAll() {
+		return (Map<String, String>) preferences.getAll();
+	}
+	
+	public void clear() {
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.clear();
+		editor.commit();
+	}
 }
