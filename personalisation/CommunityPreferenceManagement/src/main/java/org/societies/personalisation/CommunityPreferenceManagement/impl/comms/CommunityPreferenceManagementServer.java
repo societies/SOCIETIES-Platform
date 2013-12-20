@@ -110,6 +110,7 @@ public class CommunityPreferenceManagementServer implements IFeatureServer{
 					}
 					CommunityPersonalisationResultBean resultBean = new CommunityPersonalisationResultBean();
 					resultBean.setDetails(beans);
+					resultBean.setRequestID(bean.getRequestID());
 					return resultBean;
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
@@ -127,6 +128,7 @@ public class CommunityPreferenceManagementServer implements IFeatureServer{
 						}
 						CommunityPersonalisationResultBean resultBean = new CommunityPersonalisationResultBean();
 						resultBean.setModels(beans);
+						resultBean.setRequestID(bean.getRequestID());
 						return resultBean;
 
 
@@ -150,6 +152,7 @@ public class CommunityPreferenceManagementServer implements IFeatureServer{
 					}
 					CommunityPersonalisationResultBean resultBean = new CommunityPersonalisationResultBean();
 					resultBean.setModels(beans);
+					resultBean.setRequestID(bean.getRequestID());
 					return resultBean;
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema elementFormDefault="qualified" version="1.0"
-targetNamespace="http://societies.org/api/internal/schema/personalisation/comms" 
-xmlns="http://societies.org/api/internal/schema/personalisation/comms"
+	targetNamespace="http://societies.org/api/internal/schema/personalisation/comms"
+	xmlns="http://societies.org/api/internal/schema/personalisation/comms"
 	xmlns:tns="http://societies.org/api/schema/servicelifecycle/model"
 	xmlns:tns1="http://societies.org/api/internal/schema/personalisation/model"
 	xmlns:tns2="http://societies.org/api/schema/personalisation/model"
@@ -9,39 +9,49 @@ xmlns="http://societies.org/api/internal/schema/personalisation/comms"
 
 	<xs:import namespace="http://societies.org/api/schema/servicelifecycle/model"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.servicelifecycle.model.xsd" />
-	
+
 	<xs:import namespace="http://societies.org/api/schema/personalisation/model"
 		schemaLocation="../../../../external/src/main/resources/org.societies.api.schema.personalisation.model.xsd" />
-	
-	<xs:import namespace="http://societies.org/api/internal/schema/personalisation/model"
+
+	<xs:import
+		namespace="http://societies.org/api/internal/schema/personalisation/model"
 		schemaLocation="org.societies.api.internal.schema.personalisation.model.xsd" />
-		
-		
-	<xs:complexType name="CommunityPersonalisationCommsClientBean">
-		<xs:sequence>
-			<xs:element name="cisId" type="xs:string"/>
-			<xs:element name="methodType" type="CommunityPersonalisationMethodType" />
-			<xs:element name="details" type="tns1:PreferenceDetailsBean" maxOccurs="unbounded" minOccurs="0"/>
-			<xs:element name="models" type="tns1:PreferenceTreeModelBean" maxOccurs="unbounded" minOccurs="0"/>
-			<xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false" />
-		</xs:sequence>
-	</xs:complexType>
-	
-	
-		<xs:simpleType name="CommunityPersonalisationMethodType">
+
+	<xs:element name="CommunityPersonalisationCommsClientBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="cisId" type="xs:string" />
+				<xs:element name="methodType" type="CommunityPersonalisationMethodType" />
+				<xs:element name="details" type="tns1:PreferenceDetailsBean"
+					maxOccurs="unbounded" minOccurs="0" />
+				<xs:element name="models" type="tns1:PreferenceTreeModelBean"
+					maxOccurs="unbounded" minOccurs="0" />
+				<xs:element name="requestID" type="xs:string" minOccurs="1"
+					maxOccurs="1" nillable="false" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+
+	<xs:simpleType name="CommunityPersonalisationMethodType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="getCommunityPreferenceDetails" />
 			<xs:enumeration value="getAllCommunityPreferences" />
 			<xs:enumeration value="getCommunityPreferences" />
-			<xs:enumeration value="uploadUserPreferences"/>
+			<xs:enumeration value="uploadUserPreferences" />
 		</xs:restriction>
 	</xs:simpleType>
-	
-	<xs:complexType name="CommunityPersonalisationResultBean">
-		<xs:sequence>
-			<xs:element name="models" type="tns1:PreferenceTreeModelBean" maxOccurs="unbounded" minOccurs="0"/>
-			<xs:element name="details" type="tns1:PreferenceDetailsBean" maxOccurs="unbounded" minOccurs="0"/>
-			<xs:element name="requestID" type="xs:string" minOccurs="1" maxOccurs="1" nillable="false" />
-		</xs:sequence>
-	</xs:complexType>
+
+	<xs:element name="CommunityPersonalisationResultBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="models" type="tns1:PreferenceTreeModelBean"
+					maxOccurs="unbounded" minOccurs="0" />
+				<xs:element name="details" type="tns1:PreferenceDetailsBean"
+					maxOccurs="unbounded" minOccurs="0" />
+				<xs:element name="requestID" type="xs:string" minOccurs="1"
+					maxOccurs="1" nillable="false" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
 </xs:schema>

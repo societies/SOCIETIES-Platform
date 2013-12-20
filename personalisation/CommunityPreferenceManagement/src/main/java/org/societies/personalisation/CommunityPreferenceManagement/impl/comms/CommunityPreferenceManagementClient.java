@@ -337,6 +337,9 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 		if (obj instanceof CommunityPersonalisationResultBean){
 			CommunityPersonalisationResultBean bean = (CommunityPersonalisationResultBean) obj;
 			this.results.put(bean.getRequestID(), bean);
+			synchronized(results) {
+				results.notifyAll();
+			}
 			
 		}
 		
