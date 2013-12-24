@@ -43,6 +43,8 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	
 	private static ProgressDialog mBusyDialog;
 	
+	private boolean visible = false;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		
@@ -65,6 +67,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		Log.d(TAG, documentTitles.size() + " existing documents found");
 		
 		loadActionBar();
+		visible = true;
 	}
 
 	@Override
@@ -72,6 +75,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		
 		super.onPause();
 		
+		visible = false;
 		store();
 	}
 	
@@ -201,6 +205,10 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		// container view.
 		Log.d(TAG, "position = " + position + ", id = " + id);
 		
+		if (mBusyDialog != null) {
+			Log.d(TAG, "Cancelling previous busy dialog");
+			mBusyDialog.cancel();
+		}
 		mBusyDialog = new ProgressDialog(getActionBarThemedContextCompat());
 		mBusyDialog.setMessage(getText(R.string.fetchingStatus));
 		mBusyDialog.show();
@@ -229,6 +237,16 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		Log.d(TAG, "updateSigStatus: minNumSigners = " + minNumSigners);
 		Log.d(TAG, "updateSigStatus: signers = " + signers);
 
+		if (mBusyDialog != null) {
+			mBusyDialog.cancel();
+		}
+		mBusyDialog = null;
+
+		if (!visible) {
+			Log.d(TAG, "Activity not visible, will not update sig status");
+			return;
+		}
+		
 		Fragment fragment = new DummySectionFragment();
 		Bundle args = new Bundle();
 		args.putSerializable(DummySectionFragment.ARG_RETRIEVAL_STATUS, status);
@@ -269,8 +287,6 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			Log.d(TAG, "onCreateView: numSigners = " + numSigners);
 			Log.d(TAG, "onCreateView: minNumSigners = " + minNumSigners);
 			Log.d(TAG, "onCreateView: signers = " + signers);
-
-			mBusyDialog.cancel();
 			
 			// Inflate the appropriate GUI
 			switch (retrievalStatus) {
