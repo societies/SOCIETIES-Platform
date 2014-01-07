@@ -12,7 +12,10 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.os.Bundle;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.v4.app.Fragment;
@@ -31,7 +34,9 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		ActionBar.OnNavigationListener {
 
 	private static final String TAG = CommunitySigStatusActivity.class.getSimpleName();
-	
+
+	public static final String ACTION_SIG_STATUS = "SIG_STATUS";
+
 	/**
 	 * The serialization (saved instance state) Bundle key representing the
 	 * current dropdown position.
@@ -43,7 +48,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 	
 	private static ProgressDialog mBusyDialog;
 	
-	private boolean visible = false;
+	private SigStatusReceiver receiver;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +72,11 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		Log.d(TAG, documentTitles.size() + " existing documents found");
 		
 		loadActionBar();
-		visible = true;
+
+		IntentFilter filter = new IntentFilter(ACTION_SIG_STATUS);
+		receiver = new SigStatusReceiver();
+		registerReceiver(receiver, filter);
+		Log.d(TAG, "Receiver registered");
 	}
 
 	@Override
@@ -75,7 +84,12 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		
 		super.onPause();
 		
-		visible = false;
+		if (receiver != null) {
+			unregisterReceiver(receiver);
+			receiver = null;
+			Log.d(TAG, "Receiver unregistered");
+		}
+
 		store();
 	}
 	
@@ -214,7 +228,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		mBusyDialog.show();
 		
 		String uri = appendGetStatusParameter(downloadUris.get(position));
-		new GetSigStatusTask(this).execute(uri);
+		new GetSigStatusTask(getApplicationContext()).execute(uri);
 		return true;
 	}
 	
@@ -223,41 +237,6 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		return uri + delimiter + Community.SERVER_PARAMETER_GET_STATUS;
 	}
 	
-	/**
-	 * 
-	 * @param numSigners Value extracted from downloaded document, or negative value for error
-	 * @param minNumSigners Value extracted from downloaded document, or negative value for error
-	 * @param signers List of signers extracted from downloaded document, or null for error
-	 * @param errorMsg Localized error to be displayed to the user, or null for no error
-	 */
-	protected void updateSigStatus(RetrievalStatus status,
-			int numSigners, int minNumSigners, ArrayList<String> signers) {
-		
-		Log.d(TAG, "updateSigStatus: numSigners = " + numSigners);
-		Log.d(TAG, "updateSigStatus: minNumSigners = " + minNumSigners);
-		Log.d(TAG, "updateSigStatus: signers = " + signers);
-
-		if (mBusyDialog != null) {
-			mBusyDialog.cancel();
-		}
-		mBusyDialog = null;
-
-		if (!visible) {
-			Log.d(TAG, "Activity not visible, will not update sig status");
-			return;
-		}
-		
-		Fragment fragment = new DummySectionFragment();
-		Bundle args = new Bundle();
-		args.putSerializable(DummySectionFragment.ARG_RETRIEVAL_STATUS, status);
-		args.putInt(DummySectionFragment.ARG_NUM_SIGNERS, numSigners);
-		args.putInt(DummySectionFragment.ARG_MIN_NUM_SIGNERS, minNumSigners);
-		args.putStringArrayList(DummySectionFragment.ARG_SIGNERS, signers);
-		fragment.setArguments(args);
-		getSupportFragmentManager().beginTransaction()
-				.replace(R.id.container, fragment).commit();
-	}
-
 	/**
 	 * A dummy fragment representing a section of the app, but that simply
 	 * displays dummy text.
@@ -353,4 +332,22 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		}
 	}
 
+	private class SigStatusReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			
+			Log.i(TAG, "Broadcast received");
+			
+			if (mBusyDialog != null) {
+				mBusyDialog.cancel();
+			}
+			mBusyDialog = null;
+
+			Fragment fragment = new DummySectionFragment();
+			fragment.setArguments(intent.getExtras());
+			getSupportFragmentManager().beginTransaction()
+					.replace(R.id.container, fragment).commit();
+		}
+	}
 }

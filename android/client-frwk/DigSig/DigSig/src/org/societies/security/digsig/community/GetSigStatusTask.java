@@ -25,6 +25,7 @@
 package org.societies.security.digsig.community;
 
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 
@@ -33,6 +34,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.societies.security.digsig.utility.Net;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -40,10 +43,10 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 	
 	private static final String TAG = GetSigStatusTask.class.getSimpleName();
 	
-	private CommunitySigStatusActivity activity;
+	private Context context;
 	
-	public GetSigStatusTask(CommunitySigStatusActivity activity) {
-		this.activity = activity;
+	public GetSigStatusTask(Context context) {
+		this.context = context;
 	}
 	
 	/* Parameters:
@@ -60,11 +63,11 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 			return net.getString();
 		} catch (FileNotFoundException e) {
 			Log.w(TAG, "doInBackground: file not found", e);
-			activity.updateSigStatus(RetrievalStatus.SUCCESS_AND_NOT_STARTED, -1, -1, null);
+			broadcastIntent(RetrievalStatus.SUCCESS_AND_NOT_STARTED, -1, -1, null);
 			return null;
 		} catch (Exception e) {
 			Log.w(TAG, "doInBackground", e);
-			activity.updateSigStatus(RetrievalStatus.ERROR_COULD_NOT_CONNECT_TO_SERVER, -1, -1, null);
+			broadcastIntent(RetrievalStatus.ERROR_COULD_NOT_CONNECT_TO_SERVER, -1, -1, null);
 			return null;
 		}
 	}
@@ -84,7 +87,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 			json = new JSONObject(result);
 		} catch (JSONException e) {
 			Log.w(TAG, e);
-			activity.updateSigStatus(RetrievalStatus.ERROR_INVALID_RESPONSE, -1, -1, null);
+			broadcastIntent(RetrievalStatus.ERROR_INVALID_RESPONSE, -1, -1, null);
 			return;
 		}
 		
@@ -92,7 +95,7 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 		int minNumSigners = getMinNumSigners(json);
 		ArrayList<String> signers = getSigners(json);
 		
-		activity.updateSigStatus(RetrievalStatus.SUCCESS_AND_STARTED, numSigners, minNumSigners, signers);
+		broadcastIntent(RetrievalStatus.SUCCESS_AND_STARTED, numSigners, minNumSigners, signers);
 	}
 	
 	private int getNumSigners(JSONObject json) {
@@ -145,5 +148,18 @@ public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 		}
 		
 		return names;
+	}
+	
+	private void broadcastIntent(RetrievalStatus status, int numSigners, int minNumSigners, ArrayList<String> signers) {
+		
+		if (context != null) {
+			Intent intent = new Intent();
+			intent.setAction(CommunitySigStatusActivity.ACTION_SIG_STATUS);
+			intent.putExtra(CommunitySigStatusActivity.DummySectionFragment.ARG_RETRIEVAL_STATUS, (Serializable) status);
+			intent.putExtra(CommunitySigStatusActivity.DummySectionFragment.ARG_NUM_SIGNERS, numSigners);
+			intent.putExtra(CommunitySigStatusActivity.DummySectionFragment.ARG_MIN_NUM_SIGNERS, minNumSigners);
+			intent.putStringArrayListExtra(CommunitySigStatusActivity.DummySectionFragment.ARG_SIGNERS, signers);
+			context.sendBroadcast(intent);
+		}
 	}
 }
