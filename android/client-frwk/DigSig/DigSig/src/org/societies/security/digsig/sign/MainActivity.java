@@ -37,7 +37,7 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	private static final boolean testMode = true;
+	private static final boolean testMode = false;
 	
 	private final static int SIGN = 1;
 	private final static int VERIFY = 2;
