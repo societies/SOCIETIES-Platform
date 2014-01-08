@@ -11,8 +11,11 @@ import org.societies.security.digsig.sign.R;
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.ProgressDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.content.BroadcastReceiver;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -25,8 +28,10 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -61,6 +66,40 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+
+		// Button to view the whole raw ugly XML document
+		Button button = (Button) findViewById(R.id.communitySigStatusViewRawDocumentButton);
+		button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int selected = getActionBar().getSelectedNavigationIndex();
+				String uri = downloadUris.get(selected);
+				Log.d(TAG, "Selected URI of document to view = " + uri);
+				Intent i = new Intent(Intent.ACTION_VIEW);
+				i.setData(Uri.parse(uri));
+				startActivity(i);
+			}
+		});
+		
+		// Button to copy URL of the whole raw ugly XML document to clipboard
+		button = (Button) findViewById(R.id.communitySigStatusCopyRawDocumentUrlButton);
+		button.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int selected = getActionBar().getSelectedNavigationIndex();
+				String uri = downloadUris.get(selected);
+				Log.d(TAG, "Selected URI to copy = " + uri);
+				copyToClipboard(uri);
+			}
+		});
+	}
+	
+	private void enableOrDisableButtons() {
+		Button viewRawDocumentButton = (Button) findViewById(R.id.communitySigStatusViewRawDocumentButton);
+		Button copyRawDocumentUrlButton = (Button) findViewById(R.id.communitySigStatusCopyRawDocumentUrlButton);
+		boolean enable = (downloadUris.size() > 0);
+		viewRawDocumentButton.setEnabled(enable);
+		copyRawDocumentUrlButton.setEnabled(enable);
 	}
 	
 	@Override
@@ -117,6 +156,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 
 		documentTitles.clear();
 		downloadUris.clear();
+		enableOrDisableButtons();
 		loadActionBar();
 		
 		Log.d(TAG, "Download URIs cleared");
@@ -155,6 +195,7 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			documentTitles.add(key);
 			downloadUris.add(all.get(key));
 		}
+		enableOrDisableButtons();
 		Log.d(TAG, "Restored " + downloadUris.size() + " URIs");
 	}
 
@@ -349,5 +390,17 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 			getSupportFragmentManager().beginTransaction()
 					.replace(R.id.container, fragment).commit();
 		}
+	}
+
+	private void copyToClipboard(String str) {
+		
+//		if(android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+//			ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+//			clipboard.setText(str);
+//		} else {
+			ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+			ClipData clip = ClipData.newPlainText("Copied Text", str);
+			clipboard.setPrimaryClip(clip);
+//		}
 	}
 }
