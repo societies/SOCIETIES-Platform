@@ -40,6 +40,8 @@
 		interface="org.societies.api.internal.useragent.feedback.IUserFeedback" />
 	    <osgi:reference id="cisManager"
 	interface="org.societies.api.cis.management.ICisManager" />
+	    
+	    <osgi:reference id="CisDirectoryRemote" interface="org.societies.api.cis.directory.ICisDirectoryRemote" />
 	
 
 	<!-- definitions using elements of the osgi namespace can be included in 

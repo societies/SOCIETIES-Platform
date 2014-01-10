@@ -41,8 +41,16 @@
 		<property name="commManager" ref="commManager"></property>
 		<property name="userFeedback" ref="userFeedback"></property>
 		<property name="cisManager" ref="cisManager"></property>
+		<property name="cisDirectory" ref="CisDirectoryRemote"></property>
 
 
+
+	</bean>
+
+	<bean id="scaCommsServer" class="org.societies.orchestration.sca.comms.SCACommsServer"
+		name="scaCommsServer" init-method="InitService">
+		<property name="scaManager" ref="scaManager"></property>
+		<property name="commManager" ref="commManager"></property>
 	</bean>
 
 

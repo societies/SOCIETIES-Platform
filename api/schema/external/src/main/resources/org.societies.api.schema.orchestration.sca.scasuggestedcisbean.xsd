@@ -1,0 +1,17 @@
+<xs:schema elementFormDefault="qualified" version="1.0"
+	targetNamespace="http://societies.org/api/schema/orchestration/sca/scasuggestedcisbean"
+	xmlns:tns="http://societies.org/api/schema/orchestration/sca/scasuggestedcisbean"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="SCASuggestedBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="cisID" type="xs:string"
+					minOccurs="0" />
+				<xs:element name="suggestedType" type="xs:string"
+					minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+</xs:schema>
