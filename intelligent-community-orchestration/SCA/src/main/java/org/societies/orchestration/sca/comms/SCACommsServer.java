@@ -62,6 +62,7 @@ public class SCACommsServer implements IFeatureServer {
 		}
 		// TODO Auto-generated method stub
 		//SEND A MESSAGE TO JIANNIS TO JOIN
+		Result = scaManager.leaveCIS();
 		return new SCASuggestedBean();
 	}
 
