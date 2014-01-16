@@ -6,12 +6,42 @@
 	<xs:element name="SCASuggestedBean">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:element name="cisID" type="xs:string"
+				<xs:element name="cisID" type="xs:string" minOccurs="0" />
+				<xs:element name="cisName" type="xs:string" minOccurs="0"/>
+				<xs:element name="requestID" type="xs:string" minOccurs="0" />
+				<xs:element name="methodType" type="tns:SCASuggestedMethodType"
 					minOccurs="0" />
-				<xs:element name="suggestedType" type="xs:string"
+				<xs:element name="forceAction" type="xs:boolean"
 					minOccurs="0" />
 			</xs:sequence>
 		</xs:complexType>
 	</xs:element>
+	
+	<xs:element name="SCASuggestedResponseBean">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="ID" type="xs:string" minOccurs="0" />
+				<xs:element name="response" type="tns:SCASuggestedResponseType" minOccurs="0" />
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:simpleType name="SCASuggestedMethodType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="leave" />
+			<xs:enumeration value="delete" />
+			<xs:enumeration value="create" />
+			<xs:enumeration value="join" />
+		</xs:restriction>
+	</xs:simpleType>
+	
+		<xs:simpleType name="SCASuggestedResponseType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="accepted" />
+			<xs:enumeration value="declined" />
+			<xs:enumeration value="pending" />
+		</xs:restriction>
+	</xs:simpleType>
+
 
 </xs:schema>

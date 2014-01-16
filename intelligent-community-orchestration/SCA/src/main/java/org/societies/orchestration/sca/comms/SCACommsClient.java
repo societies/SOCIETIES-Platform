@@ -16,7 +16,11 @@ import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.orchestration.ICommunitySuggestion;
 import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedBean;
+import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedMethodType;
+import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedResponseBean;
+import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedResponseType;
 import org.societies.orchestration.sca.api.ISCARemote;
+import org.societies.orchestration.sca.model.SCAInvitation;
 
 public class SCACommsClient implements ICommCallback, ISCARemote {
 
@@ -88,7 +92,7 @@ public class SCACommsClient implements ICommCallback, ISCARemote {
 	}
 
 	@Override
-	public void sendJoinSuggestion(String userJID,
+	public void sendJoinSuggestion(String ID, String userJID, String cisName,
 			String suggestedCIS) {
 
 		IIdentity userID = null;
@@ -100,12 +104,14 @@ public class SCACommsClient implements ICommCallback, ISCARemote {
 		}
 		if(null!=userID) {
 			SCASuggestedBean bean = new SCASuggestedBean();
+			bean.setRequestID(ID);
+			bean.setCisName(cisName);
 			bean.setCisID(suggestedCIS);
-			bean.setSuggestedType("join");
-
+			bean.setMethodType(SCASuggestedMethodType.JOIN);
+			bean.setForceAction(false);
 			Stanza stanza = new Stanza(userID);
 			try {			
-				this.commManager.sendIQGet(stanza, bean, this);
+				this.commManager.sendMessage(stanza, bean);
 			} catch (CommunicationException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -115,10 +121,37 @@ public class SCACommsClient implements ICommCallback, ISCARemote {
 	}
 
 	@Override
-	public void sendLeaveSuggestion(String userJID,
+	public void sendLeaveSuggestion(String ID, String userJID,
 			String suggestedCIS) {
 		// TODO Auto-generated method stub
 
 	}
+
+	@Override
+	public void sendSuggestionResponse(String ID, String toJID,
+			SCASuggestedResponseType response) {
+
+		IIdentity userID = null;
+		try {
+			userID = this.commManager.getIdManager().fromJid(toJID);
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if(null!=userID) {
+			SCASuggestedResponseBean responseBean = new SCASuggestedResponseBean();
+			responseBean.setID(ID);
+			responseBean.setResponse(response);
+			Stanza stanza = new Stanza(userID);
+			try {			
+				this.commManager.sendMessage(stanza, responseBean);
+			} catch (CommunicationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+	}
+
 
 }

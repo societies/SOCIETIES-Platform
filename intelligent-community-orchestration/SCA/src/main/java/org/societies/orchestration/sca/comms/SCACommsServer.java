@@ -11,13 +11,18 @@ import org.societies.api.comm.xmpp.exceptions.CommunicationException;
 import org.societies.api.comm.xmpp.exceptions.XMPPError;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.comm.xmpp.interfaces.IFeatureServer;
+import org.societies.orchestration.sca.SCAManagerClient;
 import org.societies.orchestration.sca.api.ISCAManager;
+import org.societies.orchestration.sca.api.ISCAManagerClient;
+import org.societies.orchestration.sca.model.SCAInvitation;
 import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedBean;
+import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedResponseBean;
 
 public class SCACommsServer implements IFeatureServer {
 
 	private ISCAManager scaManager;
 	private ICommManager commManager;
+	private ISCAManagerClient scaManagerClient;
 
 	private static Logger log = LoggerFactory.getLogger(SCACommsServer.class);
 
@@ -57,12 +62,10 @@ public class SCACommsServer implements IFeatureServer {
 		log.debug("Got Message!");
 		if(arg1 instanceof SCASuggestedBean) {
 			SCASuggestedBean newbean = (SCASuggestedBean) arg1;
-			log.debug("My type is: " + newbean.getSuggestedType());
 			log.debug("Payload is of correct bean!");
 		}
 		// TODO Auto-generated method stub
 		//SEND A MESSAGE TO JIANNIS TO JOIN
-		Result = scaManager.leaveCIS();
 		return new SCASuggestedBean();
 	}
 
@@ -76,6 +79,15 @@ public class SCACommsServer implements IFeatureServer {
 	public void receiveMessage(Stanza arg0, Object arg1) {
 		// TODO Auto-generated method stub
 		log.debug("I got the message");
+		if(arg1 instanceof SCASuggestedBean) {
+			SCASuggestedBean suggestion = (SCASuggestedBean) arg1;
+			SCAInvitation invitation = new SCAInvitation(suggestion.getCisID(), suggestion.getCisName(), arg0.getFrom().getBareJid(), suggestion.getMethodType());
+			scaManagerClient.addInvitation(suggestion.getRequestID(), invitation);
+		}
+		else if (arg1 instanceof SCASuggestedResponseBean) {
+			SCASuggestedResponseBean responseBean = (SCASuggestedResponseBean) arg1;
+			scaManager.handleInvitationResponse(responseBean.getID(), arg0.getFrom().getBareJid(), responseBean.getResponse());
+		}
 
 	}
 
@@ -91,6 +103,14 @@ public class SCACommsServer implements IFeatureServer {
 
 	public void setScaManager(ISCAManager scaManager) {
 		this.scaManager = scaManager;
+	}
+	
+	public ISCAManagerClient getScaManagerClient() {
+		return scaManagerClient;
+	}
+
+	public void setScaManagerClient(ISCAManagerClient scaManagerClient) {
+		this.scaManagerClient = scaManagerClient;
 	}
 
 	public ICommManager getCommManager() {

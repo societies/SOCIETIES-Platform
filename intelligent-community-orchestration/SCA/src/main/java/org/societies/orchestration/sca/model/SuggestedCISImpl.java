@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.societies.api.internal.orchestration.ICommunitySuggestion;
+import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedMethodType;
 
 public class SuggestedCISImpl implements ICommunitySuggestion, Serializable {
 
@@ -55,5 +56,6 @@ public class SuggestedCISImpl implements ICommunitySuggestion, Serializable {
 	public void setConditionsList(ArrayList<String> conditionsList) {
 		this.conditionsList = conditionsList;
 	}
+	
 
 }

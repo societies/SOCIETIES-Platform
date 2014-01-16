@@ -3,46 +3,63 @@ package org.societies.orchestration.sca;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.societies.api.cis.directory.ICisAdvertisementRecord;
-import org.societies.api.cis.directory.ICisDirectoryCallback;
+import org.societies.api.cis.attributes.MembershipCriteria;
+import org.societies.api.cis.attributes.Rule;
 import org.societies.api.cis.directory.ICisDirectoryRemote;
 import org.societies.api.cis.management.ICis;
 import org.societies.api.cis.management.ICisManager;
+import org.societies.api.cis.management.ICisManagerCallback;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
-import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.identity.Requestor;
 import org.societies.api.internal.orchestration.ICommunitySuggestion;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
-import org.societies.api.internal.useragent.model.ExpProposalContent;
 import org.societies.api.osgi.event.CSSEvent;
 import org.societies.api.osgi.event.EMSException;
 import org.societies.api.osgi.event.EventListener;
 import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
+import org.societies.api.privacytrust.privacy.model.PrivacyException;
+import org.societies.api.schema.cis.community.CommunityMethods;
+import org.societies.api.schema.cis.community.Criteria;
+import org.societies.api.schema.cis.community.MembershipCrit;
 import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
-import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedBean;
-import org.societies.orchestration.communitylifecyclemanagementbean.Cis;
+import org.societies.api.schema.cis.manager.Create;
+import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedMethodType;
+import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggestedResponseType;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.PrivacyPolicyBehaviourConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy;
+import org.societies.orchestration.sca.api.INotificationHandler;
 import org.societies.orchestration.sca.api.ISCAManager;
 import org.societies.orchestration.sca.api.ISCARemote;
 import org.societies.orchestration.sca.comms.SCACommsClient;
+import org.societies.orchestration.sca.enums.CisCallbackType;
+import org.societies.orchestration.sca.model.SCAInvitation;
+import org.societies.orchestration.sca.model.SuggestedCISInvitationRecord;
+import org.societies.orchestration.sca.model.SuggestedCISRecord;
+import org.societies.orchestration.sca.model.SuggestedCISImpl;
+import org.societies.orchestration.sca.utils.PrivacyPolicyUtils;
 
 public class SCAManager extends EventListener implements ISCAManager {
 
 	private static Logger log = LoggerFactory.getLogger(SCAManager.class);
 
-	private HashMap<String, ICommunitySuggestion> pendingJoinSuggestions;
-	private HashMap<String, List<CisAdvertisementRecord>> cisRecords;
-
-	private List<String> pendingNotifications;
+	private HashMap<String, SuggestedCISRecord> communitySuggestions;
+	private HashMap<String, SuggestedCISInvitationRecord> suggestedInvitations;
+	
+	private Set<String> callbackMap;
 
 	private List<ICisOwned> ownedCis;
 	private List<ICis> remoteCis;
@@ -52,9 +69,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 	private IUserFeedback userFeedback; //WILL NEED THIS AT SOMEPOINT?!?!
 	private ICisManager cisManager;
 	private ICisDirectoryRemote cisDirectory;
-
 	private NotificationHandler notificationHandler;
-
 	private ISCARemote scaRemote;
 
 
@@ -66,86 +81,47 @@ public class SCAManager extends EventListener implements ISCAManager {
 	public void initSCAManager() {
 		log.debug("Run initSCAManager()");
 
-		//TODO : add pending suggestions to DB so pending can be retrieved on container restart
-		pendingJoinSuggestions = new HashMap<String, ICommunitySuggestion>();
-		cisRecords = new HashMap<String, List<CisAdvertisementRecord>>();
-		pendingNotifications = new ArrayList<String>();
+		communitySuggestions = new HashMap<String, SuggestedCISRecord>();
+		suggestedInvitations = new HashMap<String, SuggestedCISInvitationRecord>();
+		
+		callbackMap = new HashSet<String>();
+
+
 		ownedCis = new ArrayList<ICisOwned>();
 		remoteCis= new ArrayList<ICis>();
 
-		ownedCis = cisManager.getListOfOwnedCis();
-		remoteCis = cisManager.getRemoteCis();
 
 		scaRemote = new SCACommsClient(commManager);
 
-		notificationHandler = new NotificationHandler(userFeedback, this);
 
+
+		notificationHandler = new NotificationHandler(this.userFeedback, this);
 		//WE NEED TO LISTEN TO INTERNAL EVENTS
 		registerForInternalEvents();
-
-		if(!commManager.getIdManager().getThisNetworkNode().getBareJid().equals("eliza.societies.local2.macs.hw.ac.uk")) {
-			
-			log.debug("Sending msh!!");
-			scaRemote.sendJoinSuggestion("eliza.societies.local2.macs.hw.ac.uk", "someCISID");
-		}
-
 		//LETS SEND A FAKE SUGGESTED CIS
-	/*	SuggestedCISImpl cis = new SuggestedCISImpl();
-		cis.setName("Stuart");
-		cis.setSuggestionType("join");
-		InternalEvent event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newSuggestion", "org/societies/ico/sca", cis);
+		if(commManager.getIdManager().getThisNetworkNode().getBareJid().contains("jane")) {
+			SuggestedCISImpl cis = new SuggestedCISImpl();
+			cis.setName("StuartCIS10");
+			cis.setSuggestionType("new");
+			cis.setMembersList(new ArrayList<String>() {{
+				add("eliza.societies.local2.macs.hw.ac.uk");
+			}});
+			InternalEvent event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newSuggestion", "org/societies/ico/sca", cis);
 
-		log.debug("Sending fake CIS!");
-		try {
-			this.eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.debug("Sending fake CIS!");
+			try {
+				this.eventMgr.publishInternalEvent(event);
+			} catch (EMSException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
-		cis.setName("John");
-		event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newSuggestion", "org/societies/ico/sca", cis);
-
-		log.debug("Sending fake CIS!");
-		try {
-			this.eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		/*
-		cis.setSuggestionType("new");
-		 event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newSuggestion", "org/societies/ico/sca", cis);
-
-		log.debug("Sending fake CIS!");
-		try {
-			this.eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		cis.setSuggestionType("delete");
-		 event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, "newSuggestion", "org/societies/ico/sca", cis);
-
-		log.debug("Sending fake CIS!");
-		try {
-			this.eventMgr.publishInternalEvent(event);
-		} catch (EMSException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
+		log.debug("Waiting!");
 
 	}
 
 	public void registerForInternalEvents() {
-		/*String eventFilter = "(&" + 
-					"(" + CSSEventConstants.EVENT_NAME + "=" + DeviceMgmtEventConstants.RFID_READER_EVENT + ")" +
-					"(" + CSSEventConstants.EVENT_SOURCE + "=" + deviceId + ")" +
-					")"; */
 		this.eventMgr.subscribeInternalEvent(this, new String[]{EventTypes.ICO_RECOMMENDTION_EVENT}, null);
-
-
 	}
 
 	private boolean checkIfOwnedByName(String cisName) {
@@ -180,14 +156,25 @@ public class SCAManager extends EventListener implements ISCAManager {
 		return adverts;
 	}
 
-	private void handleSuggestedJoin(ICommunitySuggestion suggestedCIS) {
+	private String getCISID(String cisName) {
+		List<CisAdvertisementRecord> allCIS = new ArrayList<CisAdvertisementRecord>();
+		allCIS = getAllCISAdvertisements();
+		for(CisAdvertisementRecord cisAdv : allCIS) {
+			if(cisAdv.getName().equals(cisName)) {
+				return cisAdv.getId();
+			}
+		}
+		return null;
+	}
+
+	private void handleSuggestedJoin(SuggestedCISRecord suggestedCIS) {
 		//FIRST LETS CHECK THAT THE CIS EXISTS
 		List<CisAdvertisementRecord> records = getAllCISAdvertisements();
 
 		if(records.size()>0) {
 			CisAdvertisementRecord targetCis = null;
 			for(CisAdvertisementRecord cisAdd : records) {
-				if (cisAdd.getName().equals(suggestedCIS.getName())) {
+				if (cisAdd.getName().equals(suggestedCIS.getCisSuggestion().getName())) {
 					targetCis = cisAdd;
 					break;
 				}
@@ -199,12 +186,11 @@ public class SCAManager extends EventListener implements ISCAManager {
 				//SEND A NOTIFICATION
 				String id = UUID.randomUUID().toString();
 				String message = "Would you like to join CIS: " + targetCis.getName();
-				synchronized (pendingNotifications) {
-					pendingNotifications.add(id);
-				}
-				notificationHandler.sendUserFeedback(id, message);
 
-				if(!checkIfOwnedByName(suggestedCIS.getName()) && !checkIfRemoteByName(suggestedCIS.getName())) {
+				notificationHandler.sendJoinNotification(id, suggestedCIS.getCisSuggestion().getName(), suggestedCIS.getCisSuggestion().getMembersList());
+
+
+				if(!checkIfOwnedByName(suggestedCIS.getCisSuggestion().getName()) && !checkIfRemoteByName(suggestedCIS.getCisSuggestion().getName())) {
 					log.debug("I am not a member - proceed with checks");
 				}
 				else {
@@ -225,20 +211,27 @@ public class SCAManager extends EventListener implements ISCAManager {
 
 	}
 
-	private void handleSuggestedCreate(ICommunitySuggestion suggestedCIS) {
+	private void addSuggestedCISRecord(String id, SuggestedCISRecord suggestedCIS) {
+		log.debug("Adding new pending notification with ID: " + id);
+		synchronized (communitySuggestions) {;
+		communitySuggestions.put(id, suggestedCIS);
+		}
+	}
+
+	private void handleSuggestedCreate(String requestID, SuggestedCISRecord suggestedCIS) {
 		//first check that the suggested cis does not exist
+		log.debug("In create method!");
 		List<CisAdvertisementRecord> records = getAllCISAdvertisements();
 		boolean cisFound = false;
 		for(CisAdvertisementRecord cisAdd : records) {
-			if(cisAdd.getName().equals(suggestedCIS.getName()))
+			if(cisAdd.getName().equals(suggestedCIS.getCisSuggestion().getName()))
 			{
 				cisFound = true;
 				break;
 			}
 		}
 		if(!cisFound) {
-			log.debug("The cis does not exist");
-			//proceed
+			notificationHandler.sendCreateNotification(requestID, suggestedCIS.getCisSuggestion().getName(), suggestedCIS.getCisSuggestion().getMembersList());
 		}
 		else {
 			log.debug("The suggested cis already exists");
@@ -246,25 +239,42 @@ public class SCAManager extends EventListener implements ISCAManager {
 		}
 	}
 
-	private void handleSuggestedLeave(ICommunitySuggestion suggestedCIS) {
+	private void handleSuggestedLeave(SuggestedCISRecord suggestedCIS) {
 		//FIRST LETS CHECK IT IS A REMOTE CIS
-		if(checkIfRemoteByName(suggestedCIS.getName())) {
+		if(checkIfRemoteByName(suggestedCIS.getCisSuggestion().getName())) {
 			log.debug("I am a member of the cis");
 			String cis = "cisID";
-			scaRemote.sendLeaveSuggestion("jane.societies.", "cisID");
+			//	scaRemote.sendLeaveSuggestion("jane.societies.", "cisID");
 		}
 		else {
 			log.debug("I am not a member of this cis - ignore return false");
 		}
 	}
 
-	private void handleSuggestedDelete(ICommunitySuggestion suggestedCIS) {
+	private void handleSuggestedDelete(SuggestedCISRecord suggestedCIS) {
 		//FIRST CHECK THAT WE OWN THE CIS
-		if(checkIfOwnedByName(suggestedCIS.getName())) {
+		if(checkIfOwnedByName(suggestedCIS.getCisSuggestion().getName())) {
 			log.debug("I own this cis, proceed");
 		}
 		else {
 			log.debug("I dont own this cis - return false");
+		}
+	}
+
+	private void sendInternalFeedbackEvent(SuggestedCISRecord suggestedCIS, boolean accepted) {
+		String feedbackType = "suggestionFailed";
+		if(accepted) {
+			feedbackType = "suggestionAccepted";
+		}
+		SuggestedCISImpl cis = (SuggestedCISImpl) suggestedCIS.getCisSuggestion();
+		InternalEvent event = new InternalEvent(EventTypes.ICO_RECOMMENDTION_EVENT, feedbackType, "org/societies/ico/sca", cis);
+
+		log.debug("Sending fake CIS!");
+		try {
+			this.eventMgr.publishInternalEvent(event);
+		} catch (EMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -276,47 +286,117 @@ public class SCAManager extends EventListener implements ISCAManager {
 		if(arg0.geteventType().equals(EventTypes.ICO_RECOMMENDTION_EVENT)) {
 			log.debug("We have recieved a ICO Reomm event");
 
-			ICommunitySuggestion suggestedCIS = (ICommunitySuggestion) arg0.geteventInfo();
-			String suggestionType = suggestedCIS.getSuggestionType();
+			SuggestedCISRecord suggestedCIS = new SuggestedCISRecord((SuggestedCISImpl) arg0.geteventInfo());
+			String suggestionType = ((SuggestedCISImpl) arg0.geteventInfo()).getSuggestionType();
+
+			String requestID = UUID.randomUUID().toString();
+
 
 			if(suggestionType.equalsIgnoreCase("join")) {
 				log.debug("We have a JOIN CIS suggestion");
+				suggestedCIS.setMethodType(SCASuggestedMethodType.JOIN);
+				addSuggestedCISRecord(requestID, suggestedCIS);
 				handleSuggestedJoin(suggestedCIS);
 			}
 			else if(suggestionType.equalsIgnoreCase("leave")) {
 				log.debug("We have a LEAVE CIS suggestion");
+				suggestedCIS.setMethodType(SCASuggestedMethodType.LEAVE);
+				addSuggestedCISRecord(requestID, suggestedCIS);
 				handleSuggestedLeave(suggestedCIS);
 			}
 			else if (suggestionType.equalsIgnoreCase("delete")) {
 				log.debug("We have a DELETE CIS suggestion");
+				suggestedCIS.setMethodType(SCASuggestedMethodType.DELETE);
+				addSuggestedCISRecord(requestID, suggestedCIS);
 				handleSuggestedDelete(suggestedCIS);
 			}
 			else if (suggestionType.equalsIgnoreCase("new")) {
 				log.debug("We have a new CIS suggestion");
-				handleSuggestedCreate(suggestedCIS);
+				suggestedCIS.setMethodType(SCASuggestedMethodType.CREATE);
+				addSuggestedCISRecord(requestID, suggestedCIS);
+				handleSuggestedCreate(requestID, suggestedCIS);
 			}
 			else {
 				log.debug("We have got a suggestion which we do not know how to handle");
 			}
-
 		}
+	}
+
+	@Override
+	public void handleExternalEvent(CSSEvent arg0) {
 		// TODO Auto-generated method stub
-		/*	log.debug("Event listener has been called!");
-		log.debug("We have been given a suggestion from another component, lets check it then send to user!");
-		log.debug("The event is: " + arg0.geteventName());
-		log.debug("Lets pretend it only comes from CPA just now ....");
-		ICommunitySuggestion suggestedCis = (ICommunitySuggestion) arg0.geteventInfo();
 
-		//DOES THIS suggestComm make any sense to make?
-		//IF SO, UF TO ASK THE USER TO EDIT/CREATE/JOIN/ETC OR
-		//TELL COMPONENT THAT ITS NOT GOOD? 
-		//IF USER REJECTS UF- SEND BACK TO COMPONENT THAT SENT IT?!?!
+	}
 
-		//LETS SEND IT TO UF AND ASK USER IF THIS IS WHAT THEY WANT
-		ExpProposalContent content = new ExpProposalContent("Would you like to create a new CIS: " + suggestedCis.getName(), new String[] {"Yes", "No"});
-		List<String> reply = new ArrayList<String>();
+	private String createNewCommunity(String cisName) {
+
+		PrivacyPolicyBehaviourConstants policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY;
+		String pPolicy = "membersOnly";
+
+
+		//GENERATE MEMBERSHIP CRITERIA
+		Hashtable<String, MembershipCriteria> h = null;
+		MembershipCrit m = new MembershipCrit();
+		log.info("create MembershipCrit: " +m);
+
+		//MembershipCrit m = create.getCommunity().getMembershipCrit();
+		if (m!=null && m.getCriteria() != null && m.getCriteria().size()>0){
+			h =new Hashtable<String, MembershipCriteria>();
+
+			// populate the hashtable
+			for (Criteria crit : m.getCriteria()) {
+				MembershipCriteria meb = new MembershipCriteria();
+				log.info("create MembershipCriteria: " +meb);
+				meb.setRank(crit.getRank());
+				Rule r = new Rule();
+				if( r.setOperation(crit.getOperator()) == false);
+				ArrayList<String> a = new ArrayList<String>();
+				a.add(crit.getValue1());
+
+
+				if (crit.getValue2() != null && !crit.getValue2().isEmpty()) 
+					a.add(crit.getValue2()); 
+				if( r.setValues(a) == false){
+					meb.setRule(r);
+					h.put(crit.getAttrib(), meb);
+				}
+
+			}
+		}
+		log.info("about to create Create");
+		Create create = new Create(); 
+		create.setPrivacyPolicy(pPolicy);
+		//POLICY RECEIVED IS ENUM VALUE, CONVERT TO POLICY XML
+		//String pPolicy = "membersOnly"; //DEFAULT VALUE
+		String privacyPolicyXml = "<RequestPolicy />";
+		if(create.getPrivacyPolicy() != null && create.getPrivacyPolicy().isEmpty() == false){
+			pPolicy = create.getPrivacyPolicy();
+			log.info("pPolicy = " +pPolicy);
+		} 
+		//PrivacyPolicyBehaviourConstants policyType = PrivacyPolicyBehaviourConstants.MEMBERS_ONLY; //DEFAULT
+		PrivacyPolicyUtils utility = new PrivacyPolicyUtils();
+		log.info("Create new PrivacyPolicyUtils: " +utility );
+		RequestPolicy policyObj = null;
+		log.info("Create RequestPolicy: " +policyObj );
 		try {
-			reply = this.userFeedback.getExplicitFB(org.societies.api.internal.useragent.model.ExpProposalType.ACKNACK, content).get();
+			policyType = PrivacyPolicyBehaviourConstants.fromValue(pPolicy);
+		} catch (IllegalArgumentException ex) {
+			//IGNORE - DEFAULT TO MEMBERS_ONLY
+			log.error("Exception parsing: " + pPolicy + ". " + ex);
+		}
+		//CALL POLICY UTILS TO CREATE XML FOR STORAGE
+		try {
+			log.info("call to PrivacyPolicyUtils: " );
+			//org.societies.api.schema.privacytrust.privacy.model.privacypolicy.RequestPolicy policyObj = PrivacyPolicyUtils.inferCisPrivacyPolicy(policyType, m);
+			policyObj = PrivacyPolicyUtils.inferCisPrivacyPolicy(policyType, m);
+			privacyPolicyXml =  PrivacyPolicyUtils.toXacmlString(policyObj);
+			log.info("@@@@@@@########### privacyPolicyXml contains: " +privacyPolicyXml);
+		} catch (PrivacyException pEx) {
+			pEx.printStackTrace();
+		}
+		
+		try {
+			return cisManager.createCis(cisName, "", new Hashtable<String, MembershipCriteria>(), privacyPolicyXml).get().getCisId();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -324,27 +404,165 @@ public class SCAManager extends EventListener implements ISCAManager {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		log.debug("Got: " + reply.get(0));
-		List<ICisOwned> ownedCIS = new ArrayList<ICisOwned>();
-		if(reply.get(0).equals("Yes")) {
-			try {
-				ownedCIS =  (List<ICisOwned>) this.cisManager.createCis(suggestedCis.getName(), suggestedCis.getSuggestionType(), null, null).get();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ExecutionException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+		return null;
+	}
+
+	private void handleUserResponse(String ID, SuggestedCISRecord suggestedCIS, SCASuggestedResponseType response) {
+		switch(suggestedCIS.getMethodType()) {
+		case CREATE :
+			log.debug("In the create branch!");
+			if(response.equals(SCASuggestedResponseType.ACCEPTED)) {
+				//CREATE THE CIS
+				SuggestedCISImpl cis = (SuggestedCISImpl) suggestedCIS.getCisSuggestion();
+				String cisID = createNewCommunity(cis.getName());
+
+				//CHECK IF OTHER MEMBERS AFFECTED NEED CONTACTED
+				if(cis.getMembersList()!=null && !cis.getMembersList().isEmpty()) {
+					SuggestedCISInvitationRecord cisInvitationRecord = new SuggestedCISInvitationRecord();
+					cisInvitationRecord.setRequestID(ID);
+					cisInvitationRecord.setAffectedMembers(cis.getMembersList());
+					cisInvitationRecord.setMethodType(SCASuggestedMethodType.JOIN);
+					synchronized (suggestedInvitations) {
+						suggestedInvitations.put(ID, cisInvitationRecord);
+					}
+
+					//SEND EACH USER A NOTIFICATION
+					for(String user : cis.getMembersList()) {
+						scaRemote.sendJoinSuggestion(ID, user, cis.getName(), cisID);
+					}
+				}
+				else {
+					suggestionComplete(ID);
+				}
+
+			} else {
+				sendInternalFeedbackEvent(suggestedCIS, false);
+				suggestionComplete(ID);
 			}
-			for(ICisOwned cis : ownedCIS) {
-				log.debug("I own: " + cis.getName());
+			break;
+		case JOIN :
+			break;
+		case LEAVE :
+			/*if(suggestedCisFeedback.getSuggestedCIS().getSuggestionType().equalsIgnoreCase("leave")) {
+				if(suggestedCisFeedback.getResult().equals(SCASuggestedResponseType.ACCEPTED)) {
+					//GET ID
+					String cisID = getCISID(suggestedCisFeedback.getSuggestedCIS().getName());
+					if(null!=cisID) {
+						ICisManagerCallback callback = new CisCallback();
+						cisManager.leaveRemoteCIS(cisID, callback); 
+						log.debug("We have left CIS with ID: " + cisID);
+					}
+				}
+			}*/
+			break;
+		case DELETE :
+			break;
+
+		}
+	}
+
+	public void suggestionComplete(String requestID) {
+		log.debug("Setting request with ID " + requestID + " as completed. Removing from maps.");
+		synchronized (suggestedInvitations) {
+			suggestedInvitations.remove(requestID);
+		}
+		synchronized (communitySuggestions) {
+			communitySuggestions.remove(requestID);
+		}
+	}
+
+	@Override
+	public void feedbackResult(String id, SCASuggestedResponseType feedbackResult) {
+		log.debug("I have recieved a feedback result with ID:" + id);
+		SuggestedCISRecord communitySuggestion = null;
+		synchronized (communitySuggestions) {
+			if(communitySuggestions.containsKey(id)) {
+				communitySuggestion = communitySuggestions.get(id);
+			}
+		}
+
+		if(null!=communitySuggestion) {
+			handleUserResponse(id, communitySuggestion, feedbackResult);
+		}
+
+	}
+
+	@Override
+	public void handleInvitationResponse(String requestID, String fromJID, SCASuggestedResponseType response) {
+		SuggestedCISInvitationRecord invitationRecord =null;
+		synchronized (suggestedInvitations) {
+			invitationRecord = suggestedInvitations.get(requestID);
+		}
+		if(invitationRecord!=null) {
+
+			SuggestedCISRecord suggestedCIS = null;			
+			synchronized(communitySuggestions) {
+				suggestedCIS = communitySuggestions.get(requestID);
 			}
 
-			List<ICis> remoteCis = this.cisManager.getRemoteCis();
-			for(ICis otherCis : remoteCis){ 
-				log.debug("I am a member of " + otherCis.getName());
+			String message = fromJID + " has " + response.toString().toLowerCase() + " your invitation to " +
+					invitationRecord.getMethodType().toString().toLowerCase() +
+					" the CIS " + suggestedCIS.getCisSuggestion().getName() + ".";
+
+			notificationHandler.sendMessage(message);
+
+			if(invitationRecord.setUserResponse(fromJID, response)) {
+				suggestionComplete(requestID);
 			}
-		}*/
+		}
+	}
+
+
+	@Override
+	public void joinCIS(String cisID) {
+		List<CisAdvertisementRecord> cisAdverts = getAllCISAdvertisements();
+		for(CisAdvertisementRecord advert : cisAdverts) {
+			if(advert.getId().equals(cisID)) {
+				CisMgrCallback callback = new CisMgrCallback(cisID, CisCallbackType.JOIN_CIS);
+				this.cisManager.joinRemoteCIS(advert, callback);
+			}
+		}
+
+	}
+	
+	public void recieveCISMgrCallback(String requestID, CommunityMethods cisMethods) {
+		log.debug("I have recieved a callback, I can now continue what I am doing");
+		boolean areWeWaitingForThisID = false;
+		synchronized (callbackMap) {
+			if(callbackMap.contains(requestID)) {
+				areWeWaitingForThisID = true;
+				callbackMap.remove(requestID);
+			}
+		}
+		if(areWeWaitingForThisID) {
+			//CONTINUE WHAT WE WERE DOING....
+			log.debug(cisMethods.getGetInfo().toString());
+		}
+						
+	}
+
+	public class CisMgrCallback implements ICisManagerCallback {
+		
+		private String requestID;
+		private CisCallbackType callbackType ;
+		
+		public CisMgrCallback(String requestID, CisCallbackType callbackType) {
+			this.requestID = requestID;
+			this.callbackType = callbackType;
+		}
+
+		@Override
+		public void receiveResult(CommunityMethods arg0) {
+			switch(this.callbackType) {
+			case GET_REMOTE_CIS_MEMBERS :
+				//yourMethodHere(requestID, arg0);
+				break;
+			case JOIN_CIS :
+				//a differentMethodHere();
+				break;
+			}
+
+		}
 
 	}
 
@@ -388,24 +606,14 @@ public class SCAManager extends EventListener implements ISCAManager {
 	}
 
 	@Override
-	public void handleExternalEvent(CSSEvent arg0) {
-		// TODO Auto-generated method stub
-
+	public INotificationHandler getNotificationHandler() {
+		return this.notificationHandler;
 	}
 
 	@Override
-	public void feedbackResult(String id, String msg) {
-		log.debug("I have recieved a feedback result with ID:" + id);
-		synchronized (pendingNotifications) {
-			if(pendingNotifications.contains(id)) {
-				log.debug("It is in the the set!");
-				//USER HAS ACCEPTED OR DECLINED UF
-			}
-		}
-
+	public ISCARemote getSCARemote() {
+		return this.scaRemote;
 	}
-
-
 
 
 }
