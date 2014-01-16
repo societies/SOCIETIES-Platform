@@ -168,6 +168,9 @@ start importing internal services. cardinality is set to 0..1 because we have a 
 		
 		<osgi:reference id="cisManager" interface="org.societies.api.cis.management.ICisManager"></osgi:reference>
 		
+		<osgi:reference id="serviceMgmt" interface="org.societies.api.services.IServices"></osgi:reference>
+		
+		
 		<osgi:reference id="serviceDiscovery" interface="org.societies.api.internal.servicelifecycle.IServiceDiscovery"></osgi:reference>
 		
 		<!--  <osgi:reference id="upcm" interface="org.societies.personalisation.preference.api.UserPreferenceConditionMonitor.IUserPreferenceConditionMonitor"/> -->

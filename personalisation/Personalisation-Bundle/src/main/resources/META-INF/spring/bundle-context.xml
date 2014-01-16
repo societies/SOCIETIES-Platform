@@ -22,6 +22,7 @@
 		<property name="communityPreferenceMgr" ref="communityPreferenceManager"></property>
 		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
 		<property name="cisManager" ref="cisManager"></property>
+		<property name="serviceMgmt" ref="serviceMgmt"></property>
 	</bean>
 
 	

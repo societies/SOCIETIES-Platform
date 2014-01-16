@@ -97,6 +97,7 @@ public class PrivatePreferenceCache {
 		if (id==null){
 			if(this.logging.isDebugEnabled()){
 				this.logging.debug("Could not find preference for :\n"+details.toString());
+				registry.printRegistryContents();
 			}
 			return null;
 		}else{

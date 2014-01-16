@@ -34,6 +34,7 @@ import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
 public class Registry implements Serializable{
 
@@ -65,7 +66,17 @@ public class Registry implements Serializable{
 		this.mappings.remove(detail);
 		
 	}
-	
+	public List<String> printRegistryContents(){
+		List<String> toReturn = new ArrayList<String>();
+		Enumeration<PreferenceDetails> keys = mappings.keys();
+		while (keys.hasMoreElements()){
+			PreferenceDetails pDetail = keys.nextElement();
+			CtxIdentifier ctxIdentifier = mappings.get(pDetail);
+			toReturn.add("The preference with details: "+pDetail.toString()+" is in location: "+ctxIdentifier.toUriString());
+		}
+		
+		return toReturn;
+	}
 	public void deletePreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails detail = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		this.mappings.remove(detail);
