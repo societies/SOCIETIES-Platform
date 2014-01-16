@@ -58,7 +58,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 
 	private HashMap<String, SuggestedCISRecord> communitySuggestions;
 	private HashMap<String, SuggestedCISInvitationRecord> suggestedInvitations;
-	
+
 	private Set<String> callbackMap;
 
 	private List<ICisOwned> ownedCis;
@@ -83,7 +83,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 
 		communitySuggestions = new HashMap<String, SuggestedCISRecord>();
 		suggestedInvitations = new HashMap<String, SuggestedCISInvitationRecord>();
-		
+
 		callbackMap = new HashSet<String>();
 
 
@@ -239,22 +239,26 @@ public class SCAManager extends EventListener implements ISCAManager {
 		}
 	}
 
-	private void handleSuggestedLeave(SuggestedCISRecord suggestedCIS) {
+	private void handleSuggestedLeave(String requestID, SuggestedCISRecord suggestedCIS) {
 		//FIRST LETS CHECK IT IS A REMOTE CIS
+		log.debug("Checking if I am a remote member of CIS: " + suggestedCIS.getCisSuggestion().getName());
 		if(checkIfRemoteByName(suggestedCIS.getCisSuggestion().getName())) {
 			log.debug("I am a member of the cis");
-			String cis = "cisID";
-			//	scaRemote.sendLeaveSuggestion("jane.societies.", "cisID");
+			notificationHandler.sendLeaveNotification(requestID, suggestedCIS.getCisSuggestion().getName(), suggestedCIS.getCisSuggestion().getMembersList());
+			//GET CIS ID - YOU CAN USE FINDALLCISRECORDS() and compare each name
+			//CALL YOU WILL NEED TO CREATE CALLBACK CLASS WHICH IMPLEMENTS (MAYBE MAKE IT IN THIS CLASS)
+			//cisManager.leaveRemoteCIS(CISID, YOURCALLBACK);
 		}
 		else {
 			log.debug("I am not a member of this cis - ignore return false");
 		}
 	}
 
-	private void handleSuggestedDelete(SuggestedCISRecord suggestedCIS) {
+	private void handleSuggestedDelete(String requestID, SuggestedCISRecord suggestedCIS) {
 		//FIRST CHECK THAT WE OWN THE CIS
 		if(checkIfOwnedByName(suggestedCIS.getCisSuggestion().getName())) {
 			log.debug("I own this cis, proceed");
+			notificationHandler.sendDeleteNotification(requestID, suggestedCIS.getCisSuggestion().getName(), suggestedCIS.getCisSuggestion().getMembersList());
 		}
 		else {
 			log.debug("I dont own this cis - return false");
@@ -302,13 +306,13 @@ public class SCAManager extends EventListener implements ISCAManager {
 				log.debug("We have a LEAVE CIS suggestion");
 				suggestedCIS.setMethodType(SCASuggestedMethodType.LEAVE);
 				addSuggestedCISRecord(requestID, suggestedCIS);
-				handleSuggestedLeave(suggestedCIS);
+				handleSuggestedLeave(requestID, suggestedCIS);
 			}
 			else if (suggestionType.equalsIgnoreCase("delete")) {
 				log.debug("We have a DELETE CIS suggestion");
 				suggestedCIS.setMethodType(SCASuggestedMethodType.DELETE);
 				addSuggestedCISRecord(requestID, suggestedCIS);
-				handleSuggestedDelete(suggestedCIS);
+				handleSuggestedDelete(requestID, suggestedCIS);
 			}
 			else if (suggestionType.equalsIgnoreCase("new")) {
 				log.debug("We have a new CIS suggestion");
@@ -394,7 +398,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 		} catch (PrivacyException pEx) {
 			pEx.printStackTrace();
 		}
-		
+
 		try {
 			return cisManager.createCis(cisName, "", new Hashtable<String, MembershipCriteria>(), privacyPolicyXml).get().getCisId();
 		} catch (InterruptedException e) {
@@ -443,21 +447,33 @@ public class SCAManager extends EventListener implements ISCAManager {
 		case JOIN :
 			break;
 		case LEAVE :
-			/*if(suggestedCisFeedback.getSuggestedCIS().getSuggestionType().equalsIgnoreCase("leave")) {
-				if(suggestedCisFeedback.getResult().equals(SCASuggestedResponseType.ACCEPTED)) {
-					//GET ID
-					String cisID = getCISID(suggestedCisFeedback.getSuggestedCIS().getName());
-					if(null!=cisID) {
-						ICisManagerCallback callback = new CisCallback();
-						cisManager.leaveRemoteCIS(cisID, callback); 
-						log.debug("We have left CIS with ID: " + cisID);
-					}
+			if(response.equals(SCASuggestedResponseType.ACCEPTED)) {
+				//GET ID
+				String cisID = getCISID(suggestedCIS.getCisSuggestion().getName());
+				if(null!=cisID) {
+					CisMgrCallback callback = new CisMgrCallback(ID, CisCallbackType.GET_REMOTE_CIS_MEMBERS);
+					cisManager.leaveRemoteCIS(cisID, callback);
+					log.debug("We have requested to leave CIS with ID: " + cisID);
 				}
-			}*/
+			}
+			else {
+				//USER HAS REJECTED IT
+			}
 			break;
 		case DELETE :
+			if(response.equals(SCASuggestedResponseType.ACCEPTED)) {
+				//GET ID
+				String cisID = getCISID(suggestedCIS.getCisSuggestion().getName());
+				// --->	//CHECK IF THERE ARE OTHER PEOPLE IN THIS CIS
+				//IF YES SEND THEM A LEAVE SUGGESTION OR FORCE THEM TO LEAVE
+				if(null!=cisID) {
+					cisManager.deleteCis(cisID);
+					log.debug("We have deleted CIS with ID: " + cisID);
+				}        
+			} else {
+				//THEY HAVE REJECTED
+			}
 			break;
-
 		}
 	}
 
@@ -525,27 +541,30 @@ public class SCAManager extends EventListener implements ISCAManager {
 
 	}
 	
-	public void recieveCISMgrCallback(String requestID, CommunityMethods cisMethods) {
-		log.debug("I have recieved a callback, I can now continue what I am doing");
-		boolean areWeWaitingForThisID = false;
-		synchronized (callbackMap) {
-			if(callbackMap.contains(requestID)) {
-				areWeWaitingForThisID = true;
-				callbackMap.remove(requestID);
+	public void recievedCISMembers(String requestID, CommunityMethods cisMethods) {
+		log.debug("I have now recieved the cis members for request: " + requestID);
+		log.debug(cisMethods.getGetInfoResponse().toString());
+		SuggestedCISRecord suggestedCIS = null;
+		synchronized (communitySuggestions) {
+			suggestedCIS = communitySuggestions.get(requestID);
+		}
+		if(suggestedCIS!=null) {
+			switch(suggestedCIS.getMethodType()) {
+			case DELETE :
+				//you have got the cis members for (i assume) the cis which you want to delete.
+				//send them a message to leave?!
+				break;
 			}
 		}
-		if(areWeWaitingForThisID) {
-			//CONTINUE WHAT WE WERE DOING....
-			log.debug(cisMethods.getGetInfo().toString());
-		}
-						
 	}
 
+
+
 	public class CisMgrCallback implements ICisManagerCallback {
-		
+
 		private String requestID;
 		private CisCallbackType callbackType ;
-		
+
 		public CisMgrCallback(String requestID, CisCallbackType callbackType) {
 			this.requestID = requestID;
 			this.callbackType = callbackType;
@@ -555,7 +574,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 		public void receiveResult(CommunityMethods arg0) {
 			switch(this.callbackType) {
 			case GET_REMOTE_CIS_MEMBERS :
-				//yourMethodHere(requestID, arg0);
+				recievedCISMembers(requestID, arg0);
 				break;
 			case JOIN_CIS :
 				//a differentMethodHere();
