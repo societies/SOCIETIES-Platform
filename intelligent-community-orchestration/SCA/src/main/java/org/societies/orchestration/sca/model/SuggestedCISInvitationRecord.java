@@ -64,6 +64,7 @@ public class SuggestedCISInvitationRecord {
 	public void setMethodType(SCASuggestedMethodType methodType) {
 		this.methodType = methodType;
 	}
+
 	
 	
 

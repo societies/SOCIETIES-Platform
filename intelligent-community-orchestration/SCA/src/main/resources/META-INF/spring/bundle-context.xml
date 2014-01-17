@@ -47,6 +47,8 @@
 	<bean id="scaManagerClient" class="org.societies.orchestration.sca.SCAManagerClient"
 		name="scaManagerClient" init-method="initSCAManagerClient">
 		<property name="scaManager" ref="scaManager"></property>
+		<property name="cisManager" ref="cisManager"></property>
+
 	</bean>
 
 	<bean id="scaCommsServer" class="org.societies.orchestration.sca.comms.SCACommsServer"

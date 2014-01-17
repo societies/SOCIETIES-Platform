@@ -9,6 +9,8 @@ public interface ISCAManager {
 		
 	public void joinCIS(String cisID);
 	
+	public void leaveCISByInvitation(String requestID, String cisID);
+	
 	public INotificationHandler getNotificationHandler();
 	
 	public ISCARemote getSCARemote();

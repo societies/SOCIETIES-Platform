@@ -121,9 +121,30 @@ public class SCACommsClient implements ICommCallback, ISCARemote {
 	}
 
 	@Override
-	public void sendLeaveSuggestion(String ID, String userJID,
-			String suggestedCIS) {
-		// TODO Auto-generated method stub
+	public void sendLeaveSuggestion(String ID, String userJID, String cisName,
+			String suggestedCIS, boolean forceAction) {
+		IIdentity userID = null;
+		try {
+			userID = this.commManager.getIdManager().fromJid(userJID);
+		} catch (InvalidFormatException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		if(null!=userID) {
+			SCASuggestedBean bean = new SCASuggestedBean();
+			bean.setRequestID(ID);
+			bean.setCisName(cisName);
+			bean.setCisID(suggestedCIS);
+			bean.setMethodType(SCASuggestedMethodType.LEAVE);
+			bean.setForceAction(forceAction);
+			Stanza stanza = new Stanza(userID);
+			try {			
+				this.commManager.sendMessage(stanza, bean);
+			} catch (CommunicationException e) {
+				log.debug("ERROR SENDING TO USER: " + userJID);
+				e.printStackTrace();
+			}
+		}
 
 	}
 

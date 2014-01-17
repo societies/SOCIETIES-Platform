@@ -39,7 +39,7 @@ public class NotificationHandler implements INotificationHandler{
 		this.userFeedback=userFeedback;
 		this.scaManager=scaManager;
 	}
-	
+
 	@Override
 	public void sendMessage(String message) {
 		this.userFeedback.showNotification(message);
@@ -77,7 +77,9 @@ public class NotificationHandler implements INotificationHandler{
 	@Override
 	public void sendDeleteNotification(String id, String cisName,
 			List<String> affectedUsers) {
-		// TODO Auto-generated method stub
+		String message = DELETE_MESSAGE+cisName;	
+		ExpProposalContent content = new ExpProposalContent(message, FEEDBACK_OPTIONS);
+		new Thread(new SendFeedbackThread(id, content, false)).start();
 
 	}
 
@@ -85,12 +87,13 @@ public class NotificationHandler implements INotificationHandler{
 	public void addInvitationNotification(String id, String cisName,
 			String fromJID, SCASuggestedMethodType methodType) {
 		String message = ACCEPT_INVITE_MESSAGE + methodType.toString().toLowerCase() + " the " +
-			cisName + " from " + fromJID + ". Would you like to accept?";		
+				cisName + " from " + fromJID + ". Would you like to accept?";		
 		ExpProposalContent content = new ExpProposalContent(message, FEEDBACK_OPTIONS);
 		new Thread(new SendFeedbackThread(id, content, true)).start();
 	}
 
-	private void recieveResult(String id, SCASuggestedResponseType response, boolean invitation) {	
+	private void recieveResult(String id, SCASuggestedResponseType response, boolean invitation) {
+		log.debug("I have recieved the result!");
 		if(invitation) {
 			log.debug("Sending result to ClientMgr");
 			this.scaManagerClient.processInvitation(id, response);
@@ -99,7 +102,7 @@ public class NotificationHandler implements INotificationHandler{
 			log.debug("Sending feedback result back to MGR!");
 			this.scaManager.feedbackResult(id, response);
 		}
-		
+
 	}
 
 	private class SendFeedbackThread extends Thread {
@@ -119,19 +122,23 @@ public class NotificationHandler implements INotificationHandler{
 
 			String reply = FEEDBACK_NO;
 			try {
+				log.debug("Waiting for reply!");
 				reply = userFeedback.getExplicitFB(org.societies.api.internal.useragent.model.ExpProposalType.ACKNACK, this.expProposalContent).get().get(0);
 			} catch (InterruptedException e) {
+				log.debug("Error");
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				log.debug("Error2");
 			}
 			SCASuggestedResponseType feedback = SCASuggestedResponseType.DECLINED;
 			if(reply.equals(FEEDBACK_YES)) {
 				feedback = SCASuggestedResponseType.ACCEPTED;
 			}
 
+			log.debug("Returning result from UF thread.");
 			recieveResult(this.id, feedback, this.invitation);
 		}
 
@@ -140,8 +147,8 @@ public class NotificationHandler implements INotificationHandler{
 	@Override
 	public void setClient(ISCAManagerClient scaMgrClient) {
 		this.scaManagerClient = scaMgrClient;
-		
+
 	}
-	
+
 
 }

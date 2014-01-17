@@ -81,7 +81,7 @@ public class SCACommsServer implements IFeatureServer {
 		log.debug("I got the message");
 		if(arg1 instanceof SCASuggestedBean) {
 			SCASuggestedBean suggestion = (SCASuggestedBean) arg1;
-			SCAInvitation invitation = new SCAInvitation(suggestion.getCisID(), suggestion.getCisName(), arg0.getFrom().getBareJid(), suggestion.getMethodType());
+			SCAInvitation invitation = new SCAInvitation(suggestion.getCisID(), suggestion.getCisName(), arg0.getFrom().getBareJid(), suggestion.getMethodType(), suggestion.isForceAction());
 			scaManagerClient.addInvitation(suggestion.getRequestID(), invitation);
 		}
 		else if (arg1 instanceof SCASuggestedResponseBean) {

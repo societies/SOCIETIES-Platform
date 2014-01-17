@@ -19,7 +19,7 @@ public interface ISCARemote {
 	 * @param userJID    the JID of the user to receive the invitation
 	 * @param suggestedCIS	the suggested CIS ID for the user to leave
 	 */
-	public void sendLeaveSuggestion(String ID, String userJID, String suggestedCIS);
+	public void sendLeaveSuggestion(String ID, String userJID, String cisName, String suggestedCIS, boolean forceAction);
 	
 	/**
 	 * Sends an response for the invitation back to the original for another user

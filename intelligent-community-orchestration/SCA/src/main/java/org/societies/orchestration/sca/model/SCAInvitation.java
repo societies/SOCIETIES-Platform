@@ -8,12 +8,22 @@ public class SCAInvitation {
 	private String cisName;
 	private String fromJID;
 	private SCASuggestedMethodType methodType;
+	private boolean forceAction;
+	
+	public SCAInvitation(String cisID, String cisName, String fromJID, SCASuggestedMethodType methodType, boolean forceAction) {
+		this.cisID = cisID;
+		this.cisName = cisName;
+		this.fromJID = fromJID;
+		this.methodType = methodType;
+		this.forceAction = forceAction;
+	}
 	
 	public SCAInvitation(String cisID, String cisName, String fromJID, SCASuggestedMethodType methodType) {
 		this.cisID = cisID;
 		this.cisName = cisName;
 		this.fromJID = fromJID;
 		this.methodType = methodType;
+		this.forceAction = false;
 	}
 	
 	public String getCisID() {
@@ -40,6 +50,22 @@ public class SCAInvitation {
 	public void setMethodType(SCASuggestedMethodType methodType) {
 		this.methodType = methodType;
 	}
+
+	/**
+	 * @return the forceAction
+	 */
+	public boolean isForceAction() {
+		return forceAction;
+	}
+
+	/**
+	 * @param forceAction the forceAction to set
+	 */
+	public void setForceAction(boolean forceAction) {
+		this.forceAction = forceAction;
+	}
+	
+	
 	
 	
 }

@@ -5,8 +5,9 @@ import org.societies.api.schema.orchestration.sca.scasuggestedcisbean.SCASuggest
 
 public class SuggestedCISRecord {
 	
-	ICommunitySuggestion cisSuggestion;
-	SCASuggestedMethodType methodType;
+	private ICommunitySuggestion cisSuggestion;
+	private SCASuggestedMethodType methodType;
+	private String cisID;
 	
 	public SuggestedCISRecord(ICommunitySuggestion cisSuggestion) {
 		
@@ -28,6 +29,20 @@ public class SuggestedCISRecord {
 
 	public void setMethodType(SCASuggestedMethodType methodType) {
 		this.methodType = methodType;
+	}
+	
+	/**
+	 * @return the cisID
+	 */
+	public String getCisID() {
+		return cisID;
+	}
+
+	/**
+	 * @param cisID the cisID to set
+	 */
+	public void setCisID(String cisID) {
+		this.cisID = cisID;
 	}
 	
 	

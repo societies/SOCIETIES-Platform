@@ -58,4 +58,6 @@ public class SuggestedCISImpl implements ICommunitySuggestion, Serializable {
 	}
 	
 
+	
+
 }
