@@ -101,7 +101,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 		//LETS SEND A FAKE SUGGESTED CIS
 		if(commManager.getIdManager().getThisNetworkNode().getBareJid().contains("jane")) {
 			SuggestedCISImpl cis = new SuggestedCISImpl();
-			cis.setName("StuartCIS10");
+			cis.setName("StuartCIS12");
 			cis.setSuggestionType("new");
 			cis.setMembersList(new ArrayList<String>() {{
 				add("eliza.societies.local2.macs.hw.ac.uk");
@@ -167,7 +167,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 		return null;
 	}
 
-	private void handleSuggestedJoin(SuggestedCISRecord suggestedCIS) {
+	private void handleSuggestedJoin(String requestID, SuggestedCISRecord suggestedCIS) {
 		//FIRST LETS CHECK THAT THE CIS EXISTS
 		List<CisAdvertisementRecord> records = getAllCISAdvertisements();
 
@@ -182,16 +182,9 @@ public class SCAManager extends EventListener implements ISCAManager {
 
 
 			if(null!=targetCis) {
-				log.debug("The CIS Exists!");
-				//SEND A NOTIFICATION
-				String id = UUID.randomUUID().toString();
-				String message = "Would you like to join CIS: " + targetCis.getName();
-
-				notificationHandler.sendJoinNotification(id, suggestedCIS.getCisSuggestion().getName(), suggestedCIS.getCisSuggestion().getMembersList());
-
-
 				if(!checkIfOwnedByName(suggestedCIS.getCisSuggestion().getName()) && !checkIfRemoteByName(suggestedCIS.getCisSuggestion().getName())) {
 					log.debug("I am not a member - proceed with checks");
+					notificationHandler.sendJoinNotification(requestID, suggestedCIS.getCisSuggestion().getName(), suggestedCIS.getCisSuggestion().getMembersList());
 				}
 				else {
 					log.debug("I am a member - return false");
@@ -300,7 +293,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 				log.debug("We have a JOIN CIS suggestion");
 				suggestedCIS.setMethodType(SCASuggestedMethodType.JOIN);
 				addSuggestedCISRecord(requestID, suggestedCIS);
-				handleSuggestedJoin(suggestedCIS);
+				handleSuggestedJoin(requestID, suggestedCIS);
 			}
 			else if(suggestionType.equalsIgnoreCase("leave")) {
 				log.debug("We have a LEAVE CIS suggestion");
@@ -400,7 +393,7 @@ public class SCAManager extends EventListener implements ISCAManager {
 		}
 
 		try {
-			return cisManager.createCis(cisName, "", new Hashtable<String, MembershipCriteria>(), privacyPolicyXml).get().getCisId();
+			return cisManager.createCis(cisName, "thisisthetype", h,"description", privacyPolicyXml).get().getCisId();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -445,6 +438,23 @@ public class SCAManager extends EventListener implements ISCAManager {
 			}
 			break;
 		case JOIN :
+			if(response.equals(SCASuggestedResponseType.ACCEPTED)) {
+				SuggestedCISImpl cis = (SuggestedCISImpl) suggestedCIS.getCisSuggestion();
+				String cisID = getCISID(cis.getName());
+				joinCIS(cisID);
+				if(cis.getMembersList()!=null && !cis.getMembersList().isEmpty()) {
+					SuggestedCISInvitationRecord cisInvitationRecord = new SuggestedCISInvitationRecord();
+					cisInvitationRecord.setRequestID(ID);
+					cisInvitationRecord.setAffectedMembers(cis.getMembersList());
+					cisInvitationRecord.setMethodType(SCASuggestedMethodType.JOIN);
+					synchronized (suggestedInvitations) {
+						suggestedInvitations.put(ID, cisInvitationRecord);
+					}
+					for(String user : cis.getMembersList()) {
+						scaRemote.sendJoinSuggestion(ID, user, cis.getName(), cisID);
+					}
+				}
+			}
 			break;
 		case LEAVE :
 			if(response.equals(SCASuggestedResponseType.ACCEPTED)) {
