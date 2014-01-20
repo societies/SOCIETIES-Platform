@@ -56,7 +56,8 @@ public class SCAManagerClient implements ISCAManagerClient {
 				
 				break;
 			case LEAVE :
-				notificationHandler.sendMessage("You have automatically left CIS:" + invitation.getCisName());
+				//LEAVING THE CIS IS HANDLED REMOTELY, JUST NOTIFY USER OF IT.
+				notificationHandler.sendMessage("The community " + invitation.getCisName() + " has been deleted");
 				break;
 			case JOIN :
 				break;
@@ -67,25 +68,6 @@ public class SCAManagerClient implements ISCAManagerClient {
 				invitations.put(requestID, invitation);
 			}
 			notificationHandler.addInvitationNotification(requestID, invitation.getCisName(), invitation.getFromJID(), invitation.getMethodType());
-			/*synchronized (invitations) {
-				invitations.put(requestID, invitation);
-			}
-			switch(invitation.getMethodType()) {
-			case CREATE :
-				break;
-			case DELETE :
-				break;
-			case JOIN :
-				log.debug("Sending the joinCIS to SCAMGR");
-				
-				scaManager.joinCIS(invitation.getCisID());
-				break;
-			case LEAVE :
-				log.debug("We have a message to leave a cis!");
-				CisMgrCallback callback = new CisMgrCallback(requestID, CisCallbackType.LEAVE_CIS);
-				this.cisManager.leaveRemoteCIS(invitation.getCisID(), callback);
-				break;
-			}*/
 		}
 	}
 	@Override
