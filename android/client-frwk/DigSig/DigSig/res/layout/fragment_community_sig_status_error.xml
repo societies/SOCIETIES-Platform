@@ -17,7 +17,7 @@
         android:gravity="center"
         android:text="@string/errorNetwork"
         android:textAlignment="center"
-        android:textSize="20sp"
+        android:textSize="@dimen/font_size_large"
 	/>
     
 </LinearLayout>

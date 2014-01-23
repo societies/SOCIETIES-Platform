@@ -17,7 +17,7 @@
 	        android:gravity="center"
 	        android:text="@string/signatureThresholdReached"
 	        android:textAlignment="center"
-	        android:textSize="20sp"
+	        android:textSize="@dimen/font_size_large"
 	/>
 
     <ProgressBar
@@ -39,6 +39,7 @@
             android:layout_height="wrap_content"
             android:paddingBottom="4sp"
             android:text="@string/signedBy"
+	        android:textSize="@dimen/font_size"
             />
 
         <TextView
@@ -47,11 +48,13 @@
             android:layout_height="wrap_content"
             android:paddingLeft="4sp"
             android:paddingRight="4sp"
+	        android:textSize="@dimen/font_size"
             android:text="@string/unknown" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+	        android:textSize="@dimen/font_size"
             android:text="@string/parties" />
 
     </LinearLayout>
@@ -64,6 +67,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingBottom="4sp"
+	        android:textSize="@dimen/font_size"
             android:text="@string/required" />
 
         <TextView
@@ -72,23 +76,27 @@
             android:layout_height="wrap_content"
             android:paddingLeft="4sp"
             android:paddingRight="4sp"
+	        android:textSize="@dimen/font_size"
             android:text="@string/unknown" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+	        android:textSize="@dimen/font_size"
             android:text="@string/parties" />
     </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/font_size"
         android:text="@string/currentSigners" />
 
     <TextView
         android:id="@+id/communitySigStatusCurrentSignersTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="@dimen/font_size"
 		/>
 
 </LinearLayout>
