@@ -163,11 +163,11 @@ public class CommunitySigStatusActivity extends FragmentActivity implements
 		
 //		// FIXME: remove this testing code
 //		SharedPreferencesHelper prefs = new SharedPreferencesHelper(this);
-//		prefs.store("completed", "http://192.168.1.92/tmp/societies/test.json?sig=foo");
-//		prefs.store("in progress", "http://192.168.1.92/tmp/societies/test2.json?sig=foo");
-//		prefs.store("not started yet", "http://192.168.1.92/tmp/societies/non-existing.json?sig=foo");
-//		prefs.store("invalid response", "http://192.168.1.92/tmp/societies/invalid.json?sig=foo");
-//		prefs.store("network error", "http://192.168.1.312/invalid-ip-address.json?sig=foo");
+//		prefs.store("Completed example", "http://192.168.1.92/tmp/societies/collab-sig/completed.json?sig=foo");
+//		prefs.store("In progress example", "http://192.168.1.92/tmp/societies/collab-sig/in-progress.json?sig=foo");
+//		prefs.store("Not started yet example", "http://192.168.1.92/tmp/societies/collab-sig/non-existing.json?sig=foo");
+//		prefs.store("Invalid response example", "http://192.168.1.92/tmp/societies/collab-sig/invalid.json?sig=foo");
+//		prefs.store("Network error example", "http://192.168.1.312/collab-sig/invalid-ip-address.json?sig=foo");
 //		restore();
 	}
 

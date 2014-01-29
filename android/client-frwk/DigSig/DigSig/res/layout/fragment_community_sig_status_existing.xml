@@ -25,8 +25,8 @@
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="4sp"
-        android:paddingBottom="4sp"
+        android:paddingTop="10sp"
+        android:paddingBottom="10sp"
         android:max="100"
         />
 
@@ -90,6 +90,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/font_size"
+        android:paddingTop="20dp"
         android:text="@string/currentSigners" />
 
     <TextView

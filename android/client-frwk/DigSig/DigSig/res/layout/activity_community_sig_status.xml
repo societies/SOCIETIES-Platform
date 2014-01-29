@@ -6,22 +6,28 @@
     tools:context=".CommunitySigStatusActivity"
     tools:ignore="MergeRootFrame" >
 
+	<LinearLayout
+	    android:layout_height="wrap_content"
+	    android:layout_width="fill_parent"
+        android:layout_alignParentBottom="true"
+	    >
+	    
         <Button
             android:id="@+id/communitySigStatusViewRawDocumentButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
+            android:layout_width="0px"
+            android:layout_height="fill_parent"
             android:layout_margin="10dp"
+            android:layout_weight="1"
             android:text="@string/viewRawDocument" />
 
         <Button
             android:id="@+id/communitySigStatusCopyRawDocumentUrlButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/communitySigStatusViewRawDocumentButton"
+            android:layout_width="0px"
+            android:layout_height="fill_parent"
             android:layout_margin="10dp"
+            android:layout_weight="1"
             android:text="@string/copyUrl" />
+
+    </LinearLayout>
     
 </RelativeLayout>
