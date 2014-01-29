@@ -217,7 +217,8 @@ public class TestAccCtrlMonitor {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			List<CtxIdentifier> preferenceEntityList = new ArrayList<CtxIdentifier>();
 			preferenceEntityList.add(this.privacyPreferenceEntity.getId());
-			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
+			Mockito.when(ctxBroker.lookup(userId, CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
+			Mockito.when(ctxBroker.retrieve(preferenceEntityList.get(0))).thenReturn(new AsyncResult<CtxModelObject>(this.privacyPreferenceEntity));
 			Mockito.when(ctxBroker.createAttribute(privacyPreferenceEntity.getId(), ACC_CTRL_PREFERENCE_1)).thenReturn(new AsyncResult<CtxAttribute>(accCtrl_1_CtxAttribute));
 			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(accCtrl_1_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(accCtrl_1_CtxAttribute));
 			Mockito.when(ctxBroker.retrieve(accCtrl_1_CtxAttribute.getId())).thenReturn(new AsyncResult<CtxModelObject>(this.accCtrl_1_CtxAttribute));

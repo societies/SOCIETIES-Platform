@@ -185,7 +185,8 @@ public class TestAccCtrlPreferences {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			List<CtxIdentifier> preferenceEntityList = new ArrayList<CtxIdentifier>();
 			preferenceEntityList.add(this.privacyPreferenceEntity.getId());
-			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
+			Mockito.when(ctxBroker.lookup(userId, CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
+			Mockito.when(ctxBroker.retrieve(preferenceEntityList.get(0))).thenReturn(new AsyncResult<CtxModelObject>(this.privacyPreferenceEntity));
 			Mockito.when(ctxBroker.lookup(CtxModelType.ASSOCIATION, CtxTypes.HAS_PRIVACY_PREFERENCES)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			IndividualCtxEntity weirdPerson = new IndividualCtxEntity(userCtxEntity.getId());
 			Mockito.when(ctxBroker.retrieveIndividualEntity(this.userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(weirdPerson));

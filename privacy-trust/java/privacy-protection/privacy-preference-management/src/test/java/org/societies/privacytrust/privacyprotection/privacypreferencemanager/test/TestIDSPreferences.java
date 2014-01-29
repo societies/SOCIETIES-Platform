@@ -134,7 +134,8 @@ public class TestIDSPreferences {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxTypes.PRIVACY_PREFERENCE_REGISTRY)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			List<CtxIdentifier> preferenceEntityList = new ArrayList<CtxIdentifier>();
 			preferenceEntityList.add(this.privacyPreferenceEntity.getId());
-			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
+			Mockito.when(ctxBroker.lookup(userId, CtxModelType.ENTITY, CtxTypes.PRIVACY_PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
+			Mockito.when(ctxBroker.retrieve(preferenceEntityList.get(0))).thenReturn(new AsyncResult<CtxModelObject>(this.privacyPreferenceEntity));
 			Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) this.privacyPreferenceEntity.getId(), ids_Preference_Name1)).thenReturn(new AsyncResult<CtxAttribute>(this.ids_1_CtxAttribute));
 			Mockito.when(ctxBroker.updateAttribute(Mockito.eq(ids_1_CtxAttribute.getId()), (Serializable) Mockito.anyObject())).thenReturn(new AsyncResult<CtxAttribute>(this.ids_1_CtxAttribute));
 			IndividualCtxEntity weirdPerson = new IndividualCtxEntity(userCtxEntity.getId());
