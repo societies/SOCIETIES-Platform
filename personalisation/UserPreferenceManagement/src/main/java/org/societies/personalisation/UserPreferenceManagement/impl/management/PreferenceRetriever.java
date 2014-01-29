@@ -43,6 +43,7 @@ import org.societies.api.internal.schema.personalisation.model.PreferenceTreeMod
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
 import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
 import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
+import org.societies.personalisation.UserPreferenceManagement.impl.management.Registry;
 
 /**
  * @author Elizabeth
@@ -58,9 +59,11 @@ public class PreferenceRetriever {
 	}
 
 	public Registry retrieveRegistry(){
+		logging.debug("Call to retrieve the registry!");
 		try {
 			Future<List<CtxIdentifier>> futureAttrList = ctxBroker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY");
 			if (futureAttrList==null){
+				logging.debug("Future list is null!");
 				return new Registry();
 			}
 			List<CtxIdentifier> attrList = futureAttrList.get();
@@ -76,7 +79,7 @@ public class PreferenceRetriever {
 						}
 						return new Registry();
 					}
-
+					logging.debug("Returning registry recieved from CtxBroker");
 					return registry;
 
 				}
@@ -95,18 +98,27 @@ public class PreferenceRetriever {
 			}
 			e.printStackTrace();
 		} catch (InterruptedException e) {
+			logging.debug("Interupted Exception!");
+			logging.debug(e.toString());
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
 			// TODO Auto-generated catch block
+			logging.debug("Execution Exception!");
+			logging.debug(e.toString());
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
+			logging.debug("IO Exception!");
+			logging.debug(e.toString());
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
+			logging.debug("ClassNotFound Exception!");
+			logging.debug(e.toString());
 			e.printStackTrace();
 		}
+		logging.debug("There has been a different error ! Returning new Reg!");
 		return new Registry();
 	}
 

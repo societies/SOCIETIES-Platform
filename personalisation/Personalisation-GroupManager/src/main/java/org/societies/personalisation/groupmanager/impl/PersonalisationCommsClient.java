@@ -157,6 +157,7 @@ public class PersonalisationCommsClient implements IPersonalisationManager, ICom
 		bean.setMethod(PersonalisationMethodType.GET_INTENT_ACTION);
 		bean.setRequestor(getRequestor(requestor));
 		bean.setServiceId(serviceID);
+		
 		bean.setUserIdentity(userIdentity.getJid());
 		bean.setParameterName(parameterName);
 		

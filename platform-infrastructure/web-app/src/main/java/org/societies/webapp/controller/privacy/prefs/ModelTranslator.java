@@ -90,14 +90,17 @@ public class ModelTranslator {
 
 	public static IPreference getPreference(TreeNode rootNode){
 		IPreference preference;
+		logging.debug("yolo: " + rootNode.toString());
 
 		if (rootNode.getData() instanceof IOutcome){
 			preference = new PreferenceTreeNode((IOutcome) rootNode.getData());
+			logging.debug("it is an isntance of an Outcome");
 			return preference;
 		}
 
 		if (rootNode.getData() instanceof IPreferenceCondition){
 			preference = new PreferenceTreeNode((IPreferenceCondition) rootNode.getData());
+			
 		}else{
 			preference = new PreferenceTreeNode();
 		}

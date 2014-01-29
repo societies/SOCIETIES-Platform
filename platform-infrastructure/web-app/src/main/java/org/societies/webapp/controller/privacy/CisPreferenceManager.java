@@ -1,13 +1,18 @@
 package org.societies.webapp.controller.privacy;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.RequestScoped;
 import javax.faces.bean.ViewScoped;
 
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.cis.management.ICis;
@@ -15,70 +20,68 @@ import org.societies.api.cis.management.ICisManager;
 import org.societies.api.cis.management.ICisOwned;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.InvalidFormatException;
+import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.webapp.controller.privacy.prefs.ModelTranslator;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @ManagedBean(name = "cisPrefManager")
-@ViewScoped
+@RequestScoped
 public class CisPreferenceManager {
-	
+
 	@ManagedProperty(value = "#{cisManager}")
 	private ICisManager cisManager;
-	
+
 	@ManagedProperty(value = "#{communityPreferenceManager}")
 	private ICommunityPreferenceManager cisPrefManager;
-	
+
 	@ManagedProperty(value = "#{commMngrRef}")
 	private ICommManager commManager;
-	
-	private List<String> cisIDList;
-	
+
+	//private List<CisPreference> preferences;
+
+	private HashMap<ICis, List<IPreferenceTreeModel>> preferences;
+	private HashMap<TreeNode,PreferenceDetails> preferenceDetails;
+
 	private static Logger log = LoggerFactory.getLogger(CisPreferenceManager.class);
-	
+
 	public CisPreferenceManager() {
-		this.cisIDList = new ArrayList<String>();
-		
+		this.preferences = new HashMap<ICis, List<IPreferenceTreeModel>>();
 	}
-	
+
 	@PostConstruct
 	public void initCisPrefMgr() {
 		log.debug("Init()");
+		preferenceDetails = new HashMap<TreeNode, PreferenceDetails>();
 		//GET ALL CIS'S I AM A MEMBER OF
-		
-		//FIRST LETS GET OWNED CIS
-		List<ICisOwned> ownedCIS = this.cisManager.getListOfOwnedCis();
-		//GET REMOTE CIS
-		List<ICis> remoteCIS = this.cisManager.getRemoteCis();
-		//ADD THERE ID'S
-		for(ICisOwned ownCIS : ownedCIS) {
-			cisIDList.add(ownCIS.getCisId());
-			log.debug("Adding (OWNED) ID " + ownCIS.getCisId() + " to the list");
-		}
-		for(ICis cis : remoteCIS) {
-			cisIDList.add(cis.getCisId());
-			log.debug("Adding (REMOTE) ID " + cis.getCisId() + " to the list");
-		}
-		
-		
-	}
-	
-	public List<String> getAllCISPref() {
-		log.debug("getAllCISPref()");
-		for(String cisID : this.cisIDList) {
+
+		//GET LIST OF CIS'S
+		List<ICis> cisList = cisManager.getCisList();
+		List<TreeNode> nodes;
+		List<IPreferenceTreeModel> model;
+		for(ICis cis : cisList) {
 			try {
-				log.debug("Getting preferences for CIS : " + cisID);
-				List<IPreferenceTreeModel> cisPrefList = this.cisPrefManager.getAllCommunityPreferences(this.commManager.getIdManager().fromJid(cisID));
-				log.debug("Got : " + cisPrefList.size() + " preferences.");
+				model = this.cisPrefManager.getAllCommunityPreferences(this.commManager.getIdManager().fromJid(cis.getCisId()));
+				nodes = new ArrayList<TreeNode>();
+				if(null!=model && !model.isEmpty()) {
+					preferences.put(cis, model);
+				}
 			} catch (InvalidFormatException e) {
-				log.debug("Theres an error!");
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		return new ArrayList<String>();
+
+
 	}
+
+	public TreeNode getTreeNode(IPreferenceTreeModel model) {
+		TreeNode node = new DefaultTreeNode("Root", null); 
+		return ModelTranslator.getPreference(model.getRootPreference(), node);
+
+	}	
 
 	public ICisManager getCisManager() {
 		return cisManager;
@@ -103,7 +106,16 @@ public class CisPreferenceManager {
 	public void setCommManager(ICommManager commManager) {
 		this.commManager = commManager;
 	}
+
+	public List<ICis> getAllCIS() {
+		return new ArrayList<ICis>() {{ addAll(preferences.keySet()); }};
+	}
 	
-	
+	public List<IPreferenceTreeModel> getPreferenceTrees(ICis cis) {
+		return preferences.get(cis);
+	}
+
+
+
 
 }

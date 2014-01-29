@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -66,6 +67,7 @@ import org.societies.personalisation.preference.api.CommunityPreferenceManagemen
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceOutcome;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
 import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
@@ -200,6 +202,25 @@ public class CommunitiesHandler {
 		return null;
 	}
 
+/*	private void changeServiceResourceIdentifier(ServiceResourceIdentifier serviceID, IPreferenceTreeModel model) {
+
+		model.getPreferenceDetails().setServiceID(serviceID);
+		IPreference rootPreference = model.getRootPreference();
+
+		Enumeration<IPreference> breadthFirstEnumeration = rootPreference.breadthFirstEnumeration();
+		while (breadthFirstEnumeration.hasMoreElements()){
+			IPreference node = breadthFirstEnumeration.nextElement();
+			if (node.getUserObject() != null){
+				if (node.getUserObject() instanceof PreferenceOutcome){
+					PreferenceOutcome outcome = (PreferenceOutcome) node.getUserObject();
+					outcome.setServiceID(serviceID);
+
+				}
+			}
+		}
+
+	}*/
+
 	public class UploaderTask extends TimerTask{
 		private Logger logging = LoggerFactory.getLogger(this.getClass());
 
@@ -227,6 +248,7 @@ public class CommunitiesHandler {
 					//List<Service> services = serviceDiscovery.getServices(cisId).get();
 					List<Service> services = serviceDiscovery.getLocalServices().get();
 
+
 					//**NEW**//
 					HashMap <ServiceResourceIdentifier, ServiceResourceIdentifier> serviceServerID = new HashMap<ServiceResourceIdentifier, ServiceResourceIdentifier>();
 
@@ -234,11 +256,11 @@ public class CommunitiesHandler {
 						for(Service s : services) {
 							serviceServerID.put(s.getServiceIdentifier(), serviceMgmt.getServerServiceIdentifier(s.getServiceIdentifier()));
 						}
-					}
+					} 
 
 					//List<PreferenceDetails> matchingDetails = findRelevantPreferences(services, userPrefMgr.getPreferenceDetailsForAllPreferences());
 
-					logging.debug("Adding to matchingDetails:" + serviceServerID);
+					//logging.debug("Adding to matchingDetails:" + serviceServerID);
 					List<PreferenceDetails> matchingDetails = findRelevantPreferences(serviceServerID, userPrefMgr.getPreferenceDetailsForAllPreferences());
 					if(this.logging.isDebugEnabled()){
 						this.logging.debug("Found relevant matching details: "+matchingDetails.size());
@@ -253,28 +275,39 @@ public class CommunitiesHandler {
 						IPreferenceOutcome preference = pcm.getPreferenceManager().getPreference(userId, communityPreferenceManagerDetails.getServiceType(), communityPreferenceManagerDetails.getServiceID(), communityPreferenceManagerDetails.getPreferenceName());
 						if (preference!=null){
 							if (preference.getvalue().equalsIgnoreCase(PersonalisationConstants.YES)){
+
+								logging.debug("Adding to allowedToUpload: " + prefDetail.toString());
 								allowedToUpload.add(prefDetail);
 							}
 						}else{
 							toBeChecked.add(prefDetail);
+							logging.debug("Adding to has to be checked: " + prefDetail.toString());
 						}
 					}
 
 
 					List<IPreferenceTreeModel> models = new ArrayList<IPreferenceTreeModel>();
 					for (PreferenceDetails detail : allowedToUpload){
+						//ServiceResourceIdentifier serverID = detail.getServiceID();
+						//ServiceResourceIdentifier localID = getClientServiceID(serverID);
+						//detail.setServiceID(localID);
 						IPreferenceTreeModel model = pcm.getPreferenceManager().getModel(userId, detail);
 						if (model!=null){
+							//changeServiceResourceIdentifier(serverID, model);
 							models.add(model);
 						}
 					}
 
-					if(this.logging.isDebugEnabled()){
-						this.logging.debug("Uploading: "+models.size()+" preferences to CIS: "+cisId);
-					}
-					communityPrefMgr.uploadUserPreferences(cisId, models);
 
+					if (models.size()>0){
+						if(this.logging.isDebugEnabled()){
+							this.logging.debug("Uploading: "+models.size()+" preferences to CIS: "+cisId);
+						}
+
+						communityPrefMgr.uploadUserPreferences(cisId, models);
+					}
 					if (toBeChecked.size()>0){
+						logging.debug("Will send user feedback!");
 						String[] userFriendlyListofDetails = getUserFriendlyListofDetails(toBeChecked, FeedbackType.UPLOAD);
 
 
@@ -363,8 +396,10 @@ public class CommunitiesHandler {
 							preferenceDetails.setServiceID(serviceClientID);
 							IPreferenceTreeModel model = userPrefMgr.getModel(null, preferenceDetails);
 
-
+					//		changeServiceResourceIdentifier(serviceClientID, communityModel);
+							
 							if (model==null){
+								
 								userPrefMgr.storePreference(userId, preferenceDetails, communityModel.getRootPreference());
 								pcm.processPreferenceChanged(userId, preferenceDetails.getServiceID(), preferenceDetails.getServiceType(), preferenceDetails.getPreferenceName());
 							}else{
@@ -444,14 +479,16 @@ public class CommunitiesHandler {
 
 	private List<PreferenceDetails> findRelevantPreferences(HashMap<ServiceResourceIdentifier, ServiceResourceIdentifier> servicesID, List<PreferenceDetails> details){
 
-
+		logging.debug("Find rel pref");
+		logging.debug(servicesID.size() + " size. Details size: " + details.size());
 		List<PreferenceDetails> preferences = new ArrayList<PreferenceDetails>();
 		Set<ServiceResourceIdentifier> clientServiceIDs = servicesID.keySet();
 		for (ServiceResourceIdentifier serviceIdentifier: clientServiceIDs){
 			//ServiceResourceIdentifier serviceIdentifier = id.getServiceIdentifier();
 			for (PreferenceDetails detail : details){
+				logging.debug(detail.getServiceID().getServiceInstanceIdentifier() + " = " + serviceIdentifier.getServiceInstanceIdentifier());
 				if (ServiceModelUtils.compare(serviceIdentifier, detail.getServiceID())){
-					detail.setServiceID(servicesID.get(serviceIdentifier));
+		//!			detail.setServiceID(servicesID.get(serviceIdentifier));
 					preferences.add(detail);
 				}
 			}

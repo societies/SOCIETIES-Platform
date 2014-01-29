@@ -95,9 +95,13 @@ public class PersonalisationCommsServer implements IFeatureServer{
 				if (((PersonalisationManagerBean) bean).getMethod().equals(PersonalisationMethodType.GET_PREFERENCE)){
 					Requestor requestor = getRequestor(((PersonalisationManagerBean) bean).getRequestor());
 					IIdentity userIdentity = this.idm.fromJid(((PersonalisationManagerBean) bean).getUserIdentity());
+					String serviceType = "";
+					if (((PersonalisationManagerBean) bean).getServiceType()!=null){
+						serviceType=((PersonalisationManagerBean) bean).getServiceType();
+					}
 					Future<IAction> futureAction = this.getPersoMgr().getPreference(requestor, 
 							userIdentity,
-							((PersonalisationManagerBean) bean).getServiceType(), 
+							serviceType, 
 							((PersonalisationManagerBean) bean).getServiceId(),
 							((PersonalisationManagerBean) bean).getParameterName());
 					IAction action = futureAction.get();

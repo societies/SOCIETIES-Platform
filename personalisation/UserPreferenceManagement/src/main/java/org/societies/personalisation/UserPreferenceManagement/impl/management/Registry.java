@@ -30,41 +30,45 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
-import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
 public class Registry implements Serializable{
+	//private Logger logging = LoggerFactory.getLogger(this.getClass());
+
 
 	private Hashtable<PreferenceDetails, CtxIdentifier> mappings; 
 	private int index ;
-	
+
 	public Registry(){
 		this.mappings = new Hashtable<PreferenceDetails,CtxIdentifier>();
 		this.index = 0;
 	}
-	
+
 	public String getNameForNewPreference(){
 		this.index += 1;
 		return "preference_"+this.index;
 	}
-	
+
 	public void addPreference(PreferenceDetails detail, CtxIdentifier id){
 		this.mappings.put(detail, id);
-		
+
 	}
-	
+
 	public void addPreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName, CtxIdentifier id){
 		PreferenceDetails detail = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		this.mappings.put(detail, id);
 	}
-	
-	
+
+
 	public void deletePreference(PreferenceDetails detail){
 		this.mappings.remove(detail);
 		
+
 	}
 	public List<String> printRegistryContents(){
 		List<String> toReturn = new ArrayList<String>();
@@ -72,32 +76,40 @@ public class Registry implements Serializable{
 		while (keys.hasMoreElements()){
 			PreferenceDetails pDetail = keys.nextElement();
 			CtxIdentifier ctxIdentifier = mappings.get(pDetail);
-			toReturn.add("The preference with details: "+pDetail.toString()+" is in location: "+ctxIdentifier.toUriString());
+			if (ctxIdentifier==null){
+				toReturn.add("The preference with details: "+pDetail.toString()+" does not have a valid location in mappings. The Registry has been corrupted");
+			}else{
+				toReturn.add("The preference with details: "+pDetail.toString()+" is in location: "+ctxIdentifier.toUriString());
+			}
 		}
-		
+
 		return toReturn;
 	}
 	public void deletePreference(String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails detail = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		this.mappings.remove(detail);
 	}
-	
-	
+
+
 	public CtxIdentifier getCtxID (PreferenceDetails details){
+		//logging.debug("Size of mappings: " + mappings.size());
 		Enumeration<PreferenceDetails> e = this.mappings.keys();
-		
+
 		while(e.hasMoreElements()){
 			PreferenceDetails key = e.nextElement();
+		//	logging.debug("Does " + key.toString() + " = " + details.toString());
 			if (key.equals(details)){
+		//		logging.debug("Found it!" + this.mappings.get(key));
 				return this.mappings.get(key);
 			}
 		}
 		/*if (this.mappings.containsKey(details)){
 			return this.mappings.get(details);
 		}*/
+	//	logging.debug("Returning null!");
 		return null;
 	}
-	
+
 	public CtxIdentifier getCtxID (String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		if (this.mappings.containsKey(details)){
@@ -105,8 +117,8 @@ public class Registry implements Serializable{
 		}
 		return null;
 	}
-	
-	
+
+
 	public List<String> getPreferenceNamesofService(String serviceType, ServiceResourceIdentifier serviceID){
 		ArrayList<String> prefNames = new ArrayList<String>();
 		Enumeration<PreferenceDetails> e = this.mappings.keys();
@@ -118,17 +130,17 @@ public class Registry implements Serializable{
 		}
 		return prefNames;
 	}
-	
+
 	public List<PreferenceDetails> getPreferenceDetailsOfAllPreferences(){
 		List<PreferenceDetails> list = new ArrayList<PreferenceDetails>();
 		Enumeration<PreferenceDetails> keys = this.mappings.keys();
-		 
+
 		while(keys.hasMoreElements()){
 			list.add(keys.nextElement());
 		}
-		
+
 		return list;
-		
+
 	}
-	
+
 }

@@ -54,8 +54,8 @@ xmlns="http://societies.org/api/internal/schema/personalisation/model"
 	<xs:complexType name="PreferenceDetailsBean">
 		<xs:sequence>
 			<xs:element name="preferenceName" type="xs:string" nillable="false" minOccurs="1" maxOccurs="1" />
-			<xs:element name="serviceID" type="tns:serviceResourceIdentifier"></xs:element>
-			<xs:element name="serviceType" type="xs:string" />
+			<xs:element name="serviceID" type="tns:serviceResourceIdentifier" minOccurs="1" maxOccurs="1"></xs:element>
+			<xs:element name="serviceType" type="xs:string" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 </xs:schema>

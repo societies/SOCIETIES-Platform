@@ -72,6 +72,7 @@ import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.schema.cis.community.Community;
 import org.societies.api.schema.servicelifecycle.model.Service;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.services.IServices;
 import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler;
 import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler.DownloaderTask;
 import org.societies.personalisation.UserPreferenceManagement.impl.cis.CommunitiesHandler.UploaderTask;
@@ -109,6 +110,7 @@ public class TestCommunitiesHandler {
 	private IUserFeedback userFeedbackMgr;
 	private IC45Learning userPrefLearning;
 	private IInternalPersonalisationManager persoMgr;
+	private IServices serviceMgmt;
 	private ServiceResourceIdentifier serviceID;
 	private String parameterName;
 	private IndividualCtxEntity personCtxEntity;
@@ -145,7 +147,12 @@ public class TestCommunitiesHandler {
 		upcm.setCisManager(cisManager);
 
 		serviceDiscovery = Mockito.mock(IServiceDiscovery.class);
+		
 		upcm.setServiceDiscovery(serviceDiscovery);
+		
+		serviceMgmt = Mockito.mock(IServices.class);
+		upcm.setServiceMgmt(serviceMgmt);
+		
 		commManager = Mockito.mock(ICommManager.class);
 		idManager = Mockito.mock(IIdentityManager.class);
 		upcm.setCommManager(commManager);
@@ -172,16 +179,22 @@ public class TestCommunitiesHandler {
 			
 			List<Service> serviceList = new ArrayList<Service>();
 			serviceList.add(service);
-			Mockito.when(serviceDiscovery.getServices(cisID)).thenReturn(new AsyncResult<List<Service>>(serviceList));
+			//Mockito.when(serviceDiscovery.getServices(cisID)).thenReturn(new AsyncResult<List<Service>>(serviceList));
+			Mockito.when(serviceDiscovery.getLocalServices()).thenReturn(new AsyncResult<List<Service>>(serviceList));
+			Mockito.when(serviceMgmt.getServerServiceIdentifier(service.getServiceIdentifier())).thenReturn(this.serviceID);
 			Mockito.when(cisManager.getCisList()).thenReturn(cisList);
 			Mockito.when(ctxBroker.lookup(CtxModelType.ATTRIBUTE, "PREFERENCE_REGISTRY")).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 			Mockito.when(this.commManager.getIdManager()).thenReturn(idManager);
 			Mockito.when(this.commManager.getIdManager().fromJid(community.getCommunityJid())).thenReturn(cisID);
 			Mockito.when(this.commManager.getIdManager().getThisNetworkNode()).thenReturn(userId);
 			Mockito.when(this.idManager.getThisNetworkNode()).thenReturn(userId);
-			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
-
+			//Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
+			
 			Mockito.when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(personCtxEntity));
+			Mockito.when(ctxBroker.createAssociation(CtxModelTypes.HAS_PREFERENCES)).thenReturn(new AsyncResult<CtxAssociation>(this.ctxPreferenceAssoc));
+			Mockito.when(ctxBroker.update(ctxPreferenceAssoc)).thenReturn(new AsyncResult<CtxModelObject>(ctxPreferenceAssoc));
+			Mockito.when(ctxBroker.createEntity(CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(this.preferenceCtxEntity));
+			Mockito.when(ctxBroker.retrieve(preferenceCtxEntity.getId())).thenReturn(new AsyncResult<CtxModelObject>(preferenceCtxEntity));
 			List<PreferenceDetails> details = new ArrayList<PreferenceDetails>();
 			details.add(preferenceDetails);
 			Mockito.when(this.communityPreferenceMgr.getCommunityPreferenceDetails(cisID)).thenReturn(details);
@@ -306,6 +319,7 @@ public class TestCommunitiesHandler {
 			CtxAssociationIdentifier ctxPreferenceAssocId = new CtxAssociationIdentifier(this.userId.getBareJid(), CtxModelTypes.HAS_PREFERENCES, new Long(2));
 			this.ctxPreferenceAssoc = new CtxAssociation(ctxPreferenceAssocId);
 			this.ctxPreferenceAssoc.setParentEntity(personCtxEntityId);
+			
 			CtxAttributeIdentifier preferenceCtxAttributeId1 = new CtxAttributeIdentifier(preferenceCtxEntityId, preferenceKey1, new Long(3));
 
 			this.ctxPreferenceAttribute1  = new CtxAttribute(preferenceCtxAttributeId1);

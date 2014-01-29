@@ -129,11 +129,11 @@ public class PreferenceUtils {
 		}
 
 		Enumeration<IPreference> children = node.children();
-		ArrayList<IPreference> preferencesBelow = new ArrayList<IPreference>();
+		ArrayList<PreferenceTreeNodeBean> preferencesBelow = new ArrayList<PreferenceTreeNodeBean>();
 		while(children.hasMoreElements()){
-			preferencesBelow.add(children.nextElement());
+			preferencesBelow.add(toPreferenceTreeNodeBean(children.nextElement()));
 		}
-		
+		bean.setChildren(preferencesBelow);
 		return bean;
 
 	}

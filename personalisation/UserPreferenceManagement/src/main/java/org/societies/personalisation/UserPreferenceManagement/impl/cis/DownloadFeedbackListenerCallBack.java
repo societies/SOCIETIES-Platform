@@ -84,33 +84,92 @@ public class DownloadFeedbackListenerCallBack implements IUserFeedbackResponseEv
 		}
 
 	}
+
+	private boolean changeToClientServiceResourceIdentifier(IPreferenceTreeModel model) {
+		logging.debug("Changing PreferenceDetails SRI To Server");
+
+		ServiceResourceIdentifier serverID = model.getPreferenceDetails().getServiceID();
+		ServiceResourceIdentifier clientID = null;
+		List<Service> services;
+		try {
+			services = pcm.getServiceDiscovery().getLocalServices().get();
+
+			for(Service service : services) {
+				ServiceResourceIdentifier potentialServerID = pcm.getServiceMgmt().getServerServiceIdentifier(service.getServiceIdentifier());
+				if(ServiceUtils.compare(serverID, potentialServerID)) {
+					logging.debug("Found local service: " + service.getServiceIdentifier());
+					clientID = service.getServiceIdentifier();
+					break;
+				} else if (serverID.getServiceInstanceIdentifier().equalsIgnoreCase(potentialServerID.getServiceInstanceIdentifier())) {
+					clientID = service.getServiceIdentifier();
+					break;
+				}
+
+			}
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		if(clientID==null) {
+			pcm.getUserFeedbackMgr().showNotification("Your preferences could not be downloaded as you do not have the service installed!");
+			return false;
+		}
+			model.getPreferenceDetails().setServiceID(clientID);
+		IPreference rootPreference = model.getRootPreference();
+
+		Enumeration<IPreference> breadthFirstEnumeration = rootPreference.breadthFirstEnumeration();
+		while (breadthFirstEnumeration.hasMoreElements()){
+			IPreference node = breadthFirstEnumeration.nextElement();
+			if (node.getUserObject() != null){
+				if (node.getUserObject() instanceof PreferenceOutcome){
+					PreferenceOutcome outcome = (PreferenceOutcome) node.getUserObject();
+					outcome.setServiceID(clientID);
+
+				}
+			}
+		}
+		return true;
+
+	}
+
+
 	@Override
 	public void responseReceived(Object obj) {
 		List<String> responses = (List<String>) obj;
 
+		List<PreferenceDetails> detailsToUploadOrDownload = new ArrayList<PreferenceDetails>();
 
+		if (responses!=null){ //responses contain all the preferences for which the user indicated he wants to upload/download automatically
 
-		if (responses!=null){
-			List<PreferenceDetails> detailsToDownload = new ArrayList<PreferenceDetails>();
 			for (String response : responses){
-				if (this.detailsTable.containsKey(response)){
+				if (this.detailsTable.containsKey(response)){ //detailsTable contain all the preferences we asked about in the UF notification
 					UserPreferenceManagement preferenceManager = this.pcm.getPreferenceManager();
 					PreferenceDetails preferenceDetails = detailsTable.get(response);
-					detailsToDownload.add(preferenceDetails);
+
+					detailsToUploadOrDownload.add(preferenceDetails);
 					try {
+						/*
+						 * section: storing preference that indicates whether the preferences(preferenceDetails) should be uploaded/downloaded or not. 
+						 */
 						PreferenceDetails communityPreferenceManagerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(idm, preferenceDetails.getServiceID(), type);
 						IPreferenceOutcome preferenceOutcome = new PreferenceOutcome(communityPreferenceManagerDetails.getServiceID(), 
 								communityPreferenceManagerDetails.getServiceType(), communityPreferenceManagerDetails.getPreferenceName(), PersonalisationConstants.YES, false, false, false);
 						PreferenceTreeNode treeNode = new PreferenceTreeNode(preferenceOutcome);
-
 						this.pcm.getPreferenceManager().storePreference(idm.getThisNetworkNode(), communityPreferenceManagerDetails, treeNode);
+						/*
+						 * end section
+						 */
+
+
 						this.detailsTable.remove(response);
-
-
-						//retrieve preference from community preference mgr using <preferenceDetails>
-						//replace serviceID in retrieved preference with client serviceID
-						//merge retrieved preference with existing preference (using mergingManager)
-
 
 					} catch (URISyntaxException e) {
 						// TODO Auto-generated catch block
@@ -118,108 +177,179 @@ public class DownloadFeedbackListenerCallBack implements IUserFeedbackResponseEv
 					}
 				}
 			}
+		}
 
-			List<IPreferenceTreeModel> communityPreferences = pcm.getCommunityPreferenceMgr().getCommunityPreferences(cisID, detailsToDownload);
+		if (type.equals(PersonalisationConstants.DOWNLOAD)){
+			//if we are downloading preferences, first we download the models from the CommunityPreferenceManager
+			List<IPreferenceTreeModel> communityPreferences = pcm.getCommunityPreferenceMgr().getCommunityPreferences(cisID, detailsToUploadOrDownload);
 
 
 			for (IPreferenceTreeModel communityModel : communityPreferences)
-			{
-				ServiceResourceIdentifier serviceClientID = getClientServiceID(communityModel.getPreferenceDetails().getServiceID());
-				if (serviceClientID!= null){
-					logging.debug("I am searching for: " + serviceClientID);
-
-					if(null!=serviceClientID) {
-						PreferenceDetails preferenceDetails = communityModel.getPreferenceDetails();
-						preferenceDetails.setServiceID(serviceClientID);
-						IPreferenceTreeModel model = pcm.getPreferenceManager().getModel(null, preferenceDetails);
+			{//then we replace the server serviceID with the client serviceID
+				//	ServiceResourceIdentifier serviceClientID = getClientServiceID(communityModel.getPreferenceDetails().getServiceID());
+				//if (serviceClientID!= null){
+				//	logging.debug("I am searching for: " + serviceClientID);
 
 
-						if (model==null){
-							pcm.getPreferenceManager().storePreference(userID, preferenceDetails, communityModel.getRootPreference());
+
+				//	this.changeServiceResourceIdentifier(serviceClientID, communityModel);
+				PreferenceDetails preferenceDetails = communityModel.getPreferenceDetails();
+				//preferenceDetails.setServiceID(serviceClientID);
+				IPreferenceTreeModel model = pcm.getPreferenceManager().getModel(null, preferenceDetails);
+
+				if(changeToClientServiceResourceIdentifier(communityModel)) {
+					logging.debug("Model: " + communityModel.getPreferenceDetails());
+
+					if (model==null){
+						//then we store the preference
+						pcm.getPreferenceManager().storePreference(userID, preferenceDetails, communityModel.getRootPreference());
+						pcm.processPreferenceChanged(userID, preferenceDetails.getServiceID(), preferenceDetails.getServiceType(), preferenceDetails.getPreferenceName());
+					}else{
+						//then we merge with existing preferences
+						PreferenceMerger merger = new PreferenceMerger(pcm.getUserFeedbackMgr());
+						PreMerger preMerger = new PreMerger(pcm.getCtxBroker(), userID);
+						IPreference replaceCtxIdentifiers = preMerger.replaceCtxIdentifiers(communityModel.getRootPreference());
+						if (replaceCtxIdentifiers!=null){
+							IPreference mergeTrees = merger.mergeTrees(model.getRootPreference(), replaceCtxIdentifiers, "");
+							pcm.getPreferenceManager().storePreference(userID, preferenceDetails, mergeTrees);
 							pcm.processPreferenceChanged(userID, preferenceDetails.getServiceID(), preferenceDetails.getServiceType(), preferenceDetails.getPreferenceName());
-						}else{
-							PreferenceMerger merger = new PreferenceMerger(pcm.getUserFeedbackMgr());
-							PreMerger preMerger = new PreMerger(pcm.getCtxBroker(), userID);
-							IPreference replaceCtxIdentifiers = preMerger.replaceCtxIdentifiers(communityModel.getRootPreference());
-							if (replaceCtxIdentifiers!=null){
-								IPreference mergeTrees = merger.mergeTrees(model.getRootPreference(), replaceCtxIdentifiers, "");
-								pcm.getPreferenceManager().storePreference(userID, preferenceDetails, mergeTrees);
-								pcm.processPreferenceChanged(userID, preferenceDetails.getServiceID(), preferenceDetails.getServiceType(), preferenceDetails.getPreferenceName());
-							}
 						}
 					}
-					else {
-						logging.debug("Could not find client service ID of service:" + ServiceModelUtils.serviceResourceIdentifierToString(communityModel.getPreferenceDetails().getServiceID()));
-					}
 				}
+				//	else {
+				//		logging.debug("Could not find client service ID of service:" + ServiceModelUtils.serviceResourceIdentifierToString(communityModel.getPreferenceDetails().getServiceID()));
+				//	}
+				//}
+			}
 
-			
+
 
 		}
+		else if (type.equals(PersonalisationConstants.UPLOAD)){
+			logging.debug("In the upload branch!");
+
+			List<IPreferenceTreeModel> modelsToUpload = new ArrayList<IPreferenceTreeModel>();
+			//if we are uploading preferences, first we retrieve the local preferences using the client serviceID, 
+			for (PreferenceDetails d : detailsToUploadOrDownload){
+				PreferenceDetails localDetail = new PreferenceDetails();
+				localDetail.setPreferenceName(d.getPreferenceName());
+				localDetail.setServiceID(d.getServiceID());
+				localDetail.setServiceType(d.getServiceType());
+
+				logging.debug("Getting the tree model");
+				IPreferenceTreeModel model = this.pcm.getPreferenceManager().getModel(userID, localDetail);
+				if(model.getRootPreference().getOutcome()==null) {
+					logging.debug("out come is null after UF!");
+				}
+				//then we replace the client service ID with server service ID 
+				if (model!=null){
+					logging.debug("THe model has server: " + model.getPreferenceDetails().getServiceID().getServiceInstanceIdentifier());
+					//		this.changeServiceResourceIdentifier(changeToServerID(d.getServiceID()), model);
+					modelsToUpload.add(model);
+				}
+			}
+
+			//then we upload
+			if (modelsToUpload.size()>0){
+				logging.debug("Calling ComPrefMgr to upload models to CIS with ID: " + cisID.getBareJid());
+				this.pcm.getCommunityPreferenceMgr().uploadUserPreferences(cisID, modelsToUpload);
+			}
+		}
+
+		/*
+		 * section: create preference that indicates the preferences in detailsTable should NOT be downloaded/uploaded:
+		 */
+		Enumeration<String> keys = this.detailsTable.keys();
+
+		while(keys.hasMoreElements()){
+			try {
+				logging.debug("in this loop");
+				String nextElement = keys.nextElement();
+				PreferenceDetails preferenceDetails = this.detailsTable.get(nextElement);
+				PreferenceDetails communityPreferenceManagerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(idm, preferenceDetails.getServiceID(), type);
+				IPreferenceOutcome preferenceOutcome = new PreferenceOutcome(communityPreferenceManagerDetails.getServiceID(), 
+						communityPreferenceManagerDetails.getServiceType(), communityPreferenceManagerDetails.getPreferenceName(), PersonalisationConstants.NO, false, false, false);
+				PreferenceTreeNode treeNode = new PreferenceTreeNode(preferenceOutcome);
+				this.pcm.getPreferenceManager().storePreference(idm.getThisNetworkNode(), communityPreferenceManagerDetails, treeNode);
+
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+
+		this.responseReceived = true;
 	}
 
+	/*	private ServiceResourceIdentifier changeToServerID(ServiceResourceIdentifier clientID) {
+		ServiceResourceIdentifier serverServiceID = this.pcm.getServiceMgmt().getServerServiceIdentifier(clientID);
+		if(serverServiceID!=null) {
+			return serverServiceID;
+		}
+		return clientID;
+	}
 
-	Enumeration<String> keys = this.detailsTable.keys();
+/*	private void changeServiceResourceIdentifier(ServiceResourceIdentifier serviceID, IPreferenceTreeModel model) {
 
-	while(keys.hasMoreElements()){		
+		model.getPreferenceDetails().setServiceID(serviceID);
+		IPreference rootPreference = model.getRootPreference();
+
+		Enumeration<IPreference> breadthFirstEnumeration = rootPreference.breadthFirstEnumeration();
+		while (breadthFirstEnumeration.hasMoreElements()){
+			IPreference node = breadthFirstEnumeration.nextElement();
+			if (node.getUserObject() != null){
+				if (node.getUserObject() instanceof PreferenceOutcome){
+					PreferenceOutcome outcome = (PreferenceOutcome) node.getUserObject();
+					outcome.setServiceID(serviceID);
+
+				}
+			}
+		} 
+
+	}*/
+
+
+	//**NEW**//
+	/*public ServiceResourceIdentifier getClientServiceID(ServiceResourceIdentifier serviceServerID) {
+		List<Service> services = new ArrayList<Service>();
 		try {
-			String nextElement = keys.nextElement();
-			PreferenceDetails preferenceDetails = this.detailsTable.get(nextElement);
-			PreferenceDetails communityPreferenceManagerDetails = PreferenceUtils.getCommunityPreferenceManagerDetails(idm, preferenceDetails.getServiceID(), type);
-			IPreferenceOutcome preferenceOutcome = new PreferenceOutcome(communityPreferenceManagerDetails.getServiceID(), 
-					communityPreferenceManagerDetails.getServiceType(), communityPreferenceManagerDetails.getPreferenceName(), PersonalisationConstants.NO, false, false, false);
-			PreferenceTreeNode treeNode = new PreferenceTreeNode(preferenceOutcome);
-			this.pcm.getPreferenceManager().storePreference(idm.getThisNetworkNode(), communityPreferenceManagerDetails, treeNode);
-
-		} catch (URISyntaxException e) {
+			services = pcm.getServiceDiscovery().getLocalServices().get();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return null;
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
-
-	}
-	this.responseReceived = true;
-
-}
-
-//**NEW**//
-public ServiceResourceIdentifier getClientServiceID(ServiceResourceIdentifier serviceServerID) {
-	List<Service> services = new ArrayList<Service>();
-	try {
-		services = pcm.getServiceDiscovery().getLocalServices().get();
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		return null;
-	} catch (ExecutionException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		return null;
-	} catch (ServiceDiscoveryException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		return null;
-	}
-	for(Service service : services) {
-		if(ServiceUtils.compare(serviceServerID, pcm.getServiceMgmt().getServerServiceIdentifier(service.getServiceIdentifier()))){
-			return service.getServiceIdentifier();
+		for(Service service : services) {
+			if(ServiceUtils.compare(serviceServerID, pcm.getServiceMgmt().getServerServiceIdentifier(service.getServiceIdentifier()))){
+				return service.getServiceIdentifier();
+			}
 		}
+		return null;
+	}*/
+	public boolean isResponseReceived() {
+		return responseReceived;
 	}
-	return null;
-}
-public boolean isResponseReceived() {
-	return responseReceived;
-}
-public void setResponseReceived(boolean responseReceived) {
-	this.responseReceived = responseReceived;
-}
-public Hashtable<String, PreferenceDetails> getDetailsTable() {
-	return detailsTable;
-}
-public String getType() {
-	return type;
-}
-public void setType(String type) {
-	this.type = type;
-}
+	public void setResponseReceived(boolean responseReceived) {
+		this.responseReceived = responseReceived;
+	}
+	public Hashtable<String, PreferenceDetails> getDetailsTable() {
+		return detailsTable;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
+	}
 
 }

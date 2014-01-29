@@ -205,6 +205,12 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 			bean.setCisId(cisId.getBareJid());
 			ArrayList<PreferenceTreeModelBean> modelBeans = new ArrayList<PreferenceTreeModelBean>();
 			for (IPreferenceTreeModel model : preferences){
+				if(model.getRootPreference().getOutcome()==null) {
+					LOG.debug("Outcome is null!");
+				}
+				if(model.getRootPreference().getCondition()==null) {
+					LOG.debug("Conditiions are null!");
+				}
 				modelBeans.add(PreferenceUtils.toPreferenceTreeModelBean(model));
 			}
 			bean.setModels(modelBeans);
