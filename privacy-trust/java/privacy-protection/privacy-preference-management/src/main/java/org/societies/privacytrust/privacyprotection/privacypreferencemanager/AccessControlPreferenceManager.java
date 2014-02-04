@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 
+
+import org.eclipse.jetty.util.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.CtxException;
@@ -274,6 +276,7 @@ public class AccessControlPreferenceManager {
 		}
 		if (preferencesDoNotExist.size()>0){
 			try {
+				logging.debug("Will send UF for " + preferencesDoNotExist.size() + " datatypes");
 				List<AccessControlResponseItem> list = this.userFeedback.getAccessControlFB(RequestorUtils.toRequestor(requestor, idMgr), preferencesDoNotExist).get();
 				for (AccessControlResponseItem item: list){
 					if (item.isRemember()){
@@ -450,14 +453,16 @@ public class AccessControlPreferenceManager {
 
 		List<RequestorBean> requestors = new ArrayList<RequestorBean>();
 		requestors.add(requestor);
+		logging.debug("Storing new AccessControlPrference! with decision:" + decision);
 
 		try {
 			AccessControlOutcome outcome;
 			if (decision.equals(Decision.PERMIT)){
 				outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.ALLOW);
+				logging.debug("Outcome is allow");
 			}else{
 				outcome = new AccessControlOutcome(PrivacyOutcomeConstantsBean.BLOCK);
-
+				logging.debug("outcome is deny");
 			}
 
 			AccessControlPreferenceDetailsBean detailsBean = new AccessControlPreferenceDetailsBean();

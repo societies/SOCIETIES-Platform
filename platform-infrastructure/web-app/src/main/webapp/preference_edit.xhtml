@@ -37,6 +37,12 @@
 					<h:outputLabel for="preferenceName" value="Preference Name:"></h:outputLabel>
 					<h:outputText id="preferenceName"
 						value="#{PreferenceEditBean.preferenceDetails.preferenceName}"></h:outputText>
+						<h:outputLabel for="preferenceSize" value="Preference Size:"></h:outputLabel>
+					<h:outputText id="preferenceSize"
+						value="#{PreferenceEditBean.nodeSize} children."></h:outputText>
+							<h:outputLabel for="preferenceDepth" value="Preference Tree Depth:"></h:outputLabel>
+					<h:outputText id="preferenceDepth"
+						value="#{PreferenceEditBean.nodeDepth}"></h:outputText>
 
 
 				</h:panelGrid>

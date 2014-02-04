@@ -1,0 +1,118 @@
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Compare P P</title>
+	</ui:define>
+
+	<ui:define name="body">
+		<p:accordionPanel>
+			<p:tab title="CIS Privacy Policies">
+				<p:accordionPanel value="#{ComparePPController.getChangedCISPPN()}"
+					var="cis" multiple="true">
+					<p:tab title="#{cis.name}">
+						<p:dataTable value="#{ComparePPController.getPolicyItems(cis)}"
+							var="policyItem">
+							<p:column headerText="Original Policy Items">
+								<p:panelGrid columns="2">
+									<h:outputText value="Data Type:" />
+									<h:outputText value="#{policyItem.resource.dataType}" />
+									<h:outputText value="Conditions:" />
+									<p:dataTable value="#{policyItem.conditions}" var="condition">
+										<p:column headerText="Condition Type">
+											<h:outputText
+												value="#{condition.conditionConstant}" />
+										</p:column>
+										<p:column headerText="Condition Value">
+											<h:outputText value="#{condition.value}" />
+										</p:column>
+									</p:dataTable>
+
+								</p:panelGrid>
+							</p:column>
+							<p:column headerText="Agreed Policy Items">
+								<p:panelGrid columns="2">
+									<h:outputText value="Data Type:" />
+									<h:outputText
+										value="#{ComparePPController.getAgreementItem(cis, policyItem).resource.dataType}" />
+									<h:outputText value="Conditions:" />
+									<p:dataTable
+										value="#{ComparePPController.getAgreementItem(cis, policyItem).conditions}"
+										var="condition">
+										<p:column headerText="Condition Type">
+											<h:outputText
+												value="#{condition.conditionConstant}" />
+										</p:column>
+										<p:column headerText="Condition Value">
+											<h:outputText value="#{condition.value}" />
+										</p:column>
+									</p:dataTable>
+
+								</p:panelGrid>
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+				</p:accordionPanel>
+			</p:tab>
+			<p:tab title="CIS Access Control">
+			<p:accordionPanel value="#{ComparePPController.getChangedServicePPN()}"
+					var="service" multiple="true">
+					<p:tab title="#{cis.name}">
+						<p:dataTable value="#{ComparePPController.getServicePolicyItems(service)}"
+							var="policyItem">
+							<p:column headerText="Original Policy Items">
+								<p:panelGrid columns="2">
+									<h:outputText value="Data Type:" />
+									<h:outputText value="#{policyItem.resource.dataType}" />
+									<h:outputText value="Conditions:" />
+									<p:dataTable value="#{policyItem.conditions}" var="condition">
+										<p:column headerText="Condition Type">
+											<h:outputText
+												value="#{condition.conditionConstant}" />
+										</p:column>
+										<p:column headerText="Condition Value">
+											<h:outputText value="#{condition.value}" />
+										</p:column>
+									</p:dataTable>
+
+								</p:panelGrid>
+							</p:column>
+							<p:column headerText="Agreed Policy Items">
+								<p:panelGrid columns="2">
+									<h:outputText value="Data Type:" />
+									<h:outputText
+										value="#{ComparePPController.getServiceAgreementItem(service, policyItem).resource.dataType}" />
+									<h:outputText value="Conditions:" />
+									<p:dataTable
+										value="#{ComparePPController.getServiceAgreementItem(service, policyItem).conditions}"
+										var="condition">
+										<p:column headerText="Condition Type">
+											<h:outputText
+												value="#{condition.conditionConstant}" />
+										</p:column>
+										<p:column headerText="Condition Value">
+											<h:outputText value="#{condition.value}" />
+										</p:column>
+									</p:dataTable>
+
+								</p:panelGrid>
+							</p:column>
+						</p:dataTable>
+					</p:tab>
+				</p:accordionPanel>
+			</p:tab>
+		</p:accordionPanel>
+
+
+
+	</ui:define>
+
+
+</ui:composition>
+</html>
