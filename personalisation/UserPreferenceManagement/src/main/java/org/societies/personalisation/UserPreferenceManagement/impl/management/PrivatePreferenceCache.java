@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
@@ -59,10 +60,12 @@ public class PrivatePreferenceCache {
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private final ICtxBroker broker;
 	private PreferenceRetriever retriever;
+	private IIdentityManager idMgr;
 	
-	public PrivatePreferenceCache(ICtxBroker broker){
+	public PrivatePreferenceCache(ICtxBroker broker, IIdentityManager idMgr){
 		
 		this.broker = broker;
+		this.idMgr = idMgr;
 		this.idToIPreferenceTreeModel = new Hashtable<CtxIdentifier, IPreferenceTreeModel>();
 		this.retriever = new PreferenceRetriever(this.broker);
 		this.registry = retriever.retrieveRegistry();
@@ -93,10 +96,12 @@ public class PrivatePreferenceCache {
 		return null;
 	}
 	public IPreferenceTreeModel getPreference(PreferenceDetails details){
+		//logging.debug(""+registry.getPreferenceDetailsOfAllPreferences().get(0).getServiceID().getServiceInstanceIdentifier());
 		CtxIdentifier id = this.registry.getCtxID(details);
 		if (id==null){
 			if(this.logging.isDebugEnabled()){
 				this.logging.debug("Could not find preference for :\n"+details.toString());
+				//this.logging.debug(registry.printRegistryContents().toString());
 			}
 			return null;
 		}else{
@@ -133,6 +138,11 @@ public class PrivatePreferenceCache {
 	public boolean storePreference(IIdentity userId, PreferenceDetails details, IPreferenceTreeModel model){
 		if(this.logging.isDebugEnabled()){
 			this.logging.debug("Request to store preference for:"+details.toString());
+			if(model.getRootPreference().getOutcome()==null) {
+				logging.debug("STORING PREF OUTCOME IS NULL!!!");
+			} else {
+				logging.debug("STOREING PREFF AINT NULL!");
+			}
 		}
 
 		
@@ -142,7 +152,7 @@ public class PrivatePreferenceCache {
 				this.logging.debug("Preference doesn't exist in DB. Attempt  to store new preference");
 			}
 			//preference doesn't exist. we're going to store new preference in the db
-			PreferenceStorer storer = new PreferenceStorer(this.broker);
+			PreferenceStorer storer = new PreferenceStorer(this.broker, this.idMgr);
 			CtxIdentifier newCtxIdentifier = storer.storeNewPreference(userId, model, this.registry.getNameForNewPreference());
 			if (newCtxIdentifier==null){
 				if(this.logging.isDebugEnabled()){
@@ -173,7 +183,7 @@ public class PrivatePreferenceCache {
 			if(this.logging.isDebugEnabled()){
 				this.logging.debug("Preference exists in DB. Attempt  to update existing preference");
 			}
-			PreferenceStorer storer = new PreferenceStorer(this.broker);
+			PreferenceStorer storer = new PreferenceStorer(this.broker, this.idMgr);
 			if (!storer.storeExisting(userId, id, model)){
 				return false;
 			}
@@ -197,7 +207,7 @@ public class PrivatePreferenceCache {
 				logging.debug("Preference "+preferenceName+" of "+serviceType+":"+ServiceModelUtils.serviceResourceIdentifierToString(serviceID)+"doesn't exist. Aborting deletion");
 			}
 		}else{
-			PreferenceStorer storer = new PreferenceStorer(this.broker);
+			PreferenceStorer storer = new PreferenceStorer(this.broker, this.idMgr);
 			storer.deletePreference(dpi, id);
 			this.registry.deletePreference(details);
 			storer.storeRegistry(dpi, registry);
@@ -213,7 +223,7 @@ public class PrivatePreferenceCache {
 			}
 			return false;
 		}
-			PreferenceStorer storer = new PreferenceStorer(this.broker);
+			PreferenceStorer storer = new PreferenceStorer(this.broker, this.idMgr);
 			if (storer.deletePreference(dpi, id)){
 				this.registry.deletePreference(details);
 				storer.storeRegistry(dpi, registry);

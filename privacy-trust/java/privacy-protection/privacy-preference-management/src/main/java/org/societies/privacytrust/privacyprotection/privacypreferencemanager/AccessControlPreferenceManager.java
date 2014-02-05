@@ -276,6 +276,7 @@ public class AccessControlPreferenceManager {
 			try {
 				List<AccessControlResponseItem> list = this.userFeedback.getAccessControlFB(RequestorUtils.toRequestor(requestor, idMgr), preferencesDoNotExist).get();
 				for (AccessControlResponseItem item: list){
+					logging.debug("Received UF Response: " + item.getRequestItem().getResource().getDataIdUri()+ " Decision is : " + item.getDecision());
 					if (item.isRemember()){
 						this.privacyDataManagerInternal.updatePermission(requestor, item);
 						this.storeDecision(requestor, item.getRequestItem().getResource(), item.getRequestItem().getConditions(), action, item.getDecision());

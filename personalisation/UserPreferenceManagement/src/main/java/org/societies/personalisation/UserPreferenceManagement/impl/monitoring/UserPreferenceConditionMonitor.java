@@ -46,6 +46,7 @@ import org.societies.api.internal.personalisation.model.FeedbackTypes;
 import org.societies.api.internal.personalisation.model.IOutcome;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
 import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.services.IServices;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.internal.useragent.monitoring.UIMEvent;
@@ -101,6 +102,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	private ICommunityPreferenceManager communityPreferenceMgr;
 	private CisEventListener cisEventListener;
 	private IServiceDiscovery serviceDiscovery;
+	private IServices serviceMgmt;
 	private ICisManager cisManager;
 	private CommunitiesHandler communitiesHandler;
 	private Hashtable<String, IPreference> evaluationResults;
@@ -135,6 +137,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		return persoMgr;
 	}
 
+	
 
 	public void setPersoMgr(IInternalPersonalisationManager persoMgr) {
 		if(this.logging.isDebugEnabled()){
@@ -596,6 +599,20 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 		}
 		this.evaluationResults.put(uuid, p);
 
+	}
+
+
+
+
+	public IServices getServiceMgmt() {
+		return serviceMgmt;
+	}
+
+
+
+
+	public void setServiceMgmt(IServices serviceMgmt) {
+		this.serviceMgmt = serviceMgmt;
 	}
 
 

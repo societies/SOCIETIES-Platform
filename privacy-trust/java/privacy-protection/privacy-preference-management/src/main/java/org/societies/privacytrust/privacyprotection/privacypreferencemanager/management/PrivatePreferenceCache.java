@@ -223,6 +223,10 @@ public class PrivatePreferenceCache {
 			String name = this.registry.getNameForNewPreference(PrivacyPreferenceTypeConstants.ACCESS_CONTROL);
 			try {
 				preferenceCtxID = this.storer.storeNewPreference(bean, name);
+				if(preferenceCtxID==null) {
+					logging.debug("CtxID Is null for preference after storing!");
+				}
+				
 			} catch (PrivacyException e) {
 				e.printStackTrace();
 				this.logging.debug("Could not save AccCtrl preference. Broker returned null ctx ID");

@@ -1,0 +1,49 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	template="templates/main_template.xhtml">
+
+	<ui:define name="html_head">
+		<title>Community Preferences - SOCIETIES</title>
+	</ui:define>
+
+	<ui:define name="body">
+
+		<h4 class="form_title">
+			Community Preferences for
+			<h:outputText value="#{loginController.username}" />
+		</h4>
+
+		<p:accordionPanel multiple="true"
+			value="#{cisPrefManager.getAllCIS()}" var="cis">
+			<p:tab title="#{cis.name}">
+				<p:dataTable value="#{cisPrefManager.getPreferenceTrees(cis)}" var="pref">
+					<p:column headerText="Preference Details">
+						<p:panelGrid columns="1">
+							<h:outputText
+								value="Preference Name: #{pref.preferenceDetails.preferenceName}" />
+							<h:outputText
+								value="Service : #{pref.preferenceDetails.serviceID.serviceInstanceIdentifier}" />
+						</p:panelGrid>
+					</p:column>
+					<p:column headerText="Preference Tree">
+						<p:tree id="treeSingle" value="#{cisPrefManager.getTreeNode(pref)}" var="node" cache="false"
+							dynamic="true" expanded="true">
+
+							<p:treeNode>
+								<h:outputText
+									value="#{PreferenceEditBean.formatNodeForDisplay(node)}" />
+							</p:treeNode>
+						</p:tree>
+					</p:column>
+				</p:dataTable>
+			</p:tab>
+		</p:accordionPanel>
+
+	</ui:define>
+
+</ui:composition>
+</html>

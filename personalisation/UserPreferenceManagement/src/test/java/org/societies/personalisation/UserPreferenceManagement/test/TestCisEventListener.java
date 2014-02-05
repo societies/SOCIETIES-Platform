@@ -152,6 +152,11 @@ public class TestCisEventListener {
 			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(new ArrayList<CtxIdentifier>()));
 
 			Mockito.when(ctxBroker.retrieveIndividualEntity(userId)).thenReturn(new AsyncResult<IndividualCtxEntity>(personCtxEntity));
+			Mockito.when(ctxBroker.createAssociation(CtxModelTypes.HAS_PREFERENCES)).thenReturn(new AsyncResult<CtxAssociation>(this.ctxPreferenceAssoc));
+			Mockito.when(ctxBroker.update(ctxPreferenceAssoc)).thenReturn(new AsyncResult<CtxModelObject>(ctxPreferenceAssoc));
+			Mockito.when(ctxBroker.createEntity(CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<CtxEntity>(this.preferenceCtxEntity));
+			Mockito.when(ctxBroker.retrieve(preferenceCtxEntity.getId())).thenReturn(new AsyncResult<CtxModelObject>(preferenceCtxEntity));
+			
 			List<PreferenceDetails> details = new ArrayList<PreferenceDetails>();
 			details.add(preferenceDetails);
 			Mockito.when(this.communityPreferenceMgr.getCommunityPreferenceDetails(cisID)).thenReturn(details);

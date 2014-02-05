@@ -1,8 +1,8 @@
 /**
  * Copyright (c) 2011, SOCIETIES Consortium (WATERFORD INSTITUTE OF TECHNOLOGY (TSSG), HERIOT-WATT UNIVERSITY (HWU), SOLUTA.NET 
  * (SN), GERMAN AEROSPACE CENTRE (Deutsches Zentrum fuer Luft- und Raumfahrt e.V.) (DLR), Zavod za varnostne tehnologije
- * informacijske družbe in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
- * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÇÃO, SA (PTIN), IBM Corp., 
+ * informacijske druÅ¾be in elektronsko poslovanje (SETCCE), INSTITUTE OF COMMUNICATION AND COMPUTER SYSTEMS (ICCS), LAKE
+ * COMMUNICATIONS (LAKE), INTEL PERFORMANCE LEARNING SOLUTIONS LTD (INTEL), PORTUGAL TELECOM INOVAÃ‡ÃƒO, SA (PTIN), IBM Corp., 
  * INSTITUT TELECOM (ITSUD), AMITEC DIACHYTI EFYIA PLIROFORIKI KAI EPIKINONIES ETERIA PERIORISMENIS EFTHINIS (AMITEC), TELECOM 
  * ITALIA S.p.a.(TI),  TRIALOG (TRIALOG), Stiftelsen SINTEF (SINTEF), NEC EUROPE LTD (NEC))
  * All rights reserved.
@@ -205,6 +205,12 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 			bean.setCisId(cisId.getBareJid());
 			ArrayList<PreferenceTreeModelBean> modelBeans = new ArrayList<PreferenceTreeModelBean>();
 			for (IPreferenceTreeModel model : preferences){
+				if(model.getRootPreference().getOutcome()==null) {
+					LOG.debug("Outcome is null!");
+				}
+				if(model.getRootPreference().getCondition()==null) {
+					LOG.debug("Conditiions are null!");
+				}
 				modelBeans.add(PreferenceUtils.toPreferenceTreeModelBean(model));
 			}
 			bean.setModels(modelBeans);
@@ -337,6 +343,9 @@ public class CommunityPreferenceManagementClient implements ICommunityPreference
 		if (obj instanceof CommunityPersonalisationResultBean){
 			CommunityPersonalisationResultBean bean = (CommunityPersonalisationResultBean) obj;
 			this.results.put(bean.getRequestID(), bean);
+			synchronized(results) {
+				results.notifyAll();
+			}
 			
 		}
 		

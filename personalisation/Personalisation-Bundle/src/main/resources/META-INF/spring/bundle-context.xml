@@ -9,7 +9,7 @@
 		We've kept the osgi definitions in a separate configuration file so that 
 		this file can easily be used for integration testing outside of an OSGi environment -->
 
- 
+
 	<bean id="pcm"
 		class="org.societies.personalisation.UserPreferenceManagement.impl.monitoring.UserPreferenceConditionMonitor"
 		name="pcm" init-method="initialisePreferenceManagement">
@@ -22,9 +22,10 @@
 		<property name="communityPreferenceMgr" ref="communityPreferenceManager"></property>
 		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
 		<property name="cisManager" ref="cisManager"></property>
+		<property name="serviceMgmt" ref="serviceMgmt"></property>
 	</bean>
 
-	
+
 	<bean id="cauiTaskManager"
 		class="org.societies.personalisation.CAUITaskManager.impl.CAUITaskManager"
 		name="cauiTaskManager" init-method="initialiseCAUITaskManager">
@@ -36,8 +37,8 @@
 		name="caciTaskManager" init-method="initialiseCAUITaskManager">
 		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
-	
-	
+
+
 	<bean id="cauiPrediction"
 		class="org.societies.personalisation.CAUIPrediction.impl.CAUIPrediction"
 		name="cauiPrediction" init-method="initialiseCAUIPrediction">
@@ -67,7 +68,7 @@
 		<property name="commsMgr" ref="commsMgr"></property>
 		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
 	</bean>
-	
+
 	<bean id="cristPrediction"
 		class="org.societies.personalisation.CRISTUserIntentPrediction.impl.CRISTUserIntentPrediction"
 		name="cristPrediction" init-method="initialiseCRISTPrediction">
@@ -80,20 +81,19 @@
 		class="org.societies.personalisation.CRISTUserIntentDiscovery.impl.CRISTUserIntentDiscovery"
 		name="cristDiscovery" init-method="initialiseCRISTDiscovery">
 	</bean>
-	
+
 	<bean id="cristTaskManager"
 		class="org.societies.personalisation.CRISTUserIntentTaskManager.impl.CRISTUserIntentTaskManager"
 		name="cristTaskManager" init-method="initialiseCRISTUserIntentManager">
 		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="cristDiscovery" ref="cristDiscovery"></property>
-		<property name="persoMgr" ref="persoMgr"></property>		
+		<property name="persoMgr" ref="persoMgr"></property>
 	</bean>
 
 
 	<bean id="persoMgr"
 		class="org.societies.personalisation.management.impl.PersonalisationManager"
-		name="persoMgr" lazy-init="true"
-		init-method="initialisePersonalisationManager">
+		name="persoMgr" lazy-init="true" init-method="initialisePersonalisationManager">
 		<property name="pcm" ref="pcm"></property>
 		<property name="dianne" ref="dianne"></property>
 		<property name="ctxBroker" ref="ctxBroker"></property>
@@ -118,30 +118,32 @@
 		<property name="ctxBroker" ref="ctxBroker"></property>
 	</bean>
 
-	
-	<bean id="communityPreferenceManager" 
-	    class="org.societies.personalisation.CommunityPreferenceManagement.impl.CommunityPreferenceManagement"
-	    name="communityPreferenceManager" init-method="initialiseCommunityPreferenceManagement">
-    	<property name="ctxBroker" ref="ctxBroker"></property>
+
+	<bean id="communityPreferenceManager"
+		class="org.societies.personalisation.CommunityPreferenceManagement.impl.CommunityPreferenceManagement"
+		name="communityPreferenceManager" init-method="initialiseCommunityPreferenceManagement">
+		<property name="ctxBroker" ref="ctxBroker"></property>
 		<property name="commsMgr" ref="commsMgr"></property>
-		<property name="cisManager" ref="cisManager"></property>		
-		<property name="communityPreferenceManagementClient" ref="CommunityPreferenceManagementClient"></property>		
+		<property name="cisManager" ref="cisManager"></property>
+		<property name="serviceDiscovery" ref="serviceDiscovery"></property>
+		<property name="communityPreferenceManagementClient" ref="CommunityPreferenceManagementClient"></property>
+		<property name="serviceMgmt" ref="serviceMgmt"></property>
 	</bean>
-	
-	<bean id="CommunityPreferenceManagementClient" 
-	    class="org.societies.personalisation.CommunityPreferenceManagement.impl.comms.CommunityPreferenceManagementClient"
-	    name="CommunityPreferenceManagementClient" init-method="InitService">
-	    <property name="commManager" ref="commsMgr"></property>
-		<property name="cisManager" ref="cisManager"></property>	
-		
+
+	<bean id="CommunityPreferenceManagementClient"
+		class="org.societies.personalisation.CommunityPreferenceManagement.impl.comms.CommunityPreferenceManagementClient"
+		name="CommunityPreferenceManagementClient" init-method="InitService">
+		<property name="commManager" ref="commsMgr"></property>
+		<property name="cisManager" ref="cisManager"></property>
+
 	</bean>
-	
+
 	<bean id="CommunityPreferenceManagementFeatureServer"
-	    class="org.societies.personalisation.CommunityPreferenceManagement.impl.comms.CommunityPreferenceManagementServer"
-	    name="CommunityPreferenceManagementFeatureServer" init-method="InitService">
-	    <property name="commsManager" ref="commsMgr"></property>
-	    <property name="communityPreferenceManager" ref="communityPreferenceManager"></property>
-	    
+		class="org.societies.personalisation.CommunityPreferenceManagement.impl.comms.CommunityPreferenceManagementServer"
+		name="CommunityPreferenceManagementFeatureServer" init-method="InitService">
+		<property name="commsManager" ref="commsMgr"></property>
+		<property name="communityPreferenceManager" ref="communityPreferenceManager"></property>
+
 	</bean>
 	<!-- <context:component-scan base-package="org.societies.personalisation.management.impl"></context:component-scan> -->
 </beans>

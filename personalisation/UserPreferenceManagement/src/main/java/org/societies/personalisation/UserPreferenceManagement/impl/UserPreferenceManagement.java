@@ -73,7 +73,7 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 		this.ctxBroker = broker;
 		this.monitor = monitor;
 		this.contextCache = new PrivateContextCache(this.ctxBroker);
-		this.preferenceCache = new PrivatePreferenceCache(this.ctxBroker);
+		this.preferenceCache = new PrivatePreferenceCache(this.ctxBroker, this.monitor.getCommManager().getIdManager());
 		
 		outcomeConditionListTable = new Hashtable<IPreferenceOutcome, List<CtxIdentifier>>();
 
@@ -279,7 +279,6 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 	}
 
 	public boolean storePreference(IIdentity ownerID, PreferenceDetails details, IPreference preference) {
-
 		if(this.logging.isDebugEnabled()){
 			logging.debug("request to store preference: for " + details.toString() + "\nPreference:\n" + preference.toTreeString());
 		}

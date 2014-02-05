@@ -20,7 +20,9 @@
 package org.societies.personalisation.CommunityPreferenceManagement.impl;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,12 +32,19 @@ import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.PreferenceDetails;
+import org.societies.api.internal.servicelifecycle.IServiceDiscovery;
+import org.societies.api.internal.servicelifecycle.ServiceDiscoveryException;
+import org.societies.api.schema.servicelifecycle.model.Service;
+import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.services.IServices;
+import org.societies.api.services.ServiceUtils;
 import org.societies.personalisation.CommunityPreferenceManagement.impl.comms.CommunityPreferenceManagementClient;
 import org.societies.personalisation.CommunityPreferenceManagement.impl.management.PrivatePreferenceCache;
 import org.societies.personalisation.CommunityPreferenceManagement.impl.merging.PreferenceMerger;
 import org.societies.personalisation.preference.api.CommunityPreferenceManagement.ICommunityPreferenceManager;
 import org.societies.personalisation.preference.api.model.IPreference;
 import org.societies.personalisation.preference.api.model.IPreferenceTreeModel;
+import org.societies.personalisation.preference.api.model.PreferenceOutcome;
 import org.societies.personalisation.preference.api.model.PreferenceTreeModel;
 import org.societies.personalisation.preference.api.model.util.PreferenceUtils;
 
@@ -47,6 +56,8 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 	private ICommManager commsMgr;
 	private ICisManager cisManager;
 	private PrivatePreferenceCache prefCache;
+	private IServices serviceMgmt;
+	private IServiceDiscovery serviceDiscovery;
 	private CommunityPreferenceManagementClient communityPreferenceManagementClient;
 
 	public CommunityPreferenceManagement(){
@@ -95,11 +106,137 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 
 	}
 
+	//**NEW**//
+	/*public ServiceResourceIdentifier getClientServiceID(ServiceResourceIdentifier serviceServerID) {
+		List<Service> services = new ArrayList<Service>();
+		try {
+			services = serviceDiscovery.getLocalServices().get();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		for(Service service : services) {
+			if(ServiceUtils.compare(serviceServerID, serviceMgmt.getServerServiceIdentifier(service.getServiceIdentifier()))){
+				return service.getServiceIdentifier();
+			}
+		}
+		return null;
+	}
+
+	private void changeToClientServiceResourceIdentifier(IPreferenceTreeModel model) {
+		logging.debug("Changing PreferenceDetails SRI To Server");
+
+		ServiceResourceIdentifier serverID = model.getPreferenceDetails().getServiceID();
+		ServiceResourceIdentifier clientID = serverID;
+
+		List<Service> services;
+		try {
+			services = serviceDiscovery.getLocalServices().get();
+
+			for(Service service : services) {
+				ServiceResourceIdentifier potentialServerID = serviceMgmt.getServerServiceIdentifier(service.getServiceIdentifier());
+				if(ServiceUtils.compare(serverID, potentialServerID)) {
+					logging.debug("Found local service: " + service.getServiceIdentifier());
+					clientID = service.getServiceIdentifier();
+					break;
+				}
+
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		model.getPreferenceDetails().setServiceID(clientID);
+		IPreference rootPreference = model.getRootPreference();
+
+		Enumeration<IPreference> breadthFirstEnumeration = rootPreference.breadthFirstEnumeration();
+		while (breadthFirstEnumeration.hasMoreElements()){
+			IPreference node = breadthFirstEnumeration.nextElement();
+			if (node.getUserObject() != null){
+				if (node.getUserObject() instanceof PreferenceOutcome){
+					PreferenceOutcome outcome = (PreferenceOutcome) node.getUserObject();
+					outcome.setServiceID(clientID);
+
+				}
+			}
+		}
+
+	}
+
+	private void changeToClientServiceResourceIdentifier(PreferenceDetails preference) {
+		logging.debug("Changing PreferenceDetails SRI To Server");
+		ServiceResourceIdentifier serverID = preference.getServiceID();
+		ServiceResourceIdentifier clientID = serverID;
+		try {
+			List<Service> services = serviceDiscovery.getLocalServices().get();
+			for(Service service : services) {
+				ServiceResourceIdentifier potentialServerID = serviceMgmt.getServerServiceIdentifier(service.getServiceIdentifier());
+				if(ServiceUtils.compare(serverID, potentialServerID)) {
+					logging.debug("Found local service: " + service.getServiceIdentifier());
+					clientID = service.getServiceIdentifier();
+					break;
+				}
+
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ServiceDiscoveryException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		preference.setServiceID(clientID);
+	}*/
+
+	private void changeToServerServiceResourceIdentifier(IPreferenceTreeModel model) {
+		ServiceResourceIdentifier clientServiceID = model.getPreferenceDetails().getServiceID();
+		ServiceResourceIdentifier serverServiceID = serviceMgmt.getServerServiceIdentifier(clientServiceID);
+		if(serverServiceID!=null) {
+			clientServiceID = serverServiceID;
+		}
+
+		model.getPreferenceDetails().setServiceID(clientServiceID);
+		IPreference rootPreference = model.getRootPreference();
+
+		Enumeration<IPreference> breadthFirstEnumeration = rootPreference.breadthFirstEnumeration();
+		while (breadthFirstEnumeration.hasMoreElements()){
+			IPreference node = breadthFirstEnumeration.nextElement();
+			if (node.getUserObject() != null){
+				if (node.getUserObject() instanceof PreferenceOutcome){
+					PreferenceOutcome outcome = (PreferenceOutcome) node.getUserObject();
+					outcome.setServiceID(clientServiceID);
+
+				}
+			}
+		}
+	}
+
 	@Override
 	public void uploadUserPreferences(IIdentity cisId, List<IPreferenceTreeModel> models) {
 		if (this.logging.isDebugEnabled()){
 			this.logging.debug("Uploading : "+models.size()+" preferences to community: "+cisId.getBareJid());
 		}
+
+
 		boolean ownCIS = false;
 
 		List<ICisOwned> listOfOwnedCis = cisManager.getListOfOwnedCis();
@@ -107,11 +244,18 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 		for (ICisOwned ownedCis : listOfOwnedCis){
 			if (ownedCis.getCisId().equalsIgnoreCase(cisId.getBareJid())){
 				ownCIS = true;
-				
+
 			}
 		}
 
 		if (ownCIS){
+
+			logging.debug("I am converting it to the server ID as I am the CIS Host!");
+			//**NEW**//
+			for (IPreferenceTreeModel newModel : models){
+				changeToServerServiceResourceIdentifier(newModel);
+			}		
+
 			//JOptionPane.showMessageDialog(null, "I own this CIS");
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Uploading "+models.size()+" community preferences to my community: "+cisId.getBareJid());
@@ -136,7 +280,6 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 			}
 
 		}else{
-			//JOptionPane.showMessageDialog(null, "I do not own this CIS");
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Uploading "+models.size()+" community preferences to someone else's community: "+cisId.getBareJid());
 			}
@@ -162,13 +305,18 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 			if (this.logging.isDebugEnabled()){
 				this.logging.debug("Returning : "+preferenceDetailsForAllPreferences.size()+" preference details from (my) community: "+cisId.getBareJid());
 			}
-			
+	//		for(PreferenceDetails details : preferenceDetailsForAllPreferences) {
+	//			changeToClientServiceResourceIdentifier(details);
+	//		}
 			return preferenceDetailsForAllPreferences;
 		}else{
 			List<PreferenceDetails> communityPreferenceDetails = this.communityPreferenceManagementClient.getCommunityPreferenceDetails(cisId);
 			if (this.logging.isDebugEnabled()){
 				this.logging.debug("Returning : "+communityPreferenceDetails.size()+" preference details from (not my) community: "+cisId.getBareJid());
 			}
+	//		for(PreferenceDetails details : communityPreferenceDetails) {
+	//			changeToClientServiceResourceIdentifier(details);
+	//		}
 			return communityPreferenceDetails;
 		}
 	}
@@ -193,17 +341,25 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 		if (ownCIS){
 			for (PreferenceDetails detail : details){
 				models.add(this.prefCache.getPreference(cisId, detail));
-				
+
 			}
 			if (this.logging.isDebugEnabled()){
 				this.logging.debug("Returning : "+models.size()+" preferences  from (my) community: "+cisId.getBareJid());
+				for (int i=0; i<models.size(); i++){
+					IPreferenceTreeModel model = models.get(i);
+			//		changeToClientServiceResourceIdentifier(models.get(i));
+					this.logging.debug("Preference no"+i+": "+model.getPreferenceDetails().toString()+" \n"+model.getRootPreference().toTreeString());
+				}
 			}
 			return models;
 		}else{
-			
+
 			List<IPreferenceTreeModel> communityPreferences = this.communityPreferenceManagementClient.getCommunityPreferences(cisId, details);
 			if (this.logging.isDebugEnabled()){
 				this.logging.debug("Returning : "+communityPreferences.size()+" preferences  from (my) community: "+cisId.getBareJid());
+			}
+			for(IPreferenceTreeModel model : communityPreferences) {
+			//	changeToClientServiceResourceIdentifier(model);
 			}
 			return communityPreferences;
 		}
@@ -241,6 +397,23 @@ public class CommunityPreferenceManagement implements ICommunityPreferenceManage
 			CommunityPreferenceManagementClient communityPreferenceManagementClient) {
 		this.communityPreferenceManagementClient = communityPreferenceManagementClient;
 	}
+
+	public IServices getServiceMgmt() {
+		return serviceMgmt;
+	}
+
+	public void setServiceMgmt(IServices serviceMgmt) {
+		this.serviceMgmt = serviceMgmt;
+	}
+
+	public IServiceDiscovery getServiceDiscovery() {
+		return serviceDiscovery;
+	}
+
+	public void setServiceDiscovery(IServiceDiscovery serviceDiscovery) {
+		this.serviceDiscovery = serviceDiscovery;
+	}
+
 
 
 

@@ -127,6 +127,9 @@ public class PreferenceEditBean extends BasePageController {
 	private boolean proactive;
 	
 	private String defaultNodeValue;
+	
+	private int nodeSize;
+	private int nodeDepth;
 
 
 	private List<ServiceResourceIdentifier> availableServices = new ArrayList<ServiceResourceIdentifier>();
@@ -178,6 +181,8 @@ public class PreferenceEditBean extends BasePageController {
 			this.root = new DefaultTreeNode();
 			TreeNode node = new DefaultTreeNode("Root", null); 
 			this.root = ModelTranslator.getPreference(model.getRootPreference(), node);
+			nodeSize = this.root.getChildren().size();
+			nodeDepth = model.getRootPreference().getDepth();
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Loading preference on the tree: ");
 			}
@@ -777,6 +782,26 @@ public class PreferenceEditBean extends BasePageController {
 
 	public void setValidMenuItem(boolean validMenuItem) {
 		this.validMenuItem = validMenuItem;
+	}
+
+
+	public int getNodeSize() {
+		return nodeSize;
+	}
+
+
+	public void setNodeSize(int nodeSize) {
+		this.nodeSize = nodeSize;
+	}
+
+
+	public int getNodeDepth() {
+		return nodeDepth;
+	}
+
+
+	public void setNodeDepth(int nodeDepth) {
+		this.nodeDepth = nodeDepth;
 	}
 
 

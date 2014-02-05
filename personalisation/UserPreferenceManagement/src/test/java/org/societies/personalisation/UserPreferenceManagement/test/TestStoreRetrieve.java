@@ -123,6 +123,10 @@ public class TestStoreRetrieve {
 		preferenceEntityList.add(preferenceCtxEntity.getId());
 		try {
 			Mockito.when(commManager.getIdManager()).thenReturn(idMgr);
+			Mockito.when(ctxBroker.retrieveIndividualEntity(mockId)).thenReturn(new AsyncResult<IndividualCtxEntity>(ctxEntity));
+			Mockito.when(ctxBroker.createAssociation(CtxModelTypes.HAS_PREFERENCES)).thenReturn(new AsyncResult<CtxAssociation>(hasPreferences));
+			Mockito.when(ctxBroker.update(hasPreferences)).thenReturn(new AsyncResult<CtxModelObject>(hasPreferences));
+			Mockito.when(ctxBroker.retrieve(hasPreferences.getChildEntities().iterator().next())).thenReturn(new AsyncResult<CtxModelObject>(preferenceCtxEntity));
 			Mockito.when(ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE)).thenReturn(new AsyncResult<List<CtxIdentifier>>(preferenceEntityList));
 			Mockito.when(ctxBroker.createAttribute((CtxEntityIdentifier) this.preferenceCtxEntity.getId(), preferenceKey1)).thenReturn(new AsyncResult<CtxAttribute>(this.preferenceAttribute1));
 			Mockito.when(ctxBroker.update(preferenceAttribute1)).thenReturn(new AsyncResult<CtxModelObject>(preferenceAttribute1));

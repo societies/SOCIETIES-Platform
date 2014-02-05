@@ -522,6 +522,10 @@ public class NegotiationClient implements INegotiationClient {
 				+ iEvent.geteventSource() + "\nEventType"
 				+ iEvent.geteventType() + "\nEventInfo:"
 				+ iEvent.geteventInfo());
+		logging.debug("Printing successful neogotiation event");
+		for(ResponseItem item : envelope.getAgreement().getRequestedItems() ) {
+			logging.debug(item.toString());
+		}
 		return iEvent;
 	}
 

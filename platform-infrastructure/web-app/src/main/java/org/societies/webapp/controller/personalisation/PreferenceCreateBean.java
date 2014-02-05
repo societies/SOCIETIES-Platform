@@ -314,7 +314,8 @@ public class PreferenceCreateBean extends BasePageController {
 
 		FacesContext.getCurrentInstance().addMessage(null, message);
 
-		ContextPreferenceCondition conditionBean = new ContextPreferenceCondition(this.ctxIDTable.get(selectedCtxID), selectedCtxOperator, ctxValue, "");
+		CtxAttributeIdentifier ctxId = this.ctxIDTable.get(selectedCtxID);
+		ContextPreferenceCondition conditionBean = new ContextPreferenceCondition(ctxId, selectedCtxOperator, ctxValue, ctxId.getType());
 		if (selectedNode.getData() instanceof IOutcome){
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Adding condition to outcome");
@@ -443,6 +444,7 @@ public class PreferenceCreateBean extends BasePageController {
 			this.logging.debug("Before translating the preference :");
 		}
 		printTree();
+		
 		IPreference preference = ModelTranslator.getPreference(root);
 		erroneousNode = ModelTranslator.checkPreference(preference);
 		if (erroneousNode!=null){

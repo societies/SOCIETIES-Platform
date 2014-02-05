@@ -46,6 +46,7 @@ import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
 import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
+import org.societies.api.identity.IIdentityManager;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.context.model.CtxAssociationTypes;
 import org.societies.api.internal.context.model.CtxEntityTypes;
@@ -63,10 +64,12 @@ public class PreferenceStorer {
 
 	private Logger logging = LoggerFactory.getLogger(this.getClass());
 	private final ICtxBroker ctxBroker;
+	private IIdentityManager idMgr;
 
 
-	public PreferenceStorer(ICtxBroker broker){
-		this.ctxBroker = broker;	
+	public PreferenceStorer(ICtxBroker broker, IIdentityManager idMgr){
+		this.ctxBroker = broker;
+		this.idMgr = idMgr;	
 	}
 
 
@@ -80,7 +83,7 @@ public class PreferenceStorer {
 				}
 				return false;
 			}
-				ctxBroker.remove(id);
+			ctxBroker.remove(id);
 			return true;
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
@@ -98,20 +101,20 @@ public class PreferenceStorer {
 	}
 	public boolean storeExisting(IIdentity userId, CtxIdentifier id, IPreferenceTreeModel model){
 		try {
-			
+
 			model.setLastModifiedDate(new Date());
-			
-			
+
+
 			CtxAttribute attrPreference = (CtxAttribute) ctxBroker.retrieve(id).get();
 			if (attrPreference==null){
 				return false;
 			}
-/*			
- * 			PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
+			/*			
+			 * 			PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
  			byte[] serialisedObj = SerialisationHelper.serialise(modelBean);
-			
-			*/
-			
+
+			 */
+
 			byte[] serialisedObj = SerialisationHelper.serialise(model);
 			attrPreference.setBinaryValue(serialisedObj);
 			if (this.logging.isDebugEnabled()){
@@ -119,15 +122,15 @@ public class PreferenceStorer {
 			}
 			ctxBroker.update(attrPreference).get();
 			return true;
-			
+
 		} catch (CtxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
+
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			
+
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -138,7 +141,7 @@ public class PreferenceStorer {
 		return false;
 	}
 
-	
+
 	private byte[] toByteArray(Object obj){
 		try {
 			return SerialisationHelper.serialise((Serializable) obj);
@@ -146,7 +149,7 @@ public class PreferenceStorer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		/*
 		ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
 		ObjectOutputStream oos;
@@ -162,80 +165,57 @@ public class PreferenceStorer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
-		*/
+		 */
 		return null;
 	}
 
 
 	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel model, String key){
+
+		if (userId==null){
+			userId = this.idMgr.getThisNetworkNode();
+		}
+
 		try{
 			model.setLastModifiedDate(new Date());
-			//PreferenceTreeModelBean modelBean = PreferenceUtils.toPreferenceTreeModelBean(model);
-			Future<List<CtxIdentifier>> futureCtxIDs = ctxBroker.lookup(CtxModelType.ENTITY, CtxEntityTypes.PREFERENCE); 
-			List<CtxIdentifier> ctxIDs = futureCtxIDs.get();
-			if (ctxIDs.size()==0){
-				if(this.logging.isDebugEnabled()){
-					this.logging.debug("Preference Entity doesn't exist");
-				}
-				//Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveCssOperator();
-				
-				CtxEntity person = (CtxEntity) ctxBroker.retrieveIndividualEntity(userId).get();
-				if (person==null){
-					if(this.logging.isDebugEnabled()){
-						this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");
-					}
-					return null;
-				}
-				
-				Set<CtxAssociationIdentifier> assocIDs = person.getAssociations(CtxModelTypes.HAS_PREFERENCES);
-				CtxAssociation assoc = null;
-				if (assocIDs.size()==0){
-					Future<CtxAssociation> futureAssoc = ctxBroker.createAssociation(/*userId, */CtxModelTypes.HAS_PREFERENCES);
-					assoc = futureAssoc.get();
-					assoc.setParentEntity(person.getId());
-					ctxBroker.update(assoc).get();
-				}else{
-					assoc = (CtxAssociation) ctxBroker.retrieve(assocIDs.iterator().next()).get();
-				}
-				CtxEntity preferenceEntity = (ctxBroker.createEntity(CtxEntityTypes.PREFERENCE)).get();
+
+			IndividualCtxEntity person = ctxBroker.retrieveIndividualEntity(userId).get();
+			Set<CtxAssociationIdentifier> assocIDs = person.getAssociations(CtxModelTypes.HAS_PREFERENCES);
+			CtxAssociation assoc = null;
+			if (assocIDs.size()==0){
+				Future<CtxAssociation> futureAssoc = ctxBroker.createAssociation(/*userId, */CtxModelTypes.HAS_PREFERENCES);
+				assoc = futureAssoc.get();
+				assoc.setParentEntity(person.getId());
+				assoc = (CtxAssociation) ctxBroker.update(assoc).get();
+			}else{
+				assoc = (CtxAssociation) ctxBroker.retrieve(assocIDs.iterator().next()).get();
+			}
+			CtxEntity preferenceEntity = null;
+			Set<CtxEntityIdentifier> childEntities = assoc.getChildEntities(CtxEntityTypes.PREFERENCE);
+			if (childEntities.size()==0){
+				preferenceEntity = (ctxBroker.createEntity(CtxEntityTypes.PREFERENCE)).get();
 				assoc.addChildEntity(preferenceEntity.getId());
-				ctxBroker.update(assoc).get();
+				assoc = (CtxAssociation) ctxBroker.update(assoc).get();
 				if(this.logging.isDebugEnabled()){
 					this.logging.debug("Created Preference Entity");
 				}
-				CtxAttribute attr = (ctxBroker.createAttribute(preferenceEntity.getId(), key)).get();
-				//byte[] serialisedObj = SerialisationHelper.serialise(modelBean);
-				byte[] serialisedObj = SerialisationHelper.serialise(model);
-				if (this.logging.isDebugEnabled()){
-					this.logging.debug("Size of preference obj byte array: "+serialisedObj.length);
-				}
-				attr.setBinaryValue(serialisedObj);
-				ctxBroker.update(attr).get();
-				if(this.logging.isDebugEnabled()){
-					this.logging.debug("Created attribute: "+attr.getType());
-				}
-				return attr.getId();
-				
 			}else{
-				if (ctxIDs.size()>1){
-					if(this.logging.isDebugEnabled()){
-						this.logging.debug("There's more than one entity of type Preference for userId: "+userId.getIdentifier()+"\nStoring preference under the first in the list");
-					}
-				}
-				CtxIdentifier preferenceEntityID = ctxIDs.get(0);
-				CtxAttribute attr = (ctxBroker.createAttribute((CtxEntityIdentifier) preferenceEntityID, key)).get();
-				//attr.setBinaryValue(SerialisationHelper.serialise(modelBean));
-				byte[] serialisedObj = SerialisationHelper.serialise(model);
-				if (this.logging.isDebugEnabled()){
-					this.logging.debug("Size of preference obj byte array: "+serialisedObj.length);
-				}				
-				attr.setBinaryValue(serialisedObj);
-				ctxBroker.update(attr).get();
-				if(this.logging.isDebugEnabled()){
-					this.logging.debug("Created attribute: "+attr.getType());
-				}
-				return attr.getId();
+				preferenceEntity  = (CtxEntity) ctxBroker.retrieve(childEntities.iterator().next()).get();
 			}
+			CtxAttribute attr = (ctxBroker.createAttribute(preferenceEntity.getId(), key)).get();
+			//byte[] serialisedObj = SerialisationHelper.serialise(modelBean);
+			byte[] serialisedObj = SerialisationHelper.serialise(model);
+			if (this.logging.isDebugEnabled()){
+				this.logging.debug("Size of preference obj byte array: "+serialisedObj.length);
+			}
+			attr.setBinaryValue(serialisedObj);
+			ctxBroker.update(attr).get();
+			if(this.logging.isDebugEnabled()){
+				this.logging.debug("Created attribute: "+attr.getType());
+			}
+			return attr.getId();
+
+
 		}catch(CtxException ctxE){
 			ctxE.printStackTrace();
 		} catch (InterruptedException e) {
@@ -250,8 +230,8 @@ public class PreferenceStorer {
 		}
 		return null;
 	}
-	
-/*	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel iptm, String key){
+
+	/*	public CtxIdentifier storeNewPreference(IIdentity userId, IPreferenceTreeModel iptm, String key){
 		iptm.setLastModifiedDate(new Date());
 
 
@@ -274,12 +254,12 @@ public class PreferenceStorer {
 					CtxEntity person = broker.retrieveOperator(userId);
 					Future<List<CtxIdentifier>> futurePersonCtxIDs = broker.lookup(CtxModelType.ENTITY, "PERSON");
 					List<CtxIdentifier> personCtxIDs = futurePersonCtxIDs.get();
-					
+
 					if (personCtxIDs.size()==0){
 						if(this.logging.isDebugEnabled()){this.logging.debug("CtxEntity for operator with userId: "+userId.getIdentifier()+" does not exist. aborting storing and exiting");}
 						return null;
 					}
-					
+
 					Future<CtxModelObject> futurePerson = broker.retrieve(personCtxIDs.get(0));
 					Future<IndividualCtxEntity> futurePerson = broker.retrieveCssOperator();
 					CtxEntity person = (CtxEntity) futurePerson.get();
@@ -331,39 +311,40 @@ public class PreferenceStorer {
 
 		return null;
 	}*/
-	
+
 	public void storeRegistry(IIdentity userId, Registry registry){
 		try {
-			List<CtxIdentifier> attrList = (ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxModelTypes.PREFERENCE_REGISTRY)).get();
+			Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveIndividualEntity(userId);
+			CtxEntity person = (CtxEntity) futurePerson.get();
+			Set<CtxAttribute> attributes = person.getAttributes(CtxModelTypes.PREFERENCE_REGISTRY);
 			
-				if (attrList.size()>0){
-					CtxIdentifier identifier = attrList.get(0);
-					CtxAttribute attr =  (CtxAttribute) (ctxBroker.retrieve(identifier)).get();
-					attr.setBinaryValue(SerialisationHelper.serialise(registry));
-					
-					ctxBroker.update(attr).get();					
-					
-					if(this.logging.isDebugEnabled()){
-						this.logging.debug("Successfully updated preference registry for userId: "+userId.getIdentifier());
-					}
-				}else{
-					if(this.logging.isDebugEnabled()){
-						this.logging.debug("PreferenceRegistry not found in DB for userId:. Creating new registry");
-					}
-					
-					Future<IndividualCtxEntity> futurePerson = ctxBroker.retrieveIndividualEntity(userId);
-					
-					CtxEntity person = (CtxEntity) futurePerson.get();
-					CtxAttribute attr = (ctxBroker.createAttribute(person.getId(), CtxModelTypes.PREFERENCE_REGISTRY)).get();
-					
-					
-					attr.setBinaryValue(SerialisationHelper.serialise(registry));
-					ctxBroker.update(attr).get();
-					if(this.logging.isDebugEnabled()){
-						this.logging.debug("Successfully stored new preference registry");
-					}
+			//List<CtxIdentifier> attrList = (ctxBroker.lookup(CtxModelType.ATTRIBUTE, CtxModelTypes.PREFERENCE_REGISTRY)).get();
+
+			if (attributes.size()>0){
+				CtxAttribute attr = attributes.iterator().next();
+				//CtxAttribute attr =  (CtxAttribute) (ctxBroker.retrieve(identifier)).get();
+				attr.setBinaryValue(SerialisationHelper.serialise(registry));
+
+				ctxBroker.update(attr).get();					
+
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("Successfully updated preference registry for userId: "+userId.getIdentifier());
 				}
-			
+			}else{
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("PreferenceRegistry not found in DB for userId:. Creating new registry");
+				}
+
+				CtxAttribute attr = (ctxBroker.createAttribute(person.getId(), CtxModelTypes.PREFERENCE_REGISTRY)).get();
+
+
+				attr.setBinaryValue(SerialisationHelper.serialise(registry));
+				ctxBroker.update(attr).get();
+				if(this.logging.isDebugEnabled()){
+					this.logging.debug("Successfully stored new preference registry");
+				}
+			}
+
 		} catch (CtxException e) {
 			if(this.logging.isDebugEnabled()){
 				this.logging.debug("Exception while storing PreferenceRegistry to DB for userId:"+userId.getIdentifier());

@@ -56,7 +56,6 @@ import org.societies.api.osgi.event.EventTypes;
 import org.societies.api.osgi.event.IEventMgr;
 import org.societies.api.osgi.event.InternalEvent;
 import org.societies.api.privacytrust.privacy.model.PrivacyException;
-import org.societies.api.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ActionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ConditionUtils;
 import org.societies.api.privacytrust.privacy.util.privacypolicy.ResourceUtils;
@@ -67,6 +66,7 @@ import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Action;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ActionConstants;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Condition;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ConditionConstants;
+import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.Decision;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.ResponseItem;
 import org.societies.privacytrust.privacyprotection.api.IPrivacyDataManagerInternal;
 import org.societies.privacytrust.privacyprotection.api.model.privacypreference.IPrivacyPreference;
@@ -248,6 +248,7 @@ public class AccessControlPreferenceCreator extends EventListener{
 				}
 			}else{
 				this.logging.debug("Creating NEW preference for these details:\n"+PrivacyPreferenceUtils.toString(details));
+				this.logging.debug("With decision of: " + item.getDecision());
 				AccessControlPreferenceTreeModel createAccCtrlPreference = this.createAccCtrlPreference(item, details);
 				this.logging.debug("Created new preference: "+createAccCtrlPreference.toString());
 				this.accCtrlPrefMgr.storeAccCtrlPreference(details, createAccCtrlPreference);

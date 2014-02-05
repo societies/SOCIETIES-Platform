@@ -14,7 +14,7 @@ xmlns="http://societies.org/api/schema/personalisation/model"
 	<xs:complexType name="ActionBean">
 		<xs:sequence>
 			<xs:element name="parameterName" type="xs:string" />
-			<xs:element name="serviceType" type="xs:string"/>
+			<xs:element name="serviceType" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="serviceID" type="tns:serviceResourceIdentifier"></xs:element>
 			<xs:element name="value" type="xs:string"></xs:element>
 			<xs:element name="implementable" type="xs:boolean" />
