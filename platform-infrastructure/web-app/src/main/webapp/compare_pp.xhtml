@@ -26,8 +26,7 @@
 									<h:outputText value="Conditions:" />
 									<p:dataTable value="#{policyItem.conditions}" var="condition">
 										<p:column headerText="Condition Type">
-											<h:outputText
-												value="#{condition.conditionConstant}" />
+											<h:outputText value="#{condition.conditionConstant}" />
 										</p:column>
 										<p:column headerText="Condition Value">
 											<h:outputText value="#{condition.value}" />
@@ -46,8 +45,7 @@
 										value="#{ComparePPController.getAgreementItem(cis, policyItem).conditions}"
 										var="condition">
 										<p:column headerText="Condition Type">
-											<h:outputText
-												value="#{condition.conditionConstant}" />
+											<h:outputText value="#{condition.conditionConstant}" />
 										</p:column>
 										<p:column headerText="Condition Value">
 											<h:outputText value="#{condition.value}" />
@@ -60,10 +58,10 @@
 					</p:tab>
 				</p:accordionPanel>
 			</p:tab>
-			<p:tab title="CIS Access Control">
-			<p:accordionPanel value="#{ComparePPController.getChangedServicePPN()}"
+			<p:tab title="Service Privacy Policies">
+				<p:accordionPanel value="#{ComparePPController.getChangedServicePPN()}"
 					var="service" multiple="true">
-					<p:tab title="#{cis.name}">
+					<p:tab title="#{service.serviceName}">
 						<p:dataTable value="#{ComparePPController.getServicePolicyItems(service)}"
 							var="policyItem">
 							<p:column headerText="Original Policy Items">
@@ -73,8 +71,7 @@
 									<h:outputText value="Conditions:" />
 									<p:dataTable value="#{policyItem.conditions}" var="condition">
 										<p:column headerText="Condition Type">
-											<h:outputText
-												value="#{condition.conditionConstant}" />
+											<h:outputText value="#{condition.conditionConstant}" />
 										</p:column>
 										<p:column headerText="Condition Value">
 											<h:outputText value="#{condition.value}" />
@@ -93,8 +90,7 @@
 										value="#{ComparePPController.getServiceAgreementItem(service, policyItem).conditions}"
 										var="condition">
 										<p:column headerText="Condition Type">
-											<h:outputText
-												value="#{condition.conditionConstant}" />
+											<h:outputText value="#{condition.conditionConstant}" />
 										</p:column>
 										<p:column headerText="Condition Value">
 											<h:outputText value="#{condition.value}" />
@@ -104,6 +100,21 @@
 								</p:panelGrid>
 							</p:column>
 						</p:dataTable>
+					</p:tab>
+				</p:accordionPanel>
+			</p:tab>
+			<p:tab title="Access Control">
+				<p:accordionPanel value="#{ComparePPController.changedAccCtrl}"
+					var="accCtrl" multiple="true">
+					<p:tab title="#{ComparePPController.getJidRequestor(accCtrl)}">
+						<p:panelGrid columns="2">
+							<h:outputLabel value="Service/CIS" />
+							<h:outputText value="#{ComparePPController.getCisServiceRequestor(accCtrl)}" />
+							<h:outputLabel value="Data Type:" />
+							<h:outputText value="#{accCtrl.resource.dataType}" />
+							<h:outputLabel value="Block/Obfsucated Level" />
+							<h:outputText value="#{ComparePPController.getObfOrBlock(accCtrl)}" />
+						</p:panelGrid>
 					</p:tab>
 				</p:accordionPanel>
 			</p:tab>
