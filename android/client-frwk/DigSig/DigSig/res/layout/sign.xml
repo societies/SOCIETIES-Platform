@@ -8,26 +8,36 @@
         android:id="@+id/textViewSignIsRequestingToSign"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:paddingBottom="5dp"
         android:text="@string/isRequestingToSign" />
-
+    
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        >
 
 	    <Button
 	        android:id="@+id/buttonSignOk"
 	        android:layout_width="0px"
 	        android:layout_weight="1"
-	        android:layout_height="wrap_content"
+	        android:layout_height="fill_parent"
 	        android:text="@string/ok" />
         
         <Button
             android:id="@+id/buttonSignCancel"
             android:layout_width="0px"
             android:layout_weight="1"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:text="@string/cancel" />
 
+	    <Button
+	        android:id="@+id/buttonSignViewDoc"
+	        android:layout_width="0px"
+	        android:layout_weight="1"
+	        android:layout_height="fill_parent"
+	        android:text="@string/viewRawDocument" />
+        
     </LinearLayout>
 
 </LinearLayout>

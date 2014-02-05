@@ -11,6 +11,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -62,6 +63,18 @@ public class SignActivity extends Activity {
 				Log.d(TAG, "Cancel button clicked");
 				setResult(RESULT_CANCELED);
 				finish();
+			}
+		});
+
+        btn = (Button) findViewById(R.id.buttonSignViewDoc);
+        if (getIntent().getStringExtra(Sign.Params.DOC_TO_SIGN_URL) == null) {
+        	// TODO: remove when showRawDocumentInternally() is implemented
+        	btn.setVisibility(View.INVISIBLE);
+        }
+        btn.setOnClickListener(new View.OnClickListener() {			
+			public void onClick(View v) {
+				Log.d(TAG, "View raw document button clicked");
+				showRawDocument();
 			}
 		});
 	}
@@ -121,5 +134,35 @@ public class SignActivity extends Activity {
 	private void selectIdentity() {
 		Intent i = new Intent(this, ListIdentitiesActivity.class);
 		startActivityForResult(i, SELECT_IDENTITY);
+	}
+	
+	private void showRawDocument() {
+		
+		byte[] doc = getIntent().getByteArrayExtra(Sign.Params.DOC_TO_SIGN);
+		String docUri = getIntent().getStringExtra(Sign.Params.DOC_TO_SIGN_URL);
+		
+		if (docUri != null) {
+			showRawDocumentInBrowser(docUri);
+		}
+		else if (doc != null) {
+			showRawDocumentInternally(doc);
+		}
+	}
+	
+	private void showRawDocumentInBrowser(String uri) {
+		
+		Log.i(TAG, "Showing the raw XML document in browser. Document URI = " + uri);
+		
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(uri));
+		startActivity(i);
+	}
+	
+	private void showRawDocumentInternally(byte[] doc) {
+
+		Log.i(TAG, "Showing the raw XML document.");
+		
+		Log.w(TAG, "Showing the raw XML document internally is not supported yet.");
+		// TODO
 	}
 }
