@@ -249,7 +249,7 @@ public class ComparePrivacyPrefController {
 				RequestorCis c = null;
 				try {
 					//REQUESTOR CIS TO GET AGREEMENT USING MATTS ID
-					c = new RequestorCis(this.commManager.getIdManager().getThisNetworkNode(), this.commManager.getIdManager().fromJid(cis.getCisId()));
+					c = new RequestorCis(this.commManager.getIdManager().fromJid(cis.getOwnerId()), this.commManager.getIdManager().fromJid(cis.getCisId()));
 				} catch (InvalidFormatException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -259,6 +259,16 @@ public class ComparePrivacyPrefController {
 				if(changedArticles.size()==0) {
 					log.debug("The user did not change the policy!");
 				} else {
+					log.debug("Original Privacy Policy Requestor for CIS " + cis.getName());
+					RequestorCisBean bean2 = (RequestorCisBean) p.getRequestor();
+					log.debug("Requestor ID: " + bean2.getRequestorId());
+					log.debug("CIS Requestor ID: " + bean2.getCisRequestorId());
+					log.debug("###");
+					log.debug("Agreement of Privacy Policy Requestor for CIS " + cis.getName());
+					RequestorCisBean bean3 = (RequestorCisBean) a.getAgreement().getRequestor();
+					log.debug("Requestor ID: " + bean3.getRequestorId());
+					log.debug("CIS Requestor ID: " + bean3.getCisRequestorId());
+					log.debug("########");
 					changedCISPP.put(cis, changedArticles);
 					log.debug("The user has changed the policy!");
 				}
