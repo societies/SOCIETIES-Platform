@@ -46,6 +46,15 @@
 					<h:outputLabel for="dataID" value="Resource Identifier: " />
 					<h:outputText id="dataID"
 						value="#{accCtrleditBean.preferenceDetails.resource.dataIdUri}" />
+						<h:outputLabel for="preferenceMaxSize" value="Max Children on a Branch:"></h:outputLabel>
+					<h:outputText id="preferenceMaxSize"
+						value="#{accCtrleditBean.maxChildCount} children."></h:outputText>
+						<h:outputLabel for="preferenceAllSize" value="Children Count:"></h:outputLabel>
+					<h:outputText id="preferenceAllSize"
+						value="#{accCtrleditBean.allChildCount} children."></h:outputText>
+					<h:outputLabel for="preferenceDepth" value="Preference Tree Depth:"></h:outputLabel>
+					<h:outputText id="preferenceDepth"
+						value="#{accCtrleditBean.nodeDepth}"></h:outputText>
 					</h:panelGrid>
 				
 				<p:contextMenu for="treeSingle">

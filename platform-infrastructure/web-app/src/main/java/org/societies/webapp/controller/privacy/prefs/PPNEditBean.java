@@ -130,10 +130,25 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	private String ppnDetailUUID;
 
+	private int allChildCount;
+	private int nodeDepth;
+	private int maxChildCount;
+
 	public PPNEditBean() {
 
 	}
 
+	private void countChildren(TreeNode node) {
+		int x = 0;
+		while(node.getChildCount()>0 && x<node.getChildCount()) {
+			if(node.getChildCount()>this.maxChildCount) {
+				this.maxChildCount = node.getChildCount();
+			}
+			this.allChildCount++;
+			countChildren(node.getChildren().get(x));
+			x++;
+		}
+	}
 
 	@PostConstruct
 	public void setup(){
@@ -194,6 +209,10 @@ public class PPNEditBean extends BasePageController implements Serializable{
 				}
 				TreeNode node = new DefaultTreeNode("Root", null); 
 				this.root = ModelTranslator.getPrivacyPreference(ppnPreference.getRootPreference(), node);
+				this.maxChildCount =0;
+				this.allChildCount =0;
+				countChildren(this.root);
+				this.nodeDepth = ppnPreference.getRootPreference().getDepth();
 				if (logging.isDebugEnabled()){
 					this.logging.debug("*** AFter translation of model: ****\n");
 				}
@@ -602,7 +621,7 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 			return "Condition: trustOfRequestor > "+trustCondition.getTrustThreshold();
 		}
-		
+
 		else return "Unparseable: "+node;
 
 	}
@@ -965,6 +984,28 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		this.ppnDetailUUID = ppnDetailUUID;
 	}
 
+	public int getAllChildCount() {
+		return allChildCount;
+	}
 
+	public void setAllChildCount(int allChildCount) {
+		this.allChildCount = allChildCount;
+	}
+
+	public int getNodeDepth() {
+		return nodeDepth;
+	}
+
+	public void setNodeDepth(int nodeDepth) {
+		this.nodeDepth = nodeDepth;
+	}
+
+	public int getMaxChildCount() {
+		return maxChildCount;
+	}
+
+	public void setMaxChildCount(int maxChildCount) {
+		this.maxChildCount = maxChildCount;
+	}
 
 }

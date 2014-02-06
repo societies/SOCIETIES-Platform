@@ -44,6 +44,15 @@
 					<h:outputLabel for="resourceType" value="Resource: " />
 					<h:outputText id="resourceType"
 						value="#{PPNcreateBean.preferenceDetails.resource.dataType}" />
+						<h:outputLabel for="preferenceMaxSize" value="Max Children on a Branch:"></h:outputLabel>
+					<h:outputText id="preferenceMaxSize"
+						value="#{PPNeditBean.maxChildCount} children."></h:outputText>
+						<h:outputLabel for="preferenceAllSize" value="Children Count:"></h:outputLabel>
+					<h:outputText id="preferenceAllSize"
+						value="#{PPNeditBean.allChildCount} children."></h:outputText>
+					<h:outputLabel for="preferenceDepth" value="Preference Tree Depth:"></h:outputLabel>
+					<h:outputText id="preferenceDepth"
+						value="#{PPNeditBean.nodeDepth}"></h:outputText>
 				</h:panelGrid>
 
 				<p:contextMenu for="treeSingle">

@@ -28,6 +28,7 @@ package org.societies.webapp.controller.personalisation;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -128,8 +129,9 @@ public class PreferenceEditBean extends BasePageController {
 	
 	private String defaultNodeValue;
 	
-	private int nodeSize;
+	private int allChildCount;
 	private int nodeDepth;
+	private int maxChildCount;
 
 
 	private List<ServiceResourceIdentifier> availableServices = new ArrayList<ServiceResourceIdentifier>();
@@ -181,8 +183,10 @@ public class PreferenceEditBean extends BasePageController {
 			this.root = new DefaultTreeNode();
 			TreeNode node = new DefaultTreeNode("Root", null); 
 			this.root = ModelTranslator.getPreference(model.getRootPreference(), node);
-			nodeSize = this.root.getChildren().size();
-			nodeDepth = model.getRootPreference().getDepth();
+			this.maxChildCount =0;
+			this.allChildCount =0;
+			countChildren(this.root);
+			this.nodeDepth = model.getRootPreference().getDepth();
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Loading preference on the tree: ");
 			}
@@ -199,6 +203,18 @@ public class PreferenceEditBean extends BasePageController {
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setupCtxIds();
 		
+	}
+	
+	private void countChildren(TreeNode node) {
+		int x = 0;
+		while(node.getChildCount()>0 && x<node.getChildCount()) {
+			if(node.getChildCount()>this.maxChildCount) {
+				this.maxChildCount = node.getChildCount();
+			}
+			this.allChildCount++;
+			countChildren(node.getChildren().get(x));
+			x++;
+		}
 	}
 	
 
@@ -785,15 +801,23 @@ public class PreferenceEditBean extends BasePageController {
 	}
 
 
-	public int getNodeSize() {
-		return nodeSize;
+	
+
+	public int getAllChildCount() {
+		return allChildCount;
 	}
 
-
-	public void setNodeSize(int nodeSize) {
-		this.nodeSize = nodeSize;
+	public void setAllChildCount(int allChildCount) {
+		this.allChildCount = allChildCount;
 	}
 
+	public int getMaxChildCount() {
+		return maxChildCount;
+	}
+
+	public void setMaxChildCount(int maxChildCount) {
+		this.maxChildCount = maxChildCount;
+	}
 
 	public int getNodeDepth() {
 		return nodeDepth;

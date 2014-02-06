@@ -164,10 +164,25 @@ public class AccCtrlEditBean implements Serializable{
 	
 	private String accCtrlDetailUUID;
 	
+	private int allChildCount;
+	private int nodeDepth;
+	private int maxChildCount;
+	
 	public AccCtrlEditBean() {
 
 	}
 
+	private void countChildren(TreeNode node) {
+		int x = 0;
+		while(node.getChildCount()>0 && x<node.getChildCount()) {
+			if(node.getChildCount()>this.maxChildCount) {
+				this.maxChildCount = node.getChildCount();
+			}
+			this.allChildCount++;
+			countChildren(node.getChildren().get(x));
+			x++;
+		}
+	}
 
 	public void startAddPrivacyConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addPrivConddlg.show();");
@@ -222,6 +237,10 @@ public class AccCtrlEditBean implements Serializable{
 				 }
 				TreeNode node = new DefaultTreeNode("Root", null); 
 				this.root = ModelTranslator.getPrivacyPreference(accCtrlPreference.getRootPreference(), node);
+				this.maxChildCount =0;
+				this.allChildCount =0;
+				countChildren(this.root);
+				this.nodeDepth = accCtrlPreference.getRootPreference().getDepth();
 				if (logging.isDebugEnabled()){
 					this.logging.debug("*** AFter translation of model: ****\n");
 				}
@@ -1323,6 +1342,30 @@ public class AccCtrlEditBean implements Serializable{
 
 	public void setSelectedCtxOperator(OperatorConstants selectedCtxOperator) {
 		this.selectedCtxOperator = selectedCtxOperator;
+	}
+
+	public int getAllChildCount() {
+		return allChildCount;
+	}
+
+	public void setAllChildCount(int allChildCount) {
+		this.allChildCount = allChildCount;
+	}
+
+	public int getNodeDepth() {
+		return nodeDepth;
+	}
+
+	public void setNodeDepth(int nodeDepth) {
+		this.nodeDepth = nodeDepth;
+	}
+
+	public int getMaxChildCount() {
+		return maxChildCount;
+	}
+
+	public void setMaxChildCount(int maxChildCount) {
+		this.maxChildCount = maxChildCount;
 	}
 
 

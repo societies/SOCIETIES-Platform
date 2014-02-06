@@ -37,11 +37,22 @@
 					<h:outputLabel for="preferenceName" value="Preference Name:"></h:outputLabel>
 					<h:outputText id="preferenceName"
 						value="#{PreferenceEditBean.preferenceDetails.preferenceName}"></h:outputText>
+					<h:outputLabel for="preferenceMaxSize" value="Max Children on a Branch:"></h:outputLabel>
+					<h:outputText id="preferenceMaxSize"
+						value="#{PreferenceEditBean.maxChildCount} children."></h:outputText>
+						<h:outputLabel for="preferenceAllSize" value="Children Count:"></h:outputLabel>
+					<h:outputText id="preferenceAllSize"
+						value="#{PreferenceEditBean.allChildCount} children."></h:outputText>
+					<h:outputLabel for="preferenceDepth" value="Preference Tree Depth:"></h:outputLabel>
+					<h:outputText id="preferenceDepth"
+						value="#{PreferenceEditBean.nodeDepth}"></h:outputText>
+
 
 
 				</h:panelGrid>
 
-				<p:contextMenu id="treeContextMenu" widgetVar="treeCtxMenu" for="treeSingle">
+				<p:contextMenu id="treeContextMenu" widgetVar="treeCtxMenu"
+					for="treeSingle">
 					<p:menuitem value="View" update="messages"
 						actionListener="#{PreferenceEditBean.displaySelectedSingle}"
 						icon="ui-icon-search" />
@@ -50,16 +61,16 @@
 						icon="ui-icon-close" />
 					<p:menuitem value="Add condition below this node"
 						actionListener="#{PreferenceEditBean.startAddConditionProcessBelow}"
-						icon="ui-icon-plus" rendered="#{PreferenceEditBean.validMenuItem}"/>
+						icon="ui-icon-plus" rendered="#{PreferenceEditBean.validMenuItem}" />
 					<p:menuitem value="Add condition above this node"
 						actionListener="#{PreferenceEditBean.startAddConditionProcessAbove}"
 						icon="ui-icon-plus" />
 					<p:menuitem value="Add condition next to this node"
 						actionListener="#{PreferenceEditBean.startAddConditionProcessLevel}"
-						icon="ui-icon-plus" />	
+						icon="ui-icon-plus" />
 					<p:menuitem value="Add Outcome"
 						actionListener="#{PreferenceEditBean.startAddOutcomeProcess}"
-						icon="ui-icon-plus" rendered="#{PreferenceEditBean.validMenuItem}"/>
+						icon="ui-icon-plus" rendered="#{PreferenceEditBean.validMenuItem}" />
 					<p:menuitem value="Edit" update="treeSingle"
 						actionListener="#{PreferenceEditBean.editNode}"
 						icon="ui-icon-pencil" />
@@ -71,7 +82,7 @@
 						var="node" selectionMode="single"
 						selection="#{PreferenceEditBean.selectedNode}" cache="false"
 						dynamic="true" expanded="true">
-						
+
 						<p:treeNode>
 							<h:outputText
 								value="#{PreferenceEditBean.formatNodeForDisplay(node)}" />
@@ -106,8 +117,8 @@
 						message="Are you sure you want to delete this preference permanently?"
 						icon="ui-icon-alert">
 						<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes"
-							icon="ui-icon-check" action="#{PreferenceEditBean.deletePreference}"
-							ajax="false" />
+							icon="ui-icon-check"
+							action="#{PreferenceEditBean.deletePreference}" ajax="false" />
 						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
 							icon="ui-icon-close" oncomplete="cdelete.hide();" />
 					</p:confirmDialog>
@@ -164,9 +175,9 @@
 					<f:selectItems value="#{PreferenceEditBean.existingActionValues}" />
 				</p:selectOneMenu>
 				<h:outputText for="proactive" value="Proactive: " />
-				<p:selectBooleanButton id="proactive" value="#{PreferenceEditBean.proactive}"
-					onLabel="Yes" offLabel="No" onIcon="ui-icon-check"
-					offIcon="ui-icon-close">
+				<p:selectBooleanButton id="proactive"
+					value="#{PreferenceEditBean.proactive}" onLabel="Yes" offLabel="No"
+					onIcon="ui-icon-check" offIcon="ui-icon-close">
 				</p:selectBooleanButton>
 
 			</h:panelGrid>
@@ -191,9 +202,9 @@
 					value="#{PreferenceEditBean.selectedAction}">
 				</h:inputText>
 				<h:outputText for="proactive1" value="Proactive: " />
-				<p:selectBooleanButton id="proactive1" value="#{PreferenceEditBean.proactive}"
-					onLabel="Yes" offLabel="No" onIcon="ui-icon-check"
-					offIcon="ui-icon-close">
+				<p:selectBooleanButton id="proactive1"
+					value="#{PreferenceEditBean.proactive}" onLabel="Yes" offLabel="No"
+					onIcon="ui-icon-check" offIcon="ui-icon-close">
 				</p:selectBooleanButton>
 
 			</h:panelGrid>
@@ -224,12 +235,12 @@
 					style="word-wrap: break-word; width: 300px;" dynamic="true" />
 			</p:panel>
 		</p:dialog>
-		
+
 		<p:dialog id="messageFailureDialog1" header="Failure"
 			widgetVar="msgFailureDlg1" dynamic="true" showHeader="true">
 
 			<p:panel style="word-wrap: break-word; width: 300px;">
-				Please add an outcome under this node: <br/> #{PreferenceCreateBean.erroneousNode} <br/>Error: Condition cannot be leaf of the tree. 
+				Please add an outcome under this node: <br /> #{PreferenceCreateBean.erroneousNode} <br />Error: Condition cannot be leaf of the tree. 
 					
 			</p:panel>
 		</p:dialog>
