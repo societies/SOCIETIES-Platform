@@ -37,16 +37,22 @@
 					<h:outputLabel for="preferenceName" value="Preference Name:"></h:outputLabel>
 					<h:outputText id="preferenceName"
 						value="#{PreferenceEditBean.preferenceDetails.preferenceName}"></h:outputText>
-					<h:outputLabel for="preferenceMaxSize" value="Max Children on a Branch:"></h:outputLabel>
-					<h:outputText id="preferenceMaxSize"
-						value="#{PreferenceEditBean.maxChildCount} children."></h:outputText>
-						<h:outputLabel for="preferenceAllSize" value="Children Count:"></h:outputLabel>
-					<h:outputText id="preferenceAllSize"
-						value="#{PreferenceEditBean.allChildCount} children."></h:outputText>
+					<h:outputLabel for="leafCount" value="# Leafs:"></h:outputLabel>
+					<h:outputText id="leafCount"
+						value="#{PreferenceEditBean.leafCount}"></h:outputText>
+					<h:outputLabel for="branchCount" value="# Branches:"></h:outputLabel>
+					<h:outputText id="branchCount"
+						value="#{PreferenceEditBean.branchCount}"></h:outputText>
+					<h:outputLabel for="subBranches"
+						value="# Sub-Branches:"></h:outputLabel>
+					<h:outputText id="subBranches"
+						value="#{PreferenceEditBean.maxBranches}"></h:outputText>
 					<h:outputLabel for="preferenceDepth" value="Preference Tree Depth:"></h:outputLabel>
 					<h:outputText id="preferenceDepth"
 						value="#{PreferenceEditBean.nodeDepth}"></h:outputText>
-
+						<h:outputLabel for="preferenceSize" value="Preference Size (in bytes):"></h:outputLabel>
+					<h:outputText id="preferenceSize"
+						value="#{PreferenceEditBean.byteSize}"></h:outputText>
 
 
 				</h:panelGrid>

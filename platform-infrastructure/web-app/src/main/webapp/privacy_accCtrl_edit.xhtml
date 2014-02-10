@@ -11,7 +11,7 @@
 	</ui:define>
 
 	<ui:define name="body">
-			<ui:fragment
+		<ui:fragment
 			rendered="#{accCtrleditBean.accCtrlDetailUUID eq null or accCtrleditBean.accCtrlDetailUUID eq ''}">
 			<!-- redirect to privacypreferences page if accCtrlDetailUUID not set -->
 			<meta http-equiv="REFRESH" content="0;url=privacypreferences.xhtml" />
@@ -23,19 +23,19 @@
 				<a href="index.xhtml">Home</a> / <a href="privacysettings.xhtml">Privacy
 					Settings</a> / <a href="privacypreferences.xhtml">Privacy
 					Preferences</a> / Edit Access control Preference
-					</div>
+			</div>
 
 			<section class="form_style_main">
 
 				<h4 class="form_title">View new Access Control Preference</h4>
 				<div class="hr grid_12 clearfix"></div>
-				
+
 				<h5>Privacy Preference Details</h5>
-					<h:panelGrid columns="2" cellpadding="5">
-						
-						<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
-						<h:outputText id="requestorId"
-							value="#{AccCtrleditBean.preferenceDetails.requestor.requestorId}"></h:outputText>
+				<h:panelGrid columns="2" cellpadding="5">
+
+					<h:outputLabel for="requestorId" value="Requestor:"></h:outputLabel>
+					<h:outputText id="requestorId"
+						value="#{AccCtrleditBean.preferenceDetails.requestor.requestorId}"></h:outputText>
 
 					<h:outputLabel for="specificRequestor" value="For: "></h:outputLabel>
 					<h:outputText id="specificRequestor"
@@ -46,23 +46,31 @@
 					<h:outputLabel for="dataID" value="Resource Identifier: " />
 					<h:outputText id="dataID"
 						value="#{accCtrleditBean.preferenceDetails.resource.dataIdUri}" />
-						<h:outputLabel for="preferenceMaxSize" value="Max Children on a Branch:"></h:outputLabel>
-					<h:outputText id="preferenceMaxSize"
-						value="#{accCtrleditBean.maxChildCount} children."></h:outputText>
-						<h:outputLabel for="preferenceAllSize" value="Children Count:"></h:outputLabel>
-					<h:outputText id="preferenceAllSize"
-						value="#{accCtrleditBean.allChildCount} children."></h:outputText>
+					<h:outputLabel for="leafCount" value="# Leafs:"></h:outputLabel>
+					<h:outputText id="leafCount" value="#{accCtrleditBean.leafCount}"></h:outputText>
+					<h:outputLabel for="branchCount" value="# Branches:"></h:outputLabel>
+					<h:outputText id="branchCount"
+						value="#{accCtrleditBean.branchCount}"></h:outputText>
+					<h:outputLabel for="subBranches" value="# Sub-Branches:"></h:outputLabel>
+					<h:outputText id="subBranches"
+						value="#{accCtrleditBean.maxBranches}"></h:outputText>
 					<h:outputLabel for="preferenceDepth" value="Preference Tree Depth:"></h:outputLabel>
 					<h:outputText id="preferenceDepth"
 						value="#{accCtrleditBean.nodeDepth}"></h:outputText>
-					</h:panelGrid>
-				
+					<h:outputLabel for="preferenceSize"
+						value="Preference Size (in bytes):"></h:outputLabel>
+					<h:outputText id="preferenceSize"
+						value="#{accCtrleditBean.byteSize}"></h:outputText>
+
+				</h:panelGrid>
+
 				<p:contextMenu for="treeSingle">
 					<p:menuitem value="View" update="messages"
 						actionListener="#{accCtrleditBean.displaySelectedSingle}"
 						icon="ui-icon-search" />
 					<p:menuitem value="Delete" update="treeSingle"
-						actionListener="#{accCtrleditBean.deleteNode}" icon="ui-icon-close" />
+						actionListener="#{accCtrleditBean.deleteNode}"
+						icon="ui-icon-close" />
 					<p:menuitem value="Add Condition"
 						actionListener="#{accCtrleditBean.startAddConditionProcess}"
 						icon="ui-icon-plus" />
@@ -71,7 +79,7 @@
 						icon="ui-icon-plus" />
 					<p:menuitem value="Add Trust Condition"
 						actionListener="#{accCtrleditBean.startAddTrustConditionProcess}"
-						icon="ui-icon-plus" />						
+						icon="ui-icon-plus" />
 					<p:menuitem value="Add Outcome"
 						actionListener="#{accCtrleditBean.startAddOutcomeProcess}"
 						icon="ui-icon-plus" />
@@ -86,7 +94,8 @@
 						cache="false" dynamic="true" expanded="true">
 
 						<p:treeNode>
-							<h:outputText value="#{accCtrleditBean.formatNodeForDisplay(node)}" />
+							<h:outputText
+								value="#{accCtrleditBean.formatNodeForDisplay(node)}" />
 						</p:treeNode>
 					</p:tree>
 				</h:panelGrid>
@@ -94,17 +103,21 @@
 
 			<p:toolbar>
 				<p:toolbarGroup align="left">
-					<p:commandButton type="button" value="Save" icon="ui-icon-disk" onclick="cd.show();" />
-					
+					<p:commandButton type="button" value="Save" icon="ui-icon-disk"
+						onclick="cd.show();" />
 
-					<p:confirmDialog id ="confirmationDialog" widgetVar="cd" global="true" message="Are you sure you want to save this preference permanently?"
-							icon="ui-icon-alert" >
-						<p:commandButton value="Yes"
-							styleClass="ui-confirmdialog-yes" icon="ui-icon-check" oncomplete="cd.hide();" actionListener="#{accCtrleditBean.savePreference}"/>
-						<p:commandButton value="No"
-							styleClass="ui-confirmdialog-no" icon="ui-icon-close" oncomplete="cd.hide();"/>
+
+					<p:confirmDialog id="confirmationDialog" widgetVar="cd"
+						global="true"
+						message="Are you sure you want to save this preference permanently?"
+						icon="ui-icon-alert">
+						<p:commandButton value="Yes" styleClass="ui-confirmdialog-yes"
+							icon="ui-icon-check" oncomplete="cd.hide();"
+							actionListener="#{accCtrleditBean.savePreference}" />
+						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
+							icon="ui-icon-close" oncomplete="cd.hide();" />
 					</p:confirmDialog>
-					
+
 					<p:commandButton type="button" value="Delete" icon="ui-icon-trash"
 						onclick="cdelete.show();" />
 
@@ -118,8 +131,8 @@
 						<p:commandButton value="No" styleClass="ui-confirmdialog-no"
 							icon="ui-icon-close" oncomplete="cdelete.hide();" />
 					</p:confirmDialog>
-					
-					
+
+
 				</p:toolbarGroup>
 			</p:toolbar>
 

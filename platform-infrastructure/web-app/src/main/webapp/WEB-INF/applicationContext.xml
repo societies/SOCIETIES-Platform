@@ -77,6 +77,8 @@
 		interface="org.societies.api.services.IServices" />
 	<osgi:reference id="ctxBroker"
 		interface="org.societies.api.internal.context.broker.ICtxBroker" />
+
+	
 	
 		
 

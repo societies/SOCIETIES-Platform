@@ -25,6 +25,7 @@
 
 package org.societies.webapp.controller.personalisation;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +55,7 @@ import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxAttributeIdentifier;
 import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.internal.context.broker.ICtxBroker;
 import org.societies.api.internal.personalisation.model.IOutcome;
@@ -87,16 +89,16 @@ public class PreferenceEditBean extends BasePageController {
 	private enum ConditionStep {ABOVE, BELOW, LEVEL};
 	private ConditionStep step;
 	private final Logger logging = LoggerFactory.getLogger(getClass());
-	
+
 	@ManagedProperty(value="#{internalCtxBroker}")
 	private ICtxBroker ctxBroker;
-	
+
 	@ManagedProperty(value="#{commMngrRef}")
 	private ICommManager commMgr;
-	
 
-    @ManagedProperty(value = "#{userPreferenceConditionMonitor}")
-    private IUserPreferenceConditionMonitor userPreferenceConditionMonitor;
+
+	@ManagedProperty(value = "#{userPreferenceConditionMonitor}")
+	private IUserPreferenceConditionMonitor userPreferenceConditionMonitor;
 
 	@ManagedProperty(value="#{privacyUtilService}")
 	private PrivacyUtilService privacyUtilService;
@@ -105,19 +107,19 @@ public class PreferenceEditBean extends BasePageController {
 	private IUserPreferenceManagement preferenceManager;
 	private PreferenceDetails preferenceDetails = new PreferenceDetails();
 	private String serviceIDStr;
-	
+
 	private TreeNode selectedNode;
 	private TreeNode root;
-	
+
 	private String selectedCtxID = "";
 	private List<String> ctxIds = new ArrayList<String>();
 	private String ctxValue;
-	
+
 	Hashtable<String, CtxAttributeIdentifier> ctxIDTable = new Hashtable<String, CtxAttributeIdentifier>();
-	
+
 	private OperatorConstants selectedCtxOperator;
 	private List<OperatorConstants> operators = new ArrayList<OperatorConstants>();
-	
+
 	private List<String> existingActionValues  = new ArrayList<String>();
 	private String selectedAction = "";
 
@@ -126,12 +128,14 @@ public class PreferenceEditBean extends BasePageController {
 	private IIdentity userId;
 
 	private boolean proactive;
-	
+
 	private String defaultNodeValue;
-	
-	private int allChildCount;
+
+	private int branchCount;
+	private int maxBranches;
+	private int leafCount;
 	private int nodeDepth;
-	private int maxChildCount;
+	private int byteSize;
 
 
 	private List<ServiceResourceIdentifier> availableServices = new ArrayList<ServiceResourceIdentifier>();
@@ -139,13 +143,13 @@ public class PreferenceEditBean extends BasePageController {
 	private String preferenceDetailUUID;
 
 	private IPreferenceCondition erroneousNode;
-	
+
 	private boolean validMenuItem;
-	
-	
+
+
 	@PostConstruct
 	public void setup(){
-		
+
 		this.logging.info("#CODE2#: Initiating Preference Edit controller");
 		Map<String, String> requestParameterMap = FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
 		if (logging.isDebugEnabled()){
@@ -157,15 +161,15 @@ public class PreferenceEditBean extends BasePageController {
 			if (logging.isDebugEnabled()){
 				this.logging.debug("RequestParameter : "+key+" = "+requestParameterMap.get(key));
 			}
-			
+
 		}
-		
-		
+
+
 		if (logging.isDebugEnabled()){
 			this.logging.debug("\n\n\n\n\n\n\n\n\n\n");
 		}
 
-		
+
 		preferenceDetailUUID = "preferenceDetailUUID";
 		if (requestParameterMap.containsKey(preferenceDetailUUID)){
 			String key = requestParameterMap.get(preferenceDetailUUID);
@@ -177,15 +181,21 @@ public class PreferenceEditBean extends BasePageController {
 				this.logging.debug("Retrieved preferenceDetails from PrivacyUtilService: "+preferenceDetails.toString());
 			}
 			IPreferenceTreeModel model = this.preferenceManager.getModel(userId, preferenceDetails);
+			byteSize =0;
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Retrieved model from preference manager - is null "+(model.getRootPreference()==null));
+			}
+			try {
+				byteSize = SerialisationHelper.serialise(model).length;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 			this.root = new DefaultTreeNode();
 			TreeNode node = new DefaultTreeNode("Root", null); 
 			this.root = ModelTranslator.getPreference(model.getRootPreference(), node);
-			this.maxChildCount =0;
-			this.allChildCount =0;
-			countChildren(this.root);
+			maxBranches = 0;
+			doTree(this.root);
 			this.nodeDepth = model.getRootPreference().getDepth();
 			if (logging.isDebugEnabled()){
 				this.logging.debug("Loading preference on the tree: ");
@@ -198,42 +208,51 @@ public class PreferenceEditBean extends BasePageController {
 			}
 			printTree();
 		}
-		
+
 		createCtxAttributeTypesList();
 		setOperators(Arrays.asList(OperatorConstants.values()));
 		setupCtxIds();
-		
+
 	}
 	
-	private void countChildren(TreeNode node) {
-		int x = 0;
-		while(node.getChildCount()>0 && x<node.getChildCount()) {
-			if(node.getChildCount()>this.maxChildCount) {
-				this.maxChildCount = node.getChildCount();
+	private void doTree(TreeNode node) {
+		
+		for(TreeNode tempNode : node.getChildren()){
+			if (tempNode.isLeaf()) {
+				leafCount++;
+			} else {
+				int tempBranchCount =0;
+				for(TreeNode child : tempNode.getChildren()) {
+					if(!child.isLeaf()) {
+						tempBranchCount++;
+					}
+				}
+				if(maxBranches<tempBranchCount) {
+					maxBranches = tempBranchCount;
+				}
+				branchCount++;
+				doTree(tempNode);
 			}
-			this.allChildCount++;
-			countChildren(node.getChildren().get(x));
-			x++;
 		}
 	}
-	
+
 
 	private void createCtxAttributeTypesList() {
 		this.contextTypes = new ArrayList<String>();
 		Field[] fields = CtxAttributeTypes.class.getDeclaredFields();
-		
+
 		String[] names = new String[fields.length];
-		
+
 		for (int i=0; i<names.length; i++){
 			names[i] = fields[i].getName();
-			
-			
+
+
 		}
 		this.contextTypes = Arrays.asList(names);
-		
+
 	}
-	
-	
+
+
 	public void setupCtxIds() {
 		try {
 			if (logging.isDebugEnabled()){
@@ -271,38 +290,38 @@ public class PreferenceEditBean extends BasePageController {
 	 * METHODS CALLED FROM BUTTONS
 	 */
 	public void savePreferenceDetails(){
-		
-		
+
+
 		if (this.preferenceDetails==null){
 			FacesMessage message = new FacesMessage("Please enter at least a preferenceName");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-		
+
 		if (this.preferenceDetails.getPreferenceName()==null){
 			FacesMessage message = new FacesMessage("Please enter at least a preferenceName");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-		
+
 		if (this.preferenceDetails.getPreferenceName().trim().equalsIgnoreCase("")){
 			FacesMessage message = new FacesMessage("Please enter at least a preferenceName");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-		
+
 		if (serviceIDStr!=null){
 			if (!serviceIDStr.trim().equalsIgnoreCase("")){
 				try{
-				ServiceResourceIdentifier temp = ServiceModelUtils.generateServiceResourceIdentifierFromString(serviceIDStr);
-				this.preferenceDetails.setServiceID(temp);
+					ServiceResourceIdentifier temp = ServiceModelUtils.generateServiceResourceIdentifierFromString(serviceIDStr);
+					this.preferenceDetails.setServiceID(temp);
 				}catch(Exception e){
 					FacesMessage message = new FacesMessage("The service identifier you entered is invalid. Either remove it or enter a valid service identifier");
 					FacesContext.getCurrentInstance().addMessage(null, message);
 					return;
 				}
-				
-				
+
+
 			}
 		}
 		RequestContext context = RequestContext.getCurrentInstance();
@@ -311,12 +330,12 @@ public class PreferenceEditBean extends BasePageController {
 		if (logging.isDebugEnabled()){
 			this.logging.debug("Successfully validated preferenceDetails");
 		}
-		
-		
+
+
 	}
-	
-	
-	
+
+
+
 	public void displaySelectedSingle(){
 		if(selectedNode != null) {
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Selected", selectedNode.getData().toString());
@@ -327,7 +346,7 @@ public class PreferenceEditBean extends BasePageController {
 			FacesContext.getCurrentInstance().addMessage(null, message);
 		}
 	}
-	
+
 	public void deleteNode(){
 		if (selectedNode==null){
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Node not selected", "You must select a node to delete");
@@ -358,7 +377,7 @@ public class PreferenceEditBean extends BasePageController {
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Deletion", "Node deleted");
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
-	
+
 	public void startAddConditionProcessAbove(){
 		this.step = ConditionStep.ABOVE;
 		RequestContext.getCurrentInstance().execute("addConddlg.show();");
@@ -431,14 +450,14 @@ public class PreferenceEditBean extends BasePageController {
 				TreeNode conditionNodeAbove = new DefaultTreeNode(conditionBean, parentNode);
 				conditionNodeAbove.setParent(parentNode);
 				conditionNodeAbove.getChildren().add(selectedNode);
-				
+
 			}
-			
+
 			//add the conditionNode under the selected node
 			//selectedNode.getChildren().add(conditionNode);
 			//set the selected Node to be parent of the new condition node
 			//conditionNode.setParent(selectedNode);
-			
+
 		}
 
 		if (logging.isDebugEnabled()){
@@ -446,15 +465,15 @@ public class PreferenceEditBean extends BasePageController {
 		}
 		printTree();
 	}
-	
-	
+
+
 	public void startAddOutcomeProcess(){
 		if (this.existingActionValues.size()==0){
 			RequestContext.getCurrentInstance().execute("addOutdlg2.show();");
 		}else{
 			RequestContext.getCurrentInstance().execute("addOutdlg1.show();");
 		}
-		
+
 	}
 	public void addOutcome(){
 		if (selectedNode==null){
@@ -463,13 +482,13 @@ public class PreferenceEditBean extends BasePageController {
 			}
 			return;
 		}
-		
+
 		if (selectedNode.getData() instanceof IOutcome){
 			FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_ERROR, "Adding outcome", "You can't add an outcome as a subnode of another outcome. Please select a condition node to add the new outcome to.");
 			FacesContext.getCurrentInstance().addMessage(null, message);
 			return;
 		}
-		
+
 		if (selectedNode.getChildCount()>0){
 			List<TreeNode> children = selectedNode.getChildren();
 			for (TreeNode child :children){
@@ -487,37 +506,37 @@ public class PreferenceEditBean extends BasePageController {
 				true, 
 				true, 
 				proactive);
-		
-			
-			TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
-		
-		
-			if (logging.isDebugEnabled()){
-				this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
-			}
+
+
+		TreeNode newNode = new DefaultTreeNode(outcome, selectedNode);
+
+
+		if (logging.isDebugEnabled()){
+			this.logging.debug("Added new outcome : "+newNode+" to selected node: "+selectedNode);
+		}
 	}
 	public void editNode(){
-		
+
 	}
-	
+
 	public String formatNodeForDisplay(Object node){
-		
+
 		if (node==null){
 			return "";
 		}
-		
+
 		if (node instanceof IOutcome){
 			return ((IOutcome) node).getparameterName()+" = " + ((IOutcome) node).getvalue();
 		}
-		
+
 		if (node instanceof ContextPreferenceCondition){
 			ContextPreferenceCondition condition = (ContextPreferenceCondition) node;
 			return "Condition: "+condition.getCtxIdentifier().getType()+" = "+condition.getvalue();
 		}
 		return "";
-		
+
 	}
-	
+
 	public void savePreference(){
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Saving preference", "Now saving prefernece");
 		FacesContext.getCurrentInstance().addMessage(null, message);
@@ -536,29 +555,29 @@ public class PreferenceEditBean extends BasePageController {
 		if (logging.isDebugEnabled()){
 			this.logging.debug("Saving preferences with details: "+preferenceDetails.toString());
 		}
-		
+
 		if (this.preferenceManager.storePreference(userId, preferenceDetails, preference)){
 			RequestContext.getCurrentInstance().execute("msgSuccessDlg.show();");
 		}else{
 			RequestContext.getCurrentInstance().execute("msgFailureDlg.show();");
 		}
 	}
-	
+
 	public String deletePreference(){
 		boolean deletePreference = this.preferenceManager.deletePreference(userId, preferenceDetails);
 		if (deletePreference){
 			this.privacyUtilService.removePrefDetail(this.preferenceDetailUUID);
 			return "preferences.xhtml";
 		}
-		
+
 		return "preference_edit.xhtml";
 	}
-	
+
 	/*
 	 * 
 	 * UTIL METHODS
 	 */
-	
+
 
 	private void printTree(){
 		if (this.root==null){
@@ -586,7 +605,7 @@ public class PreferenceEditBean extends BasePageController {
 		}
 
 	}
-	
+
 	private String getChildrenToPrint(TreeNode node){
 		String str = "\n"+node;
 
@@ -596,18 +615,18 @@ public class PreferenceEditBean extends BasePageController {
 			str = str+child+"\n";
 			return str.concat(getChildrenToPrint(child));
 
-			
+
 		}
 		return str;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
+
+
+
+
+
+
 	/*
 	 * GET/SET METHODS 
 	 *
@@ -792,32 +811,35 @@ public class PreferenceEditBean extends BasePageController {
 			this.logging.debug("MenuItem is valid");
 		}
 		return true;
-		
+
 	}
 
 
 	public void setValidMenuItem(boolean validMenuItem) {
 		this.validMenuItem = validMenuItem;
 	}
-
-
+	
 	
 
-	public int getAllChildCount() {
-		return allChildCount;
+	public int getMaxBranches() {
+		return maxBranches;
 	}
 
-	public void setAllChildCount(int allChildCount) {
-		this.allChildCount = allChildCount;
+
+	public void setMaxBranches(int maxBranches) {
+		this.maxBranches = maxBranches;
 	}
 
-	public int getMaxChildCount() {
-		return maxChildCount;
+
+	public int getLeafCount() {
+		return leafCount;
 	}
 
-	public void setMaxChildCount(int maxChildCount) {
-		this.maxChildCount = maxChildCount;
+
+	public void setLeafCount(int leafCount) {
+		this.leafCount = leafCount;
 	}
+
 
 	public int getNodeDepth() {
 		return nodeDepth;
@@ -828,7 +850,25 @@ public class PreferenceEditBean extends BasePageController {
 		this.nodeDepth = nodeDepth;
 	}
 
+	public int getBranchCount() {
+		return branchCount;
+	}
 
-	
-	
+	public void setBranchCount(int branchCount) {
+		this.branchCount = branchCount;
+	}
+
+
+	public int getByteSize() {
+		return byteSize;
+	}
+
+
+	public void setByteSize(int byteSize) {
+		this.byteSize = byteSize;
+	}
+
+
+
+
 }

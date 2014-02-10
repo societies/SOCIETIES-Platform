@@ -43,16 +43,23 @@
 						value="#{PPNeditBean.displaySpecificRequestor}" />
 					<h:outputLabel for="resourceType" value="Resource: " />
 					<h:outputText id="resourceType"
-						value="#{PPNcreateBean.preferenceDetails.resource.dataType}" />
-						<h:outputLabel for="preferenceMaxSize" value="Max Children on a Branch:"></h:outputLabel>
-					<h:outputText id="preferenceMaxSize"
-						value="#{PPNeditBean.maxChildCount} children."></h:outputText>
-						<h:outputLabel for="preferenceAllSize" value="Children Count:"></h:outputLabel>
-					<h:outputText id="preferenceAllSize"
-						value="#{PPNeditBean.allChildCount} children."></h:outputText>
+						value="#{PPNcreateBean.preferenceDetails.resource.dataType}" />						
+						<h:outputLabel for="leafCount" value="# Leafs:"></h:outputLabel>
+					<h:outputText id="leafCount" value="#{PPNeditBean.leafCount}"></h:outputText>
+					<h:outputLabel for="branchCount" value="# Branches:"></h:outputLabel>
+					<h:outputText id="branchCount"
+						value="#{PPNeditBean.branchCount}"></h:outputText>
+					<h:outputLabel for="subBranches"
+						value="# Sub-Branches:"></h:outputLabel>
+					<h:outputText id="subBranches"
+						value="#{PPNeditBean.maxBranches}"></h:outputText>
 					<h:outputLabel for="preferenceDepth" value="Preference Tree Depth:"></h:outputLabel>
 					<h:outputText id="preferenceDepth"
 						value="#{PPNeditBean.nodeDepth}"></h:outputText>
+						<h:outputLabel for="preferenceSize" value="Preference Size (in bytes):"></h:outputLabel>
+					<h:outputText id="preferenceSize"
+						value="#{PPNeditBean.byteSize}"></h:outputText>
+						
 				</h:panelGrid>
 
 				<p:contextMenu for="treeSingle">

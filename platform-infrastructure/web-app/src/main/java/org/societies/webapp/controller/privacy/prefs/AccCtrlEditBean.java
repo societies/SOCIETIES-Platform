@@ -26,6 +26,7 @@
 package org.societies.webapp.controller.privacy.prefs;
 
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -58,6 +59,7 @@ import org.societies.api.context.model.CtxAttributeTypes;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.context.model.CtxModelType;
 import org.societies.api.context.model.IndividualCtxEntity;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.context.broker.ICtxBroker;
@@ -164,25 +166,36 @@ public class AccCtrlEditBean implements Serializable{
 	
 	private String accCtrlDetailUUID;
 	
-	private int allChildCount;
+	private int branchCount;
+	private int maxBranches;
+	private int leafCount;
 	private int nodeDepth;
-	private int maxChildCount;
-	
+	private int byteSize;
 	public AccCtrlEditBean() {
 
 	}
 
-	private void countChildren(TreeNode node) {
-		int x = 0;
-		while(node.getChildCount()>0 && x<node.getChildCount()) {
-			if(node.getChildCount()>this.maxChildCount) {
-				this.maxChildCount = node.getChildCount();
+	private void doTree(TreeNode node) {
+		
+		for(TreeNode tempNode : node.getChildren()){
+			if (tempNode.isLeaf()) {
+				leafCount++;
+			} else {
+				int tempBranchCount =0;
+				for(TreeNode child : tempNode.getChildren()) {
+					if(!child.isLeaf()) {
+						tempBranchCount++;
+					}
+				}
+				if(maxBranches<tempBranchCount) {
+					maxBranches = tempBranchCount;
+				}
+				branchCount++;
+				doTree(tempNode);
 			}
-			this.allChildCount++;
-			countChildren(node.getChildren().get(x));
-			x++;
 		}
 	}
+
 
 	public void startAddPrivacyConditionProcess(){
 		RequestContext.getCurrentInstance().execute("addPrivConddlg.show();");
@@ -235,11 +248,16 @@ public class AccCtrlEditBean implements Serializable{
 				 if (logging.isDebugEnabled()){
 					 this.logging.debug("Retrieved ppn preference : \n"+accCtrlPreference.getRootPreference().toString());
 				 }
+				 try {
+						byteSize = SerialisationHelper.serialise(accCtrlPreference).length;
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 				TreeNode node = new DefaultTreeNode("Root", null); 
 				this.root = ModelTranslator.getPrivacyPreference(accCtrlPreference.getRootPreference(), node);
-				this.maxChildCount =0;
-				this.allChildCount =0;
-				countChildren(this.root);
+				maxBranches = 0;
+				doTree(this.root);
 				this.nodeDepth = accCtrlPreference.getRootPreference().getDepth();
 				if (logging.isDebugEnabled()){
 					this.logging.debug("*** AFter translation of model: ****\n");
@@ -1344,12 +1362,37 @@ public class AccCtrlEditBean implements Serializable{
 		this.selectedCtxOperator = selectedCtxOperator;
 	}
 
-	public int getAllChildCount() {
-		return allChildCount;
+
+	public int getBranchCount() {
+		return branchCount;
 	}
 
-	public void setAllChildCount(int allChildCount) {
-		this.allChildCount = allChildCount;
+	public void setBranchCount(int branchCount) {
+		this.branchCount = branchCount;
+	}
+
+	public int getMaxBranches() {
+		return maxBranches;
+	}
+
+	public void setMaxBranches(int maxBranches) {
+		this.maxBranches = maxBranches;
+	}
+
+	public int getLeafCount() {
+		return leafCount;
+	}
+
+	public void setLeafCount(int leafCount) {
+		this.leafCount = leafCount;
+	}
+
+	public int getByteSize() {
+		return byteSize;
+	}
+
+	public void setByteSize(int byteSize) {
+		this.byteSize = byteSize;
 	}
 
 	public int getNodeDepth() {
@@ -1360,13 +1403,6 @@ public class AccCtrlEditBean implements Serializable{
 		this.nodeDepth = nodeDepth;
 	}
 
-	public int getMaxChildCount() {
-		return maxChildCount;
-	}
-
-	public void setMaxChildCount(int maxChildCount) {
-		this.maxChildCount = maxChildCount;
-	}
 
 
 

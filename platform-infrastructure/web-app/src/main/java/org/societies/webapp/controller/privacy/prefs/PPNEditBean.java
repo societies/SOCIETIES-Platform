@@ -26,6 +26,7 @@
 package org.societies.webapp.controller.privacy.prefs;
 
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,6 +48,7 @@ import org.primefaces.model.TreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.comm.xmpp.interfaces.ICommManager;
+import org.societies.api.context.model.util.SerialisationHelper;
 import org.societies.api.identity.IIdentity;
 import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
@@ -130,25 +132,37 @@ public class PPNEditBean extends BasePageController implements Serializable{
 
 	private String ppnDetailUUID;
 
-	private int allChildCount;
+	private int branchCount;
+	private int maxBranches;
+	private int leafCount;
 	private int nodeDepth;
-	private int maxChildCount;
+	private int byteSize;
 
 	public PPNEditBean() {
 
 	}
 
-	private void countChildren(TreeNode node) {
-		int x = 0;
-		while(node.getChildCount()>0 && x<node.getChildCount()) {
-			if(node.getChildCount()>this.maxChildCount) {
-				this.maxChildCount = node.getChildCount();
+	private void doTree(TreeNode node) {
+		
+		for(TreeNode tempNode : node.getChildren()){
+			if (tempNode.isLeaf()) {
+				leafCount++;
+			} else {
+				int tempBranchCount =0;
+				for(TreeNode child : tempNode.getChildren()) {
+					if(!child.isLeaf()) {
+						tempBranchCount++;
+					}
+				}
+				if(maxBranches<tempBranchCount) {
+					maxBranches = tempBranchCount;
+				}
+				branchCount++;
+				doTree(tempNode);
 			}
-			this.allChildCount++;
-			countChildren(node.getChildren().get(x));
-			x++;
 		}
 	}
+
 
 	@PostConstruct
 	public void setup(){
@@ -207,11 +221,17 @@ public class PPNEditBean extends BasePageController implements Serializable{
 				if (logging.isDebugEnabled()){
 					this.logging.debug("Retrieved ppn preference : \n"+ppnPreference.getRootPreference().toString());
 				}
+				
+				try {
+					byteSize = SerialisationHelper.serialise(ppnPreference).length;
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				TreeNode node = new DefaultTreeNode("Root", null); 
 				this.root = ModelTranslator.getPrivacyPreference(ppnPreference.getRootPreference(), node);
-				this.maxChildCount =0;
-				this.allChildCount =0;
-				countChildren(this.root);
+				maxBranches = 0;
+				doTree(this.root);
 				this.nodeDepth = ppnPreference.getRootPreference().getDepth();
 				if (logging.isDebugEnabled()){
 					this.logging.debug("*** AFter translation of model: ****\n");
@@ -984,14 +1004,6 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		this.ppnDetailUUID = ppnDetailUUID;
 	}
 
-	public int getAllChildCount() {
-		return allChildCount;
-	}
-
-	public void setAllChildCount(int allChildCount) {
-		this.allChildCount = allChildCount;
-	}
-
 	public int getNodeDepth() {
 		return nodeDepth;
 	}
@@ -1000,12 +1012,37 @@ public class PPNEditBean extends BasePageController implements Serializable{
 		this.nodeDepth = nodeDepth;
 	}
 
-	public int getMaxChildCount() {
-		return maxChildCount;
+	public int getBranchCount() {
+		return branchCount;
 	}
 
-	public void setMaxChildCount(int maxChildCount) {
-		this.maxChildCount = maxChildCount;
+	public void setBranchCount(int branchCount) {
+		this.branchCount = branchCount;
 	}
+
+	public int getMaxBranches() {
+		return maxBranches;
+	}
+
+	public void setMaxBranches(int maxBranches) {
+		this.maxBranches = maxBranches;
+	}
+
+	public int getLeafCount() {
+		return leafCount;
+	}
+
+	public void setLeafCount(int leafCount) {
+		this.leafCount = leafCount;
+	}
+
+	public int getByteSize() {
+		return byteSize;
+	}
+
+	public void setByteSize(int byteSize) {
+		this.byteSize = byteSize;
+	}
+
 
 }
