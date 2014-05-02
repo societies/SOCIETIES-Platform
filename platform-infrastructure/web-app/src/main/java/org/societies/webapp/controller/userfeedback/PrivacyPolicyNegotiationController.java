@@ -4,8 +4,15 @@ import org.societies.api.internal.schema.useragent.feedback.NegotiationDetailsBe
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.identity.RequestorBean;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.webapp.controller.BasePageController;
+import org.societies.webapp.controller.CISController;
+import org.societies.webapp.controller.privacy.prefs.RequestorsController;
+import org.societies.webapp.models.CisInfo;
 import org.societies.webapp.wrappers.RequestItemWrapper;
 import org.societies.webapp.wrappers.ResponseItemWrapper;
 
@@ -27,162 +34,255 @@ import java.util.List;
 @ViewScoped
 public class PrivacyPolicyNegotiationController extends BasePageController {
 
-    private void getIdFromQueryString() {
-        HttpServletRequest hsr = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        if (hsr.getParameter("id") != null)
-        {
-            eventID = hsr.getParameter("id");
-        }
-        else
-        {
-        	eventID ="";
-        }
-        if(hsr.getParameter("redirect") != null)
-        {
-        	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat(hsr.getParameter("redirect"));
-        }
-        else
-        {
-        	redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/index.xhtml");
-        }
-        if(log.isDebugEnabled()) log.debug("REDIRECT PAGE: " + redirectPage);
-        //QUICK HACK TO REDIRECT USER TO MY_COMMUNITIES PAGE 
-        if(redirectPage.equals("/societies/your_suggested_communities_list.xhtml"))
-        {
-        	//ASSUME THEY HAVE JUST ACCEPTED A PPN TO JOIN A CIS, TAKE THEM TO THERE CIS PAGE
-        	redirectPage = "/societies/your_communities_list.xhtml";
-        }
-    }
+	private void getIdFromQueryString() {
+		HttpServletRequest hsr = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		if (hsr.getParameter("id") != null)
+		{
+			eventID = hsr.getParameter("id");
+		}
+		else
+		{
+			eventID ="";
+		}
+		if(hsr.getParameter("redirect") != null)
+		{
+			redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat(hsr.getParameter("redirect"));
+		}
+		else
+		{
+			redirectPage = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath().concat("/index.xhtml");
+		}
+		if(log.isDebugEnabled()) log.debug("REDIRECT PAGE: " + redirectPage);
+		//QUICK HACK TO REDIRECT USER TO MY_COMMUNITIES PAGE 
+		if(redirectPage.equals("/societies/your_suggested_communities_list.xhtml"))
+		{
+			//ASSUME THEY HAVE JUST ACCEPTED A PPN TO JOIN A CIS, TAKE THEM TO THERE CIS PAGE
+			redirectPage = "/societies/your_communities_list.xhtml";
+		}
+	}
 
-    @ManagedProperty(value = "#{notifications}")
-    private NotificationsController notificationsController;
+	@ManagedProperty(value = "#{notifications}")
+	private NotificationsController notificationsController;
 
-    @ManagedProperty(value = "#{userFeedback}")
-    private IUserFeedback userFeedback;
+	@ManagedProperty(value = "#{userFeedback}")
+	private IUserFeedback userFeedback;
+	
+	@ManagedProperty(value = "#{RequestorsController}")
+	private RequestorsController requestorsController;
 
-    private static String eventID;
-    private static String redirectPage;
-    private UserFeedbackPrivacyNegotiationEvent event;
-    private ConditionConstants newConditionToAdd;
+	
 
-    public PrivacyPolicyNegotiationController() {
-        if (log.isDebugEnabled())
-            log.debug("PrivacyPolicyNegotiationController ctor()");
 
-    }
 
-    public NotificationsController getNotificationsController() {
-        return notificationsController;
-    }
+	private static String eventID;
+	private static String redirectPage;
+	private UserFeedbackPrivacyNegotiationEvent event;
+	private ConditionConstants newConditionToAdd;
 
-    public void setNotificationsController(NotificationsController notificationsController) {
-        this.notificationsController = notificationsController;
-    }
+	public PrivacyPolicyNegotiationController() {
+		if (log.isDebugEnabled())
+			log.debug("PrivacyPolicyNegotiationController ctor()");
 
-    public IUserFeedback getUserFeedback() {
-        return userFeedback;
-    }
+	}
+	
+	public CisAdvertisementRecord getCisRecord(RequestorCisBean requestorCis) {
+		List<CisAdvertisementRecord> cisAdvRecords = this.requestorsController.getCisListByOwner(requestorCis.getRequestorId());
+		for (CisAdvertisementRecord record: cisAdvRecords){
+			if (record.getId().equalsIgnoreCase(requestorCis.getCisRequestorId())){
+				return record;
+				}
+		}
+		return null;
+	}
+	
+	public String convertConditionValues(String value) {
+		if(value.equalsIgnoreCase("0")) {
+			return "false";
+		} else if (value.equalsIgnoreCase("1")) {
+			return "true";
+		}
+		return value;
+	}
 
-    public void setUserFeedback(IUserFeedback userFeedback) {
-        this.userFeedback = userFeedback;
-    }
+	public String getDataMessage(ResponseItem item) {
+		String message = "By accepting this Privacy Policy, ";
+		String data = item.getRequestItem().getResource().getDataType();
+		RequestorBean requestor = this.event.getNegotiationDetails().getRequestor();
+		if(requestor instanceof RequestorCisBean) {
+			RequestorCisBean requestorCis = (RequestorCisBean) requestor;
+			CisAdvertisementRecord cisAdv = getCisRecord(requestorCis);
+			if(cisAdv!=null) {
+				message = message + "the Community " + cisAdv.getName() + " on behalf of " + requestorCis.getRequestorId() + " will have <b>" +
+			formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+			} else {
+				message =  message + "the CSS " + requestor.getRequestorId()+ " will have <b>" +
+						formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+			}
+			
+		} else if (requestor instanceof RequestorServiceBean) {
+			RequestorServiceBean requestorService = (RequestorServiceBean) requestor;
+			
+			message =  message + "the Service " + requestorService.getRequestorServiceId().getServiceInstanceIdentifier() + " on behalf of " + requestorService.getRequestorId() + " will have <b>" +
+					formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+		} else {
+			message =  message + "the CSS " + requestor.getRequestorId()+ " will have <b>" +
+					formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+		}
+		return message;
+	}
+	
+	private String formatActions(List<Action> actions) {
+		String s = "";
+		for(Action act : actions) {
+			s = s + act.getActionConstant() +", ";
+		}
+		return s.substring(0, s.length()-2);
+	}
 
-    @PostConstruct
-    public void initMethod() {
-        if (log.isDebugEnabled())
-            log.debug("init()");
-        getIdFromQueryString();
-       //eventID = getIdFromQueryString();
-        event = notificationsController.getPrivacyNegotiationEvent(eventID);
 
-        if (event != null) {
-            if (log.isDebugEnabled())
-                log.debug("Preparing event for GUI with ID " + eventID);
+	public String getRequestor() {
+		if(this.event!=null) {
+			ResponsePolicy policy = this.event.getResponsePolicy();
+			
+			
+			if(policy.getRequestor() instanceof RequestorCisBean) {
+				
+				RequestorCisBean requestorCis = (RequestorCisBean) policy.getRequestor();
+				List<CisAdvertisementRecord> cisAdvRecords = this.requestorsController.getCisListByOwner(requestorCis.getRequestorId());
+				for (CisAdvertisementRecord record: cisAdvRecords){
+					if (record.getId().equalsIgnoreCase(requestorCis.getCisRequestorId())){
+						return "Negotiation with Community: " + record.getName() + " of CSS: "+record.getCssownerid(); 
+					}
+				}
+				
+				return "Negotiation with Community: <Error>";
+				
+			} else if (policy.getRequestor() instanceof RequestorServiceBean) {
+				RequestorServiceBean requestorService = (RequestorServiceBean) policy.getRequestor();
+				return "Negotiation with Service " + requestorService.getRequestorServiceId().getServiceInstanceIdentifier()+" provided by CSS: "+requestorService.getRequestorId();
+			}
+			return "Negotiation with CSS: "+ policy.getRequestor().getRequestorId();
+		} else {
+			return "Error";
+		}
+	}
 
-            prepareEventForGUI(event);
-        } else {
-            log.warn("Event not found for ID " + eventID);
-        }
-    }
+	public NotificationsController getNotificationsController() {
+		return notificationsController;
+	}
 
-    @SuppressWarnings("MethodMayBeStatic")
-    public Decision[] getDecisionOptions() {
+	public void setNotificationsController(NotificationsController notificationsController) {
+		this.notificationsController = notificationsController;
+	}
 
-        return new Decision[]{
-                Decision.DENY,
-                Decision.PERMIT
-        };
-    }
+	public IUserFeedback getUserFeedback() {
+		return userFeedback;
+	}
 
-    @SuppressWarnings("MethodMayBeStatic")
-    public String[] getAvailableConditionValues(ConditionConstants condition) {
-        return PrivacyConditionsConstantValues.getValues(condition);
-    }
+	public void setUserFeedback(IUserFeedback userFeedback) {
+		this.userFeedback = userFeedback;
+	}
 
-    @SuppressWarnings("MethodMayBeStatic")
-    public List<ConditionConstants> getAvailableConditionConstants(RequestItem requestItem) {
-        List<ConditionConstants> availableConstants = new ArrayList<ConditionConstants>();
 
-        // add any missing ConditionConstants
-        for (ConditionConstants constant : ConditionConstants.values()) {
-            boolean found = false;
 
-            for (Condition condition : requestItem.getConditions()) {
-                if (constant.equals(condition.getConditionConstant())) {
-                    found = true;
-                    break;
-                }
-            }
 
-            if (!found) {
-                availableConstants.add(constant);
-            }
-        }
 
-        return availableConstants;
-    }
+	@PostConstruct
+	public void initMethod() {
+		if (log.isDebugEnabled())
+			log.debug("init()");
+		getIdFromQueryString();
+		//eventID = getIdFromQueryString();
+		event = notificationsController.getPrivacyNegotiationEvent(eventID);
 
-    public ResponsePolicy getResponsePolicy() {
-        return event != null
-                ? event.getResponsePolicy()
-                : null;
-    }
+		if (event != null) {
+			if (log.isDebugEnabled())
+				log.debug("Preparing event for GUI with ID " + eventID);
 
-    public UserFeedbackPrivacyNegotiationEvent getCurrentNegotiationEvent() {
-        return event;
-    }
+			prepareEventForGUI(event);
+		} else {
+			log.warn("Event not found for ID " + eventID);
+		}
+	}
 
-    public void addNewCondition(RequestItem selectedRequestItem) {
-        if (newConditionToAdd == null) {
-            log.warn("newConditionToAdd is null");
-            return;
-        }
-        if (selectedRequestItem == null) {
-            log.warn("selectedRequestItem is null");
-            return;
-        }
+	@SuppressWarnings("MethodMayBeStatic")
+	public Decision[] getDecisionOptions() {
 
-        Condition condition = new Condition();
-        condition.setOptional(true);
-        condition.setConditionConstant(newConditionToAdd);
-        condition.setValue("");
+		return new Decision[]{
+				Decision.DENY,
+				Decision.PERMIT
+		};
+	}
 
-        selectedRequestItem.getConditions().add(condition);
+	@SuppressWarnings("MethodMayBeStatic")
+	public String[] getAvailableConditionValues(ConditionConstants condition) {
+		return PrivacyConditionsConstantValues.getValues(condition);
+	}
 
-        if(log.isDebugEnabled()) log.debug("Adding condition {} to request item for {}",
-                new String[]{newConditionToAdd.name(), selectedRequestItem.getResource().getDataType()});
+	@SuppressWarnings("MethodMayBeStatic")
+	public List<ConditionConstants> getAvailableConditionConstants(RequestItem requestItem) {
+		List<ConditionConstants> availableConstants = new ArrayList<ConditionConstants>();
 
-        newConditionToAdd = null;
-    }
+		// add any missing ConditionConstants
+		for (ConditionConstants constant : ConditionConstants.values()) {
+			boolean found = false;
 
-    public void completeNegotiationAction() {
-        if(log.isDebugEnabled()) log.debug("completeNegotiation() id=" + eventID);
+			for (Condition condition : requestItem.getConditions()) {
+				if (constant.equals(condition.getConditionConstant())) {
+					found = true;
+					break;
+				}
+			}
 
-        ResponsePolicy responsePolicy = event.getResponsePolicy();
-        NegotiationDetailsBean negotiationDetails = event.getNegotiationDetails();
+			if (!found) {
+				availableConstants.add(constant);
+			}
+		}
 
-        // TODO: validate action check boxes
-        /*for (ResponseItem response : responsePolicy.getResponseItems()) {
+		return availableConstants;
+	}
+
+	public ResponsePolicy getResponsePolicy() {
+		return event != null
+				? event.getResponsePolicy()
+						: null;
+	}
+
+	public UserFeedbackPrivacyNegotiationEvent getCurrentNegotiationEvent() {
+		return event;
+	}
+
+	public void addNewCondition(RequestItem selectedRequestItem) {
+		if (newConditionToAdd == null) {
+			log.warn("newConditionToAdd is null");
+			return;
+		}
+		if (selectedRequestItem == null) {
+			log.warn("selectedRequestItem is null");
+			return;
+		}
+
+		Condition condition = new Condition();
+		condition.setOptional(true);
+		condition.setConditionConstant(newConditionToAdd);
+		condition.setValue("");
+
+		selectedRequestItem.getConditions().add(condition);
+
+		if(log.isDebugEnabled()) log.debug("Adding condition {} to request item for {}",
+				new String[]{newConditionToAdd.name(), selectedRequestItem.getResource().getDataType()});
+
+		newConditionToAdd = null;
+	}
+
+	public void completeNegotiationAction() {
+		if(log.isDebugEnabled()) log.debug("completeNegotiation() id=" + eventID);
+
+		ResponsePolicy responsePolicy = event.getResponsePolicy();
+		NegotiationDetailsBean negotiationDetails = event.getNegotiationDetails();
+
+		// TODO: validate action check boxes
+		/*for (ResponseItem response : responsePolicy.getResponseItems()) {
             for (Action action : response.getRequestItem().getActions()) {
                 ActionWrapper wrapper = (ActionWrapper) action;
 
@@ -205,130 +305,140 @@ public class PrivacyPolicyNegotiationController extends BasePageController {
             }
         }*/
 
-        prepareEventForTransmission(responsePolicy);
+		prepareEventForTransmission(responsePolicy);
 
-        responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
+		responsePolicy.setNegotiationStatus(NegotiationStatus.ONGOING);
 
-        try {
-            userFeedback.submitPrivacyNegotiationResponse(eventID, negotiationDetails, responsePolicy);
-        } catch (Exception e) {
-            addGlobalMessage("Error publishing notification of completed negotiation",
-                    e.getMessage(),
-                    FacesMessage.SEVERITY_ERROR);
-            log.error("Error publishing notification of completed negotiation", e);
-        }
+		try {
+			userFeedback.submitPrivacyNegotiationResponse(eventID, negotiationDetails, responsePolicy);
+		} catch (Exception e) {
+			addGlobalMessage("Error publishing notification of completed negotiation",
+					e.getMessage(),
+					FacesMessage.SEVERITY_ERROR);
+			log.error("Error publishing notification of completed negotiation", e);
+		}
 
-        try {
+		try {
 			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
 		} catch (IOException e) {
 			addGlobalMessage("Cannot redirect you to your previous page!",
-                    e.getMessage(),
-                    FacesMessage.SEVERITY_ERROR);
+					e.getMessage(),
+					FacesMessage.SEVERITY_ERROR);
 			return;
 		} // previously, could redirect to next negotiation - but this makes no sense now
-    }
+	}
 
-    public void cancelNegotiationAction() {
-        if(log.isDebugEnabled()) log.debug("cancelNegotiation()");
+	public void cancelNegotiationAction() {
+		if(log.isDebugEnabled()) log.debug("cancelNegotiation()");
 
-        ResponsePolicy responsePolicy = getCurrentNegotiationEvent().getResponsePolicy();
-        NegotiationDetailsBean negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
+		ResponsePolicy responsePolicy = getCurrentNegotiationEvent().getResponsePolicy();
+		NegotiationDetailsBean negotiationDetails = getCurrentNegotiationEvent().getNegotiationDetails();
 
-        prepareEventForTransmission(responsePolicy);
+		prepareEventForTransmission(responsePolicy);
 
-        responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
+		responsePolicy.setNegotiationStatus(NegotiationStatus.FAILED);
 
-        try {
-            userFeedback.submitPrivacyNegotiationResponse(eventID, negotiationDetails, responsePolicy);
-        } catch (Exception e) {
-            addGlobalMessage("Error publishing notification of cancelled privacy negotiation event",
-                    e.getMessage(),
-                    FacesMessage.SEVERITY_ERROR);
-            log.error("Error publishing notification of cancelled privacy negotiation event", e);
-        }
+		try {
+			userFeedback.submitPrivacyNegotiationResponse(eventID, negotiationDetails, responsePolicy);
+		} catch (Exception e) {
+			addGlobalMessage("Error publishing notification of cancelled privacy negotiation event",
+					e.getMessage(),
+					FacesMessage.SEVERITY_ERROR);
+			log.error("Error publishing notification of cancelled privacy negotiation event", e);
+		}
 
-        try {
+		try {
 			FacesContext.getCurrentInstance().getExternalContext().redirect(redirectPage);
 		} catch (IOException e) {
 			addGlobalMessage("Cannot redirect you to your previous page!",
-                    e.getMessage(),
-                    FacesMessage.SEVERITY_ERROR);
+					e.getMessage(),
+					FacesMessage.SEVERITY_ERROR);
 			return;
 		} // previously, could redirect to next negotiation - but this makes no sense now
-    }
+	}
 
-    private static void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
-        ResponseItemWrapper.wrapList(event.getResponsePolicy().getResponseItems());
+	private static void prepareEventForGUI(UserFeedbackPrivacyNegotiationEvent event) {
+		ResponseItemWrapper.wrapList(event.getResponsePolicy().getResponseItems());
 
-        for (ResponseItem response : event.getResponsePolicy().getResponseItems()) {
+		for (ResponseItem response : event.getResponsePolicy().getResponseItems()) {
 
-            // wrap the sub items
-            if (!(response.getRequestItem() instanceof RequestItemWrapper))
-                response.setRequestItem(new RequestItemWrapper(response.getRequestItem()));
+			// wrap the sub items
+			if (!(response.getRequestItem() instanceof RequestItemWrapper))
+				response.setRequestItem(new RequestItemWrapper(response.getRequestItem()));
 
-            // set to permit by default - the user can then change
-            response.setDecision(Decision.PERMIT);
+			// set to permit by default - the user can then change
+			response.setDecision(Decision.PERMIT);
 
-            // quickly sort by condition name
-            Collections.sort(response.getRequestItem().getConditions(), new Comparator<Condition>() {
-                @Override
-                public int compare(Condition o1, Condition o2) {
-                    return o1.getConditionConstant().name().compareTo(o2.getConditionConstant().name());
-                }
-            });
+			// quickly sort by condition name
+			Collections.sort(response.getRequestItem().getConditions(), new Comparator<Condition>() {
+				@Override
+				public int compare(Condition o1, Condition o2) {
+					return o1.getConditionConstant().name().compareTo(o2.getConditionConstant().name());
+				}
+			});
 
-        }
+		}
 
-    }
+	}
 
-    private static void prepareEventForTransmission(ResponsePolicy responsePolicy) {
-        // Convert ResponseItemWrappers back to ResponseItems if necessary
-        ResponseItemWrapper.unwrapList(responsePolicy.getResponseItems());
+	private static void prepareEventForTransmission(ResponsePolicy responsePolicy) {
+		// Convert ResponseItemWrappers back to ResponseItems if necessary
+		ResponseItemWrapper.unwrapList(responsePolicy.getResponseItems());
 
-        for (ResponseItem response : responsePolicy.getResponseItems()) {
+		for (ResponseItem response : responsePolicy.getResponseItems()) {
 
-            RequestItemWrapper requestItemWrapper = (RequestItemWrapper) response.getRequestItem();
+			RequestItemWrapper requestItemWrapper = (RequestItemWrapper) response.getRequestItem();
 
-            // Action strings need to be converted back to Actions
-            // Actually we're just filtering out the unselected ones
+			// Action strings need to be converted back to Actions
+			// Actually we're just filtering out the unselected ones
 
-            // we always need read, add it if we haven't got it
-            if (!requestItemWrapper.getSelectedActionNames().contains("READ"))
-                requestItemWrapper.getSelectedActionNames().add("READ");
+			// we always need read, add it if we haven't got it
+			if (!requestItemWrapper.getSelectedActionNames().contains("READ"))
+				requestItemWrapper.getSelectedActionNames().add("READ");
 
-            // upon return, the "Actions" field should only contain selected actions
-            requestItemWrapper.setActions(requestItemWrapper.getSelectedActions());
+			// upon return, the "Actions" field should only contain selected actions
+			requestItemWrapper.setActions(requestItemWrapper.getSelectedActions());
 
-            // unwrap the sub items
-            RequestItem requestItem;
-            if (response.getRequestItem() instanceof RequestItemWrapper) {
-                requestItem = ((RequestItemWrapper) response.getRequestItem()).getRequestItem();
-                response.setRequestItem(requestItem);
-            } else {
-                requestItem = response.getRequestItem();
-            }
+			// unwrap the sub items
+			RequestItem requestItem;
+			if (response.getRequestItem() instanceof RequestItemWrapper) {
+				requestItem = ((RequestItemWrapper) response.getRequestItem()).getRequestItem();
+				response.setRequestItem(requestItem);
+			} else {
+				requestItem = response.getRequestItem();
+			}
 
-            // remove any optional, unset ConditionConstants
-            for (int i = 0; i < requestItem.getConditions().size(); i++) {
-                Condition condition = requestItem.getConditions().get(i);
+			// remove any optional, unset ConditionConstants
+			for (int i = 0; i < requestItem.getConditions().size(); i++) {
+				Condition condition = requestItem.getConditions().get(i);
 
-                if (condition.isOptional() && condition.getValue() == null || "".equals(condition.getValue())) {
-                    requestItem.getConditions().remove(i);
-                    i--;
-                }
-            }
-        }
-    }
+				if (condition.isOptional() && condition.getValue() == null || "".equals(condition.getValue())) {
+					requestItem.getConditions().remove(i);
+					i--;
+				}
+			}
+		}
+	}
 
-    public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
-        this.newConditionToAdd = newConditionToAdd;
+	public void setNewConditionToAdd(ConditionConstants newConditionToAdd) {
+		this.newConditionToAdd = newConditionToAdd;
 
-        if(log.isDebugEnabled()) log.debug("New condition to add: {}", newConditionToAdd);
-    }
+		if(log.isDebugEnabled()) log.debug("New condition to add: {}", newConditionToAdd);
+	}
 
-    public ConditionConstants getNewConditionToAdd() {
-        return newConditionToAdd;
-    }
+	public ConditionConstants getNewConditionToAdd() {
+		return newConditionToAdd;
+	}
+
+
+	public RequestorsController getRequestorsController() {
+		return requestorsController;
+	}
+
+
+	public void setRequestorsController(RequestorsController requestorsController) {
+		this.requestorsController = requestorsController;
+	}
 
 
 }

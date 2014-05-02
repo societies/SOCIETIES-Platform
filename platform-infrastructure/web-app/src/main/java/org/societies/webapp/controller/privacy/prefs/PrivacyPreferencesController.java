@@ -43,6 +43,7 @@ import org.societies.api.internal.schema.privacytrust.privacyprotection.preferen
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.IDSPreferenceDetailsBean;
 import org.societies.api.internal.schema.privacytrust.privacyprotection.preferences.PPNPreferenceDetailsBean;
 import org.societies.api.internal.servicelifecycle.ServiceModelUtils;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
 import org.societies.api.schema.identity.RequestorBean;
 import org.societies.api.schema.identity.RequestorCisBean;
 import org.societies.api.schema.identity.RequestorServiceBean;
@@ -71,6 +72,9 @@ public class PrivacyPreferencesController extends BasePageController{
 
 	@ManagedProperty(value="#{privacyUtilService}")
 	private PrivacyUtilService privacyUtilService;
+	
+	@ManagedProperty(value="#{RequestorsController}")
+	private RequestorsController requestorsController;
 
     private PPNPreferenceDetailsBean selectedPPNDetail;
     private AccessControlPreferenceDetailsBean selectedAccCtrlDetail;
@@ -156,27 +160,38 @@ public class PrivacyPreferencesController extends BasePageController{
 		DataTypeUtils dataTypeUtils = new DataTypeUtils();
 		return dataTypeUtils.getFriendlyDescription(dataType).getFriendlyName();
 	}
+	 public static String capitalize(String s) {
+	        if (s.length() == 0) return s;
+	        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
+	    }
 	
 	public String toStringRequestor(RequestorBean requestor){
-		
+		if (requestor==null){
+			return "Unknown requestor";
+		}
+		String user = requestor.getRequestorId();
+		user = user.replaceAll(".societies.local.macs.hw.ac.uk", "");
+		user = capitalize(user);
 		if (requestor instanceof RequestorCisBean){
-			return "\nCIS: "+((RequestorCisBean) requestor).getCisRequestorId();
+			List<CisAdvertisementRecord> cisListByOwner = this.requestorsController.getCisListByOwner(requestor.getRequestorId());
+			String cisName = "";
+			for (CisAdvertisementRecord record : cisListByOwner){
+				if (record.getId().equalsIgnoreCase(((RequestorCisBean) requestor).getCisRequestorId())){
+					cisName = record.getName();
+				}
+			}
+			
+			return "CIS: "+cisName+" <br/> User: "+user;
 			
 		}
 		if (requestor instanceof RequestorServiceBean){
-			String completeStr = ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) requestor).getRequestorServiceId());
-			if (null == completeStr) {
-				return "\nnone";
-			}
-			String[] serviceIdParts = completeStr.split(" ");
-			if (null == serviceIdParts || serviceIdParts.length <= 0) {
-				return "\nnone";
-			}
-			return "\nService id: "+serviceIdParts[0]+(serviceIdParts.length > 1 ? " Instance id: "+serviceIdParts[1] : "");
+			//String completeStr = ServiceModelUtils.serviceResourceIdentifierToString(((RequestorServiceBean) requestor).getRequestorServiceId());
+			return "Service: "+((RequestorServiceBean) requestor).getRequestorServiceId().getServiceInstanceIdentifier() + "<br/> User: "+user;
+
 			
 		}
 		
-		return "\nnone";
+		return "User: " + user;
 		
 		
 	}
@@ -269,6 +284,12 @@ public class PrivacyPreferencesController extends BasePageController{
 	}
 	public void setSelecteddobfDetail(DObfPreferenceDetailsBean selecteddobfDetail) {
 		this.selecteddobfDetail = selecteddobfDetail;
+	}
+	public RequestorsController getRequestorsController() {
+		return requestorsController;
+	}
+	public void setRequestorsController(RequestorsController requestorsController) {
+		this.requestorsController = requestorsController;
 	}
 
 	

@@ -87,6 +87,8 @@ public class Registry implements Serializable{
 		return null;
 	}
 	
+
+	
 	public CtxIdentifier getCtxID (String serviceType, ServiceResourceIdentifier serviceID, String preferenceName){
 		PreferenceDetails details = new PreferenceDetails(serviceType, serviceID, preferenceName);
 		if (this.mappings.containsKey(details)){

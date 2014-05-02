@@ -6,8 +6,12 @@ import org.societies.api.internal.schema.privacytrust.privacy.model.dataobfuscat
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.useragent.feedback.IUserFeedback;
 import org.societies.api.privacytrust.privacy.model.privacypolicy.constants.PrivacyConditionsConstantValues;
+import org.societies.api.schema.cis.directory.CisAdvertisementRecord;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 import org.societies.api.schema.privacytrust.privacy.model.privacypolicy.*;
 import org.societies.webapp.controller.BasePageController;
+import org.societies.webapp.controller.privacy.prefs.RequestorsController;
 import org.societies.webapp.wrappers.AccessControlResponseItemWrapper;
 import org.societies.webapp.wrappers.RequestItemWrapper;
 
@@ -92,6 +96,9 @@ public class AccessControlRequestController extends BasePageController {
 
     @ManagedProperty(value = "#{userFeedback}")
     private IUserFeedback userFeedback;
+    
+    @ManagedProperty(value = "#{RequestorsController}")
+    private RequestorsController requestorsController;
 
     private final static ObfuscatorInfoFactory obfuscatorInfoFactory = new ObfuscatorInfoFactory();
     private static String redirectPage;
@@ -112,6 +119,86 @@ public class AccessControlRequestController extends BasePageController {
         this.requestScope.add(RequestorScopeValues.ONLY_THIS_APP);
 
     }
+    
+    
+    
+    public RequestorsController getRequestorsController() {
+		return requestorsController;
+	}
+
+	public void setRequestorsController(RequestorsController requestorsController) {
+		this.requestorsController = requestorsController;
+	}
+	
+	public CisAdvertisementRecord getCisRecord(RequestorCisBean requestorCis) {
+		List<CisAdvertisementRecord> cisAdvRecords = this.requestorsController.getCisListByOwner(requestorCis.getRequestorId());
+		for (CisAdvertisementRecord record: cisAdvRecords){
+			if (record.getId().equalsIgnoreCase(requestorCis.getCisRequestorId())){
+				return record;
+				}
+		}
+		return null;
+	}
+
+	public String getDataMessage(ResponseItem item) {
+		String message = "";
+		String data = item.getRequestItem().getResource().getDataType();
+		if(this.event.getRequestor() instanceof RequestorCisBean) {
+			RequestorCisBean requestorCis = (RequestorCisBean) this.event.getRequestor();
+			CisAdvertisementRecord cisAdv = getCisRecord(requestorCis);
+			if(cisAdv!=null) {
+				message = "The Community " + cisAdv.getName() + " on behalf of " + requestorCis.getRequestorId() + " requests <b>" +
+			formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+			} else {
+				message =  message + "the CSS " + requestorCis.getRequestorId()+ " will have <b>" +
+						formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+			}
+			
+		} else if (this.event.getRequestor() instanceof RequestorServiceBean) {
+			RequestorServiceBean requestorService = (RequestorServiceBean) this.event.getRequestor();
+			
+			message = "The Service " + requestorService.getRequestorServiceId().getServiceInstanceIdentifier() + " on behalf of " + requestorService.getRequestorId() + " requests <b>" +
+					formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+		} else {
+			message = "The CSS " + this.event.getRequestor().getRequestorId()+ " requests <b>" +
+					formatActions(item.getRequestItem().getActions()) + "</b> access to your "+data+".";
+		}
+		return message;
+	}
+	
+	private String formatActions(List<Action> actions) {
+		String s = "";
+		for(Action act : actions) {
+			s = s + act.getActionConstant() +", ";
+		}
+		return s.substring(0, s.length()-2);
+	}
+	
+	
+	public String getRequestor() {
+		if(this.event!=null) {	
+			
+			if(this.event.getRequestor() instanceof RequestorCisBean) {
+				
+				RequestorCisBean requestorCis = (RequestorCisBean) this.event.getRequestor();
+				List<CisAdvertisementRecord> cisAdvRecords = this.requestorsController.getCisListByOwner(requestorCis.getRequestorId());
+				for (CisAdvertisementRecord record: cisAdvRecords){
+					if (record.getId().equalsIgnoreCase(requestorCis.getCisRequestorId())){
+						return "Access Control Request with Community: " + record.getName() + " of CSS: "+record.getCssownerid(); 
+					}
+				}
+				
+				return "Access Control Request with Community: <Error>";
+				
+			} else if (this.event.getRequestor() instanceof RequestorServiceBean) {
+				RequestorServiceBean requestorService = (RequestorServiceBean) this.event.getRequestor();
+				return "Access Control Reques with Service " + requestorService.getRequestorServiceId().getServiceInstanceIdentifier()+" provided by CSS: "+requestorService.getRequestorId();
+			}
+			return "Access Control Request with CSS: "+ this.event.getRequestor().getRequestorId();
+		} else {
+			return "Error";
+		}
+	}
 
     public NotificationsController getNotificationsController() {
         return notificationsController;

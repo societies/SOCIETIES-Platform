@@ -36,8 +36,7 @@
 
 					<p:column headerText="Requestor" width="50"
 						style="white-space: normal;">
-					#{ppnPreferenceDetail.requestor.requestorId}
-            #{PrivacyPrefsController.toStringRequestor(ppnPreferenceDetail.requestor)}
+            <p:outputLabel escape="false">#{PrivacyPrefsController.toStringRequestor(ppnPreferenceDetail.requestor)} </p:outputLabel>
         </p:column>
 
 
@@ -47,8 +46,8 @@
         
         
 					<p:column headerText="Resource" width="50">
-						<span>#{ppnPreferenceDetail.resource.scheme}</span>
-						<span class="tooltip">#{PrivacyPrefsController.toStringDataType(ppnPreferenceDetail.resource.dataType)}</span>
+						<span>#{PrivacyPrefsController.toStringDataType(ppnPreferenceDetail.resource.dataType)}</span>
+						<span class="tooltip">#{ppnPreferenceDetail.resource.scheme}</span>
 					</p:column>
 
 
@@ -83,8 +82,7 @@
 
 					<p:column headerText="Requestor" width="50"
 						style="white-space: normal;">
-					#{accCtrlPreference.requestor.requestorId}
-            #{PrivacyPrefsController.toStringRequestor(accCtrlPreference.requestor)}
+          <p:outputLabel escape="false" value="#{PrivacyPrefsController.toStringRequestor(accCtrlPreference.requestor)}"> </p:outputLabel>
         </p:column>
 
 					<p:column headerText="Resource Type">
@@ -94,8 +92,8 @@
         		#{accCtrlPreference.action.actionConstant}
         </p:column>
 					<p:column headerText="Resource" width="50">
-						<span class="tooltip">#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}</span>
-						<span><em>#{accCtrlPreference.resource.dataIdUri}</em></span>
+						<span class="tooltip"><em>#{accCtrlPreference.resource.dataIdUri}</em></span>
+						<span>#{PrivacyPrefsController.toStringDataType(accCtrlPreference.resource.dataType)}</span>
 					</p:column>
 					<!-- 				 <p:column headerText="Resource ID">        #{accCtrlPreference.resource.dataIdUri}        </p:column>         -->
 					<p:column style="width: 4%">
@@ -152,16 +150,18 @@
 
 					<p:column headerText="Requestor" width="50"
 						style="white-space: normal;">
-						#{dobfPreference.requestor.requestorId}
-            			#{PrivacyPrefsController.toStringRequestor(dobfPreference.requestor)}
-        			</p:column>
+						<p:outputLabel escape="false"
+							value="#{PrivacyPrefsController.toStringRequestor(dobfPreference.requestor)}">
+						</p:outputLabel>
+					</p:column>
+
 					<p:column headerText="Resource Type">
             			#{dobfPreference.resource.scheme}
         			</p:column>
 
 					<p:column headerText="Resource" width="50">
-						<span class="tooltip">#{PrivacyPrefsController.toStringDataType(dobfPreference.resource.dataType)}</span>
-						<span><em>#{dobfPreference.resource.dataIdUri}</em></span>
+						<span class="tooltip"><em>#{dobfPreference.resource.dataIdUri}</em></span>
+						<span>#{PrivacyPrefsController.toStringDataType(dobfPreference.resource.dataType)}</span>
 
 					</p:column>
 

@@ -170,7 +170,7 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 	}
 
 	public void initialisePreferenceManagement(){
-		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this);
+		this.prefMgr = new UserPreferenceManagement(this.getCtxBroker(), this, this.commManager);
 		mt = new MonitoringTable();
 		registered = new ArrayList<CtxAttributeIdentifier>();
 
@@ -364,8 +364,8 @@ public class UserPreferenceConditionMonitor extends EventListener implements IUs
 
 
 	@Override
-	public Future<IOutcome> getOutcome(IIdentity ownerID, ServiceResourceIdentifier serviceID, String preferenceName) {
-		return new AsyncResult<IOutcome> (this.prefMgr.getPreference(ownerID, "", serviceID, preferenceName));
+	public Future<IOutcome> getOutcome(IIdentity ownerID, String serviceType, ServiceResourceIdentifier serviceID, String preferenceName) {
+		return new AsyncResult<IOutcome> (this.prefMgr.getPreference(ownerID, serviceType, serviceID, preferenceName));
 	}
 
 

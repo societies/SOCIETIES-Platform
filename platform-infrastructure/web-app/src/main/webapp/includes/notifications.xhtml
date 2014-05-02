@@ -31,7 +31,7 @@
 
 
 				<p:panel id="ppnPopupPanel"
-					header="Negotiation with #{notification.title}"
+					header="#{notification.title}"
 					rendered="#{notification.type eq 'PPN'}"
 					styleClass="unread-notification-header">
 
@@ -47,7 +47,7 @@
 						<h:outputText value="#{notification.arrivalDate}" />
 
 						<h:button outcome="/privacy_policy_negotiation.xhtml"
-							value="View more information">
+							value="Click to Continue">
 							<f:param name="id" value="#{notification.itemId}" />
 							<f:param name="redirect" value="#{notifications.getView()}" />
 						</h:button>
@@ -71,7 +71,7 @@
 						<h:outputText value="#{notification.arrivalDate}" />
 
 						<h:button outcome="/access_control.xhtml"
-							value="View more information">
+							value="Click to Continue">
 							<f:param name="id" value="#{notification.itemId}" />
 							<f:param name="redirect" value="#{notifications.getView()}" />
 						</h:button>

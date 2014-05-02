@@ -93,7 +93,7 @@ public class ActivityFeedController extends BasePageController{
 
 	private IActivityFeed activityFeed;
 
-	private boolean done = true;
+
 	
 	private Hashtable<String, List<MarshaledActivity>> hash = new Hashtable<String, List<MarshaledActivity>>();
 	
@@ -122,7 +122,7 @@ public class ActivityFeedController extends BasePageController{
 		}
 		if (this.activityFeed!=null){
 			IActivity activity = this.activityFeed.getEmptyIActivity();
-			activity.setActor(this.userService.getUsername());
+			activity.setActor(this.userService.getUserID());
 			activity.setVerb(postActivityText);
 			String uuid = UUID.randomUUID().toString();
 			activityFeed.addActivity(activity, new ActivityFeedCallback(uuid, Method.POSTACTIVITIES));

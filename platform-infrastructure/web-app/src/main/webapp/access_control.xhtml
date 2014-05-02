@@ -16,8 +16,7 @@
 
 		<p:panel>
 			<f:facet name="header">
-                Access control request from <p:outputLabel
-					value="#{accessControlController.currentAccessEvent.requestor.requestorId}" />
+				<p:outputLabel value="#{accessControlController.getRequestor()}" />
 			</f:facet>
 
 			<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">
@@ -30,14 +29,14 @@
 				value="#{accessControlController.responseItems}" var="responseItem">
 
 				<p:panel>
-					<f:facet name="header">
+					 	<f:facet name="header"> <!-- 
 						<p:selectBooleanCheckbox id="checkbox"
-							value="#{responseItem.permitted}" />
+							value="#{responseItem.permitted}" for="checkbox" /> -->
 
-						<p:outputLabel
-							value="#{responseItem.requestItem.resource.dataType}"
-							for="checkbox" style="margin-top: 5px;" />
-						<!-- <p:commandButton value="Details >" style="float:right;"
+					<p:outputLabel
+						value="Requested Data: #{responseItem.requestItem.resource.dataType}"
+						style="margin-top: 5px;" />
+					<!-- <p:commandButton value="Details >" style="float:right;"
 							onclick="document.getElementById('#{p:component('optionsPanel')}').visible = true; return false;"
 							process="@none" update="@none" /> -->
 					</f:facet>
@@ -45,8 +44,10 @@
 					<p:panel visible="true" id="optionsPanel">
 
 						<!--Actions-->
-						<p:panelGrid columns="4">
-							<p:selectOneMenu id="actionScopeMenu"
+						<p:panelGrid columns="1">
+							<p:outputLabel escape="false"
+								value="#{accessControlController.getDataMessage(responseItem)}" />
+							<!-- <p:selectOneMenu id="actionScopeMenu"
 								value="#{responseItem.requestorscope}">
 								<f:selectItems value="#{accessControlController.requestScope}" />
 							</p:selectOneMenu>
@@ -58,7 +59,7 @@
 
 
 							<p:outputLabel
-								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" />
+								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" /> -->
 						</p:panelGrid>
 
 						<!--Obfuscation-->

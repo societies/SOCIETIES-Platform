@@ -71,7 +71,7 @@ public interface IUserPreferenceConditionMonitor {
 	 * @param preferenceName
 	 * @return
 	 */
-	public Future<IOutcome> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
+	public Future<IOutcome> getOutcome(IIdentity ownerId, String serviceType, ServiceResourceIdentifier serviceId, String preferenceName);
 	
 	
 	

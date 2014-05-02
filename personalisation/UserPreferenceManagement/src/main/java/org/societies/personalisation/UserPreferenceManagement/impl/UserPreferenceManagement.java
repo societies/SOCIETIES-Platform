@@ -28,6 +28,7 @@ package org.societies.personalisation.UserPreferenceManagement.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.societies.api.comm.xmpp.interfaces.ICommManager;
 import org.societies.api.context.model.CtxAttribute;
 import org.societies.api.context.model.CtxIdentifier;
 import org.societies.api.identity.IIdentity;
@@ -67,13 +68,15 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 	private final Map<IActionConsumer, Set<PersonalisablePreferenceIdentifier>> actionConsumerPreferenceMap = new HashMap<IActionConsumer, Set<PersonalisablePreferenceIdentifier>>();
 	private final Set<PersonalisablePreferenceIdentifier> aggregateActionConsumerPreferences = new HashSet<PersonalisablePreferenceIdentifier>();
 	private UserPreferenceConditionMonitor monitor;
+	private final ICommManager commManager;
 
-	public UserPreferenceManagement(ICtxBroker broker, UserPreferenceConditionMonitor monitor) {
+	public UserPreferenceManagement(ICtxBroker broker, UserPreferenceConditionMonitor monitor, ICommManager commManager) {
 
 		this.ctxBroker = broker;
 		this.monitor = monitor;
+		this.commManager = commManager;
 		this.contextCache = new PrivateContextCache(this.ctxBroker);
-		this.preferenceCache = new PrivatePreferenceCache(this.ctxBroker);
+		this.preferenceCache = new PrivatePreferenceCache(this.ctxBroker, commManager);
 		
 		outcomeConditionListTable = new Hashtable<IPreferenceOutcome, List<CtxIdentifier>>();
 
@@ -438,8 +441,8 @@ public class UserPreferenceManagement implements IUserPreferenceManagement {
 	 */
 	@Override
 	public Future<IOutcome> getOutcome(IIdentity ownerId,
-			ServiceResourceIdentifier serviceId, String preferenceName) {
-		return new AsyncResult<IOutcome>(this.getPreference(ownerId, "", serviceId, preferenceName));
+			ServiceResourceIdentifier serviceId, String serviceType, String preferenceName) {
+		return new AsyncResult<IOutcome>(this.getPreference(ownerId, serviceType, serviceId, preferenceName));
 	}
 
 	@Override

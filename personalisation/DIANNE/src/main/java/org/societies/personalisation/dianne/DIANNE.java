@@ -291,7 +291,7 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 		persistThread.start();
 		
 		//TEMPORARY FIX FOR #751 -
-		//this.disableDIANNELearning(cssID);
+		this.disableDIANNELearning(cssID);
 	
 	}
 
@@ -380,6 +380,8 @@ public class DIANNE implements IDIANNE, IOutcomeListener{
 	public void setCommsMgr(ICommManager commsMgr){
 		this.commsMgr = commsMgr;
 	}
+	
+	
 
 	@Override
 	public void handleOutcomes(List<IDIANNEOutcome> outcomes) {

@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackAccessControlEvent;
 import org.societies.api.internal.schema.useragent.feedback.UserFeedbackPrivacyNegotiationEvent;
+import org.societies.api.schema.identity.RequestorCisBean;
+import org.societies.api.schema.identity.RequestorServiceBean;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -71,9 +73,20 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
 		this.ufAccessControl = null;
 		this.options = new String[0];
 		this.type = TYPE_PRIVACY_POLICY_NEGOTIATION;
-		this.title = payload.getNegotiationDetails().getRequestor().getRequestorId();
+		//this.title = payload.getNegotiationDetails().getRequestor().getRequestorId();
 		this.timeoutTime = null;
 		this.complete = false;
+
+		String titleString = "Privacy Policy Negotiation with ";
+		
+		if(payload.getNegotiationDetails().getRequestor() instanceof RequestorCisBean) {
+			titleString = titleString + "CIS: " + ((RequestorCisBean) payload.getNegotiationDetails().getRequestor()).getCisRequestorId();
+		} else if(payload.getNegotiationDetails().getRequestor() instanceof RequestorServiceBean) {
+			titleString = titleString + "Service: " + ((RequestorServiceBean) payload.getNegotiationDetails().getRequestor()).getRequestorServiceId().getServiceInstanceIdentifier();
+		} else {
+			titleString = titleString + "CSS: " + payload.getNegotiationDetails().getRequestor().getRequestorId();
+		}
+		this.title = titleString;
 	}
 
 	private NotificationQueueItem(String itemId, UserFeedbackAccessControlEvent payload) {
@@ -83,9 +96,20 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
 		this.ufAccessControl = payload;
 		this.options = new String[0];
 		this.type = TYPE_ACCESS_CONTROL;
-		this.title = "Access Control Request";
+		//this.title = "Access Control Request";
 		this.timeoutTime = null;
 		this.complete = false;
+
+		String titleString = "User Access Control Request from ";
+		if(payload.getRequestor() instanceof RequestorCisBean) {
+			titleString = titleString + "CIS: " + ((RequestorCisBean) payload.getRequestor()).getCisRequestorId();
+		} else if(payload.getRequestor() instanceof RequestorServiceBean) {
+			titleString = titleString + "Service: " + ((RequestorServiceBean) payload.getRequestor()).getRequestorServiceId().getServiceInstanceIdentifier();
+		} else {
+			titleString = titleString + "CSS: " + payload.getRequestor().getRequestorId();
+		}
+		
+		this.title = titleString;
 	}
 
 	private NotificationQueueItem(String itemId, String title, Date timeout) {
@@ -155,7 +179,7 @@ public class NotificationQueueItem implements Serializable, Comparable<Notificat
 	public Date getTimeoutTime() {
 		return timeoutTime;
 	}
-	
+
 	public String getSubmitResult()
 	{
 		if(null == results || results.length == 0 || null == results[0] )

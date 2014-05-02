@@ -21,7 +21,7 @@
             </section>
             <div class="websearchbar">
                 <div class="websearchtitle">
-                    <h4 class="form_title">Suggested Communities</h4>
+                    <h4 class="form_title">Available Communities</h4>
                     <p:commandButton value="Refresh" action="#{cismanager.getsuggestedcommunities}"></p:commandButton>
                     <br/> <br/>
                     
@@ -34,7 +34,7 @@
                 <div class="hr clearfix"></div>
             </section>
             <section class="itemlist">
-                <header>SOCIETIES Suggested Communities</header>
+                <header>SOCIETIES Available Communities</header>
                 <ol class="keyinfolist">
                 <c:forEach items="#{cismanager.suggestedcommunities}" var="sugcommunity">
     				    <li class="keyinfo bypostauthor">

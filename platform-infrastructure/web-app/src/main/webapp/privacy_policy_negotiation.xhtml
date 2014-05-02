@@ -15,8 +15,9 @@
 
 		<p:panel>
 			<f:facet name="header">
-                Negotiation with: <p:outputLabel
-					value="#{ppNegotiation.responsePolicy.requestor.requestorId}" />
+			
+                <p:outputLabel
+					value="#{ppNegotiation.getRequestor()}" />
 			</f:facet>
 
 			<p:blockUI id="blockUI" widgetVar="blockUI" block=":mainForm">
@@ -34,22 +35,23 @@
 
 				<p:panel>
 					<f:facet name="header">
-						<p:selectBooleanCheckbox id="checkbox"
-							value="#{responseItem.permitted}" />
+						<!--  <p:selectBooleanCheckbox id="checkbox" for="checkbox"
+							value="#{responseItem.permitted}" />-->
 
 						<p:outputLabel
-							value="#{responseItem.requestItem.resource.dataType}"
-							for="checkbox" style="margin-top: 5px;" />
-						<p:commandButton value="Details >" style="float:right;"
+							value="Requested Data: #{responseItem.requestItem.resource.dataType}"
+							 style="margin-top: 5px;" />
+						<!-- ><p:commandButton value="Details >" style="float:right;"
 							onclick="document.getElementById('#{p:component('optionsPanel')}').visible = true; return false;"
-							process="@none" update="@none" />
+							process="@none" update="@none" /> -->
 					</f:facet>
 
 					<p:panel visible="true" id="optionsPanel">
 
 						<!--Actions-->
-						<p:panelGrid columns="4">
-							<p:selectOneMenu id="actionScopeMenu">
+						<p:panelGrid columns="1">
+						<p:outputLabel escape="false" value="#{ppNegotiation.getDataMessage(responseItem)}" />
+						<!-- 	<p:selectOneMenu id="actionScopeMenu">
 								<f:selectItem itemLabel="Everyone" />
 								<f:selectItem itemLabel="Only this app" />
 							</p:selectOneMenu>
@@ -66,7 +68,7 @@
 							</p:selectManyCheckbox>
 
 							<p:outputLabel
-								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" />
+								value="your #{responseItem.requestItem.resource.dataType.toLowerCase()}" /> -->
 						</p:panelGrid>
 
 						<!--Conditions-->
@@ -85,18 +87,16 @@
 								id="conditionValue" value="#{condition.value}"
 								required="#{!condition.optional}"
 								validatorMessage="This value is required">
-								<f:selectItem itemLabel="(none)" itemValue=""
-									noSelectionOption="true" rendered="#{condition.optional}" />
 								<f:selectItems
-									value="#{ppNegotiation.getAvailableConditionValues(condition.conditionConstant)}" />
+									value="#{ppNegotiation.getAvailableConditionValues(condition.conditionConstant)}" var="condValue" itemValue="#{condValue}" itemLabel="#{ppNegotiation.convertConditionValues(condValue)}" />
 							</p:selectOneMenu>
 
 						</p:dataGrid>
 
-						<p:commandButton outcome="productDetail"
+						 <p:commandButton outcome="productDetail"
 							icon="ui-icon-circle-plus" title="Add condition"
 							actionListener="#{ppNegotiation.addNewCondition(responseItem.requestItem)}"
-							process="addConditionName,@this" update="optionsPanel" />
+							process="addConditionName,@this" update="optionsPanel" /> 
 						<p:selectOneMenu id="addConditionName"
 							value="#{ppNegotiation.newConditionToAdd}">
 							<f:selectItems

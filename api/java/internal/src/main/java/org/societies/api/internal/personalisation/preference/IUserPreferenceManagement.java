@@ -48,7 +48,7 @@ public interface IUserPreferenceManagement {
 	 * @param preferenceName
 	 * @return
 	 */
-	public Future<IOutcome> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String preferenceName);
+	public Future<IOutcome> getOutcome(IIdentity ownerId, ServiceResourceIdentifier serviceId, String serviceType, String preferenceName);
 
     /**
      * Register a service's personalisable preference

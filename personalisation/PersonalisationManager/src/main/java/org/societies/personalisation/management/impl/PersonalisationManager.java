@@ -48,6 +48,7 @@ import org.societies.api.personalisation.model.IAction;
 import org.societies.api.personalisation.model.IActionConsumer;
 import org.societies.api.personalisation.model.PersonalisablePreferenceIdentifier;
 import org.societies.api.schema.servicelifecycle.model.ServiceResourceIdentifier;
+import org.societies.api.schema.servicelifecycle.model.ServiceType;
 import org.societies.personalisation.CAUI.api.CAUIPrediction.ICAUIPrediction;
 import org.societies.personalisation.CAUI.api.model.IUserIntentAction;
 import org.societies.personalisation.CRIST.api.CRISTUserIntentPrediction.ICRISTUserIntentPrediction;
@@ -504,7 +505,8 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 		}
 		Future<IOutcome> futurePrefOuts;
 
-		futurePrefOuts = this.pcm.getOutcome(ownerID, serviceID, preferenceName);
+		futurePrefOuts = this.pcm.getOutcome(ownerID, serviceType, serviceID, preferenceName);
+		
 
 
 		if (futurePrefOuts == null) {
@@ -1029,7 +1031,7 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 						this.logging.debug("Received " + dianneOutcomes.size() + " outcomes from dianne after receiving context event: " + ctxAttribute.getType());
 					}
 					for (IDIANNEOutcome dOut : dianneOutcomes) {
-						IPreferenceOutcome pOut = (IPreferenceOutcome) this.pcm.getOutcome(userId, dOut.getServiceID(), dOut.getparameterName()).get();
+						IPreferenceOutcome pOut = (IPreferenceOutcome) this.pcm.getOutcome(userId, dOut.getServiceType(), dOut.getServiceID(), dOut.getparameterName()).get();
 						if (null == pOut) {
 							results.add(dOut);
 						} else {
@@ -1443,7 +1445,15 @@ public class PersonalisationManager extends EventListener implements IPersonalis
 								String uuid = fEvent.getUuid();
 								if (actionInformation.containsKey(uuid)){
 									ActionInformation info = actionInformation.get(uuid);
-									updateConfidenceLevels(info, fEvent);
+									//commenting the confidence level updating for the review... throwing NPE at:
+									/*
+									 * Exception in thread "Thread-1983" java.lang.NullPointerException 
+[2014-04-28 09:43:04.990] ERROR Thread-1983                  System.err                                                        	at org.societies.personalisation.management.impl.PersonalisationManager.outcomesMatch(PersonalisationManager.java:1760) 
+[2014-04-28 09:43:04.991] ERROR Thread-1983                  System.err                                                        	at org.societies.personalisation.management.impl.PersonalisationManager.existsinCRISTList(PersonalisationManager.java:1748) 
+[2014-04-28 09:43:04.991] ERROR Thread-1983                  System.err                                                        	at org.societies.personalisation.management.impl.PersonalisationManager.updateConfidenceLevels(PersonalisationManager.java:1541) 
+[2014-04-28 09:43:04.991] ERROR Thread-1983                  System.err                                                        	at org.societies.personalisation.management.impl.PersonalisationManager$2.run(PersonalisationManager.java:1446) 
+									 */
+									//updateConfidenceLevels(info, fEvent);
 									cauiPrediction.receivePredictionFeedback(fEvent);
 									pcm.sendFeedback(fEvent, info);
 

@@ -211,7 +211,6 @@ public class RequestorsController implements Serializable{
 	public void setCisDirectory(ICisDirectoryRemote cisDirectory) {
 		this.cisDirectory = cisDirectory;
 	}
-
 	
 	public List<CssAdvertisementRecord> getCssAdvertisements() {
 		if (logging.isDebugEnabled()){

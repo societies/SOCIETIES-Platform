@@ -45,6 +45,7 @@ import org.societies.api.identity.InvalidFormatException;
 import org.societies.api.identity.Requestor;
 import org.societies.api.identity.util.RequestorUtils;
 import org.societies.api.internal.context.broker.ICtxBroker;
+import org.societies.api.internal.context.model.CtxAttributeTypes;
 import org.societies.api.internal.privacytrust.privacyprotection.IPrivacyAgreementManager;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.AgreementEnvelope;
 import org.societies.api.internal.privacytrust.privacyprotection.model.privacypolicy.IAgreement;
@@ -97,6 +98,9 @@ public class AccessControlPreferenceManager {
 	private final IIdentityManager idMgr;
 	private final DObfPreferenceCreator dobfPrefCreator;
 	private IPrivacyDataManagerInternal privacyDataManagerInternal;
+	private String[] sensedDataTypes;
+
+
 
 	public AccessControlPreferenceManager(PrivatePreferenceCache prefCache, PrivateContextCache contextCache, IUserFeedback userFeedback, ITrustBroker trustBroker, ICtxBroker ctxBroker, IPrivacyAgreementManager agreementMgr, IIdentityManager idMgr, DObfPreferenceCreator dobfPrefCreator, IPrivacyDataManagerInternal privacyDataManagerInternal){
 		this.prefCache = prefCache;
@@ -108,10 +112,26 @@ public class AccessControlPreferenceManager {
 		this.idMgr = idMgr;
 		this.dobfPrefCreator = dobfPrefCreator;
 		this.privacyDataManagerInternal = privacyDataManagerInternal;
+		sensedDataTypes = new String[]{CtxAttributeTypes.TEMPERATURE, 
+				CtxAttributeTypes.STATUS,
+				CtxAttributeTypes.LOCATION_SYMBOLIC,
+				CtxAttributeTypes.LOCATION_COORDINATES,
+				CtxAttributeTypes.ACTION};
 
 
 	}
 
+
+	private boolean isAttributeSensed(String type) {
+
+		for (String sensedType : sensedDataTypes){
+			if (sensedType.equalsIgnoreCase(type)){
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	/*	private ResponseItem checkPreferenceForAccessControl(AccessControlPreferenceDetailsBean details, IPrivacyPreferenceTreeModel model, List<Condition> conditions) throws MalformedCtxIdentifierException{
 		RequestorBean requestor = details.getRequestor();
@@ -489,9 +509,7 @@ public class AccessControlPreferenceManager {
 				if (ctxModelObject!=null && ctxModelObject instanceof CtxAttribute){
 					CtxAttribute ctxAttribute = (CtxAttribute) ctxModelObject;
 					// CtxAttribute is inferred or sensed: add a privacy preference condition
-					if (null!=ctxAttribute.getQuality()
-							&& null!=ctxAttribute.getQuality().getOriginType()
-							&& (ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.INFERRED) || ctxAttribute.getQuality().getOriginType().equals(CtxOriginType.SENSED))){
+					if (isAttributeSensed(ctxAttribute.getType())){
 						switch (ctxAttribute.getValueType()){
 						case DOUBLE:
 							condition = new ContextPreferenceCondition(ctxIdentifier, OperatorConstants.EQUALS, ctxAttribute.getDoubleValue().toString());
