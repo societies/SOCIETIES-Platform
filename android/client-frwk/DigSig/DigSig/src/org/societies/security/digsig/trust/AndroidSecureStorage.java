@@ -27,6 +27,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
+ * Low level interactions with Android secure storage.
+ * {@link SecureStorage} is to be used instead as a higher level interface.
  * Works with Android up to 4.2.2. Does not work with Android 4.3.
  */
 public class AndroidSecureStorage {

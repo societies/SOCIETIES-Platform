@@ -28,9 +28,9 @@ import android.content.Intent;
 import android.os.Build;
 
 /**
- * Describe your class here...
+ * Some constants used with Android secure storage
  *
- * @author mitjav
+ * @author Mitja Vardjan
  *
  */
 public class AndroidSecureStorageConstants {

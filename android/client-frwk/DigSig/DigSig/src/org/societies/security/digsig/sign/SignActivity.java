@@ -42,6 +42,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * This {@link Activity} is started by other (3rd party) apps when they request to sign something.
+ * The {@link SignActivity} gathers information about the calling {@link Activity}, displays that
+ * information and prompts the user to confirm or reject the signing.
+ * <br>
+ * If the document to be signed is given as a URL, then the user can preview it.
+ * Preview of embedded documents is not implemented yet.
+ */
 public class SignActivity extends Activity {
 	
 	private final static int SELECT_IDENTITY = 1;

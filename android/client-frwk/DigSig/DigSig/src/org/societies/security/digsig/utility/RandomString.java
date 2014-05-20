@@ -28,6 +28,9 @@ import java.util.Random;
 
 import android.util.Log;
 
+/**
+ * Random {@link String} generation.
+ */
 public class RandomString {
 
 	private static final String tag = RandomString.class.getSimpleName();

@@ -41,6 +41,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 
+/**
+ * Display installed identities, e.g., the X.509 certificates installed in secure storage.
+ * Return the one selected by the user.
+ */
 public class ListIdentitiesActivity extends ListActivity {
 	
 	private static final String TAG = ListIdentitiesActivity.class.getSimpleName();

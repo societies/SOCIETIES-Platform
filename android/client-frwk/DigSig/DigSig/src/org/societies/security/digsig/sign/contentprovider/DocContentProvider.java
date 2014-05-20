@@ -36,9 +36,9 @@ import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
 /**
- * Describe your class here...
+ * {@link ContentProvider} for reading and writing files from/to internal storage of this app.
  *
- * @author mitjav
+ * @author Mitja Vardjan
  *
  */
 public class DocContentProvider extends ContentProvider {

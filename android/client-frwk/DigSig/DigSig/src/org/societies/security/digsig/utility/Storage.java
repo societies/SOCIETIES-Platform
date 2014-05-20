@@ -36,10 +36,7 @@ import android.content.ContextWrapper;
 import android.util.Log;
 
 /**
- * Describe your class here...
- *
- * @author mitjav
- *
+ * Utilities for reading and writing files.
  */
 public class Storage {
 

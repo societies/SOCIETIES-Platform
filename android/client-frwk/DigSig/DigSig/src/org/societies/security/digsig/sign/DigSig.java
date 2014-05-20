@@ -39,6 +39,8 @@ import android.util.Log;
 /**
  * Signing and verifying digital signatures for {@link String} and byte[] data types, not for XML.
  *
+ * Signing of XML documents is handled by {@link SignService}.
+ * 
  * @author Mitja Vardjan
  *
  */

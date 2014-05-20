@@ -43,6 +43,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+/**
+ * Display files from external storage root directory that have one of the given extensions.
+ * Return the file selected by the user.
+ */
 public class ListFilesActivity extends ListActivity {
 	
 	private static final String TAG = ListFilesActivity.class.getSimpleName();
@@ -60,7 +64,7 @@ public class ListFilesActivity extends ListActivity {
 			if (token==null || token.length()==0) continue;
 			exts.add("."+token);
 		}
-					
+		
 		/* populate list view with certificate list */
 		Log.d(TAG, "External storage state = " + Environment.getExternalStorageState());
         File sdCard = new File(Environment.getExternalStorageDirectory().getPath());

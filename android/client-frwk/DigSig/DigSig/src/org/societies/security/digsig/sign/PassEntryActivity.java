@@ -33,6 +33,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+/**
+ * The {@link Activity} to prompt the user to enter password and return it.
+ */
 public class PassEntryActivity extends Activity {
 	
 	private EditText editText;

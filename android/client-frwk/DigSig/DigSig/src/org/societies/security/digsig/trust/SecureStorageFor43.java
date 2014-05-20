@@ -37,6 +37,7 @@ import android.util.Log;
 
 /**
  * Helper class for retrieving X.509 certificates and private keys from android secure storage.
+ * Works for Android versions from 4.3 onwards.
  * 
  * This class is not public.
  *

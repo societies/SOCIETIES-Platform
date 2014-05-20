@@ -39,6 +39,13 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
+/**
+ * High level network communication with the remote REST server that stores and merges community signatures.
+ * To be used directly from an {@link Activity}.
+ *
+ * @author Mitja Vardjan
+ *
+ */
 public class GetSigStatusTask extends AsyncTask<String, Void, String> {
 	
 	private static final String TAG = GetSigStatusTask.class.getSimpleName();

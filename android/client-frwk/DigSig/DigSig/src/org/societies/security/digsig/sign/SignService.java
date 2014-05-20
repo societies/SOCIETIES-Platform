@@ -65,7 +65,9 @@ import android.content.Intent;
 import android.util.Log;
 
 /**
- * Service to be used internally, by this app only.
+ * Service to be used internally, by this app only, to sign XML documents.
+ * 
+ * Signing of any binary data is handled by {@link DigSig}.
  */
 public class SignService extends IntentService {
 

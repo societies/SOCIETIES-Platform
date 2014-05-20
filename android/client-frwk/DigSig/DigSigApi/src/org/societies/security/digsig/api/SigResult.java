@@ -4,6 +4,9 @@ package org.societies.security.digsig.api;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+/**
+ * Data type for signature verification.
+ */
 public class SigResult implements Parcelable {
 	byte[] cert;
 	int sigStatus;

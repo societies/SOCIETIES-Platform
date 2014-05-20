@@ -59,6 +59,12 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
+/**
+ * The main {@link Activity}.
+ * Includes controls to install new identities with {@link InstallIdentityActivity},
+ * track community signature status with {@link CommunitySigStatusActivity}, and
+ * controls to perform various tests if test mode is enabled.
+ */
 public class MainActivity extends Activity {
 
 	private static final boolean testMode = false;

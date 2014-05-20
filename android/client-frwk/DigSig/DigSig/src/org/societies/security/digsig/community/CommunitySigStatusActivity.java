@@ -34,6 +34,7 @@ import org.societies.security.digsig.sign.R;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
@@ -59,6 +60,12 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * The {@link Activity} to show current status of any community signature process for documents
+ * this Android device has been involved in since the last clearing of the document list.
+ *
+ * @author Mitja Vardjan
+ */
 public class CommunitySigStatusActivity extends FragmentActivity implements
 		ActionBar.OnNavigationListener {
 

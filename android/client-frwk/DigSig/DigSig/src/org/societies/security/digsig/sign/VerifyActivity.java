@@ -57,6 +57,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 
+/**
+ * Verification of XML DSig signatures.
+ */
 public class VerifyActivity extends Activity {
 	private static final String TAG = VerifyActivity.class.getSimpleName();
 	

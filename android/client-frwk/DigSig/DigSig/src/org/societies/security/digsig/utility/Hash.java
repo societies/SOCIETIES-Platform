@@ -29,6 +29,9 @@ import java.security.NoSuchAlgorithmException;
 
 import android.util.Base64;
 
+/**
+ * Hashing utilities to generate hash for given data.
+ */
 public class Hash {
 	static MessageDigest md;
 		
