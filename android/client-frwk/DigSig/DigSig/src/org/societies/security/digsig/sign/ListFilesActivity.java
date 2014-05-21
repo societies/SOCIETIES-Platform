@@ -46,6 +46,8 @@ import android.widget.ListView;
 /**
  * Display files from external storage root directory that have one of the given extensions.
  * Return the file selected by the user.
+ * 
+ * @author Miroslav Pavleski
  */
 public class ListFilesActivity extends ListActivity {
 	

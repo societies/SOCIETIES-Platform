@@ -24,36 +24,30 @@
  */
 package org.societies.security.digsig.sign.test;
 
-import java.util.ArrayList;
+import java.net.URI;
 
-import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.sign.MainActivity;
-import org.societies.security.digsig.sign.R;
 import org.societies.security.digsig.sign.SignActivity;
-import org.societies.security.digsig.utility.RandomString;
+import org.societies.security.digsig.utility.Net;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.test.ActivityInstrumentationTestCase2;
-import android.test.UiThreadTest;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
-import android.widget.Button;
 
 /**
- * Android test case for {@link MainActivity}
+ * Android test case for uploading an XML document to the REST server, then downloading it,
+ * signing it and sending it back to the server.
  *
  * @author Mitja Vardjan
  *
  */
-public class SignActivityTest extends ActivityInstrumentationTestCase2<SignActivity> {
+public class CommunitySignatureServerDownloadTest extends ActivityInstrumentationTestCase2<SignActivity> {
 
-	private static final String TAG = SignActivityTest.class.getSimpleName();
+	private static final String TAG = CommunitySignatureServerDownloadTest.class.getSimpleName();
 	
-	private final static int SIGN = 1;
-
 	private Activity mActivity;
 	
-	public SignActivityTest() {
+	public CommunitySignatureServerDownloadTest() {
 		super(SignActivity.class);
 	}
 
@@ -73,47 +67,18 @@ public class SignActivityTest extends ActivityInstrumentationTestCase2<SignActiv
 		assertNotNull(mActivity);
 	}
 
-	@UiThreadTest
-	public void testSigningDocInIntent() {
+	@MediumTest
+	public void testInitialDocumentDownload() throws Exception {
 		
-		Log.i(TAG, "testSigningDocInIntent");
-		
-		byte[] val = null;
-		try {
-			val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
-		} catch (Exception e) {}
-						
-		Intent i = new Intent(Sign.ACTION);
-		i.putExtra(Sign.Params.DOC_TO_SIGN, val);
-		
-		ArrayList<String> idsToSign = new ArrayList<String>();
-		idsToSign.add("Miki1");
-		i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
-		
-		mActivity.startActivityForResult(i, SIGN);
-		Button okButton = (Button) mActivity.findViewById(R.id.buttonSignOk);
-		okButton.performClick();
-	}
+		Log.i(TAG, "testInitialDocumentDownload");
 
-	@UiThreadTest
-	public void testSigningDocAtUrl() {
-		
-		Log.i(TAG, "testSigningDocAtUrl");
-		
-		String url = "http://192.168.1.73/tmp/societies/doc-large.xml";
+		Net source = new Net(new URI("http://192.168.1.73/tmp/societies/doc-large.xml"));
+		Net download = new Net(new URI(CommunitySignatureServerUploadTest.downloadUri));
 
-		Intent i = new Intent(Sign.ACTION);
-		i.putExtra(Sign.Params.DOC_TO_SIGN_URL, url);
-		i.putExtra(Sign.Params.COMMUNITY_SIGNATURE_SERVER_URI, url);
-		i.putExtra(Sign.Params.DOC_TITLE, "Stress test " + RandomString.getRandomNumberString(3));
+		String contents = source.getString();
+		String result = download.getString();
+		assertEquals(contents, result);
 		
-		ArrayList<String> idsToSign = new ArrayList<String>();
-		idsToSign.add("Board001");
-		i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
-		
-		mActivity.startActivityForResult(i, SIGN);
-		Button okButton = (Button) mActivity.findViewById(R.id.buttonSignOk);
-		okButton.performClick();
-		Log.i(TAG, "testSigningDocAtUrl: button OK clicked programatically");
+		Log.i(TAG, "testInitialDocumentDownload: downloaded successfully");
 	}
 }

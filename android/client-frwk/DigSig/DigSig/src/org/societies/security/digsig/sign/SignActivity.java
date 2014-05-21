@@ -71,6 +71,11 @@ public class SignActivity extends Activity {
 		
 		Log.d(TAG, "Extra " + Sign.Params.DOC_TO_SIGN + " = " + getIntent().getByteArrayExtra(Sign.Params.DOC_TO_SIGN));
 		Log.d(TAG, "Extra " + Sign.Params.DOC_TO_SIGN_URL + " = " + getIntent().getStringExtra(Sign.Params.DOC_TO_SIGN_URL));
+		
+		if (MainActivity.testMode) {
+			Button btn = (Button) findViewById(R.id.buttonSignOk);
+			btn.performClick();
+		}
 	}
 	
 	private void initWidgets() {

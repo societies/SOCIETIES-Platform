@@ -47,6 +47,8 @@ import android.widget.Toast;
 /**
  * The {@link Activity} for installing new identities, e.g., new X.509 certificates
  * that contain also private keys.
+ * 
+ * @author Mitja Vardjan and Miroslav Pavleski
  */
 public class InstallIdentityActivity extends Activity {
 

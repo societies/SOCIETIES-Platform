@@ -44,6 +44,8 @@ import android.widget.ArrayAdapter;
 /**
  * Display installed identities, e.g., the X.509 certificates installed in secure storage.
  * Return the one selected by the user.
+ * 
+ * @author Mitja Vardjan and Miroslav Pavleski
  */
 public class ListIdentitiesActivity extends ListActivity {
 	
@@ -80,6 +82,14 @@ public class ListIdentitiesActivity extends ListActivity {
 		}
 		
 		setList();
+		
+		// For testing only
+		if (MainActivity.testMode) {
+			Intent intent = getIntent();
+			intent.putExtra(Sign.Params.IDENTITY, certNumbers.get(0));				
+			setResult(RESULT_OK,intent);
+			finish();				
+		}
 	}
 
 	@Override

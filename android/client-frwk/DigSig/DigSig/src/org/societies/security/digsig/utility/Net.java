@@ -37,6 +37,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
@@ -126,6 +127,29 @@ public class Net {
 			Log.w(TAG, e);
 			return null;
 		}
+	}
+
+	public boolean delete() {
+		
+		Log.d(TAG, "delete() " + uri);
+		
+		boolean success = false;
+		HttpClient httpclient = new DefaultHttpClient();
+		try {
+			HttpDelete httpDelete = new HttpDelete(uri);
+            HttpResponse response = httpclient.execute(httpDelete);
+            HttpEntity resEntity = response.getEntity();
+
+            Log.d(TAG, "Status: " + response.getStatusLine().toString());
+            if (response.getStatusLine().getStatusCode() == 200) {
+            	success = true;
+            }
+            resEntity.consumeContent();
+		} catch (Exception e) {
+			Log.w(TAG, "delete(): " + uri, e);
+			return false;
+		}
+		return success;
 	}
 	
 	/**

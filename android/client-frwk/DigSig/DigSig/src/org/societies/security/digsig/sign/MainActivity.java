@@ -27,13 +27,16 @@ package org.societies.security.digsig.sign;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.apiinternal.Trust;
 import org.societies.security.digsig.community.CommunitySigStatusActivity;
+import org.societies.security.digsig.utility.Storage;
 import org.societies.security.digsig.utility.StreamUtil;
 
 import android.app.Activity;
@@ -67,7 +70,7 @@ import android.widget.Toast;
  */
 public class MainActivity extends Activity {
 
-	private static final boolean testMode = false;
+	protected static final boolean testMode = true;
 	
 	private final static int SIGN = 1;
 	private final static int VERIFY = 2;
@@ -144,6 +147,8 @@ public class MainActivity extends Activity {
 	//
 	///////////////////////////////////////////////////////////////////////////
 
+	private long start = -1;
+	
 	private void initTestingWidgets() {
 		
 		Button listBtn = (Button) findViewById(R.id.buttonMainXmlSign);
@@ -184,6 +189,7 @@ public class MainActivity extends Activity {
 				idsToSign.add("Board001");
 				i.putStringArrayListExtra(Sign.Params.IDS_TO_SIGN, idsToSign);
 
+				start = new Date().getTime();
 				startActivityForResult(i, SIGN);
 			}
 		});
@@ -249,6 +255,9 @@ public class MainActivity extends Activity {
 			boolean success = intent.getBooleanExtra(Sign.Params.SUCCESS, false);
 			int sid = intent.getIntExtra(Sign.Params.SESSION_ID, -1);
 
+			long time = new Date().getTime() - start;
+			Log.i(TAG, "Signature finished, time elapsed: " + time + " ms");
+			
 			if (success && sid == MainActivity.this.sessionId) {
 				Log.d(TAG, "Received broadcast about finished signing operation.");
 				try {
@@ -273,6 +282,11 @@ public class MainActivity extends Activity {
 			else {
 				Log.w(TAG, "Success = " + success + ", session ID = " + sid +
 						", expecting session ID " + MainActivity.this.sessionId);
+			}
+			String record = String.valueOf(time) + "," + success + "\n";
+			try {
+				new Storage(MainActivity.this).writeToExternalStorage("DigSig Test.csv", record.getBytes("UTF-8"), true);
+			} catch (UnsupportedEncodingException e) {
 			}
 		}
 	}

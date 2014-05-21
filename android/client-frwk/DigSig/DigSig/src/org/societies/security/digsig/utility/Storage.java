@@ -24,15 +24,19 @@
  */
 package org.societies.security.digsig.utility;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.societies.security.digsig.sign.DigSigException;
 
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.net.Uri;
+import android.os.Environment;
 import android.util.Log;
 
 /**
@@ -95,6 +99,26 @@ public class Storage {
 			throw new DigSigException(e);
 		} catch (IOException e) {
 			throw new DigSigException(e);
+		}
+	}
+	
+	public boolean writeToExternalStorage(String fileName, byte[] file, boolean append) {
+		try {
+			InputStream is = new ByteArrayInputStream(file);
+			Log.d(TAG, "External storage state = " + Environment.getExternalStorageState());
+			FileOutputStream os = new FileOutputStream(
+					Environment.getExternalStorageDirectory().getPath() + "/" + fileName, append);
+			int numRead;
+			byte[] buf = new byte[1024];
+			while ( (numRead = is.read(buf) ) >= 0) {
+				os.write(buf, 0, numRead);
+			}
+			os.close();
+			is.close();
+			return true;
+		} catch(Exception e) {
+			Log.w(TAG, e);
+			return false;
 		}
 	}
 }
