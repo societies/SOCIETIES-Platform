@@ -51,9 +51,13 @@ import android.os.RemoteException;
 import android.util.Log;
 
 /**
- * Service to be used by other processes (other apps).
+ * Service to be used by other processes (other apps) to:
+ * <br>
+ * - Get upload and download URIs.<br>
+ * - Verify signatures (not yet implemented)<br>
+ * - Get certificates (not yet implemented)<br>
  *
- * @author mitjav
+ * @author Mitja Vardjan
  *
  */
 public class SignServiceRemote extends Service {

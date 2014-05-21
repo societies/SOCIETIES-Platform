@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
+import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.apiinternal.Community;
 import org.societies.security.digsig.sign.MainActivity;
@@ -178,7 +179,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
 		Bundle data = new Bundle();
 		Results.resourceName = "Android JUnit test " + new Random().nextInt();
-		data.putString(Verify.Params.DOC_TITLE, Results.resourceName);
+		data.putString(Sign.Params.DOC_TITLE, Results.resourceName);
 		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://192.168.1.92/societies/community-signature/notify");
 		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2);
 		msg.setData(data);
