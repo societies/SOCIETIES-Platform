@@ -425,7 +425,8 @@ public class MainActivity extends Activity {
 		// Create and send a message to the service, using a supported 'what' value
 		Message msg = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
 		Bundle data = new Bundle();
-		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://192.168.1.92/societies/community-signature/notify");
+//		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://localhost/societies/community-signature/notify");
+		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "foo");
 		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2);
 		msg.setData(data);
 		msg.replyTo = mMessenger;

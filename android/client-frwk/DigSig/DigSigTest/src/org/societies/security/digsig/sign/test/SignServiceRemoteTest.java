@@ -181,7 +181,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		Results.resourceName = "Android JUnit test " + new Random().nextInt();
 		data.putString(Sign.Params.DOC_TITLE, Results.resourceName);
 		data.putString(Verify.Params.NOTIFICATION_ENDPOINT, "http://192.168.1.92/societies/community-signature/notify");
-		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2);
+		data.putInt(Verify.Params.NUM_SIGNERS_THRESHOLD, 2000);
 		msg.setData(data);
 		msg.replyTo = mMessenger;
 		try {
