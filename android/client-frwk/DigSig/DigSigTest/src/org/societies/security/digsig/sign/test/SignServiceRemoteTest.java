@@ -27,10 +27,12 @@ package org.societies.security.digsig.sign.test;
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
+import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.apiinternal.Community;
@@ -50,6 +52,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.suitebuilder.annotation.MediumTest;
 import android.util.Log;
 
 /**
@@ -115,6 +118,9 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 			case Verify.Methods.VERIFY:
 				Results.methodVerifyCalled = true;
 				assertTrue(msg.getData().getBoolean(Verify.Params.SUCCESS));
+				ArrayList<SigResult> results = msg.getData().getParcelableArrayList(Verify.Params.RESULT);
+				assertNotNull(results);
+				assertEquals(1, results.size());
 				Log.i(TAG, "VERIFY completed successfully");
 				break;
 			default:
@@ -143,6 +149,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		assertNotNull(mActivity);
 	}
 
+	@MediumTest
 	public void testSignServiceRemote() throws Exception {
 
 		Log.i(TAG, "testSignServiceRemote");
