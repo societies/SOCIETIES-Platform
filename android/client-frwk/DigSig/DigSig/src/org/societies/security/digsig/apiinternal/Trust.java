@@ -1,5 +1,7 @@
 package org.societies.security.digsig.apiinternal;
 
+import org.societies.security.digsig.api.Verify;
+
 import android.content.Intent;
 
 /**
@@ -18,6 +20,11 @@ public class Trust {
 		public static final String PASSWORD = "PASSWORD";
 		public static final String PKCS12 = "PKCS12";
 		public static final String EXTENSIONS = "EXTENSIONS";
+		
+		/**
+		 * Please use {@link Verify.Params#RESULT} instead.
+		 */
+		@Deprecated
 		public static final String RESULT = "RESULT";
 	}
 }

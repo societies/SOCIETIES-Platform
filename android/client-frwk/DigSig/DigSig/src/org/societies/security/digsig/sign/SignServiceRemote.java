@@ -24,13 +24,26 @@
  */
 package org.societies.security.digsig.sign;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.net.URLEncoder;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.xml.security.Init;
+import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.signature.XMLSignature;
+import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.apiinternal.RestServer;
@@ -39,9 +52,13 @@ import org.societies.security.digsig.trust.SecureStorage;
 import org.societies.security.digsig.utility.KeyUtil;
 import org.societies.security.digsig.utility.RandomString;
 import org.societies.security.digsig.utility.StringUtil;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import android.app.Service;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -68,6 +85,8 @@ public class SignServiceRemote extends Service {
 	public static final String ENCODING = "UTF8";
 
 	private SecureStorage secureStorage;
+
+	private DocumentBuilder db;
 
 	/**
 	 * Target we publish for clients to send messages to IncomingHandler.
@@ -105,15 +124,28 @@ public class SignServiceRemote extends Service {
 				Log.w(TAG, "handleMessage: Could not initialize", e);
 			}
 
+			Message reply;
+			
 			switch (msg.what) {
 			case Verify.Methods.GET_CERTIFICATE:
 				mService.get().getCertificate(0);  // FIXME
 				break;
 			case Verify.Methods.VERIFY:
-				mService.get().verify();
+				reply = Message.obtain(null, Verify.Methods.VERIFY, 0, 0);
+				reply.setData(mService.get().verify(msg.getData()));
+				if (msg.replyTo != null) {
+					try {
+						msg.replyTo.send(reply);
+					} catch (RemoteException e) {
+						Log.i(TAG, "handleMessage: sending return message", e);
+					}
+				}
+				else {
+					Log.w(TAG, "replyTo is null, cannot return the generated URI.");
+				}
 				break;
 			case Verify.Methods.GENERATE_URIS:
-				Message reply = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
+				reply = Message.obtain(null, Verify.Methods.GENERATE_URIS, 0, 0);
 				reply.setData(mService.get().generateUris(msg.getData()));
 				if (msg.replyTo != null) {
 					try {
@@ -138,9 +170,121 @@ public class SignServiceRemote extends Service {
 		secureStorage.getCertificate(index);
 	}
 
-	private void verify() {
-		Log.w(TAG, "verify: Not yet implemented");
-		// TODO
+	private void initXmlSecurityIfNecessary() throws ParserConfigurationException {
+
+		if (!Init.isInitialized()) {
+			Init.init();
+		}
+
+		if (db == null) {
+			DocumentBuilderFactory dbf;
+			dbf = DocumentBuilderFactory.newInstance();
+			dbf.setNamespaceAware(true);
+			db = dbf.newDocumentBuilder();
+		}
+	}
+
+	private Bundle verify(Bundle data) {
+
+		try {
+			initXmlSecurityIfNecessary();
+		} catch (ParserConfigurationException e) {
+			Log.w(TAG, "verify: failed", e);
+		}
+
+		String uriStr = data.getString(Verify.Params.DOC_TO_VERIFY_URI);
+		Uri uri = Uri.parse(uriStr);
+
+		if (uri == null) {
+			Log.w(TAG, "No document to verify");
+			return null;
+		}
+
+		InputStream is;
+		try {
+			is = getContentResolver().openInputStream(uri);
+			return doCheckSignature(is);
+		} catch (FileNotFoundException e) {
+			Log.w(TAG, "File " + uriStr + " not found", e);
+			return null;
+		}
+	}
+
+	private Bundle doCheckSignature(InputStream is) {
+		
+		Bundle bundle = new Bundle();
+		LinkedList<Element> signatures = null;
+		ArrayList<SigResult> results;
+		List<X509Certificate> certs;
+		
+		try {
+			Document doc = db.parse(is);
+
+			signatures = new LinkedList<Element>();
+			NodeList nl = doc.getElementsByTagNameNS("http://www.w3.org/2000/09/xmldsig#", "Signature");
+
+			Log.i(TAG, String.format("Retrieved %d signatures from the document...", nl.getLength()));
+
+			results = new ArrayList<SigResult>(nl.getLength());   
+			certs = new ArrayList<X509Certificate>(nl.getLength());
+			for (int i = 0; i < nl.getLength(); i++) {
+				signatures.add((Element) nl.item(i));
+
+				SigResult result = new SigResult(); // populate with unknown results
+
+				result.setCert(new byte[0]);
+				result.setSigStatus(-1);
+				result.setTrustStatus(-1);
+
+				results.add(result);
+				certs.add(null);
+			}
+		} catch (Exception e) {
+			Log.e(TAG, "Failed while parsing XML and extracting signatures.", e);
+
+			bundle.putBoolean(Verify.Params.SUCCESS, false);
+			return bundle;
+		}
+
+		int resultNum = 0;
+
+		for ( Element sig : signatures ) {
+			XMLSignature xmlSignature = null;
+			SigResult result = results.get(resultNum++);
+
+			try {
+				xmlSignature = new XMLSignature(sig, null);
+
+				X509Certificate sigCertificate = null;
+				KeyInfo keyInfo = xmlSignature.getKeyInfo();
+				if (keyInfo != null) sigCertificate = keyInfo.getX509Certificate();
+
+				if (sigCertificate == null) {
+					continue; // error
+				}
+
+				// Cache the certificate for the signature
+				certs.set(resultNum-1, sigCertificate);
+
+				boolean valid = xmlSignature.checkSignatureValue(sigCertificate);
+				result.setSigStatus(valid ? 1 : 0);    
+
+			} catch (Exception e) {
+				// just continue, unknown data will be signaled in SigResult
+				Log.e(TAG, String.format("Failed while verifying %d signature.", resultNum), e);
+			}
+		}
+
+		// TODO handle trust checking for certificates
+		// For now only fake it is ok:
+		for (SigResult result : results) {
+			result.setTrustStatus(1);
+		}
+
+		bundle.putParcelableArrayList(Verify.Params.RESULT, results);
+		bundle.putBoolean(Verify.Params.SUCCESS, true);
+		Log.i(TAG, "XML document signature verification completed successfully");
+		return bundle;
 	}
 
 	private Bundle generateUris(Bundle data) {
@@ -158,7 +302,7 @@ public class SignServiceRemote extends Service {
 			bundle.putBoolean(Verify.Params.SUCCESS, false);
 			return bundle;
 		}
-		
+
 		String notificationEndpoint = data.getString(Verify.Params.NOTIFICATION_ENDPOINT);
 		int numSignersThreshold = data.getInt(Verify.Params.NUM_SIGNERS_THRESHOLD, -1);
 		String title = data.getString(Sign.Params.DOC_TITLE);
@@ -232,7 +376,6 @@ public class SignServiceRemote extends Service {
 		Log.d(TAG, "uriForFileUpload(): uri = " + uriStr);
 		return uriStr;
 	}
-
 
 	public String sign(byte[] dataToSign, PrivateKey privateKey) throws DigSigException {
 

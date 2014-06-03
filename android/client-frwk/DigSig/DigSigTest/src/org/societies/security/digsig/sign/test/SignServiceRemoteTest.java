@@ -24,6 +24,7 @@
  */
 package org.societies.security.digsig.sign.test;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.util.Iterator;
@@ -41,7 +42,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -60,6 +63,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 	private static final String TAG = SignServiceRemoteTest.class.getSimpleName();
 
 	private static final int TIME_TO_WAIT = 3000;
+	private static final String fileName = Environment.getExternalStorageDirectory().getPath() + "/test-verify.xml";
 
 	private static Activity mActivity;
 
@@ -77,6 +81,8 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 	private static class Results {
 		public static boolean methodGenerateUrisCalled = false;
 		public static String resourceName;
+
+		public static boolean methodVerifyCalled = false;
 	}
 
 	/**
@@ -105,6 +111,11 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 				}
 				assertTrue(preferenceExists(Results.resourceName));
 				Log.i(TAG, "GENERATE_URIS completed successfully");
+				break;
+			case Verify.Methods.VERIFY:
+				Results.methodVerifyCalled = true;
+				assertTrue(msg.getData().getBoolean(Verify.Params.SUCCESS));
+				Log.i(TAG, "VERIFY completed successfully");
 				break;
 			default:
 				super.handleMessage(msg);
@@ -142,6 +153,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		Thread.sleep(TIME_TO_WAIT);
 		assertTrue(mBound);
 		assertTrue(Results.methodGenerateUrisCalled);
+		assertTrue(Results.methodVerifyCalled);
 	}
 
 	/**
@@ -160,6 +172,7 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 			mService = new Messenger(service);
 			mBound = true;
 			generateUris();
+			verifySigs();
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -185,11 +198,29 @@ public class SignServiceRemoteTest extends ActivityInstrumentationTestCase2<Main
 		msg.setData(data);
 		msg.replyTo = mMessenger;
 		try {
-			Log.i(TAG, "Sending message to service");
+			Log.i(TAG, "generateUris: Sending message to service");
 			mService.send(msg);
-			Log.i(TAG, "Message sent to service");
+			Log.i(TAG, "generateUris: Message sent to service");
 		} catch (Exception e) {
 			Log.e(TAG, "generateUris", e);
+		}
+	}
+
+	private void verifySigs() {
+		if (!mBound) return;
+		// Create and send a message to the service, using a supported 'what' value
+		Message msg = Message.obtain(null, Verify.Methods.VERIFY, 0, 0);
+		Bundle data = new Bundle();
+		Uri uri = Uri.fromFile(new File(fileName));
+		data.putString(Verify.Params.DOC_TO_VERIFY_URI, uri.toString());
+		msg.setData(data);
+		msg.replyTo = mMessenger;
+		try {
+			Log.i(TAG, "verifySigs: Sending message to service");
+			mService.send(msg);
+			Log.i(TAG, "verifySigs: Message sent to service");
+		} catch (Exception e) {
+			Log.e(TAG, "verifySigs", e);
 		}
 	}
 

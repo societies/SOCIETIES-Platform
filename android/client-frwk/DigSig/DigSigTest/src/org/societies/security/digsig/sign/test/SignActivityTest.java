@@ -27,7 +27,6 @@ package org.societies.security.digsig.sign.test;
 import java.util.ArrayList;
 
 import org.societies.security.digsig.api.Sign;
-import org.societies.security.digsig.sign.MainActivity;
 import org.societies.security.digsig.sign.R;
 import org.societies.security.digsig.sign.SignActivity;
 import org.societies.security.digsig.utility.RandomString;
@@ -40,7 +39,7 @@ import android.util.Log;
 import android.widget.Button;
 
 /**
- * Android test case for {@link MainActivity}
+ * Android test case for {@link SignActivity}
  *
  * @author Mitja Vardjan
  *
@@ -74,14 +73,12 @@ public class SignActivityTest extends ActivityInstrumentationTestCase2<SignActiv
 	}
 
 	@UiThreadTest
-	public void testSigningDocInIntent() {
+	public void testSigningDocInIntent() throws Exception {
 		
 		Log.i(TAG, "testSigningDocInIntent");
 		
 		byte[] val = null;
-		try {
-			val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
-		} catch (Exception e) {}
+		val = "<xml><miki Id='Miki1'>aadsads</miki></xml>".getBytes("UTF-8");
 						
 		Intent i = new Intent(Sign.ACTION);
 		i.putExtra(Sign.Params.DOC_TO_SIGN, val);

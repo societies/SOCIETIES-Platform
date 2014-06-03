@@ -1,5 +1,7 @@
 package org.societies.security.digsig.api;
 
+import java.util.ArrayList;
+
 import android.app.Service;
 import android.content.Intent;
 
@@ -44,6 +46,17 @@ public class Verify {
 	 */
 	public class Params {
 		
+		/**
+		 * {@link URI} of the XML document that contains signatures to be verified.
+		 */
+		public static final String DOC_TO_VERIFY_URI = "DOC_TO_VERIFY_URI";
+
+		/**
+		 * Result of signature verification.
+		 * Type: {@link ArrayList} of {@link SigResult}
+		 */
+		public static final String RESULT = "RESULT";
+
 		/**
 		 * Endpoint for notifying the uploader about future events, e.g. when the resource is modified.
 		 * Supported protocol is HTTP. On event, a HTTP GET is performed on the given endpoint (HTTP URL).

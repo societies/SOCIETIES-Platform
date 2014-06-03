@@ -52,7 +52,6 @@ public class CommunitySignatureServerMultipleMergeTest extends ActivityInstrumen
 	
 	long start;
 	String contents;
-	Net download;
 	
 	public CommunitySignatureServerMultipleMergeTest() {
 		super(MainActivity.class);
@@ -82,15 +81,25 @@ public class CommunitySignatureServerMultipleMergeTest extends ActivityInstrumen
 		}
 		public void run() {
 			long uploadStart = new Date().getTime() - start;
-//			Log.i(TAG, "Thread " + Thread.currentThread().getName() + ": starting upload after " + 
+//			Log.d(TAG, "Thread " + Thread.currentThread().getName() + ": starting upload after " + 
 //					uploadStart + " ms");
 
-			assertTrue(download.put(contents));
-			long finish = new Date().getTime() - start;
-//			Log.i(TAG, "Thread " + Thread.currentThread().getName() + ": uploaded successfully, time = " +
-//					finish + " ms");
-			Log.i(TAG, "Thread " + Thread.currentThread().getName() + ": started, finished uploading at: " +
-					uploadStart + ", " + finish);
+			assertNotNull(contents);
+			String contentsCopy = new String(contents);
+			Net download;
+			try {
+				download = new Net(new URI(CommunitySignatureServerUploadTest.downloadUri));
+				download.getString();
+				assertTrue(download.put(contentsCopy));
+				long finish = new Date().getTime() - start;
+//				Log.d(TAG, "Thread " + Thread.currentThread().getName() + ": uploaded successfully, time = " +
+//						finish + " ms");
+				Log.i(TAG, "Thread " + Thread.currentThread().getName() + ": started, finished uploading at: " +
+						uploadStart + ", " + finish);
+			} catch (Exception e) {
+				Log.e(TAG, "Thread " + Thread.currentThread().getName(), e);
+				fail();
+			}
 		}
 	}
 	
@@ -100,7 +109,6 @@ public class CommunitySignatureServerMultipleMergeTest extends ActivityInstrumen
 		Log.i(TAG, "testInitialDocumentUpload");
 
 		Net source = new Net(new URI(signedDocUri));
-		download = new Net(new URI(CommunitySignatureServerUploadTest.downloadUri));
 
 		contents = source.getString();
 		assertTrue(contents.length() > 0);
