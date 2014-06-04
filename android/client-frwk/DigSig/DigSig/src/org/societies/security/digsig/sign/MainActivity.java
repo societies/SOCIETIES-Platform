@@ -27,14 +27,12 @@ package org.societies.security.digsig.sign;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Date;
 
 import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
-import org.societies.security.digsig.apiinternal.Trust;
 import org.societies.security.digsig.community.CommunitySigStatusActivity;
 import org.societies.security.digsig.utility.Storage;
 import org.societies.security.digsig.utility.StreamUtil;
@@ -284,10 +282,7 @@ public class MainActivity extends Activity {
 						", expecting session ID " + MainActivity.this.sessionId);
 			}
 			String record = String.valueOf(time) + "," + success + "\n";
-			try {
-				new Storage(MainActivity.this).writeToExternalStorage("DigSig Test.csv", record.getBytes("UTF-8"), true);
-			} catch (UnsupportedEncodingException e) {
-			}
+			new Storage(MainActivity.this).writeToExternalStorage("DigSig Test.csv", record, true);
 		}
 	}
 
@@ -304,7 +299,7 @@ public class MainActivity extends Activity {
 		else if (requestCode == VERIFY) {
 			if (resultCode == RESULT_OK) {
 				// get data
-				ArrayList<SigResult> sigResults = data.getParcelableArrayListExtra(Trust.Params.RESULT);
+				ArrayList<SigResult> sigResults = data.getParcelableArrayListExtra(Verify.Params.RESULT);
 
 				boolean allOk = true;
 
