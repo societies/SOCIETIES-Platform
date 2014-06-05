@@ -98,7 +98,7 @@ public class SignServiceRemoteSpeedTest extends ActivityInstrumentationTestCase2
 				new Storage(mActivity).writeToExternalStorage("DigSig speed test.csv", record, true);
 				ArrayList<SigResult> results = msg.getData().getParcelableArrayList(Verify.Params.RESULT);
 				assertNotNull(results);
-				assertEquals(1, results.size());
+				assertTrue(results.size() >= 1);
 				Log.i(TAG, "VERIFY completed successfully");
 				Results.methodVerifyCalled = true;
 				break;
