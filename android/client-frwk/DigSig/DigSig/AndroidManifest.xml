@@ -45,15 +45,6 @@
                 </action>
             </intent-filter>
         </activity>
-        <activity android:name="org.societies.security.digsig.sign.VerifyActivity" >
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" >
-                </category>
-
-                <action android:name="org.societies.security.digsig.action.Verify" >
-                </action>
-            </intent-filter>
-        </activity>
         <activity android:name="org.societies.security.digsig.sign.InstallIdentityActivity" >
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" >
