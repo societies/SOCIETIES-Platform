@@ -24,18 +24,15 @@
  */
 package org.societies.security.digsig.sign;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.societies.security.digsig.api.SigResult;
 import org.societies.security.digsig.api.Sign;
 import org.societies.security.digsig.api.Verify;
 import org.societies.security.digsig.community.CommunitySigStatusActivity;
 import org.societies.security.digsig.utility.Storage;
-import org.societies.security.digsig.utility.StreamUtil;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -71,7 +68,6 @@ public class MainActivity extends Activity {
 	protected static final boolean testMode = true;
 	
 	private final static int SIGN = 1;
-	private final static int VERIFY = 2;
 
 	private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -206,23 +202,6 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		Button verifyBtn = (Button) findViewById(R.id.buttonMainVerify);
-		verifyBtn.setOnClickListener(new View.OnClickListener() {			
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(MainActivity.this, VerifyActivity.class);
-
-				ByteArrayOutputStream os = new ByteArrayOutputStream();				
-				InputStream is = getResources().openRawResource(R.raw.sample);
-
-				StreamUtil.copyStream(is, os);
-
-				i.putExtra(Sign.Params.DOC_TO_SIGN, os.toByteArray());
-
-				startActivityForResult(i, VERIFY);
-			}
-		});
-
 		CheckBox showTestingOptions = (CheckBox) findViewById(R.id.checkBoxMainShowTestingOptions);
 		showTestingOptions.setVisibility(View.VISIBLE);
 		showTestingOptions.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -238,7 +217,6 @@ public class MainActivity extends Activity {
 	private void showTestButtons(boolean show) {
 		int visibility = show ? View.VISIBLE : View.INVISIBLE;
 		findViewById(R.id.buttonMainSign).setVisibility(visibility);
-		findViewById(R.id.buttonMainVerify).setVisibility(visibility);
 		findViewById(R.id.buttonMainXmlSign).setVisibility(visibility);
 		findViewById(R.id.buttonMainXmlSignUrl).setVisibility(visibility);
 		findViewById(R.id.textViewMainSignUrl).setVisibility(visibility);
@@ -295,42 +273,6 @@ public class MainActivity extends Activity {
 			signedUrl = data.getStringExtra(Sign.Params.SIGNED_DOC_URL);
 			sessionId = data.getIntExtra(Sign.Params.SESSION_ID, -1);
 			Log.d(TAG, "URL of the signed XML: " + signedUrl);
-		}
-		else if (requestCode == VERIFY) {
-			if (resultCode == RESULT_OK) {
-				// get data
-				ArrayList<SigResult> sigResults = data.getParcelableArrayListExtra(Verify.Params.RESULT);
-
-				boolean allOk = true;
-
-				for (int i=0;i<sigResults.size();i++) {
-					SigResult result = sigResults.get(i);
-					if (result.getSigStatus()==0) {
-						Toast.makeText(this, String.format("Signature %d is invalid !", i+1), Toast.LENGTH_LONG).show();
-						allOk=false;
-						break;
-					} else if (result.getSigStatus()==-1) {
-						Toast.makeText(this, String.format("Error while verifying signatrue number %d !", i+1), Toast.LENGTH_LONG).show();
-						allOk=false;
-						break;
-					}
-
-					if (result.getTrustStatus()==0) {
-						Toast.makeText(this, String.format("Trust status on signature number %d is invalid !", i+1), Toast.LENGTH_LONG).show();
-						allOk=false;
-						break;
-					} else if (result.getTrustStatus()==-1) {
-						Toast.makeText(this, String.format("Error while verifying trust status on signatrue number %d !", i+1), Toast.LENGTH_LONG).show();
-						allOk=false;
-						break;
-					}					
-				}
-
-				if (allOk) 
-					Toast.makeText(this, String.format("Successfully verified %d signatures in the file.", sigResults.size()), Toast.LENGTH_LONG).show();
-			} else {
-				Toast.makeText(this, "Error while verifying file. Is the XML valid ?", Toast.LENGTH_LONG).show();
-			}
 		}
 	}
 

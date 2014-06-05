@@ -13,7 +13,6 @@
     <string name="testXmlSigning">Test XML Signing (doc in intent)</string>
     <string name="testXmlSigningUrl">Test XML Signing (doc url)</string>
     <string name="testDefaultUrlLabel">URL of the ducument to sign:</string>
-    <string name="testVerification">Test Verification</string>
     <string name="isRequestingToSign">is requesting to sign a document. Allow?</string>
     <string name="unknownApp">Unknown app</string>
     <string name="title_activity_community_sig_status">CommunitySigStatusActivity</string>
